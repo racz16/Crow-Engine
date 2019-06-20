@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+</head>
+
+<body>
+    <div id="container">
+        <canvas id="canvas" width="100vw" height="1000vh">
+            Canvas is not supported in your browser.
+        </canvas>
+        <div id="overlay">
+            <div>FPS: <span id="fps"></span></div>
+            <div>
+                <span>Sound </span>
+                <i id="unmute" class="fas fa-volume-mute"></i>
+                <i id="mute" class="fas fa-volume-up"></i>
+            </div>
+            <div>
+                <span>Fullscreen </span>
+                <i id="expand" class="fas fa-compress"></i>
+                <i id="compress" class="fas fa-expand"></i>
+            </div>
+            <div>
+                <span>GPU vendor: </span>
+                <span id="vendor"></span>
+            </div>
+            <div>
+                <span>GPU renderer: </span>
+                <span id="renderer"></span>
+            </div>
+            <!--<div>
+                Rendered triangles: 100000
+            </div>-->
+        </div>
+    </div>
+    <script src="out/engine.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        .container {
+            position: relative;
+        }
+
+        #mute {
+            display: none;
+        }
+
+        #expand {
+            display: none;
+        }
+
+        #overlay {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-family: monospace;
+            padding: 1em;
+        }
+    </style>
+</body>
+
+</html>

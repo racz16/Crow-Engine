@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "none",
+        "target": "es2018",
+        "outDir": "out/classes",
+        //"declaration": true,
+    },
+    "exclude": [
+        "node_modules",
+        "*.js"
+    ],
+    "include": [
+        "./src/**/*"
+    ],
+    "compileOnSave": true,
+}

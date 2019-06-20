@@ -1,0 +1,68 @@
+import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
+import { vec3 } from "gl-matrix";
+import { Ubo } from "../../../webgl/buffer/Ubo";
+import { BlinnPhongLightContainer } from "./BlinnPhongLightContainer";
+import { GameObject } from "../../../core/GameObject";
+import { Scene } from "../../../core/Scene";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+
+export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponent {
+
+    private static readonly DIRECTIONAL_LIGHT_TYPE = 0;
+
+    public setDiffuseColor(diffuse: vec3): void {
+        super.setDiffuseColor(diffuse);
+        this.invalidate();
+    }
+
+    public setSpecularColor(specular: vec3): void {
+        super.setSpecularColor(specular);
+        this.invalidate();
+    }
+
+    public setAmbientColor(ambient: vec3): void {
+        super.setAmbientColor(ambient);
+        this.invalidate();
+    }
+
+    public setActive(active: boolean): void {
+        super.setActive(active);
+        this.invalidate();
+    }
+
+    public private_attachToGameObject(object: GameObject): void {
+        super.private_attachToGameObject(object);
+        this.invalidate();
+    }
+
+    public private_detachFromGameObject(): void {
+        super.private_detachFromGameObject();
+        this.invalidate();
+    }
+
+    public invalidate(): void {
+        super.invalidate();
+        if (this.isTheMainDirectionalLight()) {
+            if (BlinnPhongLightContainer.getInstance().getDirectionalLight() !== this) {
+                BlinnPhongLightContainer.getInstance().setDirectionalLight(this);
+            } else {
+                BlinnPhongLightContainer.getInstance().refreshDirectionalLight();
+            }
+
+        }
+    }
+
+    public private_refresh(ubo: Ubo) {
+        ubo.storewithOffset(new Float32Array(this.getAmbientColor()), BlinnPhongLightComponent.AMBIENT_OFFSET);
+        ubo.storewithOffset(new Float32Array(this.getDiffuseColor()), BlinnPhongLightComponent.DIFFUSE_OFFSET);
+        ubo.storewithOffset(new Float32Array(this.getSpecularColor()), BlinnPhongLightComponent.SPECULAR_OFFSET);
+        ubo.storewithOffset(new Float32Array(this.getGameObject().getTransform().getForwardVector()), BlinnPhongLightComponent.DIRECTION_OFFSET);
+        ubo.storewithOffset(new Int32Array([BlinnPhongDirectionalLightComponent.DIRECTIONAL_LIGHT_TYPE]), BlinnPhongLightComponent.TYPE_OFFSET);
+        ubo.storewithOffset(new Int32Array([this.isActive() ? 1 : 0]), BlinnPhongLightComponent.ACTIVE_OFFSET);
+    }
+
+    public isTheMainDirectionalLight(): boolean {
+        return this === Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
+    }
+
+}
