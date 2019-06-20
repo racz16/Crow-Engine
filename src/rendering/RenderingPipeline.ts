@@ -15,6 +15,7 @@ import { Rbo } from "../webgl/fbo/Rbo";
 import { InternalFormat } from "../webgl/enum/InternalFormat";
 import { ScreenRenderer } from "./ScreenRenderer";
 import { Parameter } from "../utility/parameter/Parameter";
+import { Log } from "../utility/log/Log";
 
 export class RenderingPipeline {
 
@@ -109,6 +110,7 @@ export class RenderingPipeline {
     }
 
     public static render(): void {
+        Log.lifeCycleInfo('rendering started');
         this.beforeRender();
         Gl.setEnableDepthTest(true);
         //prepare
@@ -121,6 +123,7 @@ export class RenderingPipeline {
         //Gl.clear(true, true, false);
         //this.screenRenderer.render();
         //this.getParameters().set(this.WORK, null);
+        Log.lifeCycleInfo('rendering finished');
     }
 
     private static beforeRender(): void {
@@ -140,10 +143,10 @@ export class RenderingPipeline {
         if (canvas.clientWidth !== canvas.width || canvas.clientHeight !== canvas.height) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
-        }
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        if (camera) {
-            camera.invalidate();
+            const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+            if (camera) {
+                camera.invalidate();
+            }
         }
     }
 }

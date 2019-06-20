@@ -1,13 +1,16 @@
 import { GameObject } from "./GameObject";
+import { Log } from "../utility/log/Log";
 
 export class GameObjectContainer {
 
     private gameObjects = new Array<GameObject>();
 
     public private_updateComponents(): void {
+        Log.lifeCycleInfo('updading components started');
         for (const gameObject of this.gameObjects) {
             gameObject.private_update();
         }
+        Log.lifeCycleInfo('updading components finished');
     }
 
     public private_addGameObject(gameObject: GameObject): void {

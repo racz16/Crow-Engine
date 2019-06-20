@@ -6,6 +6,7 @@ import { Scene } from "../../../core/Scene";
 import { vec3 } from "gl-matrix";
 import { ICamera } from "../../camera/ICamera";
 import { Utility } from "../../../utility/Utility";
+import { Log } from "../../../utility/log/Log";
 
 export class BlinnPhongLightContainer {
 
@@ -24,6 +25,7 @@ export class BlinnPhongLightContainer {
         this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
         this.ubo.bindToBindingPoint(2);
         this.positionalLights = [];
+        Log.resourceInfo('Lights ubo created');
     }
 
     public static getInstance(): BlinnPhongLightContainer {
@@ -56,6 +58,7 @@ export class BlinnPhongLightContainer {
         for (let i = addedLightCount; i < BlinnPhongLightContainer.LIGHT_COUNT; i++) {
             this.ubo.storewithOffset(new Int32Array([0]), (i + 1) * BlinnPhongLightContainer.LIGHT_DATASIZE + BlinnPhongLightContainer.ACTIVE_OFFSET);
         }
+        Log.resourceInfo('Lights ubo refreshed');
     }
 
     private sortPositionalLights(): void {

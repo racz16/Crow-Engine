@@ -10,6 +10,7 @@ import { Gl } from "../../webgl/Gl";
 import { IRenderable } from "../../resource/IRenderable";
 import { BlinnPhongLightContainer } from "../../component/light/blinnphong/BlinnPhongLightContainer";
 import { vec2 } from "gl-matrix";
+import { Log } from "../../utility/log/Log";
 
 export class BlinnPhongRenderer extends Renderer {
 
@@ -22,6 +23,7 @@ export class BlinnPhongRenderer extends Renderer {
     }
 
     public render(): void {
+        Log.renderingInfo('Blinn-Phong renderer started');
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
@@ -31,6 +33,7 @@ export class BlinnPhongRenderer extends Renderer {
             }
         }
         Gl.setEnableCullFace(true);
+        Log.renderingInfo('Blinn-Phong renderer finished');
     }
 
     private beforeDrawShader(): void {

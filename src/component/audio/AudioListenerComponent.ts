@@ -2,6 +2,7 @@ import { Component } from "../../core/Component";
 import { GameObject } from "../../core/GameObject";
 import { Scene } from "../../core/Scene";
 import { Audio } from "../../resource/Audio";
+import { Log } from "../../utility/log/Log";
 
 export class AudioListenerComponent extends Component {
     private invalid: boolean;
@@ -13,6 +14,7 @@ export class AudioListenerComponent extends Component {
             const up = this.getGameObject().getTransform().getUpVector();
             Audio.setAudioListener(position, forward, up);
             this.invalid = false;
+            //Log.info('audio listener refreshed');
         }
     }
 

@@ -24,6 +24,8 @@ import { ICubeMapTexture } from "./resource/texture/ICubeMapTexture";
 import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
+import { Log } from "./utility/log/Log";
+import { LogType } from "./utility/log/LogType";
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -38,7 +40,6 @@ window.onload = () => {
     tsb.createDragon();
     tsb.createBezierSpline();
     tsb.createAudioSource();
-
     /*
         const rc = new RotateComponent();
         mgo.getComponents().add(rc);
@@ -87,6 +88,8 @@ export class TestSceneBuilder {
     public initialize(): void {
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
         Engine.initialize(canvas);
+
+        //Log.setInfoLog(LogType.LIFE_CYCLE, true);
     }
 
     public loadResources(): void {
@@ -114,9 +117,9 @@ export class TestSceneBuilder {
         go.getComponents().add(pc);
 
         //audio listener
-        //const alc = new AudioListenerComponent();
-        //go.getComponents().add(alc);
-        //Scene.getParameters().set(Scene.MAIN_AUDIO_LISTENER, new ComponentParameter(alc));
+        const alc = new AudioListenerComponent();
+        go.getComponents().add(alc);
+        Scene.getParameters().set(Scene.MAIN_AUDIO_LISTENER, new ComponentParameter(alc));
 
         //directional light
         const dlgo = new GameObject();
@@ -219,11 +222,11 @@ export class TestSceneBuilder {
     }
 
     public createAudioSource(): void {
-        //const go = new GameObject();
+        const go = new GameObject();
 
-        //const as = new AudioSourceComponent(this.musicPath);
-        //go.getComponents().add(as);
-        //as.start();
+        const as = new AudioSourceComponent(this.musicPath);
+        go.getComponents().add(as);
+        as.start();
     }
 
 }

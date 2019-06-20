@@ -6,6 +6,7 @@ import { Scene } from "../../core/Scene";
 import { BufferObjectUsage } from "../../webgl/enum/BufferObjectUsage";
 import { Utility } from "../../utility/Utility";
 import { GameObject } from "../../core/GameObject";
+import { Log } from "../../utility/log/Log";
 
 export class CameraComponent extends Component implements ICamera {
 
@@ -54,6 +55,7 @@ export class CameraComponent extends Component implements ICamera {
         CameraComponent.ubo.storewithOffset(new Float32Array(CameraComponent.camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
         CameraComponent.ubo.storewithOffset(new Float32Array(CameraComponent.camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         CameraComponent.camera = null;
+        Log.resourceInfo('matrices ubo refreshed');
     }
 
     public static makeCameraUboUsable(): void {
@@ -65,6 +67,7 @@ export class CameraComponent extends Component implements ICamera {
         CameraComponent.ubo = new Ubo();
         CameraComponent.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
         CameraComponent.ubo.bindToBindingPoint(Scene.CAMERA_BINDING_POINT);
+        Log.resourceInfo('matrices ubo created');
     }
 
     public static releaseCameraUbo(): void {
@@ -72,6 +75,7 @@ export class CameraComponent extends Component implements ICamera {
         if (CameraComponent.isCameraUboUsable()) {
             CameraComponent.ubo.release();
             CameraComponent.ubo = null;
+            Log.resourceInfo('matrices ubo released');
         }
     }
 
