@@ -3,10 +3,11 @@ import { Component } from "../../core/Component";
 import { GameObject } from "../../core/GameObject";
 import { RenderingPipeline } from "../../rendering/RenderingPipeline";
 import { Material } from "../../material/Material";
+import { RenderableBoundingShape } from "./RenderableBoundingShape";
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component {
 
-    //private final RenderableBoundingShape boundingShape;
+    private readonly boundingShape: RenderableBoundingShape;
     private renderable: T;
     private material: Material;
     private renderableActive = true;
@@ -19,8 +20,8 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         super();
         this.setRenderable(renderable);
         this.setMaterial(material);
-        //this.boundingShape = new RenderableBoundingShape(this);
-        //this.addInvalidatable(boundingShape);
+        this.boundingShape = new RenderableBoundingShape(this);
+        this.addInvalidatable(this.boundingShape);
     }
 
     public getRenderable(): T {
@@ -32,7 +33,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
             throw new Error();
         }
         this.renderable = renderable;
-        //this.invalidate();
+        this.invalidate();
     }
 
     public getMaterial(): Material {
@@ -46,9 +47,9 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.material = material;
     }
 
-    /*public RenderableBoundingShape getBoundingShape() {
-        return boundingShape;
-    }*/
+    public getBoundingShape(): RenderableBoundingShape {
+        return this.boundingShape;
+    }
 
     public isReflectable(): boolean {
         return this.reflectable;
