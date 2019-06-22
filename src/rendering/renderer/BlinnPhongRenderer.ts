@@ -27,13 +27,17 @@ export class BlinnPhongRenderer extends Renderer {
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
-            if (renderableComponent.isActive() && renderableComponent.isRenderableActive()) {
+            if (renderableComponent.isActive() && renderableComponent.isRenderableActive() && this.isInsideFrustum(renderableComponent)) {
                 this.beforeDrawInstance(renderableComponent);
                 renderableComponent.draw();
             }
         }
         Gl.setEnableCullFace(true);
         Log.renderingInfo('Blinn-Phong renderer finished');
+    }
+
+    private isInsideFrustum(renderableComponent: RenderableComponent<IRenderable>): boolean {
+        return renderableComponent.getBoundingShape().isInsideMainCameraFrustum();
     }
 
     private beforeDrawShader(): void {

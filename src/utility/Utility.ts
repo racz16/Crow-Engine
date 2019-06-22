@@ -70,6 +70,16 @@ export class Utility {
         return data[0] >= 0 && data[1] >= 0 && data[2] >= 0;
     }
 
+    public static getMaxCoordinate(vector: vec3): number {
+        let max = Number.NEGATIVE_INFINITY;
+        for (const coordinate of vector) {
+            if (coordinate > max) {
+                max = coordinate;
+            }
+        }
+        return max;
+    }
+
     public static loadResource<T>(path: string, callback: (resource: T) => void, async?: boolean, responseType?: XMLHttpRequestResponseType): void {
         const xhttp = new XMLHttpRequest();
         if (responseType) {

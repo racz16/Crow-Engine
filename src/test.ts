@@ -4,7 +4,7 @@ import { GameObject } from "./core/GameObject";
 import { MeshComponent } from "./component/renderable/MeshComponent";
 import { Material } from "./material/Material";
 import { CameraComponent } from "./component/camera/CameraComponent";
-import { vec3, vec4 } from "gl-matrix";
+import { vec3, vec4, glMatrix } from "gl-matrix";
 import { Scene } from "./core/Scene";
 import { ComponentParameter } from "./utility/parameter/ComponentParameter";
 import { InfoComponent } from "./test/InfoComponent";
@@ -24,8 +24,6 @@ import { ICubeMapTexture } from "./resource/texture/ICubeMapTexture";
 import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
-import { Log } from "./utility/log/Log";
-import { LogType } from "./utility/log/LogType";
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -40,6 +38,7 @@ window.onload = () => {
     tsb.createDragon();
     tsb.createBezierSpline();
     tsb.createAudioSource();
+
     /*
         const rc = new RotateComponent();
         mgo.getComponents().add(rc);
@@ -201,6 +200,9 @@ export class TestSceneBuilder {
 
         const mc = new MeshComponent(this.dragon, new Material());
         go.getComponents().add(mc);
+
+        const rc = new RotateComponent();
+        go.getComponents().add(rc);
     }
 
     public createBezierSpline(): void {

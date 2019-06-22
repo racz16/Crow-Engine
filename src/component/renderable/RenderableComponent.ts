@@ -3,11 +3,12 @@ import { Component } from "../../core/Component";
 import { GameObject } from "../../core/GameObject";
 import { RenderingPipeline } from "../../rendering/RenderingPipeline";
 import { Material } from "../../material/Material";
-import { RenderableBoundingShape } from "./RenderableBoundingShape";
+import { IBoundingShape } from "./boundingshape/IBoundingShape";
+import { SphereBoundingShape } from "./boundingshape/SphereBoundingShape";
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component {
 
-    private readonly boundingShape: RenderableBoundingShape;
+    private boundingShape: IBoundingShape;
     private renderable: T;
     private material: Material;
     private renderableActive = true;
@@ -20,8 +21,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         super();
         this.setRenderable(renderable);
         this.setMaterial(material);
-        this.boundingShape = new RenderableBoundingShape(this);
-        this.addInvalidatable(this.boundingShape);
+        this.setBoundingShape(new SphereBoundingShape());
     }
 
     public getRenderable(): T {
@@ -47,7 +47,18 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.material = material;
     }
 
-    public getBoundingShape(): RenderableBoundingShape {
+    public setBoundingShape(boundingShape: IBoundingShape): void {
+        if (!boundingShape) {
+            throw new Error();
+        }
+        if (this.boundingShape) {
+            this.boundingShape.private_setRenderableComponent(null);
+        }
+        this.boundingShape = boundingShape;
+        this.boundingShape.private_setRenderableComponent(this);
+    }
+
+    public getBoundingShape(): IBoundingShape {
         return this.boundingShape;
     }
 

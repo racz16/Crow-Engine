@@ -1,12 +1,13 @@
 import { Component } from "../../core/Component";
 import { ICamera } from "./ICamera";
 import { Ubo } from "../../webgl/buffer/Ubo";
-import { mat4 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { Scene } from "../../core/Scene";
 import { BufferObjectUsage } from "../../webgl/enum/BufferObjectUsage";
 import { Utility } from "../../utility/Utility";
 import { GameObject } from "../../core/GameObject";
 import { Log } from "../../utility/log/Log";
+import { Frustum } from "./frustum/Frustum";
 
 export class CameraComponent extends Component implements ICamera {
 
@@ -14,13 +15,11 @@ export class CameraComponent extends Component implements ICamera {
     private static camera: CameraComponent;
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
-    //private final HashMap<CornerPoint, Vector3f> cornerPoints = new HashMap<>();
-    //private final Vector3f center = new Vector3f();
+    private frustum: Frustum;
     protected valid: boolean;
     private nearPlaneDistance: number;
     private farPlaneDistance: number;
     private fov: number;
-    //private boolean frustumCulling = true;
     private uboInitialized = false;
 
     public constructor(fov = 45, nearPlane = 0.1, farPlane = 200) {
@@ -32,9 +31,6 @@ export class CameraComponent extends Component implements ICamera {
         this.setFov(fov);
         this.setNearPlaneDistance(nearPlane);
         this.setFarPlaneDistance(farPlane);
-        /*for(CornerPoint cp : CornerPoint.values()){
-            cornerPoints.put(cp, new Vector3f());
-        }*/
     }
 
     public static refreshMatricesUbo(): void {
@@ -55,6 +51,7 @@ export class CameraComponent extends Component implements ICamera {
         CameraComponent.ubo.storewithOffset(new Float32Array(CameraComponent.camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
         CameraComponent.ubo.storewithOffset(new Float32Array(CameraComponent.camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         CameraComponent.camera = null;
+
         Log.resourceInfo('matrices ubo refreshed');
     }
 
@@ -136,9 +133,10 @@ export class CameraComponent extends Component implements ICamera {
 
     protected refresh(): void {
         if (!this.valid) {
+            this.valid = true;
             this.refreshProjectionMatrix();
             this.refreshViewMatrixAndFrustum();
-            this.valid = true;
+
         }
     }
 
@@ -151,8 +149,7 @@ export class CameraComponent extends Component implements ICamera {
             this.viewMatrix = Utility.computeViewMatrix(
                 this.getGameObject().getTransform().getAbsolutePosition(),
                 this.getGameObject().getTransform().getAbsoluteRotation());
-            //frustum.set(new Matrix4f(projectionMatrix).mul(viewMatrix));
-            //refreshFrustumVertices();
+            this.frustum.refresh();
         }
     }
 
@@ -176,6 +173,7 @@ export class CameraComponent extends Component implements ICamera {
 
     public private_detachFromGameObject(): void {
         this.getGameObject().getTransform().removeInvalidatable(this);
+        this.frustum = null;
         super.private_detachFromGameObject();
         this.invalidate();
     }
@@ -183,114 +181,21 @@ export class CameraComponent extends Component implements ICamera {
     public private_attachToGameObject(g: GameObject): void {
         super.private_attachToGameObject(g);
         this.getGameObject().getTransform().addInvalidatable(this);
+        this.frustum = new Frustum(this);
         this.invalidate();
     }
 
-    /*public boolean isFrustumCulling() {
-        return frustumCulling;
-    }
-
-    public void setFrustumCulling(boolean frustumCulling) {
-        this.frustumCulling = frustumCulling;
-    }*/
-
-    /*private void refreshFrustumVertices() {
-        refreshFrustumCornerPoints();
-        refreshFrustumCenterPoint();
-    }
-
-    private void refreshFrustumCornerPoints() {
-        Matrix4f inverseViewProjectionMatrix = computeInverseViewProjectionMatrix();
-        Vector4f vec = new Vector4f();
-        for (CornerPoint cp : CornerPoint.values()) {
-            vec.set(cp.getClipSpacePosition().mul(inverseViewProjectionMatrix));
-            vec.div(vec.w);
-            cornerPoints.get(cp).set(vec.x, vec.y, vec.z);
-        }
-    }
-
-    private void refreshFrustumCenterPoint() {
-        center.set(0, 0, 0);
-        for (CornerPoint cp : CornerPoint.values()) {
-            center.add(cornerPoints.get(cp));
-        }
-        center.div(8);
-    }*/
-
-    /*private computeInverseViewProjectionMatrix(): mat4 {
-        if (projectionMode == ProjectionMode.PERSPECTIVE) {
-        return projectionMatrix.invertPerspectiveView(viewMatrix, new Matrix4f());
-        } else {
-            return projectionMatrix.mulAffine(viewMatrix, new Matrix4f()).invertAffine();
-        }
-    }*/
-
-    /*public boolean isInsideFrustum(@NotNull Vector3f position, float radius) {
-        if (position == null) {
-            throw new NullPointerException();
-        }
-        if (radius < 0) {
-            throw new IllegalArgumentException("Radius can't be negative");
-        }
-        return isInsideFrustumUnsafe(position, radius);
-    }
-
-    private boolean isInsideFrustumUnsafe(@NotNull Vector3f position, float radius) {
-        if (isFrustumCulling() && getGameObject() != null) {
-            refresh();
-            return frustum.testSphere(position, radius);
-        } else {
-            return true;
-        }
-    }
-
-    public boolean isInsideFrustum(@NotNull Vector3f aabbMin, @NotNull Vector3f aabbMax) {
-        if (aabbMin == null || aabbMax == null) {
-            throw new NullPointerException();
-        }
-        return isInsideFrustumUnsafe(aabbMin, aabbMax);
-    }
-
-    private boolean isInsideFrustumUnsafe(@NotNull Vector3f aabbMin, @NotNull Vector3f aabbMax) {
-        if (isFrustumCulling() && getGameObject() != null) {
-            refresh();
-            return frustum.testAab(aabbMin, aabbMax);
-        } else {
-            return true;
-        }
-    }
-
-    public Map<CornerPoint, Vector3f> getFrustumCornerPoints() {
-        Map < CornerPoint, Vector3f > ret = new HashMap<>(8);
-        if (getGameObject() != null) {
-            ret.putAll(cornerPoints);
-        }
-        return ret;
-    }
-
-    public Vector3f getFrustumCornerPoint(@NotNull CornerPoint cornerPoint) {
-        if (cornerPoint == null) {
-            throw new NullPointerException();
-        }
-        return getFrustumCornerPointUnsafe(cornerPoint);
-    }
-
-    private Vector3f getFrustumCornerPointUnsafe(@NotNull CornerPoint cornerPoint) {
-        if (getGameObject() != null) {
-            refresh();
-            return new Vector3f(cornerPoints.get(cornerPoint));
+    public getFrustum(): Frustum {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.frustum;
         } else {
             return null;
         }
     }
 
-    public Vector3f getFrustumCenter() {
-        if (getGameObject() != null) {
-            refresh();
-            return new Vector3f(center);
-        } else {
-            return null;
-        }
-    }*/
+    public isUsable(): boolean {
+        return this.getGameObject() != null;
+    }
 
 }
