@@ -17,7 +17,7 @@ export class Material {
     //private Class<? extends GeometryRenderer> renderer;
 
     /*public constructor(renderer: Class<? extends GeometryRenderer> ){
-        if(renderer == null){
+        if(!renderer){
             throw new Error();
         }
         this.renderer = renderer;

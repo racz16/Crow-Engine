@@ -2,19 +2,14 @@ import { Renderer } from "../Renderer";
 import { mat4, vec2 } from "gl-matrix";
 import { ShadowShader } from "../../resource/shader/ShadowShader";
 import { Fbo } from "../../webgl/fbo/Fbo";
-import { Utility } from "../../utility/Utility";
-import { Scene } from "../../core/Scene";
 import { RenderingPipeline } from "../RenderingPipeline";
 import { Parameter } from "../../utility/parameter/Parameter";
 import { FboAttachmentSlot } from "../../webgl/enum/FboAttachmentSlot";
-import { RenderableContainer } from "../../core/RenderableContainer";
-import { RenderableComponent } from "../../component/renderable/RenderableComponent";
-import { Texture2D } from "../../resource/texture/Texture2D";
-import { IRenderable } from "../../resource/IRenderable";
 import { Gl } from "../../webgl/Gl";
 import { CullFace } from "../../webgl/enum/CullFace";
 import { GlTexture2D } from "../../webgl/texture/GlTexture2D";
 import { InternalFormat } from "../../webgl/enum/InternalFormat";
+import { Utility } from "../../utility/Utility";
 
 export class ShadowRenderer extends Renderer {
 
@@ -85,7 +80,7 @@ export class ShadowRenderer extends Renderer {
             //.getGameObject(), this.getShadowCameraDistance(), this.getShadowCameraNearDistance(), this.getShadowCameraFarDistance()));
             //RenderingPipeline.getParameters()
             //.set(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRIX, new Parameter<mat4>(mat4.from(this.projectionViewMatrix)));
-            if (this.fbo == null || this.fbo.isReleased() || this.getResolution() != this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getAttachment().getSize()[0]) {
+            if (!Utility.isUsable(this.fbo) || this.getResolution() != this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getAttachment().getSize()[0]) {
                 this.releaseFbo();
                 this.generateFbo();
             }
@@ -105,9 +100,9 @@ export class ShadowRenderer extends Renderer {
 
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
-            if (renderableComponent.isActive() && renderableComponent.isRenderableActive() && renderableComponent
+            if (renderableComponent.isActive() && renderableComponent
                 .isCastShadow()) {
-                //beforeDrawMeshInstance(projectionViewMatrix, renderableComponent.getGameObject().getTransform().getModelMatrix());
+                //beforeDrawMeshInstance(projectionViewMatrix, renderableComponent.getModelMatrix());
                 renderableComponent.draw();
                 this.setNumberOfRenderedElements(this.getNumberOfRenderedElements() + 1);
                 this.setNumberOfRenderedFaces(this.getNumberOfRenderedFaces() + renderableComponent.getFaceCount());
@@ -118,7 +113,7 @@ export class ShadowRenderer extends Renderer {
     }
 
     private beforeShader(): void {
-        if (this.shader == null || this.shader.isReleased) {
+        if (!Utility.isUsable(this.shader)) {
             this.shader = new ShadowShader();
         }
         //OpenGl.setViewport(this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getAttachment().getSize(), vec2.create());
@@ -141,7 +136,7 @@ export class ShadowRenderer extends Renderer {
     }
 
     private generateFbo(): void {
-        if (this.fbo == null || this.fbo.isReleased()) {
+        if (!Utility.isUsable(this.fbo)) {
             this.fbo = new Fbo();
             //fbo.bind();
             const depthTexture = new GlTexture2D();
@@ -159,7 +154,7 @@ export class ShadowRenderer extends Renderer {
     }
 
     private releaseFbo(): void {
-        if (this.fbo != null) {
+        if (this.fbo) {
             this.fbo.release();
             this.fbo = null;
         }
@@ -183,8 +178,8 @@ export class ShadowRenderer extends Renderer {
 
     public removeFromRenderingPipeline(): void {
         const shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP).getValue();
-        if (shadowMap != null) {
-            if (!shadowMap.isReleased()) {
+        if (shadowMap) {
+            if (shadowMap.isUsable()) {
                 shadowMap.release();
             }
             RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, null);

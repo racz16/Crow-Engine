@@ -31,7 +31,7 @@ export class Spline implements ISpline {
     protected refresh(): void {
         if (!this.valid) {
             if (this.getRequiredControlPoints() <= this.getNumberOfControlPoints()) {
-                if (Utility.isReleased(this.vao)) {
+                if (!Utility.isUsable(this.vao)) {
                     this.createVao();
                 }
             } else {
@@ -237,17 +237,17 @@ export class Spline implements ISpline {
     //
     //frustum culling-----------------------------------------------------------
     //
-    public getRadius(): number {
+    public getObjectSpaceRadius(): number {
         this.refresh();
         return this.furthestVertexDistance;
     }
 
-    public getAabbMin() {
+    public getObjectSpaceAabbMin() {
         this.refresh();
         return vec3.clone(this.aabbMin);
     }
 
-    public getAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): vec3 {
         this.refresh();
         return vec3.clone(this.aabbMax);
     }
@@ -265,7 +265,7 @@ export class Spline implements ISpline {
     //misc----------------------------------------------------------------------
     //
     public getDataSize(): number {
-        return !Utility.isReleased(this.vao) ? this.vao.getDataSize() : 0;
+        return Utility.isUsable(this.vao) ? this.vao.getDataSize() : 0;
     }
 
     public update(): void {
@@ -273,7 +273,7 @@ export class Spline implements ISpline {
     }
 
     public release(): void {
-        if (!Utility.isReleased(this.vao)) {
+        if (Utility.isUsable(this.vao)) {
             this.vao.release();
             this.vao = null;
             this.valid = false;
@@ -281,8 +281,10 @@ export class Spline implements ISpline {
         }
     }
 
-    public isReleased() {
-        return false;
+    public isUsable() {
+        return true;
     }
+
+    public private_update(): void { }
 
 }

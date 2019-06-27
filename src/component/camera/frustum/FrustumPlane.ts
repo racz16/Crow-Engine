@@ -9,7 +9,7 @@ export class FrustumPlane {
         this.point = point;
     }
 
-    public computeDistanceFromPlane(position: vec3): number {
+    public computeDistanceFrom(position: vec3): number {
         return vec3.dot(this.normalVector, vec3.sub(vec3.create(), position, this.point));
     }
 

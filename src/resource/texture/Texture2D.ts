@@ -46,8 +46,8 @@ export class Texture2D implements ITexture2D {
         this.texture.bindToTextureUnit(textureUnit);
     }
 
-    public isReleased(): boolean {
-        return this.texture.isReleased();
+    public isUsable(): boolean {
+        return this.texture.isUsable();
     }
 
     public release(): void {

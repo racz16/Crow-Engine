@@ -7,7 +7,7 @@ export class ParameterContainer {
 
     public get<T>(key: ParameterKey<T>): Parameter<T> {
         const pcm = this.getParameterContainerMap(key);
-        if (pcm == null) {
+        if (!pcm) {
             return null;
         } else {
             return pcm.get(key.getKey());
@@ -16,7 +16,7 @@ export class ParameterContainer {
 
     public getValue<T>(key: ParameterKey<T>): T {
         const param = this.get(key);
-        return param == null ? null : param.getValue();
+        return param ? param.getValue() : null;
     }
 
     public getValueOrDefault<T>(key: ParameterKey<T>, defaultValue: T): T {
@@ -25,7 +25,7 @@ export class ParameterContainer {
     }
 
     public set<T>(key: ParameterKey<T>, parameter: Parameter<T>): void {
-        if (key == null) {
+        if (!key) {
             throw new Error();
         }
         this.setUnsafe(key, parameter);
@@ -33,7 +33,7 @@ export class ParameterContainer {
 
     private setUnsafe<T>(key: ParameterKey<T>, parameter: Parameter<T>): void {
         let pcm = this.getParameterContainerMap(key);
-        if (pcm == null) {
+        if (!pcm) {
             pcm = new ParameterContainerMap<T>();
             this.parameters.set(key.getReturnType(), pcm);
         }
@@ -63,10 +63,10 @@ class ParameterContainerMap<S>{
     }
 
     private addAndRemoveCallbacks(removed: Parameter<S>, added: Parameter<S>): void {
-        if (removed != null) {
+        if (removed) {
             removed.private_removedFromParameters(added);
         }
-        if (added != null) {
+        if (added) {
             added.private_addedToParameters(removed);
         }
     }

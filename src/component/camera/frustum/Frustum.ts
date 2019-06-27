@@ -1,6 +1,6 @@
 import { FrustumCornerPoint, FrustumCornerPointResolver } from "./FrustumCornerPoint";
 import { vec3, mat4, vec4 } from "gl-matrix";
-import { ICamera } from "../ICamera";
+import { ICameraComponent } from "../ICameraComponent";
 import { FrustumPlane } from "./FrustumPlane";
 import { FrustumSide, FrustumSideResolver } from "./FrustumSide";
 import { IFrustum } from "./IFrustum";
@@ -10,11 +10,11 @@ export class Frustum implements IFrustum {
     private readonly planes = new Map<FrustumSide, FrustumPlane>();
     private readonly cornerPoints = new Map<FrustumCornerPoint, vec3>();
     private centerPoint: vec3;
-    private readonly camera: ICamera;
+    private readonly camera: ICameraComponent;
     private IP: mat4;
     private IV: mat4;
 
-    public constructor(camera: ICamera) {
+    public constructor(camera: ICameraComponent) {
         this.camera = camera;
     }
 

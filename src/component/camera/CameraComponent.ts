@@ -1,5 +1,5 @@
 import { Component } from "../../core/Component";
-import { ICamera } from "./ICamera";
+import { ICameraComponent } from "./ICameraComponent";
 import { Ubo } from "../../webgl/buffer/Ubo";
 import { mat4, vec3 } from "gl-matrix";
 import { Scene } from "../../core/Scene";
@@ -9,20 +9,20 @@ import { GameObject } from "../../core/GameObject";
 import { Log } from "../../utility/log/Log";
 import { Frustum } from "./frustum/Frustum";
 
-export class CameraComponent extends Component implements ICamera {
+export class CameraComponent extends Component implements ICameraComponent {
 
     private static ubo: Ubo;
     private static camera: CameraComponent;
+
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
     private frustum: Frustum;
-    protected valid: boolean;
     private nearPlaneDistance: number;
     private farPlaneDistance: number;
     private fov: number;
     private uboInitialized = false;
 
-    public constructor(fov = 45, nearPlane = 0.1, farPlane = 200) {
+    public constructor(fov = 70, nearPlane = 0.1, farPlane = 200) {
         super();
         if (!this.uboInitialized) {
             CameraComponent.createUbo();
@@ -34,7 +34,7 @@ export class CameraComponent extends Component implements ICamera {
     }
 
     public static refreshMatricesUbo(): void {
-        if (CameraComponent.camera != null) {
+        if (CameraComponent.camera) {
             CameraComponent.createUbo();
             CameraComponent.refreshUboUnsafe();
         }
@@ -77,12 +77,12 @@ export class CameraComponent extends Component implements ICamera {
     }
 
     public static isCameraUboUsable(): boolean {
-        return !Utility.isReleased(CameraComponent.ubo);
+        return Utility.isUsable(CameraComponent.ubo);
     }
 
     private static invalidateMainCamera(): void {
         const cam = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        if (cam != null) {
+        if (cam) {
             cam.invalidate();
         }
     }
@@ -123,17 +123,16 @@ export class CameraComponent extends Component implements ICamera {
         this.invalidate();
     }
 
-    public invalidate(): void {
-        this.valid = false;
-        super.invalidate();
+    public invalidate(sender?: any): void {
+        super.invalidate(event);
         if (this.isTheMainCamera()) {
             CameraComponent.camera = this;
         }
     }
 
     protected refresh(): void {
-        if (!this.valid) {
-            this.valid = true;
+        if (!this.isValid()) {
+            this.setValid(true);
             this.refreshProjectionMatrix();
             this.refreshViewMatrixAndFrustum();
 
@@ -145,7 +144,7 @@ export class CameraComponent extends Component implements ICamera {
     }
 
     private refreshViewMatrixAndFrustum(): void {
-        if (this.getGameObject() != null) {
+        if (this.getGameObject()) {
             this.viewMatrix = Utility.computeViewMatrix(
                 this.getGameObject().getTransform().getAbsolutePosition(),
                 this.getGameObject().getTransform().getAbsoluteRotation());
@@ -154,7 +153,7 @@ export class CameraComponent extends Component implements ICamera {
     }
 
     public getViewMatrix(): mat4 {
-        if (this.getGameObject() != null) {
+        if (this.getGameObject()) {
             this.refresh();
             return mat4.clone(this.viewMatrix);
         } else {
@@ -172,21 +171,20 @@ export class CameraComponent extends Component implements ICamera {
     }
 
     public private_detachFromGameObject(): void {
-        this.getGameObject().getTransform().removeInvalidatable(this);
+        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
         this.frustum = null;
         super.private_detachFromGameObject();
-        this.invalidate();
     }
 
     public private_attachToGameObject(g: GameObject): void {
         super.private_attachToGameObject(g);
-        this.getGameObject().getTransform().addInvalidatable(this);
+        this.getGameObject().getTransform().getInvalidatables().addInvalidatable(this);
         this.frustum = new Frustum(this);
-        this.invalidate();
     }
 
     public getFrustum(): Frustum {
         if (this.isUsable()) {
+            //TODO: ne itt, hanem a frustum getterjeiben
             this.refresh();
             return this.frustum;
         } else {

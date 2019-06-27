@@ -5,12 +5,14 @@ export interface IRenderable extends IResource {
 
     getVertexCount(): number;
 
-    getRadius(): number;
+    getObjectSpaceRadius(): number;
 
-    getAabbMin(): vec3;
+    getObjectSpaceAabbMin(): vec3;
 
-    getAabbMax(): vec3;
+    getObjectSpaceAabbMax(): vec3;
 
     draw(): void;
+
+    private_update(): void;
 
 }

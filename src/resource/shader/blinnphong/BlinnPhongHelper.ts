@@ -27,15 +27,15 @@ export abstract class BlinnPhongHelper {
     }
 
     protected isTexture2DUsable(): boolean {
-        return this.slot != null && this.slot.isActive() && this.slot.getTexture2D() != null && (this.slot.getTexture2D() as Texture2D).loaded;
+        return this.slot && this.slot.isActive() && this.slot.getTexture2D() && (this.slot.getTexture2D() as Texture2D).loaded;
     }
 
     protected isCubeMapTextureUsable(): boolean {
-        return this.slot != null && this.slot.isActive() && this.slot.getCubeMapTexture() != null && (this.slot.getCubeMapTexture() as CubeMapTexture).loaded === 6;
+        return this.slot && this.slot.isActive() && this.slot.getCubeMapTexture() && (this.slot.getCubeMapTexture() as CubeMapTexture).loaded === 6;
     }
 
     protected isColorUsable(): boolean {
-        return this.slot != null && this.slot.isActive() && this.slot.getColor() != null;
+        return this.slot && this.slot.isActive() && this.slot.getColor() != null;
     }
 
     protected loadTexture2D(): void {

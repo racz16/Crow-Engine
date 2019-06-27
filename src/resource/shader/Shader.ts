@@ -61,8 +61,8 @@ export abstract class Shader {
         shader.release();
     }
 
-    public isReleased(): boolean {
-        return this.shaderProgram.isReleased();
+    public isUsable(): boolean {
+        return this.shaderProgram.isUsable();
     }
 
     public release(): void {

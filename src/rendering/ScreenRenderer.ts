@@ -6,6 +6,7 @@ import { TexturedQuadShader } from "../resource/Shader/TexturedQuadShader";
 import { Gl } from "../webgl/Gl";
 import { vec2 } from "gl-matrix";
 import { TestSceneBuilder } from "../test";
+import { Utility } from "../utility/Utility";
 
 export class ScreenRenderer extends Renderer {
 
@@ -28,10 +29,10 @@ export class ScreenRenderer extends Renderer {
     }
 
     private beforeShader(): void {
-        if (this.shader == null || this.shader.isReleased()) {
+        if (!Utility.isUsable(this.shader)) {
             this.shader = new TexturedQuadShader();
         }
-        if (this.quad == null || this.quad.isReleased()) {
+        if (!Utility.isUsable(this.quad)) {
             this.quad = QuadMesh.getInstance();
         }
         Fbo.bindDefaultFrameBuffer();
@@ -43,13 +44,13 @@ export class ScreenRenderer extends Renderer {
         /*const image = RenderingPipeline.getParameters().getValue(RenderingPipeline.WORK);
         image.bindToTextureUnit(0);*/
         const image = TestSceneBuilder.diffuse;
-        if(image != null && image.loaded){
+        if (image && image.loaded) {
             image.bindToTextureUnit(0);
         }
     }
 
     public release(): void {
-        if (!this.shader.isReleased()) {
+        if (!this.shader.isUsable()) {
             this.shader.release();
         }
     }

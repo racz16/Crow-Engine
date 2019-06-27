@@ -1,6 +1,5 @@
 import { GameObject } from "./GameObject";
 import { InvalidatableContainer } from "../utility/invalidatable/InvalidatableContainer";
-import { IInvalidatable } from "../utility/invalidatable/IInvalidatable";
 import { IComponent } from "../component/IComponent";
 
 export class Component implements IComponent {
@@ -8,33 +7,23 @@ export class Component implements IComponent {
     private readonly invalidatables = new InvalidatableContainer(this);
     private gameObject: GameObject;
     private active = true;
+    private valid = false;
 
-    public addInvalidatable(invalidatable: IInvalidatable): void {
-        this.invalidatables.addInvalidatable(invalidatable);
+    public getInvalidatables(): InvalidatableContainer {
+        return this.invalidatables;
     }
 
-    public getInvalidatable(index: number): IInvalidatable {
-        return this.invalidatables.getInvalidatable(index);
-    }
-
-    public containsInvalidatable(invalidatable: IInvalidatable): boolean {
-        return this.invalidatables.containsInvalidatable(invalidatable);
-    }
-
-    public removeInvalidatable(invalidatable: IInvalidatable): void {
-        this.invalidatables.removeInvalidatable(invalidatable);
-    }
-
-    public getInvalidatableCount(): number {
-        return this.invalidatables.getInvalidatableCount();
-    }
-
-    public getInvalidatablesIterator(): IterableIterator<IInvalidatable> {
-        return this.invalidatables.getIterator();
-    }
-
-    public invalidate(): void {
+    public invalidate(sender?: any): void {
+        this.valid = false;
         this.invalidatables.invalidate();
+    }
+
+    protected isValid(): boolean {
+        return this.valid;
+    }
+
+    protected setValid(valid: boolean): void {
+        this.valid = valid;
     }
 
     public isActive(): boolean {
@@ -43,31 +32,23 @@ export class Component implements IComponent {
 
     public setActive(active: boolean): void {
         this.active = active;
+        this.invalidatables.invalidate();
     }
 
     public getGameObject(): GameObject {
         return this.gameObject;
     }
 
-    public setGameObject(object: GameObject): void {
-        if (object == null) {
-            if (this.gameObject != null) {
-                this.gameObject.getComponents().remove(this);
-            }
-        } else {
-            object.getComponents().add(this);
-        }
-    }
-
-    public private_attachToGameObject(object: GameObject): void {
-        this.gameObject = object;
+    public private_attachToGameObject(gameObject: GameObject): void {
+        this.gameObject = gameObject;
+        this.invalidatables.invalidate();
     }
 
     public private_detachFromGameObject(): void {
         this.gameObject = null;
+        this.invalidatables.invalidate();
     }
 
-    public private_update(): void {
-    }
+    public private_update(): void { }
 
 }

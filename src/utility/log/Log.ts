@@ -1,5 +1,6 @@
 import { LogLevel } from "./LogLevel";
 import { LogType } from "./LogType";
+import { mat4, mat3, vec3, vec4 } from "gl-matrix";
 
 export class Log {
 
@@ -51,6 +52,31 @@ export class Log {
 
     public static printStackTrace(message: any = 'stack trace'): void {
         console.trace(message);
+    }
+
+    public static logVector3(v: vec3): void {
+        console.table([v]);
+    }
+
+    public static logVector4(v: vec4): void {
+        console.table([v]);
+    }
+
+    public static logMatrix3x3(m: mat3): void {
+        console.table([
+            [m[0], m[3], m[6]],
+            [m[1], m[4], m[7]],
+            [m[2], m[5], m[8]],
+        ]);
+    }
+
+    public static logMatrix4x4(m: mat4): void {
+        console.table([
+            [m[0], m[4], m[8], m[12]],
+            [m[1], m[5], m[9], m[13]],
+            [m[2], m[6], m[10], m[14]],
+            [m[3], m[7], m[11], m[15]]
+        ]);
     }
 
     public static lifeCycleInfo(message: any): void { }

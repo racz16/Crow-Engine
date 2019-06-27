@@ -7,7 +7,7 @@ export class ChildContainer {
     private gameObject: GameObject;
 
     public constructor(gameObject: GameObject) {
-        if (gameObject.getChildren() != null) {
+        if (gameObject.getChildren()) {
             throw new Error();
         }
         this.gameObject = gameObject;

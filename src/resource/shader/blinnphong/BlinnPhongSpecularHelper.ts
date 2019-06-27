@@ -27,7 +27,7 @@ export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
         if (isThereGlossiness == null || isThereGlossiness != 1) {
             const color = slot.getColor();
             sp.loadBoolean(this.getIsThereGlossinessName(), false);
-            if (color != null) {
+            if (color) {
                 sp.loadVector4(this.getColorName(), color);
             } else {
                 sp.loadVector4(this.getColorName(), BlinnPhongSpecularHelper.defaultValue);

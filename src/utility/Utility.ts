@@ -4,22 +4,26 @@ import { Gl } from "../webgl/Gl";
 
 export class Utility {
 
-    //TODO: loggolás
-
     private constructor() { }
 
     public static computeModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
         let model = mat4.create();
         mat4.translate(model, model, position);
-        mat4.rotateX(model, model, Utility.toRadians(rotation[0]));
-        mat4.rotateY(model, model, Utility.toRadians(rotation[1]));
         mat4.rotateZ(model, model, Utility.toRadians(rotation[2]));
+        mat4.rotateY(model, model, Utility.toRadians(rotation[1]));
+        mat4.rotateX(model, model, Utility.toRadians(rotation[0]));
         mat4.scale(model, model, scale);
         return model;
     }
 
     public static computeInverseModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
-        return mat4.invert(mat4.create(), Utility.computeModelMatrix(position, rotation, scale));
+        let model = mat4.create();
+        mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
+        mat4.rotateX(model, model, Utility.toRadians(-rotation[0]));
+        mat4.rotateY(model, model, Utility.toRadians(-rotation[1]));
+        mat4.rotateZ(model, model, Utility.toRadians(-rotation[2]));
+        mat4.translate(model, model, vec3.negate(vec3.create(), position));
+        return model;
     }
 
     public static computeViewMatrix(position: vec3, rotation: vec3): mat4 {
@@ -62,8 +66,8 @@ export class Utility {
         return ret;
     }
 
-    public static isReleased(resource: IResource): boolean {
-        return resource == null || resource.isReleased();
+    public static isUsable(resource: IResource): boolean {
+        return resource && resource.isUsable();
     }
 
     public static isColor(data: vec3): boolean {

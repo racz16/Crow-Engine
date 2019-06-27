@@ -4,7 +4,7 @@ import { BlinnPhongDirectionalLightComponent } from "./BlinnPhongDirectionalLigh
 import { BlinnPhongPositionalLightComponent } from "./BlinnPhongPositionalLightComponent";
 import { Scene } from "../../../core/Scene";
 import { vec3 } from "gl-matrix";
-import { ICamera } from "../../camera/ICamera";
+import { ICameraComponent } from "../../camera/ICameraComponent";
 import { Utility } from "../../../utility/Utility";
 import { Log } from "../../../utility/log/Log";
 
@@ -29,7 +29,7 @@ export class BlinnPhongLightContainer {
     }
 
     public static getInstance(): BlinnPhongLightContainer {
-        if (BlinnPhongLightContainer.instance == null) {
+        if (!BlinnPhongLightContainer.instance) {
             BlinnPhongLightContainer.instance = new BlinnPhongLightContainer();
         }
         return BlinnPhongLightContainer.instance;
@@ -37,7 +37,7 @@ export class BlinnPhongLightContainer {
 
     public refreshUbo(): void {
         if (this.refreshDirectional) {
-            if (this.mainDirectionalLight && this.mainDirectionalLight.isActive() && this.mainDirectionalLight.getGameObject != null) {
+            if (this.mainDirectionalLight && this.mainDirectionalLight.isActive() && this.mainDirectionalLight.getGameObject()) {
                 this.mainDirectionalLight.private_refresh(this.ubo);
             } else {
                 this.ubo.storewithOffset(new Int32Array([0]), BlinnPhongLightContainer.ACTIVE_OFFSET);
@@ -70,8 +70,8 @@ export class BlinnPhongLightContainer {
         });
     }
 
-    private computePositionalLightDistanceFromCamera(light: BlinnPhongPositionalLightComponent, camera: ICamera): number {
-        if (!light.isActive() || light.getGameObject() == null) {
+    private computePositionalLightDistanceFromCamera(light: BlinnPhongPositionalLightComponent, camera: ICameraComponent): number {
+        if (!light.isActive() || !light.getGameObject()) {
             return Number.POSITIVE_INFINITY;
         }
         const cameraPosition = camera.getGameObject().getTransform().getAbsolutePosition();

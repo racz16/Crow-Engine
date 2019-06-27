@@ -14,7 +14,7 @@ export class GameObjectContainer {
     }
 
     public private_addGameObject(gameObject: GameObject): void {
-        if (gameObject == null) {
+        if (!gameObject) {
             throw new Error();
         }
         const index = this.gameObjects.indexOf(gameObject);

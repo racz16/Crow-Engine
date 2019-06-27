@@ -91,8 +91,8 @@ export class StaticMesh implements IMesh {
         Gl.gl.drawElements(Gl.gl.TRIANGLES, this.getVertexCount(), Gl.gl.UNSIGNED_INT, 0);
     }
 
-    public isReleased(): boolean {
-        return this.vao.isReleased();
+    public isUsable(): boolean {
+        return this.vao.isUsable();
     }
 
     public release(): void {
@@ -103,7 +103,7 @@ export class StaticMesh implements IMesh {
     //misc----------------------------------------------------------------------
     //
     public getDataSize(): number {
-        return this.isReleased() ? 0 : this.vao.getDataSize();
+        return this.isUsable() ? this.vao.getDataSize() : 0;
     }
 
     public getVertexCount(): number {
@@ -114,16 +114,18 @@ export class StaticMesh implements IMesh {
         return this.faceCount;
     }
 
-    public getRadius(): number {
+    public getObjectSpaceRadius(): number {
         return this.furthestVertexDistance;
     }
 
-    public getAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): vec3 {
         return vec3.clone(this.aabbMax);
     }
 
-    public getAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): vec3 {
         return vec3.clone(this.aabbMin);
     }
+
+    public private_update(): void { }
 
 }

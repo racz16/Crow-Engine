@@ -52,7 +52,7 @@ export class SkyBoxRenderer extends Renderer {
     }
 
     public isUsable(): boolean {
-        return !Utility.isReleased(this.shader);
+        return Utility.isUsable(this.shader);
     }
 
     public removeFromRenderingPipeline(): void {

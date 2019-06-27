@@ -1,10 +1,10 @@
 import { vec3, mat4, quat } from "gl-matrix";
 import { GameObject } from "./GameObject";
 import { Utility } from "../utility/Utility";
-import { InvalidatableContainer } from "../utility/invalidatable/InvalidatableContainer";
 import { IInvalidatable } from "../utility/invalidatable/IInvalidatable";
+import { InvalidatableContainer } from "../utility/invalidatable/InvalidatableContainer";
 
-export class Transform {
+export class Transform implements IInvalidatable {
 
     private relativePosition = vec3.create();
     private relativeRotation = vec3.create();
@@ -17,9 +17,9 @@ export class Transform {
     private forward = vec3.create();
     private right = vec3.create();
     private up = vec3.create();
-    private invalidatables = new InvalidatableContainer(this);
     private gameObject: GameObject;
     private valid: boolean;
+    private invalidatables = new InvalidatableContainer(this);
 
     public Transform(position: vec3, rotation: vec3, scale: vec3) {
         this.setRelativePosition(position);
@@ -150,8 +150,8 @@ export class Transform {
     }
 
     private refreshMatrices(): void {
-        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale))
-        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale))
+        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
     }
 
     private refreshAbsoluteTransform(): void {
@@ -225,13 +225,13 @@ export class Transform {
     public private_update(): void {
     }
 
-    public private_detachFromGameObject(): void {
-        this.gameObject = null;
+    public private_attachToGameObject(gameObject: GameObject): void {
+        this.gameObject = gameObject;
         this.invalidate();
     }
 
-    public private_attachToGameObject(object: GameObject): void {
-        this.gameObject = object;
+    public private_detachFromGameObject(): void {
+        this.gameObject = null;
         this.invalidate();
     }
 
@@ -247,28 +247,13 @@ export class Transform {
         return this.gameObject && this.gameObject.getParent() != null;
     }
 
-    //
-    //invalidation-------------------------------------------------------------
-    //
     public invalidate(): void {
         this.invalidatables.invalidate();
         this.valid = false;
     }
 
-    public addInvalidatable(invalidatable: IInvalidatable): void {
-        this.invalidatables.addInvalidatable(invalidatable);
-    }
-
-    public containsInvalidatable(invalidatable: IInvalidatable): boolean {
-        return this.invalidatables.containsInvalidatable(invalidatable);
-    }
-
-    public removeInvalidatable(invalidatable: IInvalidatable): void {
-        this.invalidatables.removeInvalidatable(invalidatable);
-    }
-
-    public getInvalidatablesIterator(): IterableIterator<IInvalidatable> {
-        return this.invalidatables.getIterator();
+    public getInvalidatables(): InvalidatableContainer {
+        return this.invalidatables;
     }
 
 }

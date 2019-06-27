@@ -1,29 +1,34 @@
 import { BoundingShape } from "./BoundingShape";
-import { ICamera } from "../../camera/ICamera";
-import { vec4 } from "gl-matrix";
+import { ICameraComponent } from "../../camera/ICameraComponent";
+import { vec4, mat4 } from "gl-matrix";
 import { Scene } from "../../../core/Scene";
 
 export class ObbBoundingShape extends BoundingShape {
 
-    private csObbCornerPoints: Array<vec4>;
-    private camera: ICamera;
+    private clipSpaceObbCornerPoints: Array<vec4>;
+    private camera: ICameraComponent;
 
     public isInsideMainCameraFrustum(): boolean {
         if (this.isUsable()) {
             this.refresh();
-            if (this.camera.isUsable()) {
-                for (let i = 0; i < 3; i++) {
-                    if (this.isOutsidePositivePlane(i) || this.isOutsideNegativePlane(i)) {
-                        return false;
-                    }
-                }
+            if (this.camera) {
+                this.isInsideMainCameraFrustumUnsafe();
+            }
+        }
+        return true;
+    }
+
+    private isInsideMainCameraFrustumUnsafe(): boolean {
+        for (let i = 0; i < 3; i++) {
+            if (this.isOutsidePositivePlane(i) || this.isOutsideNegativePlane(i)) {
+                return false;
             }
         }
         return true;
     }
 
     private isOutsidePositivePlane(coordinate: number) {
-        for (const cp of this.csObbCornerPoints) {
+        for (const cp of this.clipSpaceObbCornerPoints) {
             if (cp[coordinate] <= cp[3]) {
                 return false;
             }
@@ -32,7 +37,7 @@ export class ObbBoundingShape extends BoundingShape {
     }
 
     private isOutsideNegativePlane(coordinate: number) {
-        for (const cp of this.csObbCornerPoints) {
+        for (const cp of this.clipSpaceObbCornerPoints) {
             if (cp[coordinate] >= -cp[3]) {
                 return false;
             }
@@ -42,7 +47,7 @@ export class ObbBoundingShape extends BoundingShape {
 
     private refresh(): void {
         this.handleMainCameraChange();
-        if (!this.isValid()) {
+        if ((!this.isValid() || this.getRenderableComponent().isBillboard()) && this.isUsable() && this.camera) {
             this.refreshUnsafe();
             this.setValid(true);
         }
@@ -51,37 +56,45 @@ export class ObbBoundingShape extends BoundingShape {
     private handleMainCameraChange(): void {
         const mainCamera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
         if (mainCamera != this.camera) {
-            if (this.camera) {
-                this.camera.removeInvalidatable(this);
-            }
-            this.camera = mainCamera;
-            if (this.camera) {
-                this.camera.addInvalidatable(this);
-            }
-            this.invalidate();
+            this.changeCamera(mainCamera);
         }
+    }
+
+    private changeCamera(mainCamera: ICameraComponent) {
+        if (this.camera) {
+            this.camera.getInvalidatables().removeInvalidatable(this);
+        }
+        this.camera = mainCamera;
+        if (this.camera) {
+            this.camera.getInvalidatables().addInvalidatable(this);
+        }
+        this.invalidate();
     }
 
     private refreshUnsafe(): void {
         const cornerPoints = this.computeObjectSpaceAabbCornerPoints();
-        const M = this.getRenderableComponent().getGameObject().getTransform().getModelMatrix();
-        const V = this.camera.getViewMatrix();
-        const P = this.camera.getProjectionMatrix();
+        const MVP = mat4.create();
+        mat4.mul(MVP, this.camera.getProjectionMatrix(), mat4.mul(MVP, this.camera.getViewMatrix(), this.getRenderableComponent().getModelMatrix()));
+        //const M = this.getRenderableComponent().getModelMatrix();
+        //const V = this.camera.getViewMatrix();
+        //const P = this.camera.getProjectionMatrix();
         for (const cornerPoint of cornerPoints) {
-            vec4.transformMat4(cornerPoint, cornerPoint, M);
-            vec4.transformMat4(cornerPoint, cornerPoint, V);
-            vec4.transformMat4(cornerPoint, cornerPoint, P);
+            vec4.transformMat4(cornerPoint, cornerPoint, MVP);
+            //vec4.transformMat4(cornerPoint, cornerPoint, M);
+            //vec4.transformMat4(cornerPoint, cornerPoint, V);
+            //vec4.transformMat4(cornerPoint, cornerPoint, P);
         }
-        this.csObbCornerPoints = cornerPoints;
+        this.clipSpaceObbCornerPoints = cornerPoints;
     }
 
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
         if (this.isUsable()) {
             this.refresh();
-            return this.csObbCornerPoints.values();
-        } else {
-            return null;
+            if (this.camera) {
+                return this.clipSpaceObbCornerPoints.values();
+            }
         }
+        return null;
     }
 
 }

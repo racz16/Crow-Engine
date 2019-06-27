@@ -51,7 +51,7 @@ export class Vao extends GlObject {
     }
 
     public getEbo(): Ebo {
-        return Utility.isReleased(this.ebo) ? null : this.ebo;
+        return Utility.isUsable(this.ebo) ? this.ebo : null;
     }
 
     //

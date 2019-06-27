@@ -1,3 +1,5 @@
 export interface IInvalidatable {
-    invalidate(): void;
+
+    invalidate(sender?: any): void;
+
 }

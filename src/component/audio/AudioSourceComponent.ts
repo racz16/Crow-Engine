@@ -4,12 +4,13 @@ import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelT
 import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";
 import { GameObject } from "../../core/GameObject";
 import { Audio } from "../../resource/Audio";
+import { Transform } from "../../core/Transform";
 
 export class AudioSourceComponent extends Component {
+
     private gain: GainNode;
     private panner: PannerNode;
     private bufferSource: AudioBufferSourceNode;
-    private invalid: boolean;
     private volume = 1;
     private muted: boolean;
 
@@ -43,7 +44,7 @@ export class AudioSourceComponent extends Component {
     }
 
     public start(): void {
-        if (this.getGameObject() != null && this.isActive()) {
+        if (this.getGameObject() && this.isActive()) {
             this.bufferSource.start();
         }
     }
@@ -171,7 +172,7 @@ export class AudioSourceComponent extends Component {
     }
 
     private updatePositionAndOrientation(): void {
-        if (this.getGameObject() != null && this.invalid && this.isActive()) {
+        if (this.getGameObject() && !this.isValid() && this.isActive()) {
             const ctx = Audio.context;
             const position = this.getGameObject().getTransform().getAbsolutePosition();
             const forward = this.getGameObject().getTransform().getForwardVector();
@@ -181,7 +182,7 @@ export class AudioSourceComponent extends Component {
             this.panner.orientationX.setValueAtTime(forward[0], ctx.currentTime);
             this.panner.orientationY.setValueAtTime(forward[1], ctx.currentTime);
             this.panner.orientationZ.setValueAtTime(forward[2], ctx.currentTime);
-            this.invalid = false;
+            this.setValid(true);
         }
     }
 
@@ -192,21 +193,15 @@ export class AudioSourceComponent extends Component {
         }
     }
 
-    public invalidate(): void {
-        super.invalidate();
-        this.invalid = true;
-    }
-
-    public private_attachToGameObject(go: GameObject): void {
-        super.private_attachToGameObject(go);
-        this.getGameObject().getTransform().addInvalidatable(this);
-        this.invalidate();
+    public private_attachToGameObject(gameObject: GameObject): void {
+        super.private_attachToGameObject(gameObject);
+        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
     public private_detachFromGameObject(): void {
-        this.getGameObject().getTransform().removeInvalidatable(this);
+        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
         super.private_detachFromGameObject();
-        this.invalidate();
         this.stop();
     }
+
 }

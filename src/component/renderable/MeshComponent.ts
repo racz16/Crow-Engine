@@ -1,16 +1,10 @@
 import { IMesh } from "../../resource/mesh/IMesh";
 import { RenderableComponent } from "./RenderableComponent";
 import { Gl } from "../../webgl/Gl";
-import { Material } from "../../material/Material";
-
 
 export class MeshComponent extends RenderableComponent<IMesh>{
 
-    private twoSided: boolean;
-
-    public constructor(mesh: IMesh, material: Material) {
-        super(mesh, material);
-    }
+    private twoSided = false;
 
     public isTwoSided(): boolean {
         return this.twoSided;
@@ -18,6 +12,7 @@ export class MeshComponent extends RenderableComponent<IMesh>{
 
     public setTwoSided(twoSided: boolean): void {
         this.twoSided = twoSided;
+        this.invalidate();
     }
 
     public getFaceCount(): number {
@@ -25,13 +20,13 @@ export class MeshComponent extends RenderableComponent<IMesh>{
     }
 
     public draw(): void {
-        if (!this.isTwoSided()) {
+        if (this.isTwoSided()) {
             Gl.setEnableCullFace(false);
-        } else {
-            Gl.setEnableCullFace(true);
         }
         super.draw();
+        if (this.isTwoSided()) {
+            Gl.setEnableCullFace(true);
+        }
     }
-
 
 }

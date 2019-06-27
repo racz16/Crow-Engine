@@ -1,25 +1,25 @@
 import { IBoundingShape } from "./IBoundingShape";
-import { RenderableComponent } from "../RenderableComponent";
 import { IRenderable } from "../../../resource/IRenderable";
 import { vec4, vec3 } from "gl-matrix";
+import { IRenderableComponent } from "../IRenderableComponent";
 
 export abstract class BoundingShape implements IBoundingShape {
 
-    private renderableComponent: RenderableComponent<IRenderable>;
+    private renderableComponent: IRenderableComponent<IRenderable>;
     private valid = false;
 
-    public private_setRenderableComponent(renderableComponent: RenderableComponent<IRenderable>): void {
+    public private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
-            this.renderableComponent.removeInvalidatable(this);
+            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
-            this.renderableComponent.addInvalidatable(this);
+            this.renderableComponent.getInvalidatables().addInvalidatable(this);
         }
         this.invalidate();
     }
 
-    public getRenderableComponent(): RenderableComponent<IRenderable> {
+    public getRenderableComponent(): IRenderableComponent<IRenderable> {
         return this.renderableComponent;
     }
 
@@ -32,35 +32,48 @@ export abstract class BoundingShape implements IBoundingShape {
     }
 
     protected computeObjectSpaceAabbCornerPoints(): Array<vec4> {
-        const originalAabbMin = this.getObjectSpaceAabbMin();
-        const originalAabbMax = this.getObjectSpaceAabbMax();
+        const osAabbMin = this.getObjectSpaceAabbMin();
+        const osAabbMax = this.getObjectSpaceAabbMax();
+        return this.getObjectSpaceAabbCornerPoints(osAabbMin, osAabbMax);
+    }
+
+    private getObjectSpaceAabbCornerPoints(osAabbMin: vec3, osAabbMax: vec3): Array<vec4> {
         const cornerPoints = new Array<vec4>(8);
-        cornerPoints[0] = vec4.fromValues(originalAabbMax[0], originalAabbMax[1], originalAabbMax[2], 1);//right-top-front
-        cornerPoints[1] = vec4.fromValues(originalAabbMax[0], originalAabbMin[1], originalAabbMax[2], 1);//right-bottom-front
-        cornerPoints[2] = vec4.fromValues(originalAabbMax[0], originalAabbMax[1], originalAabbMin[2], 1);//right-top-back
-        cornerPoints[3] = vec4.fromValues(originalAabbMax[0], originalAabbMin[1], originalAabbMin[2], 1);//right-bottom-back
-        cornerPoints[4] = vec4.fromValues(originalAabbMin[0], originalAabbMax[1], originalAabbMax[2], 1);//left-top-front
-        cornerPoints[5] = vec4.fromValues(originalAabbMin[0], originalAabbMin[1], originalAabbMax[2], 1);//left-bottom-front
-        cornerPoints[6] = vec4.fromValues(originalAabbMin[0], originalAabbMax[1], originalAabbMin[2], 1);//left-top-back
-        cornerPoints[7] = vec4.fromValues(originalAabbMin[0], originalAabbMin[1], originalAabbMin[2], 1);//left-bottom-back
+        cornerPoints[0] = vec4.fromValues(osAabbMax[0], osAabbMax[1], osAabbMax[2], 1);//right-top-front
+        cornerPoints[1] = vec4.fromValues(osAabbMax[0], osAabbMin[1], osAabbMax[2], 1);//right-bottom-front
+        cornerPoints[2] = vec4.fromValues(osAabbMax[0], osAabbMax[1], osAabbMin[2], 1);//right-top-back
+        cornerPoints[3] = vec4.fromValues(osAabbMax[0], osAabbMin[1], osAabbMin[2], 1);//right-bottom-back
+        cornerPoints[4] = vec4.fromValues(osAabbMin[0], osAabbMax[1], osAabbMax[2], 1);//left-top-front
+        cornerPoints[5] = vec4.fromValues(osAabbMin[0], osAabbMin[1], osAabbMax[2], 1);//left-bottom-front
+        cornerPoints[6] = vec4.fromValues(osAabbMin[0], osAabbMax[1], osAabbMin[2], 1);//left-top-back
+        cornerPoints[7] = vec4.fromValues(osAabbMin[0], osAabbMin[1], osAabbMin[2], 1);//left-bottom-back
         return cornerPoints;
     }
 
     protected getObjectSpaceAabbMin(): vec3 {
-        return this.getRenderableComponent().getRenderable().getAabbMin();
+        if (this.renderableComponent) {
+            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMin();
+        } else {
+            return null;
+        }
     }
 
     protected getObjectSpaceAabbMax(): vec3 {
-        return this.getRenderableComponent().getRenderable().getAabbMax();
+        if (this.renderableComponent) {
+            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMax();
+        } else {
+            return null;
+        }
     }
 
     public invalidate(): void {
         this.valid = false;
     }
 
-    public isUsable(): boolean {
+    protected isUsable(): boolean {
         return this.renderableComponent && this.renderableComponent.getGameObject() != null;
     }
 
     public abstract isInsideMainCameraFrustum(): boolean;
+
 }

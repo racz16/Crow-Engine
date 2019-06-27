@@ -1,14 +1,13 @@
-import { RenderableComponent } from "../RenderableComponent";
 import { IRenderable } from "../../../resource/IRenderable";
 import { IInvalidatable } from "../../../utility/invalidatable/IInvalidatable";
+import { IRenderableComponent } from "../IRenderableComponent";
 
 export interface IBoundingShape extends IInvalidatable {
 
-    private_setRenderableComponent(renderableComponent: RenderableComponent<IRenderable>): void;
-
-    getRenderableComponent(): RenderableComponent<IRenderable>;
+    getRenderableComponent(): IRenderableComponent<IRenderable>;
 
     isInsideMainCameraFrustum(): boolean;
 
-    isUsable(): boolean;
+    private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void;
+
 }

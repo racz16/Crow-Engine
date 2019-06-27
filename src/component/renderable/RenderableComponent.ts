@@ -5,23 +5,28 @@ import { RenderingPipeline } from "../../rendering/RenderingPipeline";
 import { Material } from "../../material/Material";
 import { IBoundingShape } from "./boundingshape/IBoundingShape";
 import { SphereBoundingShape } from "./boundingshape/SphereBoundingShape";
+import { IRenderableComponent } from "./IRenderableComponent";
+import { vec2, mat4 } from "gl-matrix";
+import { Scene } from "../../core/Scene";
+import { Utility } from "../../utility/Utility";
 
-export abstract class RenderableComponent<T extends IRenderable> extends Component {
+export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 
-    private boundingShape: IBoundingShape;
     private renderable: T;
+    private boundingShape: IBoundingShape;
     private material: Material;
-    private renderableActive = true;
+    private readonly visibilityInterval = vec2.fromValues(0, 100);
     private materialActive = true;
     private castShadow = true;
     private receiveShadow = true;
     private reflectable = false;
+    private billboard = false;
 
-    public constructor(renderable: T, material: Material) {
+    public constructor(renderable: T, material = new Material(), boundingShape: IBoundingShape = new SphereBoundingShape()) {
         super();
         this.setRenderable(renderable);
         this.setMaterial(material);
-        this.setBoundingShape(new SphereBoundingShape());
+        this.setBoundingShape(boundingShape);
     }
 
     public getRenderable(): T {
@@ -29,7 +34,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     }
 
     public setRenderable(renderable: T): void {
-        if (renderable == null) {
+        if (!renderable) {
             throw new Error();
         }
         this.renderable = renderable;
@@ -41,14 +46,19 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     }
 
     public setMaterial(material: Material): void {
-        if (material == null) {
+        if (!material) {
             throw new Error();
         }
         this.material = material;
+        this.invalidate();
+    }
+
+    public getBoundingShape(): IBoundingShape {
+        return this.boundingShape;
     }
 
     public setBoundingShape(boundingShape: IBoundingShape): void {
-        if (!boundingShape) {
+        if (!boundingShape || boundingShape.getRenderableComponent()) {
             throw new Error();
         }
         if (this.boundingShape) {
@@ -56,10 +66,16 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
         this.boundingShape = boundingShape;
         this.boundingShape.private_setRenderableComponent(this);
+        this.invalidate();
     }
 
-    public getBoundingShape(): IBoundingShape {
-        return this.boundingShape;
+    public isBillboard(): boolean {
+        return this.billboard;
+    }
+
+    public setBillboard(billboard: boolean): void {
+        this.billboard = billboard;
+        this.invalidate();
     }
 
     public isReflectable(): boolean {
@@ -68,6 +84,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     public setReflectable(reflectable: boolean): void {
         this.reflectable = reflectable;
+        this.invalidate();
     }
 
     public isCastShadow(): boolean {
@@ -76,6 +93,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     public setCastShadow(castShadow: boolean): void {
         this.castShadow = castShadow;
+        this.invalidate();
     }
 
     public isReceiveShadows(): boolean {
@@ -84,14 +102,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     public setReceiveShadows(receiveShadows: boolean): void {
         this.receiveShadow = receiveShadows;
-    }
-
-    public isRenderableActive(): boolean {
-        return this.renderableActive;
-    }
-
-    public setRenderableActive(renderableActive: boolean): void {
-        this.renderableActive = renderableActive;
+        this.invalidate();
     }
 
     public isMaterialActive(): boolean {
@@ -100,6 +111,62 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     public setMaterialActive(materialActive: boolean): void {
         this.materialActive = materialActive;
+        this.invalidate();
+    }
+
+    public getVisibilityInterval(): vec2 {
+        return vec2.clone(this.visibilityInterval);
+    }
+
+    public setVisibilityInterval(interval: vec2): void {
+        if (!interval) {
+            throw new Error();
+        }
+        this.visibilityInterval[0] = interval[0];
+        this.visibilityInterval[1] = interval[1];
+    }
+
+    public getModelMatrix(): mat4 {
+        if (this.getGameObject()) {
+            if (this.isBillboard()) {
+                return this.computeBillboardModelMatrix();
+            } else {
+                return this.getGameObject().getTransform().getModelMatrix();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private computeBillboardModelMatrix(): mat4 {
+        const modelMatrix = mat4.transpose(mat4.create(), Scene.getParameters().getValue(Scene.MAIN_CAMERA).getViewMatrix());
+        for (let i = 0; i < 3; i++) {
+            modelMatrix[i + 12] = this.getGameObject().getTransform().getAbsolutePosition()[i];
+        }
+        modelMatrix[3] = modelMatrix[7] = modelMatrix[11] = 0;
+        modelMatrix[15] = 1;
+        mat4.scale(modelMatrix, modelMatrix, this.getGameObject().getTransform().getAbsoluteScale());
+        return modelMatrix;
+    }
+
+    public getInverseModelMatrix(): mat4 {
+        if (this.getGameObject()) {
+            if (this.isBillboard()) {
+                return this.computeBillboardInverseModelMatrix();
+            } else {
+                return this.getGameObject().getTransform().getInverseModelMatrix();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private computeBillboardInverseModelMatrix(): mat4 {
+        const transform = this.getGameObject().getTransform();
+        const position = transform.getAbsolutePosition();
+        const rotation = transform.getAbsoluteRotation();
+        const scale = transform.getAbsoluteScale();
+        return Utility.computeInverseModelMatrix(position, rotation, scale);
     }
 
     public abstract getFaceCount(): number;
@@ -108,18 +175,21 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.renderable.draw();
     }
 
-    public private_detachFromGameObject(): void {
-        this.getGameObject().getTransform().removeInvalidatable(this);
-        super.private_detachFromGameObject();
-        RenderingPipeline.getRenderableContainer().private_remove(this);
-        this.invalidate();
+    public private_update(): void {
+        super.private_update();
+        this.renderable.private_update();
     }
 
-    public private_attachToGameObject(object: GameObject): void {
-        super.private_attachToGameObject(object);
-        this.getGameObject().getTransform().addInvalidatable(this);
+    public private_attachToGameObject(gameObject: GameObject): void {
+        super.private_attachToGameObject(gameObject);
+        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
         RenderingPipeline.getRenderableContainer().private_add(this);
-        this.invalidate();
+    }
+
+    public private_detachFromGameObject(): void {
+        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
+        super.private_detachFromGameObject();
+        RenderingPipeline.getRenderableContainer().private_remove(this);
     }
 
 }

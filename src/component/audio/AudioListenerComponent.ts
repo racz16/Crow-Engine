@@ -2,25 +2,17 @@ import { Component } from "../../core/Component";
 import { GameObject } from "../../core/GameObject";
 import { Scene } from "../../core/Scene";
 import { Audio } from "../../resource/Audio";
-import { Log } from "../../utility/log/Log";
 
 export class AudioListenerComponent extends Component {
-    private invalid: boolean;
 
     public private_update(): void {
-        if (this.isTheMainAudioListener() && this.invalid && this.getGameObject() != null && this.isActive()) {
+        if (this.isTheMainAudioListener() && !this.isValid() && this.getGameObject() && this.isActive()) {
             const position = this.getGameObject().getTransform().getAbsolutePosition();
             const forward = this.getGameObject().getTransform().getForwardVector();
             const up = this.getGameObject().getTransform().getUpVector();
             Audio.setAudioListener(position, forward, up);
-            this.invalid = false;
-            //Log.info('audio listener refreshed');
+            this.setValid(true);
         }
-    }
-
-    public invalidate() {
-        super.invalidate();
-        this.invalid = true;
     }
 
     public isTheMainAudioListener(): boolean {
@@ -34,16 +26,14 @@ export class AudioListenerComponent extends Component {
         }
     }
 
-    public private_attachToGameObject(go: GameObject): void {
-        super.private_attachToGameObject(go);
-        go.getTransform().addInvalidatable(this);
-        this.invalidate();
+    public private_attachToGameObject(gameObject: GameObject): void {
+        super.private_attachToGameObject(gameObject);
+        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
     public private_detachFromGameObject(): void {
-        this.getGameObject().getTransform().removeInvalidatable(this);
+        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
         super.private_detachFromGameObject();
-        this.invalidate();
         if (this.isTheMainAudioListener) {
             Audio.setAudioListenerToDefault();
         }

@@ -20,7 +20,7 @@ export class QuadMesh implements IMesh {
     }
 
     public static getInstance(): QuadMesh {
-        if (QuadMesh.instace == null) {
+        if (!QuadMesh.instace) {
             QuadMesh.instace = new QuadMesh();
         }
         return QuadMesh.instace;
@@ -78,20 +78,20 @@ export class QuadMesh implements IMesh {
         return 2;
     }
 
-    public getRadius(): number {
+    public getObjectSpaceRadius(): number {
         return Math.sqrt(2);
     }
 
-    public getAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): vec3 {
         return vec3.fromValues(-1, -1, 0);
     }
 
-    public getAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): vec3 {
         return vec3.fromValues(1, 1, 0);
     }
 
     public draw(): void {
-        if (Utility.isReleased(this.vao)) {
+        if (!Utility.isUsable(this.vao)) {
             this.loadData();
         }
         this.vao.bind();
@@ -99,7 +99,7 @@ export class QuadMesh implements IMesh {
     }
 
     public getDataSize(): number {
-        return Utility.isReleased(this.vao) ? 0 : 104;
+        return Utility.isUsable(this.vao) ? 104 : 0;
     }
 
     public release(): void {
@@ -107,8 +107,10 @@ export class QuadMesh implements IMesh {
         this.vao = null;
     }
 
-    public isReleased(): boolean {
-        return false;
+    public isUsable(): boolean {
+        return true;
     }
+
+    public private_update(): void { }
 
 }

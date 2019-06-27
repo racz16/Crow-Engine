@@ -50,8 +50,8 @@ export class CubeMapTexture implements ICubeMapTexture {
         this.texture.release();
     }
 
-    public isReleased(): boolean {
-        return this.texture.isReleased();
+    public isUsable(): boolean {
+        return this.texture.isUsable();
     }
 
 

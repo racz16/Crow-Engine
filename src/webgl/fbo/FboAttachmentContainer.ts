@@ -87,15 +87,15 @@ export class FboAttachmentContainer {
     }
 
     public isThereTextureAttachment(): boolean {
-        return !Utility.isReleased(this.texture);
+        return Utility.isUsable(this.texture);
     }
 
     public isThereCubeMapSideTextureAttachment(): boolean {
-        return this.cubeMapSideTexture != null && !this.cubeMapSideTexture.isReleased();
+        return this.cubeMapSideTexture && this.cubeMapSideTexture.isUsable();
     }
 
     public isThereRboAttachment(): boolean {
-        return !Utility.isReleased(this.rbo);
+        return Utility.isUsable(this.rbo);
     }
 
     //draw--------------------------------------------------------------------------------------------------------------

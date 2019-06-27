@@ -13,6 +13,6 @@ export interface IFboAttachment {
 
     getSampleCount(): number;
 
-    isReleased(): boolean;
+    isUsable(): boolean;
 
 }

@@ -27,8 +27,8 @@ export abstract class GlObject implements IResource {
         this.dataSize = size;
     }
 
-    public isReleased(): boolean {
-        return this.id === GlObject.INVALID_ID;
+    public isUsable(): boolean {
+        return this.id !== GlObject.INVALID_ID;
     }
 
     public abstract release(): void;

@@ -1,4 +1,3 @@
-
 import { Utility } from "../Utility";
 import { IInvalidatable } from "./IInvalidatable";
 
@@ -13,7 +12,7 @@ export class InvalidatableContainer {
     }
 
     public addInvalidatable(invalidatable: IInvalidatable): void {
-        if (invalidatable == null) {
+        if (!invalidatable) {
             throw new Error();
         }
         if (invalidatable === this.container) {
@@ -61,7 +60,7 @@ export class InvalidatableContainer {
 
     private invalidateAll(): void {
         for (const invalidatable of this.invalidatables) {
-            invalidatable.invalidate();
+            invalidatable.invalidate(this.container);
         }
     }
 }

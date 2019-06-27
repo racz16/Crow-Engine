@@ -4,7 +4,7 @@ import { GameObject } from "./core/GameObject";
 import { MeshComponent } from "./component/renderable/MeshComponent";
 import { Material } from "./material/Material";
 import { CameraComponent } from "./component/camera/CameraComponent";
-import { vec3, vec4, glMatrix } from "gl-matrix";
+import { vec3, vec4, glMatrix, vec2 } from "gl-matrix";
 import { Scene } from "./core/Scene";
 import { ComponentParameter } from "./utility/parameter/ComponentParameter";
 import { InfoComponent } from "./test/InfoComponent";
@@ -24,6 +24,7 @@ import { ICubeMapTexture } from "./resource/texture/ICubeMapTexture";
 import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
+import { ObbBoundingShape } from "./component/renderable/boundingshape/ObbBoundingShape";
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -143,6 +144,7 @@ export class TestSceneBuilder {
         ma.setSlot(Material.DIFFUSE, ds);
 
         const rc = new MeshComponent(this.box, ma);
+        rc.setBillboard(true);
         go.getComponents().add(rc);
     }
 
@@ -162,6 +164,7 @@ export class TestSceneBuilder {
     public createNormalPomBox(): void {
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
+
         const ma = new Material();
         ma.getParameters().set(MaterialSlot.USE_POM, new Parameter<Number>(1));
         ma.getParameters().set(MaterialSlot.POM_SCALE, new Parameter<Number>(0.2));
@@ -173,7 +176,15 @@ export class TestSceneBuilder {
         ma.setSlot(Material.NORMAL, ns);
 
         const rc = new MeshComponent(this.box, ma);
+        rc.setVisibilityInterval(vec2.fromValues(0, 1));
         go.getComponents().add(rc);
+
+        const ma2 = new Material();
+        ma2.setSlot(Material.NORMAL, ns);
+
+        const rc2 = new MeshComponent(this.box, ma2);
+        rc2.setVisibilityInterval(vec2.fromValues(1, 100));
+        go.getComponents().add(rc2);
     }
 
     public createReflectionBox(): void {
@@ -198,7 +209,7 @@ export class TestSceneBuilder {
         go.getTransform().setRelativePosition(vec3.fromValues(10, -0.5, 0));
         go.getTransform().setRelativeScale(vec3.fromValues(0.1, 0.1, 0.1));
 
-        const mc = new MeshComponent(this.dragon, new Material());
+        const mc = new MeshComponent(this.dragon, new Material(), new ObbBoundingShape());
         go.getComponents().add(mc);
 
         const rc = new RotateComponent();

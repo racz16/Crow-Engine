@@ -84,10 +84,10 @@ export class RenderingPipeline {
             return;
         }
         this.refreshIfCanvasResized();
-        /*if (Utility.isReleased(this.fbo) ||
+        /*if (!Utility.isUsable(this.fbo) ||
             this.getRenderingSize()[0] != this.getFboSize()[0] ||
             this.getRenderingSize()[1] != this.getFboSize()[1]) {
-            if (this.fbo != null) {
+            if (this.fbo) {
                 this.fbo.release();
             }
             this.fbo = new Fbo();
@@ -101,10 +101,10 @@ export class RenderingPipeline {
                 throw new Error();
             }
         }*/
-        if (this.screenRenderer == null || !this.screenRenderer.isUsable()) {
+        if (!Utility.isUsable(this.screenRenderer)) {
             this.screenRenderer = new ScreenRenderer();
         }
-        if (this.skyboxRenderer == null || !this.skyboxRenderer.isUsable()) {
+        if (!Utility.isUsable(this.skyboxRenderer)) {
             this.skyboxRenderer = new SkyBoxRenderer();
         }
     }
@@ -133,7 +133,7 @@ export class RenderingPipeline {
 
         const mainCamera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
         const dirLight = Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
-        if (mainCamera == null || !mainCamera.isActive() || dirLight == null || !dirLight.isActive()) {
+        if (!mainCamera || !mainCamera.isActive() || !dirLight || !dirLight.isActive()) {
             throw new Error();
         }
     }

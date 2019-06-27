@@ -2,7 +2,6 @@ import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
 import { vec3 } from "gl-matrix";
 import { Ubo } from "../../../webgl/buffer/Ubo";
 import { BlinnPhongLightContainer } from "./BlinnPhongLightContainer";
-import { GameObject } from "../../../core/GameObject";
 import { Scene } from "../../../core/Scene";
 import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
@@ -25,23 +24,8 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
         this.invalidate();
     }
 
-    public setActive(active: boolean): void {
-        super.setActive(active);
-        this.invalidate();
-    }
-
-    public private_attachToGameObject(object: GameObject): void {
-        super.private_attachToGameObject(object);
-        this.invalidate();
-    }
-
-    public private_detachFromGameObject(): void {
-        super.private_detachFromGameObject();
-        this.invalidate();
-    }
-
-    public invalidate(): void {
-        super.invalidate();
+    public invalidate(sender?: any): void {
+        super.invalidate(event);
         if (this.isTheMainDirectionalLight()) {
             if (BlinnPhongLightContainer.getInstance().getDirectionalLight() !== this) {
                 BlinnPhongLightContainer.getInstance().setDirectionalLight(this);

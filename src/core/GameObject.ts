@@ -74,9 +74,9 @@ export class GameObject {
     }
 
     private removeParent(): void {
-        if (this.parent != null) {
+        if (this.parent) {
             this.parent.getChildren().private_removeChild(this);
-            this.parent.getTransform().removeInvalidatable(this.transform);
+            this.parent.getTransform().getInvalidatables().removeInvalidatable(this.transform);
             parent = null;
             this.setRoot(this);
         }
@@ -84,10 +84,10 @@ export class GameObject {
 
     private addParent(parent: GameObject): void {
         this.parent = parent;
-        if (parent != null) {
+        if (parent) {
             this.setRoot(parent.getRoot());
             parent.getChildren().private_addChild(this);
-            parent.getTransform().addInvalidatable(this.getTransform());
+            parent.getTransform().getInvalidatables().addInvalidatable(this.getTransform());
         }
     }
 
@@ -100,7 +100,7 @@ export class GameObject {
     }
 
     public setTransform(transform: Transform): void {
-        if (transform.getGameObject() != null) {
+        if (transform.getGameObject()) {
             throw new Error();
         }
         this.transform.private_detachFromGameObject();

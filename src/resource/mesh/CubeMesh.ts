@@ -20,7 +20,7 @@ export class CubeMesh implements IMesh {
     }
 
     public static getInstance(): CubeMesh {
-        if (CubeMesh.instance == null) {
+        if (!CubeMesh.instance) {
             CubeMesh.instance = new CubeMesh();
         }
         return CubeMesh.instance;
@@ -42,20 +42,20 @@ export class CubeMesh implements IMesh {
         return 12;
     }
 
-    public getRadius(): number {
+    public getObjectSpaceRadius(): number {
         return Math.sqrt(3);
     }
 
-    public getAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): vec3 {
         return vec3.fromValues(-1, -1, -1);
     }
 
-    public getAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): vec3 {
         return vec3.fromValues(1, 1, 1);
     }
 
     public draw(): void {
-        if (Utility.isReleased(this.vao)) {
+        if (!Utility.isUsable(this.vao)) {
             this.loadData();
         }
         this.vao.bind();
@@ -63,7 +63,7 @@ export class CubeMesh implements IMesh {
     }
 
     public getDataSize() {
-        return Utility.isReleased(this.vao) ? 0 : this.positions.length * 4;
+        return Utility.isUsable(this.vao) ? this.positions.length * 4 : 0;
     }
 
     public release(): void {
@@ -71,8 +71,10 @@ export class CubeMesh implements IMesh {
         this.vao = null;
     }
 
-    public isReleased(): boolean {
-        return false;
+    public isUsable(): boolean {
+        return true;
     }
+
+    public private_update(): void { }
 
 }

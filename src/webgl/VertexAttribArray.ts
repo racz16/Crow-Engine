@@ -23,7 +23,7 @@ export class VertexAttribArray {
     }
 
     public getVbo(): Vbo {
-        return Utility.isReleased(this.vbo) ? null : this.vbo;
+        return Utility.isUsable(this.vbo) ? this.vbo : null;
     }
 
     public setVbo(vbo: Vbo, vap: VertexAttribPointer): void {

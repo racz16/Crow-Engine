@@ -8,7 +8,7 @@ export class ComponentContainer {
     private gameObject: GameObject;
 
     public constructor(gameObject: GameObject) {
-        if (gameObject.getComponents() != null) {
+        if (gameObject.getComponents()) {
             throw new Error();
         }
         this.gameObject = gameObject;
@@ -26,7 +26,7 @@ export class ComponentContainer {
         if (this.contains(component)) {
             return;
         }
-        if (component.getGameObject() != null) {
+        if (component.getGameObject()) {
             throw new Error();
         }
         this.addUnsafe(component);

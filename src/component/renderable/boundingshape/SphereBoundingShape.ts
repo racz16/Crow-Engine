@@ -8,11 +8,10 @@ export class SphereBoundingShape extends BoundingShape {
 
     public isInsideMainCameraFrustum(): boolean {
         const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        if (camera.isUsable() && this.isUsable()) {
+        if (camera && this.isUsable()) {
             const position = this.getRenderableComponent().getGameObject().getTransform().getAbsolutePosition();
             for (const plane of camera.getFrustum().getPlanesIterator()) {
-                const distance = plane.computeDistanceFromPlane(position);
-                if (distance + this.getRealRadius() < 0) {
+                if (plane.computeDistanceFrom(position) + this.getWorldSpaceRadius() < 0) {
                     return false;
                 }
             }
@@ -21,7 +20,7 @@ export class SphereBoundingShape extends BoundingShape {
     }
 
     private refresh(): void {
-        if (!this.isValid()) {
+        if (!this.isValid() && this.isUsable()) {
             this.refreshUnsafe();
             this.setValid(true);
         }
@@ -29,21 +28,25 @@ export class SphereBoundingShape extends BoundingShape {
 
     private refreshUnsafe(): void {
         const renderableComponent = this.getRenderableComponent();
-        const originalRadius = renderableComponent.getRenderable().getRadius();
+        const osRadius = renderableComponent.getRenderable().getObjectSpaceRadius();
         const absoluteScale = renderableComponent.getGameObject().getTransform().getAbsoluteScale();
-        this.radius = originalRadius * Utility.getMaxCoordinate(absoluteScale);
+        this.radius = osRadius * Utility.getMaxCoordinate(absoluteScale);
     }
 
-    public getOriginalRadius(): number {
-        return this.getRenderableComponent().getRenderable().getRadius();
-    }
-
-    public getRealRadius(): number {
-        if (this.getRenderableComponent().getGameObject() == null) {
-            return this.getOriginalRadius();
+    public getObjectSpaceRadius(): number {
+        if (this.getRenderableComponent()) {
+            return this.getRenderableComponent().getRenderable().getObjectSpaceRadius();
         } else {
+            return null;
+        }
+    }
+
+    public getWorldSpaceRadius(): number {
+        if (this.isUsable()) {
             this.refresh();
             return this.radius;
+        } else {
+            return null;
         }
     }
 

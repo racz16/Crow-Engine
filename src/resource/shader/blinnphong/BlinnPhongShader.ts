@@ -1,9 +1,7 @@
 import { Shader } from "../Shader";
-import { mat3, vec3, vec4, vec2 } from "gl-matrix";
-import { GameObject } from "../../../core/GameObject";
+import { mat3, vec3 } from "gl-matrix";
 import { Scene } from "../../../core/Scene";
 import { Material } from "../../../material/Material";
-import { RenderableComponent } from "../../../component/renderable/RenderableComponent";
 import { IRenderable } from "../../IRenderable";
 import { BlinnPhongDiffuseHelper } from "./BlinnPhongDiffuseHelper";
 import { BlinnPhongSpecularHelper } from "./BlinnPhongSpecularHelper";
@@ -12,6 +10,7 @@ import { BlinnPhongHelper } from "./BlinnPhongHelper";
 import { BlinnPhongReflectionHelper } from "./BlinnPhongReflectionHelper";
 import { BlinnPhongRefractionHelper } from "./BlinnPhongRefractionHelper";
 import { BlinnPhongEnvironmentHelper } from "./BlinnPhongEnvironmentHelper";
+import { IRenderableComponent } from "../../../component/renderable/IRenderableComponent";
 
 export class BlinnPhongShader extends Shader {
 
@@ -31,10 +30,10 @@ export class BlinnPhongShader extends Shader {
         ];
     }
 
-    public setUniforms(rc: RenderableComponent<IRenderable>): void {
-        const go = rc.getGameObject();
-        const inverseModel3x3 = mat3.fromMat4(mat3.create(), go.getTransform().getInverseModelMatrix());
-        const model = go.getTransform().getModelMatrix();
+    public setUniforms(rc: IRenderableComponent<IRenderable>): void {
+        
+        const model = rc.getModelMatrix();
+        const inverseModel3x3 = mat3.fromMat4(mat3.create(), rc.getInverseModelMatrix());
         const sp = this.getShaderProgram();
         sp.loadMatrix3('inverseTransposedModelMatrix3x3', inverseModel3x3, true);
         sp.loadMatrix4('modelMatrix', model, false);
@@ -51,8 +50,7 @@ export class BlinnPhongShader extends Shader {
         const reflectionSlot = material.getSlot(Material.REFLECTION);
         const isThereReflectionMap = "material.isThereReflectionMap";
         const reflectionTextureUnit = 4;
-        const reflectionUsable = reflectionSlot != null && reflectionSlot.isActive() && reflectionSlot
-            .getCubeMapTexture() != null;
+        const reflectionUsable = reflectionSlot && reflectionSlot.isActive() && reflectionSlot.getCubeMapTexture() != null;
         //refraction
         const refractionSlot = material.getSlot(Material.REFRACTION);
         const isThereRefractionMap = "material.isThereRefractionMap";
@@ -60,8 +58,7 @@ export class BlinnPhongShader extends Shader {
         const refractionIndex = "material.refractionIndex";
         const index = material.getParameters().getValue(Material.REFRACTION_INDEX) == null ? 1 / 1.33 : material
             .getParameters().getValue(Material.REFRACTION_INDEX) as number;
-        const refractionUsable = refractionSlot != null && refractionSlot.isActive() && refractionSlot
-            .getCubeMapTexture() != null;
+        const refractionUsable = refractionSlot && refractionSlot.isActive() && refractionSlot.getCubeMapTexture() != null;
         //intensity
         const intensitySlot = material.getSlot(Material.ENVIRONMENT_INTENSITY);
         const isThereIntensityMap = "material.isThereEnvironmentIntensityMap";
@@ -105,15 +102,15 @@ export class BlinnPhongShader extends Shader {
                     //sp.loadVector3(environmentProbePosition, reflectionSlot.getCubeMapTexture().getPosition());
                 }
             }
-            if (intensitySlot != null && intensitySlot.isActive()) {
+            if (intensitySlot && intensitySlot.isActive()) {
                 const texture = intensitySlot.getTexture2D();
                 const color = intensitySlot.getColor();
-                if (texture != null) {
+                if (texture) {
                     texture.bindToTextureUnit(intensityTextureUnit);
                     sp.loadBoolean(isThereIntensityMap, true);
                     sp.loadVector2(tileName, intensitySlot.getTextureTile());
                     sp.loadVector2(offsetName, intensitySlot.getTextureOffset());
-                } else if (color != null) {
+                } else if (color) {
                     sp.loadVector3(intensityColor, vec3.fromValues(color[0], color[1], color[2]));
                     sp.loadBoolean(isThereIntensityMap, false);
                 } else {
