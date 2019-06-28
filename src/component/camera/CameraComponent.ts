@@ -8,6 +8,7 @@ import { Utility } from "../../utility/Utility";
 import { GameObject } from "../../core/GameObject";
 import { Log } from "../../utility/log/Log";
 import { Frustum } from "./frustum/Frustum";
+import { RenderingPipeline } from "../../rendering/RenderingPipeline";
 
 export class CameraComponent extends Component implements ICameraComponent {
 
@@ -22,7 +23,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     private fov: number;
     private uboInitialized = false;
 
-    public constructor(fov = 70, nearPlane = 0.1, farPlane = 200) {
+    public constructor(fov = 55, nearPlane = 0.1, farPlane = 200) {
         super();
         if (!this.uboInitialized) {
             CameraComponent.createUbo();
@@ -63,7 +64,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     private static createUboUnsafe(): void {
         CameraComponent.ubo = new Ubo();
         CameraComponent.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
-        CameraComponent.ubo.bindToBindingPoint(Scene.CAMERA_BINDING_POINT);
+        CameraComponent.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
         Log.resourceInfo('matrices ubo created');
     }
 

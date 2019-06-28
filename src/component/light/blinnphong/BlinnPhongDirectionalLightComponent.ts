@@ -9,21 +9,6 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
 
     private static readonly DIRECTIONAL_LIGHT_TYPE = 0;
 
-    public setDiffuseColor(diffuse: vec3): void {
-        super.setDiffuseColor(diffuse);
-        this.invalidate();
-    }
-
-    public setSpecularColor(specular: vec3): void {
-        super.setSpecularColor(specular);
-        this.invalidate();
-    }
-
-    public setAmbientColor(ambient: vec3): void {
-        super.setAmbientColor(ambient);
-        this.invalidate();
-    }
-
     public invalidate(sender?: any): void {
         super.invalidate(event);
         if (this.isTheMainDirectionalLight()) {
@@ -46,7 +31,7 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
     }
 
     public isTheMainDirectionalLight(): boolean {
-        return this === Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
+        return Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT) === this;
     }
 
 }

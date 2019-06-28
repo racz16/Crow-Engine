@@ -7,6 +7,7 @@ import { vec3 } from "gl-matrix";
 import { ICameraComponent } from "../../camera/ICameraComponent";
 import { Utility } from "../../../utility/Utility";
 import { Log } from "../../../utility/log/Log";
+import { RenderingPipeline } from "../../../rendering/RenderingPipeline";
 
 export class BlinnPhongLightContainer {
 
@@ -19,11 +20,11 @@ export class BlinnPhongLightContainer {
     private mainDirectionalLight: BlinnPhongDirectionalLightComponent;
     private refreshDirectional = false;
     private positionalLights: Array<BlinnPhongPositionalLightComponent>;
+    private addedLightCount = 0;
 
     private constructor() {
         this.ubo = new Ubo();
         this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
-        this.ubo.bindToBindingPoint(2);
         this.positionalLights = [];
         Log.resourceInfo('Lights ubo created');
     }
@@ -35,7 +36,19 @@ export class BlinnPhongLightContainer {
         return BlinnPhongLightContainer.instance;
     }
 
+    public useLights(): void {
+        this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT.bindingPoint);
+    }
+
     public refreshUbo(): void {
+        this.refreshDirectionalLightInUbo();
+        this.sortPositionalLights();
+        this.refreshPositionalLightsInUbo();
+        this.refreshRemainingSlotsInUbo();
+        Log.resourceInfo('Lights ubo refreshed');
+    }
+
+    private refreshDirectionalLightInUbo(): void {
         if (this.refreshDirectional) {
             if (this.mainDirectionalLight && this.mainDirectionalLight.isActive() && this.mainDirectionalLight.getGameObject()) {
                 this.mainDirectionalLight.private_refresh(this.ubo);
@@ -44,21 +57,25 @@ export class BlinnPhongLightContainer {
             }
             this.refreshDirectional = false;
         }
-        this.sortPositionalLights();
-        let addedLightCount = 0;
+    }
+
+    private refreshPositionalLightsInUbo(): void {
+        this.addedLightCount = 0;
         for (const light of this.positionalLights) {
-            if (addedLightCount == BlinnPhongLightContainer.LIGHT_COUNT) {
+            if (this.addedLightCount === BlinnPhongLightContainer.LIGHT_COUNT) {
                 return;
             }
             if (light.isActive() && light.getGameObject()) {
-                light.private_refresh(this.ubo, addedLightCount + 1);
-                addedLightCount++;
+                light.private_refresh(this.ubo, this.addedLightCount + 1);
+                this.addedLightCount++;
             }
         }
-        for (let i = addedLightCount; i < BlinnPhongLightContainer.LIGHT_COUNT; i++) {
+    }
+
+    private refreshRemainingSlotsInUbo(): void {
+        for (let i = this.addedLightCount; i < BlinnPhongLightContainer.LIGHT_COUNT; i++) {
             this.ubo.storewithOffset(new Int32Array([0]), (i + 1) * BlinnPhongLightContainer.LIGHT_DATASIZE + BlinnPhongLightContainer.ACTIVE_OFFSET);
         }
-        Log.resourceInfo('Lights ubo refreshed');
     }
 
     private sortPositionalLights(): void {
@@ -80,10 +97,9 @@ export class BlinnPhongLightContainer {
     }
 
     public private_addLight(light: BlinnPhongPositionalLightComponent): void {
-        if (Utility.contains(this.positionalLights, light)) {
-            return;
+        if (!Utility.contains(this.positionalLights, light)) {
+            this.positionalLights.push(light);
         }
-        this.positionalLights.push(light);
     }
 
     public refreshDirectionalLight(): void {
@@ -92,7 +108,7 @@ export class BlinnPhongLightContainer {
 
     public setDirectionalLight(dirLight: BlinnPhongDirectionalLightComponent): void {
         this.mainDirectionalLight = dirLight;
-        this.refreshDirectional = true;
+        this.refreshDirectionalLight();
     }
 
     public getPositionalLight(index: number): BlinnPhongPositionalLightComponent {

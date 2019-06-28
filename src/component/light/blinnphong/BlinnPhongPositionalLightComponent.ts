@@ -18,6 +18,7 @@ export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLight
 
     public setConstant(constant: number) {
         this.constant = constant;
+        this.invalidate();
     }
 
     public getLinear(): number {
@@ -26,6 +27,7 @@ export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLight
 
     public setLinear(linear: number) {
         this.linear = linear;
+        this.invalidate();
     }
 
     public getQuadratic(): number {
@@ -34,6 +36,7 @@ export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLight
 
     public setQuadratic(quadratic: number): void {
         this.quadratic = quadratic;
+        this.invalidate();
     }
 
 }

@@ -34,6 +34,7 @@ export abstract class BlinnPhongLightComponent extends Component {
             throw new Error();
         }
         this.diffuseColor.set(diffuse);
+        this.invalidate();
     }
 
     public getSpecularColor(): vec3 {
@@ -45,6 +46,7 @@ export abstract class BlinnPhongLightComponent extends Component {
             throw new Error();
         }
         this.specularColor.set(specular);
+        this.invalidate();
     }
 
     public getAmbientColor(): vec3 {
@@ -56,6 +58,7 @@ export abstract class BlinnPhongLightComponent extends Component {
             throw new Error();
         }
         this.ambientColor.set(ambient);
+        this.invalidate();
     }
 
     public private_detachFromGameObject(): void {

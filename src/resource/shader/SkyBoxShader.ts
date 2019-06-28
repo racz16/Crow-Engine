@@ -1,11 +1,13 @@
 import { Shader } from "./Shader";
 import { Scene } from "../../core/Scene";
+import { RenderingPipeline } from "../../rendering/RenderingPipeline";
+import { Utility } from "../../utility/Utility";
 
 export class SkyBoxShader extends Shader {
 
     public constructor() {
         super();
-        this.getShaderProgram().bindUniformBlockToBindingPoint('Camera', Scene.CAMERA_BINDING_POINT);
+        Utility.bindUniformBlockToBindingPoint(this.getShaderProgram(), RenderingPipeline.CAMERA_BINDING_POINT);
     }
 
     public setUniforms() {

@@ -15,9 +15,6 @@ export class Scene {
     private static readonly GAMEOBJECTS = new GameObjectContainer();
     private static readonly PARAMETERS = new ParameterContainer();
 
-    public static readonly CAMERA_BINDING_POINT = 1;
-    public static readonly LIGHTS_BINDING_POINT = 2;
-
     private constructor() { }
 
     public static getGameObjects(): GameObjectContainer {

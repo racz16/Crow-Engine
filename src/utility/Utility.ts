@@ -1,6 +1,8 @@
 import { mat4, vec3 } from "gl-matrix";
 import { IResource } from "../resource/IResource";
 import { Gl } from "../webgl/Gl";
+import { GlShaderProgram } from "../webgl/shader/GlShaderProgram";
+import { BindingPoint } from "../rendering/BindingPoint";
 
 export class Utility {
 
@@ -82,6 +84,10 @@ export class Utility {
             }
         }
         return max;
+    }
+
+    public static bindUniformBlockToBindingPoint(shader: GlShaderProgram, bindingPoint: BindingPoint): void {
+        shader.bindUniformBlockToBindingPoint(bindingPoint.name, bindingPoint.bindingPoint);
     }
 
     public static loadResource<T>(path: string, callback: (resource: T) => void, async?: boolean, responseType?: XMLHttpRequestResponseType): void {

@@ -31,6 +31,7 @@ export class BlinnPhongSpotLightComponent extends BlinnPhongPositionalLightCompo
             throw new Error();
         }
         this.cutoff = cutoff;
+        this.invalidate();
     }
 
     public getOuterCutoff(): number {
@@ -42,6 +43,7 @@ export class BlinnPhongSpotLightComponent extends BlinnPhongPositionalLightCompo
             throw new Error();
         }
         this.outerCutoff = outerCutoff;
+        this.invalidate();
     }
 
 }

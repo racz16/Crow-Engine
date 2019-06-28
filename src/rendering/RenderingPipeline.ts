@@ -16,6 +16,7 @@ import { InternalFormat } from "../webgl/enum/InternalFormat";
 import { ScreenRenderer } from "./ScreenRenderer";
 import { Parameter } from "../utility/parameter/Parameter";
 import { Log } from "../utility/log/Log";
+import { BindingPoint } from "./BindingPoint";
 
 export class RenderingPipeline {
 
@@ -30,6 +31,9 @@ export class RenderingPipeline {
     private static fbo: Fbo;
     private static screenRenderer: ScreenRenderer;
     private static skyboxRenderer: SkyBoxRenderer;
+
+    public static readonly CAMERA_BINDING_POINT = new BindingPoint(1, 'Camera');
+    public static readonly LIGHTS_BINDING_POINT = new BindingPoint(2, 'Lights');
 
     public static readonly WORK = new ParameterKey<ITexture2D>(GlTexture2D, "WORK");
 
