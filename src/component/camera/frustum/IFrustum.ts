@@ -4,6 +4,7 @@ import { FrustumPlane } from "./FrustumPlane";
 import { FrustumSide } from "./FrustumSide";
 
 export interface IFrustum {
+    
     getCenterPoint(): vec3;
 
     getCornerPointsIterator(): IterableIterator<vec3>;
@@ -13,9 +14,5 @@ export interface IFrustum {
     getPlanesIterator(): IterableIterator<FrustumPlane>;
 
     getPlane(side: FrustumSide): FrustumPlane;
-
-    refresh(): void;
-
-    isUsable(): boolean;
 
 }

@@ -59,7 +59,7 @@ export class BlinnPhongRenderer extends Renderer {
         if (!Utility.isUsable(this.shader)) {
             this.shader = new BlinnPhongShader();
         }
-        CameraComponent.refreshMatricesUbo();
+        
         BlinnPhongLightContainer.getInstance().refreshUbo();
         this.shader.start();
         //RenderingPipeline.bindFbo();

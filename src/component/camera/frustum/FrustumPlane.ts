@@ -1,4 +1,4 @@
-import { vec3, vec4, mat4, glMatrix } from "gl-matrix";
+import { vec3 } from "gl-matrix";
 
 export class FrustumPlane {
     public readonly normalVector: vec3;

@@ -12,10 +12,10 @@ export interface ICameraComponent extends IComponent {
 
     getFov(): number;
 
+    getAspectRatio(): number;
+
     getNearPlaneDistance(): number;
 
     getFarPlaneDistance(): number;
-
-    isUsable(): boolean;
 
 }

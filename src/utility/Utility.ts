@@ -32,15 +32,18 @@ export class Utility {
         return Utility.computeInverseModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
     }
 
-    public static computePerspectiveProjectionMatrix(fov: number, nearPlane: number, farPlane: number): mat4 {
-        if (fov <= 0 || fov >= 180 || nearPlane <= 0 || farPlane <= nearPlane) {
+    public static computeInverseViewMatrix(position: vec3, rotation: vec3): mat4 {
+        return Utility.computeModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
+    }
+
+    public static computePerspectiveProjectionMatrix(fov: number, aspectRatio: number, nearPlane: number, farPlane: number): mat4 {
+        if (fov <= 0 || fov >= 180 || nearPlane <= 0 || farPlane <= nearPlane || aspectRatio <= 0) {
             throw new Error();
         }
-        const aspectRatio = Utility.getAspectRatio();
         return mat4.perspective(mat4.create(), this.toRadians(fov), aspectRatio, nearPlane, farPlane);
     }
 
-    public static getAspectRatio(): number {
+    public static getCanvasAspectRatio(): number {
         return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;;
     }
 

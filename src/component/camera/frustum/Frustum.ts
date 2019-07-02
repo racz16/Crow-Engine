@@ -4,8 +4,10 @@ import { ICameraComponent } from "../ICameraComponent";
 import { FrustumPlane } from "./FrustumPlane";
 import { FrustumSide, FrustumSideResolver } from "./FrustumSide";
 import { IFrustum } from "./IFrustum";
+import { IInvalidatable } from "../../../utility/invalidatable/IInvalidatable";
+import { Utility } from "../../../utility/Utility";
 
-export class Frustum implements IFrustum {
+export class Frustum implements IFrustum, IInvalidatable {
 
     private readonly planes = new Map<FrustumSide, FrustumPlane>();
     private readonly cornerPoints = new Map<FrustumCornerPoint, vec3>();
@@ -13,37 +15,74 @@ export class Frustum implements IFrustum {
     private readonly camera: ICameraComponent;
     private IP: mat4;
     private IV: mat4;
+    private valid = false;
 
     public constructor(camera: ICameraComponent) {
         this.camera = camera;
+        camera.getInvalidatables().addInvalidatable(this);
     }
 
     public getCenterPoint(): vec3 {
-        return vec3.clone(this.centerPoint);
+        if (this.isUsable()) {
+            this.refresh();
+            return vec3.clone(this.centerPoint);
+        } else {
+            return null;
+        }
     }
 
     public getCornerPointsIterator(): IterableIterator<vec3> {
-        return this.cornerPoints.values();
+        if (this.isUsable()) {
+            this.refresh();
+            return this.cornerPoints.values();
+        } else {
+            return null;
+        }
     }
 
     public getCornerPoint(cornerPoint: FrustumCornerPoint): vec3 {
-        return vec3.clone(this.cornerPoints.get(cornerPoint));
+        if (this.isUsable()) {
+            this.refresh();
+            return vec3.clone(this.cornerPoints.get(cornerPoint));
+        } else {
+            return null;
+        }
     }
 
     public getPlanesIterator(): IterableIterator<FrustumPlane> {
-        return this.planes.values();
+        if (this.isUsable()) {
+            this.refresh();
+            return this.planes.values();
+        } else {
+            return null;
+        }
     }
 
     public getPlane(side: FrustumSide): FrustumPlane {
-        return this.planes.get(side);
+        if (this.isUsable()) {
+            this.refresh();
+            return this.planes.get(side);
+        } else {
+            return null;
+        }
     }
 
-    public refresh(): void {
-        this.IP = mat4.invert(mat4.create(), this.camera.getProjectionMatrix());
-        this.IV = mat4.invert(mat4.create(), this.camera.getViewMatrix());
-        this.refreshCornerPoints();
-        this.refreshCenterPoint();
-        this.refreshPlanes();
+    private refresh(): void {
+        if (!this.valid) {
+            this.IP = mat4.invert(mat4.create(), this.camera.getProjectionMatrix());
+            this.IV = this.computeInverseViewMatrix();
+            this.refreshCornerPoints();
+            this.refreshCenterPoint();
+            this.refreshPlanes();
+            this.valid = true;
+        }
+    }
+
+    private computeInverseViewMatrix(): mat4 {
+        const transform = this.camera.getGameObject().getTransform();
+        const position = transform.getAbsolutePosition();
+        const rotation = transform.getAbsoluteRotation();
+        return Utility.computeInverseViewMatrix(position, rotation);
     }
 
     private refreshCornerPoints(): void {
@@ -86,8 +125,12 @@ export class Frustum implements IFrustum {
         return new FrustumPlane(normalVector, p0);
     }
 
-    public isUsable(): boolean {
-        return this.camera != null;
+    public invalidate(sender?: any): void {
+        this.valid = false;
+    }
+
+    private isUsable(): boolean {
+        return this.camera != null && this.camera.getGameObject() != null;
     }
 
 }

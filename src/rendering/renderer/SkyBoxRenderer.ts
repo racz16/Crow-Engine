@@ -40,7 +40,6 @@ export class SkyBoxRenderer extends Renderer {
         if (!this.isUsable()) {
             this.shader = new SkyBoxShader();
         }
-        CameraComponent.refreshMatricesUbo();
         this.shader.start();
         //RenderingPipeline.bindFbo();
         Gl.gl.depthFunc(Gl.gl.LEQUAL);
