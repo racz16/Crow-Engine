@@ -10,7 +10,7 @@ export class AabbBoundingShape extends BoundingShape {
 
     public isInsideMainCameraFrustum(): boolean {
         const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        if (camera && this.isUsable()) {
+        if (camera && !this.getRenderableComponent().getBillboard() && this.isUsable()) {
             this.refresh();
             return this.isInsideMainCameraFrustumUnsafe(camera);
         }
@@ -37,7 +37,7 @@ export class AabbBoundingShape extends BoundingShape {
     }
 
     private refresh(): void {
-        if ((!this.isValid() || this.getRenderableComponent().isBillboard()) && this.isUsable()) {
+        if (!this.isValid() && !this.getRenderableComponent().getBillboard() && this.isUsable()) {
             this.refreshUnsafe();
             this.setValid(true);
         }
@@ -77,7 +77,7 @@ export class AabbBoundingShape extends BoundingShape {
     }
 
     public getWorldSpaceAabbMin(): vec3 {
-        if (!this.isUsable()) {
+        if (!this.isUsable() && !this.getRenderableComponent().getBillboard()) {
             this.refresh();
             return vec3.clone(this.aabbMin);
         } else {
@@ -90,7 +90,7 @@ export class AabbBoundingShape extends BoundingShape {
     }
 
     public getWorldSpaceAabbMax(): vec3 {
-        if (this.isUsable()) {
+        if (this.isUsable() && !this.getRenderableComponent().getBillboard()) {
             this.refresh();
             return vec3.clone(this.aabbMax);
         } else {

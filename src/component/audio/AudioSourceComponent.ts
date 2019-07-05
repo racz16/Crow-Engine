@@ -4,7 +4,6 @@ import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelT
 import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";
 import { GameObject } from "../../core/GameObject";
 import { Audio } from "../../resource/Audio";
-import { Transform } from "../../core/Transform";
 
 export class AudioSourceComponent extends Component {
 

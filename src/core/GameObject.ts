@@ -100,6 +100,7 @@ export class GameObject {
     }
 
     public setTransform(transform: Transform): void {
+        //TODO: ne lehessen változtatni, max a konstruktorban
         if (transform.getGameObject()) {
             throw new Error();
         }

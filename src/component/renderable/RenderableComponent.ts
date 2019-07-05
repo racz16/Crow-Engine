@@ -7,8 +7,7 @@ import { IBoundingShape } from "./boundingshape/IBoundingShape";
 import { SphereBoundingShape } from "./boundingshape/SphereBoundingShape";
 import { IRenderableComponent } from "./IRenderableComponent";
 import { vec2, mat4 } from "gl-matrix";
-import { Scene } from "../../core/Scene";
-import { Utility } from "../../utility/Utility";
+import { IBillboard } from "./billboard/IBillboard";
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 
@@ -20,7 +19,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     private castShadow = true;
     private receiveShadow = true;
     private reflectable = false;
-    private billboard = false;
+    private billboard: IBillboard;
 
     public constructor(renderable: T, material = new Material(), boundingShape: IBoundingShape = new SphereBoundingShape()) {
         super();
@@ -69,12 +68,19 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.invalidate();
     }
 
-    public isBillboard(): boolean {
+    public getBillboard(): IBillboard {
         return this.billboard;
     }
 
-    public setBillboard(billboard: boolean): void {
+    public setBillboard(billboard: IBillboard): void {
+        if (billboard && billboard.getRenderableComponent()) {
+            throw new Error();
+        }
+        if (this.billboard) {
+            this.billboard.private_setRenderableComponent(null);
+        }
         this.billboard = billboard;
+        this.billboard.private_setRenderableComponent(this);
         this.invalidate();
     }
 
@@ -128,8 +134,8 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     public getModelMatrix(): mat4 {
         if (this.getGameObject()) {
-            if (this.isBillboard()) {
-                return this.computeBillboardModelMatrix();
+            if (this.billboard) {
+                return this.billboard.getModelMatrix(this.getGameObject().getTransform());
             } else {
                 return this.getGameObject().getTransform().getModelMatrix();
             }
@@ -138,35 +144,16 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    private computeBillboardModelMatrix(): mat4 {
-        const modelMatrix = mat4.transpose(mat4.create(), Scene.getParameters().getValue(Scene.MAIN_CAMERA).getViewMatrix());
-        for (let i = 0; i < 3; i++) {
-            modelMatrix[i + 12] = this.getGameObject().getTransform().getAbsolutePosition()[i];
-        }
-        modelMatrix[3] = modelMatrix[7] = modelMatrix[11] = 0;
-        modelMatrix[15] = 1;
-        mat4.scale(modelMatrix, modelMatrix, this.getGameObject().getTransform().getAbsoluteScale());
-        return modelMatrix;
-    }
-
     public getInverseModelMatrix(): mat4 {
         if (this.getGameObject()) {
-            if (this.isBillboard()) {
-                return this.computeBillboardInverseModelMatrix();
+            if (this.billboard) {
+                return this.billboard.getInverseModelMatrix(this.getGameObject().getTransform());
             } else {
                 return this.getGameObject().getTransform().getInverseModelMatrix();
             }
         } else {
             return null;
         }
-    }
-
-    private computeBillboardInverseModelMatrix(): mat4 {
-        const transform = this.getGameObject().getTransform();
-        const position = transform.getAbsolutePosition();
-        const rotation = transform.getAbsoluteRotation();
-        const scale = transform.getAbsoluteScale();
-        return Utility.computeInverseModelMatrix(position, rotation, scale);
     }
 
     public abstract getFaceCount(): number;

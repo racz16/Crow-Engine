@@ -9,7 +9,7 @@ export class ObbBoundingShape extends BoundingShape {
     private camera: ICameraComponent;
 
     public isInsideMainCameraFrustum(): boolean {
-        if (this.isUsable()) {
+        if (this.isUsable() && !this.getRenderableComponent().getBillboard()) {
             this.refresh();
             if (this.camera) {
                 this.isInsideMainCameraFrustumUnsafe();
@@ -47,7 +47,7 @@ export class ObbBoundingShape extends BoundingShape {
 
     private refresh(): void {
         this.handleMainCameraChange();
-        if ((!this.isValid() || this.getRenderableComponent().isBillboard()) && this.isUsable() && this.camera) {
+        if (!this.isValid() && !this.getRenderableComponent().getBillboard() && this.isUsable() && this.camera) {
             this.refreshUnsafe();
             this.setValid(true);
         }
@@ -75,20 +75,14 @@ export class ObbBoundingShape extends BoundingShape {
         const cornerPoints = this.computeObjectSpaceAabbCornerPoints();
         const MVP = mat4.create();
         mat4.mul(MVP, this.camera.getProjectionMatrix(), mat4.mul(MVP, this.camera.getViewMatrix(), this.getRenderableComponent().getModelMatrix()));
-        //const M = this.getRenderableComponent().getModelMatrix();
-        //const V = this.camera.getViewMatrix();
-        //const P = this.camera.getProjectionMatrix();
         for (const cornerPoint of cornerPoints) {
             vec4.transformMat4(cornerPoint, cornerPoint, MVP);
-            //vec4.transformMat4(cornerPoint, cornerPoint, M);
-            //vec4.transformMat4(cornerPoint, cornerPoint, V);
-            //vec4.transformMat4(cornerPoint, cornerPoint, P);
         }
         this.clipSpaceObbCornerPoints = cornerPoints;
     }
 
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
-        if (this.isUsable()) {
+        if (this.isUsable() && !this.getRenderableComponent().getBillboard()) {
             this.refresh();
             if (this.camera) {
                 return this.clipSpaceObbCornerPoints.values();

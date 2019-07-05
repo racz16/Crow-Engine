@@ -10,7 +10,7 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
     private static readonly DIRECTIONAL_LIGHT_TYPE = 0;
 
     public invalidate(sender?: any): void {
-        super.invalidate(event);
+        super.invalidate();
         if (this.isTheMainDirectionalLight()) {
             if (BlinnPhongLightContainer.getInstance().getDirectionalLight() !== this) {
                 BlinnPhongLightContainer.getInstance().setDirectionalLight(this);
