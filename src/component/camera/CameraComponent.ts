@@ -9,6 +9,7 @@ import { GameObject } from "../../core/GameObject";
 import { Log } from "../../utility/log/Log";
 import { Frustum } from "./frustum/Frustum";
 import { RenderingPipeline } from "../../rendering/RenderingPipeline";
+import { IFrustum } from "./frustum/IFrustum";
 
 export class CameraComponent extends Component implements ICameraComponent {
 
@@ -17,7 +18,7 @@ export class CameraComponent extends Component implements ICameraComponent {
 
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
-    private readonly frustum: Frustum;
+    private frustum: IFrustum;
     private nearPlaneDistance: number;
     private farPlaneDistance: number;
     private fov: number;
@@ -25,7 +26,7 @@ export class CameraComponent extends Component implements ICameraComponent {
 
     public constructor(fov = 55, aspectRatio = 1, nearPlane = 0.1, farPlane = 200) {
         super();
-        this.frustum = new Frustum(this);
+        this.setFrustum(new Frustum());
         this.setFov(fov);
         this.setAspectRatio(aspectRatio);
         this.setNearPlaneDistance(nearPlane);
@@ -41,8 +42,12 @@ export class CameraComponent extends Component implements ICameraComponent {
     private static createUboUnsafe(): void {
         this.ubo = new Ubo();
         this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
-        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
+        this.useCameraUbo();
         Log.resourceInfo('camera ubo created');
+    }
+
+    public static useCameraUbo(): void {
+        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
     }
 
     public static refreshUbo(): void {
@@ -174,8 +179,20 @@ export class CameraComponent extends Component implements ICameraComponent {
         return mat4.clone(this.projectionMatrix);
     }
 
-    public getFrustum(): Frustum {
+    public getFrustum(): IFrustum {
         return this.frustum;
+    }
+
+    public setFrustum(frustum: IFrustum): void {
+        if (!frustum || frustum.getCameraComponent()) {
+            throw new Error();
+        }
+        if (this.frustum) {
+            this.frustum.private_setCameraComponent(null);
+        }
+        this.frustum = frustum;
+        this.frustum.private_setCameraComponent(this);
+        this.invalidate();
     }
 
     public isTheMainCamera(): boolean {

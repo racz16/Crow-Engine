@@ -8,8 +8,6 @@ export interface IComponent extends IInvalidatable {
 
     isActive(): boolean;
 
-    setActive(active: boolean): void;
-
     getGameObject(): GameObject;
 
 }

@@ -8,6 +8,11 @@ export class Utility {
 
     private constructor() { }
 
+    public static isParallel(a: vec3, b: vec3): boolean {
+        const dot = vec3.dot(a, b);
+        return dot === 1 || dot === -1;
+    }
+
     public static computeModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
         let model = mat4.create();
         mat4.translate(model, model, position);

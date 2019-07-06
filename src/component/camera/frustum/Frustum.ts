@@ -12,15 +12,10 @@ export class Frustum implements IFrustum, IInvalidatable {
     private readonly planes = new Map<FrustumSide, FrustumPlane>();
     private readonly cornerPoints = new Map<FrustumCornerPoint, vec3>();
     private centerPoint: vec3;
-    private readonly camera: ICameraComponent;
+    private cameraComponent: ICameraComponent;
     private IP: mat4;
     private IV: mat4;
     private valid = false;
-
-    public constructor(camera: ICameraComponent) {
-        this.camera = camera;
-        camera.getInvalidatables().addInvalidatable(this);
-    }
 
     public getCenterPoint(): vec3 {
         if (this.isUsable()) {
@@ -69,7 +64,7 @@ export class Frustum implements IFrustum, IInvalidatable {
 
     private refresh(): void {
         if (!this.valid) {
-            this.IP = mat4.invert(mat4.create(), this.camera.getProjectionMatrix());
+            this.IP = mat4.invert(mat4.create(), this.cameraComponent.getProjectionMatrix());
             this.IV = this.computeInverseViewMatrix();
             this.refreshCornerPoints();
             this.refreshCenterPoint();
@@ -79,7 +74,7 @@ export class Frustum implements IFrustum, IInvalidatable {
     }
 
     private computeInverseViewMatrix(): mat4 {
-        const transform = this.camera.getGameObject().getTransform();
+        const transform = this.cameraComponent.getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const rotation = transform.getAbsoluteRotation();
         return Utility.computeInverseViewMatrix(position, rotation);
@@ -125,12 +120,27 @@ export class Frustum implements IFrustum, IInvalidatable {
         return new FrustumPlane(normalVector, p0);
     }
 
+    public getCameraComponent(): ICameraComponent {
+        return this.cameraComponent;
+    }
+
+    public private_setCameraComponent(cameraComponent: ICameraComponent): void {
+        if (this.cameraComponent) {
+            this.cameraComponent.getInvalidatables().removeInvalidatable(this);
+        }
+        this.cameraComponent = cameraComponent;
+        if (this.cameraComponent) {
+            this.cameraComponent.getInvalidatables().addInvalidatable(this);
+        }
+        this.invalidate();
+    }
+
     public invalidate(sender?: any): void {
         this.valid = false;
     }
 
     private isUsable(): boolean {
-        return this.camera != null && this.camera.getGameObject() != null;
+        return this.cameraComponent && this.cameraComponent.getGameObject() != null;
     }
 
 }

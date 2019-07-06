@@ -135,7 +135,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     public getModelMatrix(): mat4 {
         if (this.getGameObject()) {
             if (this.billboard) {
-                return this.billboard.getModelMatrix(this.getGameObject().getTransform());
+                return this.billboard.getModelMatrix();
             } else {
                 return this.getGameObject().getTransform().getModelMatrix();
             }
@@ -147,7 +147,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     public getInverseModelMatrix(): mat4 {
         if (this.getGameObject()) {
             if (this.billboard) {
-                return this.billboard.getInverseModelMatrix(this.getGameObject().getTransform());
+                return this.billboard.getInverseModelMatrix();
             } else {
                 return this.getGameObject().getTransform().getInverseModelMatrix();
             }

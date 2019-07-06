@@ -6,9 +6,9 @@ import { IInvalidatable } from "../../../utility/invalidatable/IInvalidatable";
 
 export interface IBillboard extends IInvalidatable {
 
-    getModelMatrix(transform: Transform): mat4;
+    getModelMatrix(): mat4;
 
-    getInverseModelMatrix(transform: Transform): mat4;
+    getInverseModelMatrix(): mat4;
 
     getRenderableComponent(): IRenderableComponent<IRenderable>;
 

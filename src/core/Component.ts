@@ -32,7 +32,7 @@ export class Component implements IComponent {
 
     public setActive(active: boolean): void {
         this.active = active;
-        this.invalidatables.invalidate();
+        this.invalidate();
     }
 
     public getGameObject(): GameObject {
@@ -41,12 +41,12 @@ export class Component implements IComponent {
 
     public private_attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
-        this.invalidatables.invalidate();
+        this.invalidate();
     }
 
     public private_detachFromGameObject(): void {
         this.gameObject = null;
-        this.invalidatables.invalidate();
+        this.invalidate();
     }
 
     public private_update(): void { }

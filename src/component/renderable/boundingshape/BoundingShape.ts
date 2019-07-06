@@ -8,17 +8,6 @@ export abstract class BoundingShape implements IBoundingShape {
     private renderableComponent: IRenderableComponent<IRenderable>;
     private valid = false;
 
-    public private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
-        if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
-        }
-        this.renderableComponent = renderableComponent;
-        if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().addInvalidatable(this);
-        }
-        this.invalidate();
-    }
-
     public getRenderableComponent(): IRenderableComponent<IRenderable> {
         return this.renderableComponent;
     }
@@ -64,6 +53,17 @@ export abstract class BoundingShape implements IBoundingShape {
         } else {
             return null;
         }
+    }
+
+    public private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+        if (this.renderableComponent) {
+            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+        }
+        this.renderableComponent = renderableComponent;
+        if (this.renderableComponent) {
+            this.renderableComponent.getInvalidatables().addInvalidatable(this);
+        }
+        this.invalidate();
     }
 
     public invalidate(): void {

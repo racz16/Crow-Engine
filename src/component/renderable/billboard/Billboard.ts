@@ -1,5 +1,4 @@
 import { IBillboard } from "./IBillboard";
-import { Transform } from "../../../core/Transform";
 import { mat4, vec3 } from "gl-matrix";
 import { ICameraComponent } from "../../camera/ICameraComponent";
 import { IRenderableComponent } from "../IRenderableComponent";
@@ -70,7 +69,6 @@ export abstract class Billboard implements IBillboard {
             if (this.camera != camera) {
                 this.changeCamera(camera);
             }
-            console.log('refresh');
             this.refreshUnsafe();
             this.valid = true;
         }

@@ -27,7 +27,6 @@ export class BlinnPhongRenderer extends Renderer {
     public render(): void {
         Log.renderingInfo('Blinn-Phong renderer started');
         const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        BlinnPhongLightContainer.getInstance().useLights();
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
@@ -59,8 +58,9 @@ export class BlinnPhongRenderer extends Renderer {
         if (!Utility.isUsable(this.shader)) {
             this.shader = new BlinnPhongShader();
         }
-        
+
         BlinnPhongLightContainer.getInstance().refreshUbo();
+        BlinnPhongLightContainer.getInstance().useLightsUbo();
         this.shader.start();
         //RenderingPipeline.bindFbo();
         Gl.setViewport(RenderingPipeline.getRenderingSize(), vec2.create());

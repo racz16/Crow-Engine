@@ -19,28 +19,40 @@ export class BlinnPhongLightContainer {
     private ubo: Ubo;
     private mainDirectionalLight: BlinnPhongDirectionalLightComponent;
     private refreshDirectional = false;
-    private positionalLights: Array<BlinnPhongPositionalLightComponent>;
+    private positionalLights = new Array<BlinnPhongPositionalLightComponent>();
     private addedLightCount = 0;
 
-    private constructor() {
-        this.ubo = new Ubo();
-        this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
-        this.positionalLights = [];
-        Log.resourceInfo('Lights ubo created');
-    }
+    private constructor() { }
 
     public static getInstance(): BlinnPhongLightContainer {
-        if (!BlinnPhongLightContainer.instance) {
-            BlinnPhongLightContainer.instance = new BlinnPhongLightContainer();
+        if (!this.instance) {
+            this.instance = new BlinnPhongLightContainer();
         }
-        return BlinnPhongLightContainer.instance;
+        return this.instance;
     }
 
-    public useLights(): void {
+    public useLightsUbo(): void {
         this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT.bindingPoint);
     }
 
+    private createUboIfNotUsable(): void {
+        if (!this.isUsable()) {
+            this.ubo = new Ubo();
+            this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
+            Log.resourceInfo('Lights ubo created');
+        }
+    }
+
+    public releaseUbo(): void {
+        if (this.isUsable()) {
+            this.ubo.release();
+            this.ubo = null;
+            this.refreshDirectional = true;
+        }
+    }
+
     public refreshUbo(): void {
+        this.createUboIfNotUsable();
         this.refreshDirectionalLightInUbo();
         this.sortPositionalLights();
         this.refreshPositionalLightsInUbo();
@@ -125,6 +137,10 @@ export class BlinnPhongLightContainer {
 
     public getDirectionalLight(): BlinnPhongDirectionalLightComponent {
         return this.mainDirectionalLight;
+    }
+
+    public isUsable(): boolean {
+        return Utility.isUsable(this.ubo);
     }
 
 }

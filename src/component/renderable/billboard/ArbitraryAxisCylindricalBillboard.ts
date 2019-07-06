@@ -1,5 +1,6 @@
 import { Billboard } from "./Billboard";
 import { vec3, mat4 } from "gl-matrix";
+import { Utility } from "../../../utility/Utility";
 
 export class ArbitraryAxisCylindricalBillboard extends Billboard {
 
@@ -27,8 +28,8 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
         const cameraPosition = cameraTransform.getAbsolutePosition();
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
-        let forward = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), cameraPosition, position));
-        if (vec3.dot(forward, this.axis) === 1) {
+        const forward = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), cameraPosition, position));
+        if (Utility.isParallel(forward, this.axis)) {
             this.setMatricesToDefault();
         } else {
             this.refreshMatrices(forward);

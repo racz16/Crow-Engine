@@ -1,5 +1,6 @@
 import { Billboard } from "./Billboard";
 import { mat4, vec3 } from "gl-matrix";
+import { Utility } from "../../../utility/Utility";
 
 export class RealSphericalBillboard extends Billboard {
 
@@ -9,7 +10,7 @@ export class RealSphericalBillboard extends Billboard {
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const forward = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), cameraPosition, position));
-        if (vec3.dot(forward, cameraUp) === 1) {
+        if (Utility.isParallel(forward, cameraUp)) {
             this.setMatricesToDefault();
         } else {
             this.refreshMatrices(forward, cameraUp);
