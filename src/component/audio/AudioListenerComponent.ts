@@ -34,7 +34,7 @@ export class AudioListenerComponent extends Component {
     public private_detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
         super.private_detachFromGameObject();
-        if (this.isTheMainAudioListener) {
+        if (this.isTheMainAudioListener()) {
             Audio.setAudioListenerToDefault();
         }
     }

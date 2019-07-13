@@ -1,31 +1,62 @@
 import { vec3 } from "gl-matrix";
+import { IAudioSourceComponent } from "../component/audio/IAudioSourceComponent";
 
 export class Audio {
+
     private static ctx: AudioContext;
-    private static muted = true;
     private static deprecated: boolean;
+    private static volume = 1;
+    private static audioSources = new Array<IAudioSourceComponent>();
 
     private constructor() { }
 
     public static initialize(): void {
         this.ctx = new AudioContext();
-        this.ctx.suspend();
         this.deprecated = this.ctx.listener.positionX === undefined;
+    }
+
+    public static private_add(audioSource: IAudioSourceComponent): void {
+        if (!this.audioSources.includes(audioSource)) {
+            this.audioSources.push(audioSource);
+        }
+    }
+
+    public static getAudioSourceCount(): number {
+        return this.audioSources.length;
+    }
+
+    public static getAudioSource(index: number): IAudioSourceComponent {
+        return this.audioSources[index];
+    }
+
+    public static getAudioSourcesIterator(): IterableIterator<IAudioSourceComponent> {
+        return this.audioSources.values();
     }
 
     public static get context(): AudioContext {
         return this.ctx;
     }
 
-    public static isMuted(): boolean {
-        return this.muted;
+    public static getVolume(): number {
+        return this.volume;
     }
 
-    public static setMuted(muted: boolean): void {
-        this.muted = muted;
-        if (!this.isMuted()) {
-            this.ctx.resume();
+    public static setVolume(volume: number): void {
+        if (volume < 0) {
+            throw new Error();
         }
+        this.volume = volume;
+        for (const audioSource of this.audioSources) {
+            audioSource.invalidate();
+        }
+    }
+
+    public static isContextUsable(): boolean {
+        return this.ctx.state === 'running';
+    }
+
+    public static tryStartContext(): void {
+        this.ctx.resume();
     }
 
     public static setAudioListenerToDefault(): void {
@@ -57,12 +88,16 @@ export class Audio {
         if (this.deprecated) {
             listener.setOrientation(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
         } else {
-            listener.forwardX.setValueAtTime(forward[0], 0);
-            listener.forwardY.setValueAtTime(forward[1], 0);
-            listener.forwardZ.setValueAtTime(forward[2], 0);
-            listener.upX.setValueAtTime(up[0], 0);
-            listener.upY.setValueAtTime(up[1], 0);
-            listener.upZ.setValueAtTime(up[2], 0);
+            this.setAudioListenerOrientation(listener, forward, up);
         }
+    }
+
+    private static setAudioListenerOrientation(listener: AudioListener, forward: vec3, up: vec3): void {
+        listener.forwardX.setValueAtTime(forward[0], 0);
+        listener.forwardY.setValueAtTime(forward[1], 0);
+        listener.forwardZ.setValueAtTime(forward[2], 0);
+        listener.upX.setValueAtTime(up[0], 0);
+        listener.upY.setValueAtTime(up[1], 0);
+        listener.upZ.setValueAtTime(up[2], 0);
     }
 }

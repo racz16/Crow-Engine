@@ -98,7 +98,7 @@ export class Utility {
         shader.bindUniformBlockToBindingPoint(bindingPoint.name, bindingPoint.bindingPoint);
     }
 
-    public static loadResource<T>(path: string, callback: (resource: T) => void, async?: boolean, responseType?: XMLHttpRequestResponseType): void {
+    public static loadResource<T>(path: string, callback: (resource: T) => void, async = false, responseType?: XMLHttpRequestResponseType): void {
         const xhttp = new XMLHttpRequest();
         if (responseType) {
             xhttp.responseType = responseType;

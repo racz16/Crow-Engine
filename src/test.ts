@@ -4,15 +4,12 @@ import { GameObject } from "./core/GameObject";
 import { MeshComponent } from "./component/renderable/MeshComponent";
 import { Material } from "./material/Material";
 import { CameraComponent } from "./component/camera/CameraComponent";
-import { vec3, vec4, glMatrix, vec2 } from "gl-matrix";
+import { vec3, vec4, vec2 } from "gl-matrix";
 import { Scene } from "./core/Scene";
 import { ComponentParameter } from "./utility/parameter/ComponentParameter";
 import { InfoComponent } from "./test/InfoComponent";
 import { RotateComponent } from "./test/RotateComponent";
 import { BlinnPhongDirectionalLightComponent } from "./component/light/blinnphong/BlinnPhongDirectionalLightComponent";
-import { BlinnPhongLightContainer } from "./component/light/blinnphong/BlinnPhongLightContainer";
-import { BlinnPhongPointLightComponent } from "./component/light/blinnphong/BlinnPhongPointLightComponent";
-import { BlinnPhongSpotLightComponent } from "./component/light/blinnphong/BlinnPhongSpotLightComponent";
 import { AudioSourceComponent } from "./component/audio/AudioSourceComponent";
 import { AudioListenerComponent } from "./component/audio/AudioListenerComponent";
 import { SplineComponent } from "./component/renderable/SplineComponent";
@@ -25,11 +22,7 @@ import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
 import { ObbBoundingShape } from "./component/renderable/boundingshape/ObbBoundingShape";
-import { InverseCameraSphericalBillboard } from "./component/renderable/billboard/InverseCameraSphericalBillboard";
-import { RealSphericalBillboard } from "./component/renderable/billboard/RealSphericalBillboard";
-import { AxisAlignedCylindricalBillboard } from "./component/renderable/billboard/AxisAlignedCylindricalBillboard";
-import { BillboardAxis } from "./component/renderable/billboard/BillboardAxis";
-import { ArbitraryAxisCylindricalBillboard } from "./component/renderable/billboard/ArbitraryAxisCylindricalBillboard";
+
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();

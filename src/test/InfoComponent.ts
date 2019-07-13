@@ -26,23 +26,35 @@ export class InfoComponent extends Component {
     private mute(): void {
         document.getElementById('mute').style.display = 'none';
         document.getElementById('unmute').style.display = 'inline';
-        Audio.setMuted(true);
+        Audio.setVolume(0);
     }
 
     private toggleFullscreen(): void {
-        if (!document.fullscreenElement) {
+        const inFullscreen = !!document.fullscreenElement;
+        document.getElementById('expand').style.display = !inFullscreen ? 'inline' : 'none';
+        document.getElementById('compress').style.display = inFullscreen ? 'inline' : 'none';
+        if (inFullscreen) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        } else {
+            document.documentElement.requestFullscreen();
+        }
+
+
+        /*if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
-        }
+        }*/
     }
 
     private unmute(): void {
         document.getElementById('mute').style.display = 'inline';
         document.getElementById('unmute').style.display = 'none';
-        Audio.setMuted(false);
+        Audio.setVolume(1);
     }
 
     public private_update(): void {

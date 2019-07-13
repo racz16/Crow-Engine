@@ -4,14 +4,15 @@ import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelT
 import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";
 import { GameObject } from "../../core/GameObject";
 import { Audio } from "../../resource/Audio";
+import { IAudioSourceComponent } from "./IAudioSourceComponent";
 
-export class AudioSourceComponent extends Component {
+export class AudioSourceComponent extends Component implements IAudioSourceComponent {
 
     private gain: GainNode;
     private panner: PannerNode;
     private bufferSource: AudioBufferSourceNode;
     private volume = 1;
-    private muted: boolean;
+    private loaded = false;
 
     public constructor(soundPath: string) {
         super();
@@ -21,8 +22,8 @@ export class AudioSourceComponent extends Component {
         this.panner = ctx.createPanner();
         this.gain = ctx.createGain();
         this.bufferSource.connect(this.panner).connect(this.gain).connect(ctx.destination);
-        this.muted = Audio.isMuted();
-        this.gain.gain.value = Audio.isMuted() ? 0 : this.volume;
+        this.gain.gain.value = this.volume;
+        Audio.private_add(this);
     }
 
     public static createAmbientAudioSourceComponent(soundPath: string): AudioSourceComponent {
@@ -38,6 +39,7 @@ export class AudioSourceComponent extends Component {
         Utility.loadResource<ArrayBuffer>(soundPath, (res) => {
             ctx.decodeAudioData(res, (data) => {
                 this.bufferSource.buffer = data;
+                this.loaded = true;
             });
         }, true, 'arraybuffer');
     }
@@ -61,9 +63,7 @@ export class AudioSourceComponent extends Component {
             throw new Error();
         }
         this.volume = volume;
-        if (!Audio.isMuted()) {
-            this.gain.gain.setValueAtTime(volume, 0);
-        }
+        this.gain.gain.setValueAtTime(volume * Audio.getVolume(), 0);
     }
 
     public isLoop(): boolean {
@@ -155,34 +155,23 @@ export class AudioSourceComponent extends Component {
     }
 
     public private_update(): void {
-        this.updateMute();
-        this.updatePositionAndOrientation();
-    }
-
-    private updateMute(): void {
-        if (this.muted != Audio.isMuted()) {
-            this.muted = Audio.isMuted();
-            if (Audio.isMuted()) {
-                this.gain.gain.value = 0;
-            } else {
-                this.gain.gain.value = this.volume;
-            }
-        }
-    }
-
-    private updatePositionAndOrientation(): void {
         if (this.getGameObject() && !this.isValid() && this.isActive()) {
-            const ctx = Audio.context;
-            const position = this.getGameObject().getTransform().getAbsolutePosition();
-            const forward = this.getGameObject().getTransform().getForwardVector();
-            this.panner.positionX.setValueAtTime(position[0], ctx.currentTime);
-            this.panner.positionY.setValueAtTime(position[1], ctx.currentTime);
-            this.panner.positionZ.setValueAtTime(position[2], ctx.currentTime);
-            this.panner.orientationX.setValueAtTime(forward[0], ctx.currentTime);
-            this.panner.orientationY.setValueAtTime(forward[1], ctx.currentTime);
-            this.panner.orientationZ.setValueAtTime(forward[2], ctx.currentTime);
+            this.updatePositionAndOrientationUnsafe();
+            this.setVolume(this.volume);
             this.setValid(true);
         }
+    }
+
+    private updatePositionAndOrientationUnsafe(): void {
+        const ctx = Audio.context;
+        const position = this.getGameObject().getTransform().getAbsolutePosition();
+        const forward = this.getGameObject().getTransform().getForwardVector();
+        this.panner.positionX.setValueAtTime(position[0], ctx.currentTime);
+        this.panner.positionY.setValueAtTime(position[1], ctx.currentTime);
+        this.panner.positionZ.setValueAtTime(position[2], ctx.currentTime);
+        this.panner.orientationX.setValueAtTime(forward[0], ctx.currentTime);
+        this.panner.orientationY.setValueAtTime(forward[1], ctx.currentTime);
+        this.panner.orientationZ.setValueAtTime(forward[2], ctx.currentTime);
     }
 
     public setActive(active: boolean): void {
@@ -190,6 +179,10 @@ export class AudioSourceComponent extends Component {
         if (!active) {
             this.stop();
         }
+    }
+
+    public isUsable(): boolean {
+        return this.loaded && this.getGameObject() && this.isActive();
     }
 
     public private_attachToGameObject(gameObject: GameObject): void {

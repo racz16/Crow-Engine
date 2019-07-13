@@ -44,7 +44,7 @@ export class BlinnPhongRenderer extends Renderer {
 
     private isVisible(renderableComponent: IRenderableComponent<IRenderable>, camera: ICameraComponent): boolean {
         const visibility = renderableComponent.getVisibilityInterval();
-        if (visibility[0] <= 0 && visibility[1] >= 100) {
+        if (visibility[0] === Number.NEGATIVE_INFINITY && visibility[1] == Number.POSITIVE_INFINITY) {
             return true;
         }
         const renderablePosition = renderableComponent.getGameObject().getTransform().getAbsolutePosition();

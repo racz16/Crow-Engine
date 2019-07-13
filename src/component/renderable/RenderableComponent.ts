@@ -14,7 +14,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     private renderable: T;
     private boundingShape: IBoundingShape;
     private material: Material;
-    private readonly visibilityInterval = vec2.fromValues(0, 100);
+    private readonly visibilityInterval = vec2.fromValues(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
     private materialActive = true;
     private castShadow = true;
     private receiveShadow = true;

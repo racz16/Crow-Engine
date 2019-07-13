@@ -1,6 +1,7 @@
 import { GameObject } from "./GameObject";
 import { Component } from "./Component";
 import { Utility } from "../utility/Utility";
+import { IComponent } from "../component/IComponent";
 
 export class ComponentContainer {
 
@@ -49,7 +50,7 @@ export class ComponentContainer {
         }
     }
 
-    public removeAll<T extends Component>(type: new () => T): void {
+    public removeAll<T extends Component>(type: new (..._) => T): void {
         for (let i = this.components.length - 1; i >= 0; i--) {
             const component = this.components[i];
             if (component instanceof type) {
@@ -67,17 +68,17 @@ export class ComponentContainer {
         return this.components[index];
     }
 
-    public getAll<T extends Component>(type: new () => T) {
+    public getAll<T>(type: new (..._) => T): Array<T> {
         let ret = new Array<T>();
         for (const component of this.components) {
             if (component instanceof type) {
-                ret.push(component);
+                ret.push(component as unknown as T);
             }
         }
         return ret;
     }
 
-    public getFirst<T extends Component>(type: new () => T): T {
+    public getFirst<T extends IComponent>(type: new (..._) => T): T {
         for (const component of this.components) {
             if (component instanceof type) {
                 return component;
