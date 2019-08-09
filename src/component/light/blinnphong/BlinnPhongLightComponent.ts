@@ -1,4 +1,4 @@
-import { Component } from "../../../core/Component";
+import { Component } from "../../Component";
 import { vec3 } from "gl-matrix";
 import { GameObject } from "../../../core/GameObject";
 import { Utility } from "../../../utility/Utility";

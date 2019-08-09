@@ -13,12 +13,8 @@ export class ChildContainer {
         this.gameObject = gameObject;
     }
 
-    public get(index: number): GameObject {
-        return this.children[index];
-    }
-
     public contains(child: GameObject): boolean {
-        return this.children.indexOf(child) != -1;
+        return this.children.includes(child);
     }
 
     public containsDeep(child: GameObject): boolean {
@@ -35,6 +31,18 @@ export class ChildContainer {
             }
         }
         return false;
+    }
+
+    public get(index: number): GameObject {
+        return this.children[index];
+    }
+
+    public getChildCount(): number {
+        return this.children.length;
+    }
+
+    public getChildrenIterator(): IterableIterator<GameObject> {
+        return this.children.values();
     }
 
     public remove(child: GameObject): void {
@@ -54,14 +62,6 @@ export class ChildContainer {
 
     public private_addChild(child: GameObject): void {
         this.children.push(child);
-    }
-
-    public getChildCount(): number {
-        return this.children.length;
-    }
-
-    public getChildrenIterator(): IterableIterator<GameObject> {
-        return this.children.values();
     }
 
 }

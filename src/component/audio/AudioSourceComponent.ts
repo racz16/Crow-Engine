@@ -1,4 +1,4 @@
-import { Component } from "../../core/Component";
+import { Component } from "../Component";
 import { Utility } from "../../utility/Utility";
 import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelType";
 import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";

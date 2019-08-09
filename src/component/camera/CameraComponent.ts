@@ -1,4 +1,4 @@
-import { Component } from "../../core/Component";
+import { Component } from "../Component";
 import { ICameraComponent } from "./ICameraComponent";
 import { Ubo } from "../../webgl/buffer/Ubo";
 import { mat4 } from "gl-matrix";

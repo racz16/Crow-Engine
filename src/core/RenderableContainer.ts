@@ -3,6 +3,7 @@ import { Utility } from "../utility/Utility";
 import { IRenderableComponent } from "../component/renderable/IRenderableComponent";
 
 export class RenderableContainer {
+
     private renderables = new Array<IRenderableComponent<IRenderable>>();
 
     public getRenderableComponent(index: number): IRenderableComponent<IRenderable> {
@@ -18,17 +19,16 @@ export class RenderableContainer {
     }
 
     public private_add(renderable: IRenderableComponent<IRenderable>): void {
-        if (Utility.contains(this.renderables, renderable)) {
-            return;
+        if (!this.renderables.includes(renderable)) {
+            this.renderables.push(renderable);
         }
-        this.renderables.push(renderable);
     }
 
     public private_remove(renderable: IRenderableComponent<IRenderable>): void {
         const index = this.renderables.indexOf(renderable);
-        if (index === -1) {
-            return;
+        if (index !== -1) {
+            Utility.removeElement(this.renderables, index);
         }
-        Utility.removeElement(this.renderables, index);
     }
+
 }

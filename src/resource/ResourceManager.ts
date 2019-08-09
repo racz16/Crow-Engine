@@ -14,7 +14,7 @@ export class ResourceManager {
     }
 
     public static contains(resource: IResource): boolean {
-        return Utility.contains(ResourceManager.resources, resource);
+        return ResourceManager.resources.includes(resource);
     }
 
     public static getResourcesIterator(): IterableIterator<IResource> {

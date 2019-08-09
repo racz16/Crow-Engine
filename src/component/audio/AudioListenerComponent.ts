@@ -1,4 +1,4 @@
-import { Component } from "../../core/Component";
+import { Component } from "../Component";
 import { GameObject } from "../../core/GameObject";
 import { Scene } from "../../core/Scene";
 import { Audio } from "../../resource/Audio";

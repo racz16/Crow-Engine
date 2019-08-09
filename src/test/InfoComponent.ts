@@ -1,9 +1,10 @@
-import { Component } from "../core/Component";
+import { Component } from "../component/Component";
 import { Time } from "../core/Time";
 import { Audio } from "../resource/Audio";
 import { Gl } from "../webgl/Gl";
 
 export class InfoComponent extends Component {
+
     private textNode: Text;
 
     public constructor() {
@@ -40,15 +41,6 @@ export class InfoComponent extends Component {
         } else {
             document.documentElement.requestFullscreen();
         }
-
-
-        /*if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        }*/
     }
 
     private unmute(): void {
@@ -60,4 +52,5 @@ export class InfoComponent extends Component {
     public private_update(): void {
         this.textNode.nodeValue = Time.getFps() + '';
     }
+
 }

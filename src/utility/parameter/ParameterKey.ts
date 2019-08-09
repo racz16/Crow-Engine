@@ -1,10 +1,10 @@
 
 export class ParameterKey<T>{
 
-    private returnType: new () => T;
+    private returnType: new (..._) => T;
     private key: string;
 
-    public constructor(returnType: new () => T, key: string) {
+    public constructor(returnType: new (..._) => T, key: string) {
         if (returnType == null || key == null) {
             throw new Error();
         }
@@ -12,7 +12,7 @@ export class ParameterKey<T>{
         this.key = key;
     }
 
-    public getReturnType(): new () => T {
+    public getReturnType(): new (..._) => T {
         return this.returnType;
     }
 

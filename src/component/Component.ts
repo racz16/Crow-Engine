@@ -1,6 +1,6 @@
-import { GameObject } from "./GameObject";
+import { GameObject } from "../core/GameObject";
 import { InvalidatableContainer } from "../utility/invalidatable/InvalidatableContainer";
-import { IComponent } from "../component/IComponent";
+import { IComponent } from "./IComponent";
 
 export class Component implements IComponent {
 

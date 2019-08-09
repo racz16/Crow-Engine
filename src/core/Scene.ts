@@ -24,4 +24,5 @@ export class Scene {
     public static getParameters(): ParameterContainer {
         return Scene.PARAMETERS;
     }
+
 }

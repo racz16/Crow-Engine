@@ -28,7 +28,7 @@ export class InvalidatableContainer {
     }
 
     public containsInvalidatable(invalidatable: IInvalidatable): boolean {
-        return Utility.contains(this.invalidatables, invalidatable);;
+        return this.invalidatables.includes(invalidatable);;
     }
 
     public getInvalidatable(index: number): IInvalidatable {

@@ -1,5 +1,4 @@
 import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
-import { vec3 } from "gl-matrix";
 import { Ubo } from "../../../webgl/buffer/Ubo";
 import { BlinnPhongLightContainer } from "./BlinnPhongLightContainer";
 import { Scene } from "../../../core/Scene";

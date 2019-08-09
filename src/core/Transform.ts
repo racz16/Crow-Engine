@@ -239,10 +239,6 @@ export class Transform implements IInvalidatable {
         return this.gameObject;
     }
 
-    public setGameObject(object: GameObject): void {
-        object.setTransform(this);
-    }
-
     private haveParent(): boolean {
         return this.gameObject && this.gameObject.getParent() != null;
     }

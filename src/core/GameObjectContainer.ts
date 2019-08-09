@@ -17,8 +17,7 @@ export class GameObjectContainer {
         if (!gameObject) {
             throw new Error();
         }
-        const index = this.gameObjects.indexOf(gameObject);
-        if (index === -1) {
+        if (!this.gameObjects.includes(gameObject)) {
             this.gameObjects.push(gameObject);
         }
     }

@@ -1,5 +1,5 @@
 import { GameObject } from "./GameObject";
-import { Component } from "./Component";
+import { Component } from "../component/Component";
 import { Utility } from "../utility/Utility";
 import { IComponent } from "../component/IComponent";
 
@@ -64,18 +64,14 @@ export class ComponentContainer {
         this.removeAll(Component);
     }
 
-    public get(index: number): Component {
-        return this.components[index];
-    }
-
-    public getAll<T>(type: new (..._) => T): Array<T> {
-        let ret = new Array<T>();
+    public getAll<T>(type: new (..._) => T): IterableIterator<T> {
+        const ret = new Array<T>();
         for (const component of this.components) {
             if (component instanceof type) {
-                ret.push(component as unknown as T);
+                ret.push(component);
             }
         }
-        return ret;
+        return ret.values();
     }
 
     public getFirst<T extends IComponent>(type: new (..._) => T): T {
@@ -87,6 +83,10 @@ export class ComponentContainer {
         return null;
     }
 
+    public get(index: number): Component {
+        return this.components[index];
+    }
+
     public getComponentCount(): number {
         return this.components.length;
     }
@@ -94,4 +94,5 @@ export class ComponentContainer {
     public getComponentIterator(): IterableIterator<Component> {
         return this.components.values();
     }
+
 }

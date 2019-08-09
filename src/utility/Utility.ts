@@ -64,10 +64,6 @@ export class Utility {
         array.splice(index, 1);
     }
 
-    public static contains<T>(array: Array<T>, element: T): boolean {
-        return array.indexOf(element) !== -1;
-    }
-
     public static copy<T>(array: Array<T>): Array<T> {
         let ret = new Array<T>();
         for (const element of array) {

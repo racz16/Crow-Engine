@@ -1,20 +1,19 @@
-import { Transform } from "./Transform";
 import { ComponentContainer } from "./ComponentContainer";
 import { ChildContainer } from "./ChildContainer";
 import { vec3 } from "gl-matrix";
 import { Scene } from "./Scene";
+import { Transform } from "./Transform";
 
 export class GameObject {
 
     private components: ComponentContainer;
     private children: ChildContainer;
-    private parent: GameObject = null;
+    private parent: GameObject;
     private root: GameObject;
     private transform: Transform;
 
-    public constructor() {
-        this.transform = new Transform();
-        this.transform.private_attachToGameObject(this);
+    public constructor(transform = new Transform()) {
+        this.setTransform(transform);
         this.root = this;
         this.components = new ComponentContainer(this);
         this.children = new ChildContainer(this);
@@ -26,9 +25,17 @@ export class GameObject {
         this.components.private_update();
     }
 
-    //
-    //children------------------------------------------------------------------
-    //
+    public getRoot(): GameObject {
+        return this.root;
+    }
+
+    private setRoot(root: GameObject): void {
+        this.root = root;
+        for (const child of this.children.getChildrenIterator()) {
+            child.setRoot(root);
+        }
+    }
+
     public getParent(): GameObject {
         return this.parent;
     }
@@ -43,17 +50,6 @@ export class GameObject {
         this.setParentUnsafe(parent);
     }
 
-    public getRoot(): GameObject {
-        return this.root;
-    }
-
-    private setRoot(root: GameObject): void {
-        this.root = root;
-        for (const child of this.children.getChildrenIterator()) {
-            child.setRoot(root);
-        }
-    }
-
     private setParentUnsafe(parent: GameObject): void {
         const holder = this.getCurrentTransformData();
         this.removeParent();
@@ -62,7 +58,8 @@ export class GameObject {
     }
 
     private getCurrentTransformData(): TransformHolder {
-        return new TransformHolder(this.transform.getAbsolutePosition(),
+        return new TransformHolder(
+            this.transform.getAbsolutePosition(),
             this.transform.getAbsoluteRotation(),
             this.transform.getAbsoluteScale());
     }
@@ -91,21 +88,14 @@ export class GameObject {
         }
     }
 
-    //
-    //transform-------------------------------------------
-    //
-
     public getTransform(): Transform {
         return this.transform;
     }
 
-    public setTransform(transform: Transform): void {
-        //TODO: ne lehessen változtatni, max a konstruktorban
+    private setTransform(transform: Transform): void {
         if (transform.getGameObject()) {
             throw new Error();
         }
-        this.transform.private_detachFromGameObject();
-        transform.private_attachToGameObject(this);
         this.transform = transform;
     }
 

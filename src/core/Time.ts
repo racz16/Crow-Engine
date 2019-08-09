@@ -7,6 +7,7 @@ export class Time {
     private static currentFps = 0;
     private static lastFps = 0;
     private static frameTimeSum = 0;
+    private static lastFrameTime = 0;
     private static lastFrameMoment = Time.START_MOMENT;
     private static deltaTimeFactor = 0;
     private static frameCount = 0;
@@ -14,47 +15,51 @@ export class Time {
     private constructor() { }
 
     public static private_update(): void {
-        Time.refreshDeltaTimeFactor();
-        Time.refreshFps();
+        this.refreshDeltaTimeFactor();
+        this.refreshFps();
     }
 
     private static refreshDeltaTimeFactor(): void {
         const currentMoment = performance.now();
-        const lastFrameTime = currentMoment - Time.lastFrameMoment;
-        Time.frameTimeSum += lastFrameTime;
-        Time.deltaTimeFactor = lastFrameTime / Time.TARGET_FRAME_TIME;
-        Time.lastFrameMoment = currentMoment;
+        this.lastFrameTime = currentMoment - this.lastFrameMoment;
+        this.frameTimeSum += this.lastFrameTime;
+        this.deltaTimeFactor = this.lastFrameTime / this.TARGET_FRAME_TIME;
+        this.lastFrameMoment = currentMoment;
     }
 
     private static refreshFps(): void {
-        Time.frameCount++;
-        Time.currentFps++;
-        if (Time.frameTimeSum >= Time.ONE_SECOND) {
-            Time.frameTimeSum = 0;
-            Time.lastFps = Time.currentFps;
-            Time.currentFps = 0;
+        this.frameCount++;
+        this.currentFps++;
+        if (this.frameTimeSum >= this.ONE_SECOND) {
+            this.lastFps = Math.round(this.currentFps / this.frameTimeSum * this.ONE_SECOND);
+            this.frameTimeSum = 0;
+            this.currentFps = 0;
         }
     }
 
     public static getDeltaTimeFactor(): number {
-        return Time.deltaTimeFactor;
+        return this.deltaTimeFactor;
     }
 
     public static getFps(): number {
-        return Time.lastFps;
+        return this.lastFps;
+    }
+
+    public static getLastFrameTime(): number {
+        return this.lastFrameTime;
     }
 
     public static getTimeInMillisecs(): number {
         const currentMoment = performance.now();
-        return currentMoment - Time.START_MOMENT;
+        return currentMoment - this.START_MOMENT;
     }
 
     public static getTimeInSecs(): number {
-        return Time.getTimeInMillisecs() / Time.ONE_SECOND;
+        return this.getTimeInMillisecs() / this.ONE_SECOND;
     }
 
     public static getFrameCount(): number {
-        return Time.frameCount;
+        return this.frameCount;
     }
 
 }

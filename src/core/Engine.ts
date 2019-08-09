@@ -17,16 +17,20 @@ export class Engine {
 
     public static initialize(canvas: HTMLCanvasElement, logLevel = this.DEBUG ? LogLevel.INFO : LogLevel.ERROR): void {
         try {
-            Log.initialize(logLevel);
-            Gl.initialize(canvas);
-            Audio.initialize();
-            RenderingPipeline.initialize();
-            Engine.initialized = true;
-            Log.lifeCycleInfo('engine initialized');
+            this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
             Log.error(error);
             ResourceManager.releaseResources();
         }
+    }
+
+    private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
+        Log.initialize(logLevel);
+        Gl.initialize(canvas);
+        Audio.initialize();
+        RenderingPipeline.initialize();
+        Engine.initialized = true;
+        Log.lifeCycleInfo('engine initialized');
     }
 
     public static start(): void {
@@ -43,16 +47,20 @@ export class Engine {
 
     private static createNextFrame(): void {
         try {
-            Time.private_update();
-            Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} started`);
-            Scene.getGameObjects().private_updateComponents();
-            RenderingPipeline.render();
-            window.requestAnimationFrame(Engine.createNextFrame);
-            Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} finished`);
+            Engine.createNextFrameUnsafe();
         } catch (error) {
             Log.error(error);
             ResourceManager.releaseResources();
         }
+    }
+
+    private static createNextFrameUnsafe(): void {
+        Time.private_update();
+        Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} started`);
+        Scene.getGameObjects().private_updateComponents();
+        RenderingPipeline.render();
+        window.requestAnimationFrame(Engine.createNextFrame);
+        Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} finished`);
     }
 
     public static isInitialized(): boolean {

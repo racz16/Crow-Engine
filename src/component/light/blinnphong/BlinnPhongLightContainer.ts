@@ -109,7 +109,7 @@ export class BlinnPhongLightContainer {
     }
 
     public private_addLight(light: BlinnPhongPositionalLightComponent): void {
-        if (!Utility.contains(this.positionalLights, light)) {
+        if (!this.positionalLights.includes(light)) {
             this.positionalLights.push(light);
         }
     }
