@@ -15,10 +15,10 @@ export class ComponentContainer {
         this.gameObject = gameObject;
     }
 
-    public private_update(): void {
+    protected update(): void {
         for (const component of this.components) {
             if (component.isActive()) {
-                component.private_update();
+                (component as any).updateComponent();
             }
         }
     }
@@ -34,7 +34,7 @@ export class ComponentContainer {
     }
 
     private addUnsafe(component: Component): void {
-        component.private_attachToGameObject(this.gameObject);
+        (component as any).attachToGameObject(this.gameObject);
         this.components.push(component);
     }
 
@@ -45,7 +45,7 @@ export class ComponentContainer {
     public remove(component: Component): void {
         const index = this.components.indexOf(component);
         if (index >= 0) {
-            this.components[index].private_detachFromGameObject();
+            (this.components[index] as any).detachFromGameObject();
             Utility.removeElement(this.components, index);
         }
     }
@@ -54,7 +54,7 @@ export class ComponentContainer {
         for (let i = this.components.length - 1; i >= 0; i--) {
             const component = this.components[i];
             if (component instanceof type) {
-                component.private_detachFromGameObject();
+                (component as any).detachFromGameObject();
                 Utility.removeElement(this.components, i);
             }
         }

@@ -18,13 +18,13 @@ export class RenderableContainer {
         return this.renderables.values();
     }
 
-    public private_add(renderable: IRenderableComponent<IRenderable>): void {
+    private add(renderable: IRenderableComponent<IRenderable>): void {
         if (!this.renderables.includes(renderable)) {
             this.renderables.push(renderable);
         }
     }
 
-    public private_remove(renderable: IRenderableComponent<IRenderable>): void {
+    private remove(renderable: IRenderableComponent<IRenderable>): void {
         const index = this.renderables.indexOf(renderable);
         if (index !== -1) {
             Utility.removeElement(this.renderables, index);

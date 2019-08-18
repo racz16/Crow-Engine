@@ -16,7 +16,7 @@ export class QuadMesh implements IMesh {
 
     private constructor() {
         this.loadData();
-        ResourceManager.private_add(this);
+        (ResourceManager as any).add(this);
     }
 
     public static getInstance(): QuadMesh {
@@ -111,6 +111,6 @@ export class QuadMesh implements IMesh {
         return true;
     }
 
-    public private_update(): void { }
+    public update(): void { }
 
 }

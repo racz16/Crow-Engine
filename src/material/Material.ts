@@ -1,6 +1,5 @@
 import { ParameterKey } from "../utility/parameter/ParameterKey";
 import { MaterialSlot } from "./MaterialSlot";
-import { Parameter } from "../utility/parameter/Parameter";
 import { ParameterContainer } from "../utility/parameter/ParameterContainer";
 
 export class Material {
@@ -28,11 +27,14 @@ export class Material {
     }*/
 
     public getSlot(key: ParameterKey<MaterialSlot>): MaterialSlot {
-        return this.slots.getValue(key);
+        return this.slots.get(key);
     }
 
     public setSlot(key: ParameterKey<MaterialSlot>, slot: MaterialSlot): void {
-        this.slots.set(key, new Parameter<MaterialSlot>(slot));
+        if (!key) {
+            throw new Error();
+        }
+        this.slots.set(key, slot);
     }
 
     public getParameters(): ParameterContainer {

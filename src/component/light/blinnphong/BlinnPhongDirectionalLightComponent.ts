@@ -16,11 +16,10 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
             } else {
                 BlinnPhongLightContainer.getInstance().refreshDirectionalLight();
             }
-
         }
     }
 
-    public private_refresh(ubo: Ubo) {
+    protected refresh(ubo: Ubo) {
         ubo.storewithOffset(new Float32Array(this.getAmbientColor()), BlinnPhongLightComponent.AMBIENT_OFFSET);
         ubo.storewithOffset(new Float32Array(this.getDiffuseColor()), BlinnPhongLightComponent.DIFFUSE_OFFSET);
         ubo.storewithOffset(new Float32Array(this.getSpecularColor()), BlinnPhongLightComponent.SPECULAR_OFFSET);
@@ -30,7 +29,7 @@ export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponen
     }
 
     public isTheMainDirectionalLight(): boolean {
-        return Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT) === this;
+        return Scene.getParameters().get(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT) === this;
     }
 
 }

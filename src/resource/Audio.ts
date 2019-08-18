@@ -15,7 +15,7 @@ export class Audio {
         this.deprecated = this.ctx.listener.positionX === undefined;
     }
 
-    public static private_add(audioSource: IAudioSourceComponent): void {
+    private static add(audioSource: IAudioSourceComponent): void {
         if (!this.audioSources.includes(audioSource)) {
             this.audioSources.push(audioSource);
         }

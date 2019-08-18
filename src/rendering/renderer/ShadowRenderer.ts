@@ -3,7 +3,6 @@ import { mat4, vec2 } from "gl-matrix";
 import { ShadowShader } from "../../resource/shader/ShadowShader";
 import { Fbo } from "../../webgl/fbo/Fbo";
 import { RenderingPipeline } from "../RenderingPipeline";
-import { Parameter } from "../../utility/parameter/Parameter";
 import { FboAttachmentSlot } from "../../webgl/enum/FboAttachmentSlot";
 import { Gl } from "../../webgl/Gl";
 import { CullFace } from "../../webgl/enum/CullFace";
@@ -109,7 +108,7 @@ export class ShadowRenderer extends Renderer {
             }
         }
         this.afterShader();
-        RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, new Parameter<GlTexture2D>(this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getTextureAttachment()));
+        RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getTextureAttachment());
     }
 
     private beforeShader(): void {
@@ -177,7 +176,7 @@ export class ShadowRenderer extends Renderer {
     }
 
     public removeFromRenderingPipeline(): void {
-        const shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP).getValue();
+        const shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP);
         if (shadowMap) {
             if (shadowMap.isUsable()) {
                 shadowMap.release();

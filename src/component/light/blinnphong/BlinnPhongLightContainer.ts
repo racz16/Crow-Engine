@@ -39,7 +39,7 @@ export class BlinnPhongLightContainer {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
             this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
-            Log.resourceInfo('Lights ubo created');
+            Log.logResourceInfo('Lights ubo created');
         }
     }
 
@@ -57,13 +57,13 @@ export class BlinnPhongLightContainer {
         this.sortPositionalLights();
         this.refreshPositionalLightsInUbo();
         this.refreshRemainingSlotsInUbo();
-        Log.resourceInfo('Lights ubo refreshed');
+        Log.logResourceInfo('Lights ubo refreshed');
     }
 
     private refreshDirectionalLightInUbo(): void {
         if (this.refreshDirectional) {
             if (this.mainDirectionalLight && this.mainDirectionalLight.isActive() && this.mainDirectionalLight.getGameObject()) {
-                this.mainDirectionalLight.private_refresh(this.ubo);
+                (this.mainDirectionalLight as any).refresh(this.ubo);
             } else {
                 this.ubo.storewithOffset(new Int32Array([0]), BlinnPhongLightContainer.ACTIVE_OFFSET);
             }
@@ -78,7 +78,7 @@ export class BlinnPhongLightContainer {
                 return;
             }
             if (light.isActive() && light.getGameObject()) {
-                light.private_refresh(this.ubo, this.addedLightCount + 1);
+                (light as any).refresh(this.ubo, this.addedLightCount + 1);
                 this.addedLightCount++;
             }
         }
@@ -91,7 +91,7 @@ export class BlinnPhongLightContainer {
     }
 
     private sortPositionalLights(): void {
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.positionalLights.sort((a, b) => {
             const ad = this.computePositionalLightDistanceFromCamera(a, camera);
             const bd = this.computePositionalLightDistanceFromCamera(b, camera);
@@ -108,7 +108,7 @@ export class BlinnPhongLightContainer {
         return vec3.distance(cameraPosition, lightPosition);
     }
 
-    public private_addLight(light: BlinnPhongPositionalLightComponent): void {
+    public addLight(light: BlinnPhongPositionalLightComponent): void {
         if (!this.positionalLights.includes(light)) {
             this.positionalLights.push(light);
         }

@@ -6,7 +6,6 @@ import { Material } from "./material/Material";
 import { CameraComponent } from "./component/camera/CameraComponent";
 import { vec3, vec4, vec2 } from "gl-matrix";
 import { Scene } from "./core/Scene";
-import { ComponentParameter } from "./utility/parameter/ComponentParameter";
 import { InfoComponent } from "./test/InfoComponent";
 import { RotateComponent } from "./test/RotateComponent";
 import { BlinnPhongDirectionalLightComponent } from "./component/light/blinnphong/BlinnPhongDirectionalLightComponent";
@@ -16,8 +15,6 @@ import { SplineComponent } from "./component/renderable/SplineComponent";
 import { BezierSpline } from "./resource/spline/BezierSpline";
 import { Texture2D } from "./resource/texture/Texture2D";
 import { CubeMapTexture } from "./resource/texture/CubeMapTexture";
-import { Parameter } from "./utility/parameter/Parameter";
-import { ICubeMapTexture } from "./resource/texture/ICubeMapTexture";
 import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
@@ -63,7 +60,8 @@ export class TestSceneBuilder {
 
     private dragon: StaticMesh;
     private box: StaticMesh;
-    public static diffuse: Texture2D;
+    private diffuse: Texture2D;
+    private specular: Texture2D;
     private normal9: Texture2D;
     private normal6: Texture2D;
     private elyHills: CubeMapTexture;
@@ -71,6 +69,7 @@ export class TestSceneBuilder {
     private dragonPath = 'res/meshes/dragon.obj';
     private boxPath = 'res/meshes/box.obj';
     private diffusePath = 'res/textures/diffuse1.png';
+    private specularPath = 'res/textures/specular1.png';
     private normal9Path = 'res/textures/normal9.jpg';
     private normal6Path = 'res/textures/normal6.png';
     private musicPath = 'res/sounds/music.ogg';
@@ -93,7 +92,8 @@ export class TestSceneBuilder {
     public loadResources(): void {
         this.dragon = new StaticMesh(this.dragonPath);
         this.box = new StaticMesh(this.boxPath);
-        TestSceneBuilder.diffuse = new Texture2D(this.diffusePath);
+        this.diffuse = new Texture2D(this.diffusePath);
+        this.specular = new Texture2D(this.specularPath);
         this.normal9 = new Texture2D(this.normal9Path);
         this.normal6 = new Texture2D(this.normal6Path);
         this.elyHills = new CubeMapTexture(this.elyHillsPaths);
@@ -101,14 +101,14 @@ export class TestSceneBuilder {
 
     public setUpScene(): void {
         //skybox
-        Scene.getParameters().set(Scene.MAIN_SKYBOX, new Parameter<ICubeMapTexture>(this.elyHills));
+        Scene.getParameters().set(Scene.MAIN_SKYBOX, this.elyHills);
 
         //camera
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(0, 0, 10));
         const cc = new CameraComponent();
         go.getComponents().add(cc);
-        Scene.getParameters().set(Scene.MAIN_CAMERA, new ComponentParameter(cc));
+        Scene.getParameters().set(Scene.MAIN_CAMERA, cc);
 
         //input
         const pc = new PlayerComponent();
@@ -117,14 +117,14 @@ export class TestSceneBuilder {
         //audio listener
         const alc = new AudioListenerComponent();
         go.getComponents().add(alc);
-        Scene.getParameters().set(Scene.MAIN_AUDIO_LISTENER, new ComponentParameter(alc));
+        Scene.getParameters().set(Scene.MAIN_AUDIO_LISTENER, alc);
 
         //directional light
         const dlgo = new GameObject();
         const dlc = new BlinnPhongDirectionalLightComponent();
         dlgo.getComponents().add(dlc);
         dlgo.getTransform().setRelativeRotation(vec3.fromValues(-45, 45, 0));
-        Scene.getParameters().set(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT, new ComponentParameter(dlc));
+        Scene.getParameters().set(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT, dlc);
     }
 
     public createUi(): void {
@@ -138,8 +138,12 @@ export class TestSceneBuilder {
         const ma = new Material();
 
         const ds = new MaterialSlot();
-        ds.setTexture2D(TestSceneBuilder.diffuse);
+        ds.setTexture2D(this.diffuse);
         ma.setSlot(Material.DIFFUSE, ds);
+
+        const ss = new MaterialSlot();
+        ss.setTexture2D(this.specular);
+        ma.setSlot(Material.SPECULAR, ss);
 
         const rc = new MeshComponent(this.box, ma);
         //rc.setBillboard(new AxisAlignedCylindricalBillboard(BillboardAxis.Z_AXIS));
@@ -165,10 +169,10 @@ export class TestSceneBuilder {
         go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
 
         const ma = new Material();
-        ma.getParameters().set(MaterialSlot.USE_POM, new Parameter<Number>(1));
-        ma.getParameters().set(MaterialSlot.POM_SCALE, new Parameter<Number>(0.2));
-        ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, new Parameter(50));
-        ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, new Parameter(100));
+        ma.getParameters().set(MaterialSlot.USE_POM, 1);
+        ma.getParameters().set(MaterialSlot.POM_SCALE, 0.2);
+        ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 50);
+        ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, 100);
 
         const ns = new MaterialSlot();
         ns.setTexture2D(this.normal6);

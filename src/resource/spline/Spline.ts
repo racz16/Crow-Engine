@@ -25,7 +25,7 @@ export class Spline implements ISpline {
     protected furthestVertexDistance: number;
 
     public constructor() {
-        ResourceManager.private_add(this);
+        (ResourceManager as any).add(this);
     }
 
     protected refresh(): void {
@@ -268,10 +268,6 @@ export class Spline implements ISpline {
         return Utility.isUsable(this.vao) ? this.vao.getDataSize() : 0;
     }
 
-    public update(): void {
-
-    }
-
     public release(): void {
         if (Utility.isUsable(this.vao)) {
             this.vao.release();
@@ -281,10 +277,10 @@ export class Spline implements ISpline {
         }
     }
 
-    public isUsable() {
+    public isUsable(): boolean {
         return true;
     }
 
-    public private_update(): void { }
+    public update(): void { }
 
 }

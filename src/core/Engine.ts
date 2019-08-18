@@ -19,7 +19,7 @@ export class Engine {
         try {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
-            Log.error(error);
+            Log.logError(error);
             ResourceManager.releaseResources();
         }
     }
@@ -30,7 +30,7 @@ export class Engine {
         Audio.initialize();
         RenderingPipeline.initialize();
         Engine.initialized = true;
-        Log.lifeCycleInfo('engine initialized');
+        Log.logLifeCycleInfo('engine initialized');
     }
 
     public static start(): void {
@@ -42,25 +42,25 @@ export class Engine {
         }
         Engine.createNextFrame();
         Engine.started = true;
-        Log.lifeCycleInfo('engine started');
+        Log.logLifeCycleInfo('engine started');
     }
 
     private static createNextFrame(): void {
         try {
             Engine.createNextFrameUnsafe();
         } catch (error) {
-            Log.error(error);
+            Log.logError(error);
             ResourceManager.releaseResources();
         }
     }
 
     private static createNextFrameUnsafe(): void {
-        Time.private_update();
-        Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} started`);
-        Scene.getGameObjects().private_updateComponents();
+        (Time as any).update();
+        Log.logLifeCycleInfo(`FRAME ${Time.getFrameCount()} started`);
+        (Scene.getGameObjects() as any).updateComponents();
         RenderingPipeline.render();
         window.requestAnimationFrame(Engine.createNextFrame);
-        Log.lifeCycleInfo(`FRAME ${Time.getFrameCount()} finished`);
+        Log.logLifeCycleInfo(`FRAME ${Time.getFrameCount()} finished`);
     }
 
     public static isInitialized(): boolean {

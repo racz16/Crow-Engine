@@ -273,7 +273,7 @@ vec4 getSpecularColor(vec2 textureCoordinates){
     vec4 ret;
     if(material.isThereSpecularMap){
         ret = texture(material.specular, textureCoordinates * material.specularTile + material.specularOffset);
-        if(material.isThereGlossiness){
+        if(!material.isThereGlossiness){
             ret.a = material.specularColor.a;
         }
     }else{

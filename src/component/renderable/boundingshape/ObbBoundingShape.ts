@@ -54,7 +54,7 @@ export class ObbBoundingShape extends BoundingShape {
     }
 
     private handleMainCameraChange(): void {
-        const mainCamera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const mainCamera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (mainCamera != this.camera) {
             this.changeCamera(mainCamera);
         }

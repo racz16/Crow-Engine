@@ -8,10 +8,6 @@ export class Log {
 
     private static infoLogTypes = new Map<LogType, boolean>();
 
-    public static lifeCycleLog = false;
-    public static glLog = false;
-    public static resourceLog = false;
-
     public static initialize(logLevel: LogLevel): void {
         this.setLogLevel(logLevel);
     }
@@ -23,9 +19,9 @@ export class Log {
     public static setLogLevel(logLevel: LogLevel): void {
         this.logLevel = logLevel;
 
-        this.info = logLevel < LogLevel.INFO ? () => { } : (message: any) => { console.info(message) };
-        this.warning = logLevel < LogLevel.WARNING ? () => { } : (message: any) => { console.warn(message) };
-        this.error = logLevel < LogLevel.ERROR ? () => { } : (message: any) => { console.error(message) };
+        this.logInfo = logLevel < LogLevel.INFO ? () => { } : (message: any) => { console.info(message) };
+        this.logWarning = logLevel < LogLevel.WARNING ? () => { } : (message: any) => { console.warn(message) };
+        this.logError = logLevel < LogLevel.ERROR ? () => { } : (message: any) => { console.error(message) };
     }
 
     public static isInfoLog(logType: LogType): boolean {
@@ -36,16 +32,16 @@ export class Log {
         this.infoLogTypes.set(logType, log);
         switch (logType) {
             case LogType.LIFE_CYCLE:
-                this.lifeCycleInfo = !log ? () => { } : (message: any) => { this.info(message) };
+                this.logLifeCycleInfo = !log ? () => { } : (message: any) => { this.logInfo(message) };
                 break;
             case LogType.GL:
-                this.glInfo = !log ? () => { } : (message: any) => { this.info(message) };
+                this.logGlInfo = !log ? () => { } : (message: any) => { this.logInfo(message) };
                 break;
             case LogType.RESOURCES:
-                this.resourceInfo = !log ? () => { } : (message: any) => { this.info(message) };
+                this.logResourceInfo = !log ? () => { } : (message: any) => { this.logInfo(message) };
                 break;
             case LogType.RENDERING:
-                this.renderingInfo = !log ? () => { } : (message: any) => { this.info(message) };
+                this.logRenderingInfo = !log ? () => { } : (message: any) => { this.logInfo(message) };
                 break;
         }
     }
@@ -54,7 +50,7 @@ export class Log {
         console.trace(message);
     }
 
-    public static logVector3(v: vec3): void {
+    public static printVector3(v: vec3): void {
         console.table([v]);
     }
 
@@ -62,7 +58,7 @@ export class Log {
         console.table([v]);
     }
 
-    public static logMatrix3x3(m: mat3): void {
+    public static printMatrix3x3(m: mat3): void {
         console.table([
             [m[0], m[3], m[6]],
             [m[1], m[4], m[7]],
@@ -70,7 +66,7 @@ export class Log {
         ]);
     }
 
-    public static logMatrix4x4(m: mat4): void {
+    public static printMatrix4x4(m: mat4): void {
         console.table([
             [m[0], m[4], m[8], m[12]],
             [m[1], m[5], m[9], m[13]],
@@ -79,19 +75,19 @@ export class Log {
         ]);
     }
 
-    public static lifeCycleInfo(message: any): void { }
+    public static logLifeCycleInfo(message: any): void { }
 
-    public static glInfo(message: any): void { }
+    public static logGlInfo(message: any): void { }
 
-    public static resourceInfo(message: any): void { }
+    public static logResourceInfo(message: any): void { }
 
-    public static renderingInfo(message: any): void { }
+    public static logRenderingInfo(message: any): void { }
 
 
-    public static info(message: any): void { }
+    public static logInfo(message: any): void { }
 
-    public static warning(message: any): void { }
+    public static logWarning(message: any): void { }
 
-    public static error(message: any): void { }
+    public static logError(message: any): void { }
 
 }

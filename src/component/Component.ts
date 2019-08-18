@@ -5,6 +5,7 @@ import { IComponent } from "./IComponent";
 export class Component implements IComponent {
 
     private readonly invalidatables = new InvalidatableContainer(this);
+    private readonly parameterInvalidatables = new InvalidatableContainer(this);
     private gameObject: GameObject;
     private active = true;
     private valid = false;
@@ -13,9 +14,14 @@ export class Component implements IComponent {
         return this.invalidatables;
     }
 
+    private getParameterInvalidatables(): InvalidatableContainer {
+        return this.parameterInvalidatables;
+    }
+
     public invalidate(sender?: any): void {
         this.valid = false;
         this.invalidatables.invalidate();
+        this.parameterInvalidatables.invalidate();
     }
 
     protected isValid(): boolean {
@@ -39,16 +45,16 @@ export class Component implements IComponent {
         return this.gameObject;
     }
 
-    public private_attachToGameObject(gameObject: GameObject): void {
+    protected attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
         this.invalidate();
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.gameObject = null;
         this.invalidate();
     }
 
-    public private_update(): void { }
+    protected updateComponent(): void { }
 
 }

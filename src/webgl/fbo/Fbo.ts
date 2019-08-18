@@ -105,7 +105,7 @@ export class Fbo extends GlObject {
 
     public setDrawBuffers(...indices: Array<number>): void {
         for (const fac of this.color) {
-            fac.private_setDrawBuffer(indices.includes(fac.getIndex()));
+            (fac as any).setDrawBuffer(indices.includes(fac.getIndex()));
         }
         if (indices.length === 0) {
             indices.push(Gl.gl.NONE);

@@ -25,8 +25,8 @@ export class BlinnPhongRenderer extends Renderer {
     }
 
     public render(): void {
-        Log.renderingInfo('Blinn-Phong renderer started');
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        Log.logRenderingInfo('Blinn-Phong renderer started');
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
@@ -35,7 +35,7 @@ export class BlinnPhongRenderer extends Renderer {
                 renderableComponent.draw();
             }
         }
-        Log.renderingInfo('Blinn-Phong renderer finished');
+        Log.logRenderingInfo('Blinn-Phong renderer finished');
     }
 
     private isInsideFrustum(renderableComponent: IRenderableComponent<IRenderable>): boolean {

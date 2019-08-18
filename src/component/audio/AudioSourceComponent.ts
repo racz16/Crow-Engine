@@ -23,7 +23,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         this.gain = ctx.createGain();
         this.bufferSource.connect(this.panner).connect(this.gain).connect(ctx.destination);
         this.gain.gain.value = this.volume;
-        Audio.private_add(this);
+        (Audio as any).add(this);
     }
 
     public static createAmbientAudioSourceComponent(soundPath: string): AudioSourceComponent {
@@ -154,7 +154,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         this.panner.coneOuterGain = volume;
     }
 
-    public private_update(): void {
+    protected updateComponent(): void {
         if (this.getGameObject() && !this.isValid() && this.isActive()) {
             this.updatePositionAndOrientationUnsafe();
             this.setVolume(this.volume);
@@ -185,14 +185,14 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         return this.loaded && this.getGameObject() && this.isActive();
     }
 
-    public private_attachToGameObject(gameObject: GameObject): void {
-        super.private_attachToGameObject(gameObject);
+    protected attachToGameObject(gameObject: GameObject): void {
+        super.attachToGameObject(gameObject);
         gameObject.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.private_detachFromGameObject();
+        super.detachFromGameObject();
         this.stop();
     }
 

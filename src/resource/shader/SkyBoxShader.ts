@@ -11,7 +11,7 @@ export class SkyBoxShader extends Shader {
     }
 
     public setUniforms() {
-        const skybox = Scene.getParameters().getValue(Scene.MAIN_SKYBOX);
+        const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX);
         skybox.bindToTextureUnit(0);
         this.getShaderProgram().loadBoolean("isThereCubeMap", true);
     }

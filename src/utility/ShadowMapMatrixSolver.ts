@@ -29,7 +29,7 @@ export class ShadowMapMatrixSolver {
     }
 
     private static initializeCamera(): void {
-        this.camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        this.camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
     }
 
     private static initializeLight(lightGameObject: GameObject, distance: number): void {

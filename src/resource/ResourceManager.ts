@@ -7,7 +7,7 @@ export class ResourceManager {
 
     private constructor() { }
 
-    public static private_add(resource: IResource): void {
+    private static add(resource: IResource): void {
         if (!ResourceManager.contains(resource)) {
             ResourceManager.resources.push(resource);
         }

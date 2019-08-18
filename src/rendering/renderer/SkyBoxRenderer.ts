@@ -22,8 +22,8 @@ export class SkyBoxRenderer extends Renderer {
     }
 
     public render(): void {
-        Log.renderingInfo('skybox renderer started');
-        const skybox = Scene.getParameters().getValue(Scene.MAIN_SKYBOX) as CubeMapTexture;
+        Log.logRenderingInfo('skybox renderer started');
+        const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
         }
@@ -33,7 +33,7 @@ export class SkyBoxRenderer extends Renderer {
         this.box.draw();
 
         Gl.gl.depthFunc(Gl.gl.LESS);
-        Log.renderingInfo('skybox renderer started');
+        Log.logRenderingInfo('skybox renderer started');
     }
 
     private prepare(): void {

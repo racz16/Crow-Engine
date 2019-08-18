@@ -16,7 +16,7 @@ export class CubeMesh implements IMesh {
 
     private constructor() {
         this.loadData();
-        ResourceManager.private_add(this);
+        (ResourceManager as any).add(this);
     }
 
     public static getInstance(): CubeMesh {
@@ -75,6 +75,6 @@ export class CubeMesh implements IMesh {
         return true;
     }
 
-    public private_update(): void { }
+    public update(): void { }
 
 }

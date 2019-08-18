@@ -162,21 +162,21 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.renderable.draw();
     }
 
-    public private_update(): void {
-        super.private_update();
-        this.renderable.private_update();
+    protected updateComponent(): void {
+        super.updateComponent();
+        this.renderable.update();
     }
 
-    public private_attachToGameObject(gameObject: GameObject): void {
-        super.private_attachToGameObject(gameObject);
+    protected attachToGameObject(gameObject: GameObject): void {
+        super.attachToGameObject(gameObject);
         gameObject.getTransform().getInvalidatables().addInvalidatable(this);
-        RenderingPipeline.getRenderableContainer().private_add(this);
+        (RenderingPipeline.getRenderableContainer() as any).add(this);
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.private_detachFromGameObject();
-        RenderingPipeline.getRenderableContainer().private_remove(this);
+        super.detachFromGameObject();
+        (RenderingPipeline.getRenderableContainer() as any).remove(this);
     }
 
 }

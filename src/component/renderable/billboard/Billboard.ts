@@ -64,7 +64,7 @@ export abstract class Billboard implements IBillboard {
     }
 
     protected refresh(): void {
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (!this.valid || this.camera != camera) {
             if (this.camera != camera) {
                 this.changeCamera(camera);
@@ -85,7 +85,7 @@ export abstract class Billboard implements IBillboard {
     protected abstract refreshUnsafe(): void;
 
     protected isUsable(): boolean {
-        return this.renderableComponent && this.renderableComponent.getGameObject() && Scene.getParameters().getValue(Scene.MAIN_CAMERA) != null;
+        return this.renderableComponent && this.renderableComponent.getGameObject() && Scene.getParameters().get(Scene.MAIN_CAMERA) != null;
     }
 
     public getModelMatrix(): mat4 {

@@ -9,7 +9,7 @@ export class AabbBoundingShape extends BoundingShape {
     private readonly aabbMax = vec3.create();
 
     public isInsideMainCameraFrustum(): boolean {
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (camera && !this.getRenderableComponent().getBillboard() && this.isUsable()) {
             this.refresh();
             return this.isInsideMainCameraFrustumUnsafe(camera);

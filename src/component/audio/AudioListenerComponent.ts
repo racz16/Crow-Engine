@@ -5,7 +5,7 @@ import { Audio } from "../../resource/Audio";
 
 export class AudioListenerComponent extends Component {
 
-    public private_update(): void {
+    protected updateComponent(): void {
         if (this.isTheMainAudioListener() && !this.isValid() && this.getGameObject() && this.isActive()) {
             const position = this.getGameObject().getTransform().getAbsolutePosition();
             const forward = this.getGameObject().getTransform().getForwardVector();
@@ -16,7 +16,7 @@ export class AudioListenerComponent extends Component {
     }
 
     public isTheMainAudioListener(): boolean {
-        return Scene.getParameters().getValue(Scene.MAIN_AUDIO_LISTENER) === this;
+        return Scene.getParameters().get(Scene.MAIN_AUDIO_LISTENER) === this;
     }
 
     public setActive(active: boolean): void {
@@ -26,14 +26,14 @@ export class AudioListenerComponent extends Component {
         }
     }
 
-    public private_attachToGameObject(gameObject: GameObject): void {
-        super.private_attachToGameObject(gameObject);
+    protected attachToGameObject(gameObject: GameObject): void {
+        super.attachToGameObject(gameObject);
         gameObject.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.private_detachFromGameObject();
+        super.detachFromGameObject();
         if (this.isTheMainAudioListener()) {
             Audio.setAudioListenerToDefault();
         }

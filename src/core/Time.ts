@@ -14,7 +14,7 @@ export class Time {
 
     private constructor() { }
 
-    public static private_update(): void {
+    private static update(): void {
         this.refreshDeltaTimeFactor();
         this.refreshFps();
     }

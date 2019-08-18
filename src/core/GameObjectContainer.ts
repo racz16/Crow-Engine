@@ -5,15 +5,15 @@ export class GameObjectContainer {
 
     private gameObjects = new Array<GameObject>();
 
-    public private_updateComponents(): void {
-        Log.lifeCycleInfo('updading components started');
+    private updateComponents(): void {
+        Log.logLifeCycleInfo('updading components started');
         for (const gameObject of this.gameObjects) {
-            gameObject.private_update();
+            (gameObject as any).update();
         }
-        Log.lifeCycleInfo('updading components finished');
+        Log.logLifeCycleInfo('updading components finished');
     }
 
-    public private_addGameObject(gameObject: GameObject): void {
+    private addGameObject(gameObject: GameObject): void {
         if (!gameObject) {
             throw new Error();
         }

@@ -5,13 +5,37 @@ import { vec2 } from "gl-matrix";
 import { CubeMapSideResolver } from "../../webgl/enum/CubeMapSide";
 import { TextureFiltering, TextureFilteringResolver } from "./TextureFiltering";
 import { Gl } from "../../webgl/Gl";
+import { Utility } from "../../utility/Utility";
 
 export class CubeMapTexture implements ICubeMapTexture {
 
     private texture: GlCubeMapTexture;
     public loaded = 0;
 
+    private static defaultTexture: CubeMapTexture;
+
+    public static getDefaultTexture(): CubeMapTexture {
+        if (!Utility.isUsable(this.defaultTexture)) {
+            this.defaultTexture = new CubeMapTexture();
+        }
+        return this.defaultTexture;
+    }
+
     public constructor(paths?: Array<string>, textureFiltering = TextureFiltering.None) {
+        if (paths) {
+            this.createTextureFromImage(paths, textureFiltering);
+        } else {
+            this.createEmptyTexture();
+        }
+    }
+
+    private createEmptyTexture(): void {
+        this.texture = new GlCubeMapTexture();
+        this.texture.allocate(InternalFormat.R8, vec2.fromValues(1, 1), false);
+        this.loaded = 6;
+    }
+
+    private createTextureFromImage(paths: Array<string>, textureFiltering: TextureFiltering): void {
         this.texture = new GlCubeMapTexture();
         for (let i = 0; i < 6; i++) {
             const path = paths[i];

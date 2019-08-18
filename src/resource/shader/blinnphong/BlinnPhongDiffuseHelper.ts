@@ -12,8 +12,10 @@ export class BlinnPhongDiffuseHelper extends BlinnPhongHelper {
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();
         } else if (this.isColorUsable()) {
+            this.loadDefaultTexture2D();
             this.loadColor3();
         } else {
+            this.loadDefaultTexture2D();
             this.loadDefaultColor3(BlinnPhongDiffuseHelper.defaultValue);
         }
     }

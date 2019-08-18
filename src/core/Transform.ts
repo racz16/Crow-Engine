@@ -19,7 +19,8 @@ export class Transform implements IInvalidatable {
     private up = vec3.create();
     private gameObject: GameObject;
     private valid: boolean;
-    private invalidatables = new InvalidatableContainer(this);
+    private readonly invalidatables = new InvalidatableContainer(this);
+    private readonly parameterInvalidatables = new InvalidatableContainer(this);
 
     public Transform(position: vec3, rotation: vec3, scale: vec3) {
         this.setRelativePosition(position);
@@ -222,15 +223,15 @@ export class Transform implements IInvalidatable {
     //
     //GameObject related--------------------------------------------------------
     //
-    public private_update(): void {
+    protected update(): void {
     }
 
-    public private_attachToGameObject(gameObject: GameObject): void {
+    protected attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
         this.invalidate();
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.gameObject = null;
         this.invalidate();
     }
@@ -245,11 +246,16 @@ export class Transform implements IInvalidatable {
 
     public invalidate(): void {
         this.invalidatables.invalidate();
+        this.parameterInvalidatables.invalidate();
         this.valid = false;
     }
 
     public getInvalidatables(): InvalidatableContainer {
         return this.invalidatables;
+    }
+
+    private getParameterInvalidatables(): InvalidatableContainer {
+        return this.parameterInvalidatables;
     }
 
 }

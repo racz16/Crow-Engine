@@ -13,6 +13,6 @@ export interface IRenderable extends IResource {
 
     draw(): void;
 
-    private_update(): void;
+    update(): void;
 
 }

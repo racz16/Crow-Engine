@@ -17,12 +17,16 @@ export class GameObject {
         this.root = this;
         this.components = new ComponentContainer(this);
         this.children = new ChildContainer(this);
-        Scene.getGameObjects().private_addGameObject(this);
+        (Scene.getGameObjects() as any).addGameObject(this);
     }
 
-    public private_update(): void {
-        this.transform.private_update();
-        this.components.private_update();
+    public asd(){
+        console.log('asd');
+    }
+
+    protected update(): void {
+        (this.transform as any).update();
+        (this.components as any).update();
     }
 
     public getRoot(): GameObject {
@@ -72,7 +76,7 @@ export class GameObject {
 
     private removeParent(): void {
         if (this.parent) {
-            this.parent.getChildren().private_removeChild(this);
+            (this.parent.getChildren() as any).removeChild(this);
             this.parent.getTransform().getInvalidatables().removeInvalidatable(this.transform);
             parent = null;
             this.setRoot(this);
@@ -83,7 +87,7 @@ export class GameObject {
         this.parent = parent;
         if (parent) {
             this.setRoot(parent.getRoot());
-            parent.getChildren().private_addChild(this);
+            (parent.getChildren() as any).addChild(this);
             parent.getTransform().getInvalidatables().addInvalidatable(this.getTransform());
         }
     }

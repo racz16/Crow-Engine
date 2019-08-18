@@ -60,9 +60,28 @@ export abstract class BlinnPhongHelper {
         this.sp.loadBoolean(this.getIsThereMapName(), false);
     }
 
+    protected loadColor4(): void {
+        const color = this.slot.getColor();
+        this.sp.loadVector4(this.getColorName(), color);
+        this.sp.loadBoolean(this.getIsThereMapName(), false);
+    }
+
+    protected loadDefaultTexture2D(): void {
+        const texture = Texture2D.getDefaultTexture();
+        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
+    }
+
+    protected loadDefaultCubeMapTexture(): void {
+        const texture = CubeMapTexture.getDefaultTexture();
+        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
+    }
+
     protected loadDefaultColor3(defaultColor: vec3): void {
         this.sp.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
         this.sp.loadBoolean(this.getIsThereMapName(), false);
+        
     }
 
     protected loadDefaultColor4(defaultColor: vec4): void {

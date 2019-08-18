@@ -61,16 +61,16 @@ export abstract class BlinnPhongLightComponent extends Component {
         this.invalidate();
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.private_detachFromGameObject();
+        super.detachFromGameObject();
     }
 
-    public private_attachToGameObject(g: GameObject): void {
-        super.private_attachToGameObject(g);
+    protected attachToGameObject(g: GameObject): void {
+        super.attachToGameObject(g);
         this.getGameObject().getTransform().getInvalidatables().addInvalidatable(this);
     }
 
-    public abstract private_refresh(ubo: Ubo, index: number): void;
+    protected abstract refresh(ubo: Ubo, index: number): void;
 
 }

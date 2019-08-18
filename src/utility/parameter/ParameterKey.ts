@@ -5,7 +5,7 @@ export class ParameterKey<T>{
     private key: string;
 
     public constructor(returnType: new (..._) => T, key: string) {
-        if (returnType == null || key == null) {
+        if (!returnType || !key) {
             throw new Error();
         }
         this.returnType = returnType;

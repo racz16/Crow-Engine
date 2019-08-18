@@ -10,7 +10,7 @@ export class BlinnPhongSpotLightComponent extends BlinnPhongPositionalLightCompo
     private cutoff = 12.5;
     private outerCutoff = 15.0;
 
-    public private_refresh(ubo: Ubo, index: number) {
+    protected refresh(ubo: Ubo, index: number) {
         ubo.storewithOffset(new Float32Array(this.getAmbientColor()), this.computeOffset(BlinnPhongLightComponent.AMBIENT_OFFSET, index));
         ubo.storewithOffset(new Float32Array(this.getDiffuseColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
         ubo.storewithOffset(new Float32Array(this.getSpecularColor()), this.computeOffset(BlinnPhongLightComponent.SPECULAR_OFFSET, index));

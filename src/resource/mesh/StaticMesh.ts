@@ -27,7 +27,7 @@ export class StaticMesh implements IMesh {
             this.computeFrustumCullingData(mesh);
             this.loadMesh(mesh);
         });
-        ResourceManager.private_add(this);
+        (ResourceManager as any).add(this);
     }
 
     //
@@ -126,6 +126,6 @@ export class StaticMesh implements IMesh {
         return vec3.clone(this.aabbMin);
     }
 
-    public private_update(): void { }
+    public update(): void { }
 
 }

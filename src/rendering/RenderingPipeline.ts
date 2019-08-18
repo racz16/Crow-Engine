@@ -11,10 +11,7 @@ import { FboAttachmentSlot } from "../webgl/enum/FboAttachmentSlot";
 import { vec2, mat4 } from "gl-matrix";
 import { SkyBoxRenderer } from "./renderer/SkyBoxRenderer";
 import { BlinnPhongRenderer } from "./renderer/BlinnPhongRenderer";
-import { Rbo } from "../webgl/fbo/Rbo";
-import { InternalFormat } from "../webgl/enum/InternalFormat";
 import { ScreenRenderer } from "./ScreenRenderer";
-import { Parameter } from "../utility/parameter/Parameter";
 import { Log } from "../utility/log/Log";
 import { BindingPoint } from "./BindingPoint";
 
@@ -114,7 +111,7 @@ export class RenderingPipeline {
     }
 
     public static render(): void {
-        Log.lifeCycleInfo('rendering started');
+        Log.logLifeCycleInfo('rendering started');
         this.beforeRender();
         Gl.setEnableDepthTest(true);
         //prepare
@@ -127,7 +124,7 @@ export class RenderingPipeline {
         //Gl.clear(true, true, false);
         //this.screenRenderer.render();
         //this.getParameters().set(this.WORK, null);
-        Log.lifeCycleInfo('rendering finished');
+        Log.logLifeCycleInfo('rendering finished');
     }
 
     private static beforeRender(): void {
@@ -135,8 +132,8 @@ export class RenderingPipeline {
         //this.bindFbo();
         Gl.clear(true, true, false);
 
-        const mainCamera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
-        const dirLight = Scene.getParameters().getValue(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
+        const mainCamera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const dirLight = Scene.getParameters().get(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
         if (!mainCamera || !mainCamera.isActive() || !dirLight || !dirLight.isActive()) {
             throw new Error();
         }
@@ -147,7 +144,7 @@ export class RenderingPipeline {
         if (canvas.clientWidth !== canvas.width || canvas.clientHeight !== canvas.height) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
-            const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+            const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
             if (camera) {
                 camera.invalidate();
             }

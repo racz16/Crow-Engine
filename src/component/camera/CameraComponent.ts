@@ -43,7 +43,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo = new Ubo();
         this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
         this.useCameraUbo();
-        Log.resourceInfo('camera ubo created');
+        Log.logResourceInfo('camera ubo created');
     }
 
     public static useCameraUbo(): void {
@@ -51,7 +51,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     public static refreshUbo(): void {
-        const cam = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const cam = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (!this.uboValid && cam && cam instanceof CameraComponent) {
             this.createUboIfNotExists();
             this.refreshUboUnsafe(cam);
@@ -63,7 +63,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo.storewithOffset(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
         this.ubo.storewithOffset(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         this.uboValid = true;
-        Log.resourceInfo('camera ubo refreshed');
+        Log.logResourceInfo('camera ubo refreshed');
     }
 
     public static releaseUbo(): void {
@@ -71,7 +71,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         if (this.isUboUsable()) {
             this.ubo.release();
             this.ubo = null;
-            Log.resourceInfo('camera ubo released');
+            Log.logResourceInfo('camera ubo released');
         }
     }
 
@@ -80,7 +80,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     private static invalidateMainCamera(): void {
-        const cam = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const cam = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (cam) {
             cam.invalidate();
         }
@@ -196,22 +196,22 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     public isTheMainCamera(): boolean {
-        return Scene.getParameters().getValue(Scene.MAIN_CAMERA) == this;
+        return Scene.getParameters().get(Scene.MAIN_CAMERA) == this;
     }
 
-    public private_update(): void {
+    protected updateComponent(): void {
         if (this.isTheMainCamera()) {
             CameraComponent.refreshUbo();
         }
     }
 
-    public private_detachFromGameObject(): void {
+    protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.private_detachFromGameObject();
+        super.detachFromGameObject();
     }
 
-    public private_attachToGameObject(g: GameObject): void {
-        super.private_attachToGameObject(g);
+    protected attachToGameObject(g: GameObject): void {
+        super.attachToGameObject(g);
         this.getGameObject().getTransform().getInvalidatables().addInvalidatable(this);
     }
 

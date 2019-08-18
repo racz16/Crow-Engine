@@ -15,15 +15,16 @@ export class BlinnPhongRefractionHelper extends BlinnPhongHelper {
             this.loadCubeMapTexture();
             this.loadRefractionIndex();
         } else {
+            this.loadDefaultCubeMapTexture();
             sp.loadBoolean(this.getIsThereMapName(), false);
         }
     }
 
     private loadRefractionIndex(): void {
         const sp = this.getSp();
-        const index = this.material.getParameters().getValue(Material.REFRACTION_INDEX) == null ?
+        const index = this.material.getParameters().get(Material.REFRACTION_INDEX) == null ?
             BlinnPhongRefractionHelper.defaultRefractionIndex :
-            this.material.getParameters().getValue(Material.REFRACTION_INDEX) as number;
+            this.material.getParameters().get(Material.REFRACTION_INDEX) as number;
         sp.loadFloat(this.getRefractionIndexName(), index);
     }
 

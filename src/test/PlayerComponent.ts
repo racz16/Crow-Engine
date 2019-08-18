@@ -22,13 +22,13 @@ export class PlayerComponent extends Component {
         return false;
     }
 
-    public private_update(): void {
+    protected updateComponent(): void {
         const moveSpeed = 1;
         const rotateSpeed = 1;
         const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * Time.getDeltaTimeFactor());
         const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * Time.getDeltaTimeFactor());
         const upSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getUpVector(), moveSpeed * Time.getDeltaTimeFactor());
-        
+
         //move
         if (this.includes('KeyW')) {
             this.getGameObject().getTransform().move(forwardSpeed);

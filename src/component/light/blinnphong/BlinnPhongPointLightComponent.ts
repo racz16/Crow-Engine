@@ -6,7 +6,7 @@ export class BlinnPhongPointLightComponent extends BlinnPhongPositionalLightComp
 
     private static readonly POINT_LIGHT_TYPE = 1;
 
-    public private_refresh(ubo: Ubo, index: number) {
+    protected refresh(ubo: Ubo, index: number) {
         ubo.storewithOffset(new Float32Array(this.getAmbientColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
         ubo.storewithOffset(new Float32Array(this.getDiffuseColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
         ubo.storewithOffset(new Float32Array(this.getSpecularColor()), this.computeOffset(BlinnPhongLightComponent.SPECULAR_OFFSET, index));

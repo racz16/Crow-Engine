@@ -49,7 +49,7 @@ export class InfoComponent extends Component {
         Audio.setVolume(1);
     }
 
-    public private_update(): void {
+    protected updateComponent(): void {
         this.textNode.nodeValue = Time.getFps() + '';
     }
 

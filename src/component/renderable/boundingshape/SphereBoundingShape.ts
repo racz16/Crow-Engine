@@ -7,7 +7,7 @@ export class SphereBoundingShape extends BoundingShape {
     private radius: number;
 
     public isInsideMainCameraFrustum(): boolean {
-        const camera = Scene.getParameters().getValue(Scene.MAIN_CAMERA);
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (camera && this.isUsable()) {
             const position = this.getRenderableComponent().getGameObject().getTransform().getAbsolutePosition();
             for (const plane of camera.getFrustum().getPlanesIterator()) {

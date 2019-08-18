@@ -57,8 +57,8 @@ export class BlinnPhongShader extends Shader {
         const isThereRefractionMap = "material.isThereRefractionMap";
         const refractionTextureUnit = 5;
         const refractionIndex = "material.refractionIndex";
-        const index = material.getParameters().getValue(Material.REFRACTION_INDEX) == null ? 1 / 1.33 : material
-            .getParameters().getValue(Material.REFRACTION_INDEX) as number;
+        const index = material.getParameters().get(Material.REFRACTION_INDEX) == null ? 1 / 1.33 : material
+            .getParameters().get(Material.REFRACTION_INDEX) as number;
         const refractionUsable = refractionSlot && refractionSlot.isActive() && refractionSlot.getCubeMapTexture() != null;
         //intensity
         const intensitySlot = material.getSlot(Material.ENVIRONMENT_INTENSITY);

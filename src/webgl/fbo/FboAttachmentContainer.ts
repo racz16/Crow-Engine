@@ -103,7 +103,7 @@ export class FboAttachmentContainer {
         return this.draw;
     }
 
-    public private_setDrawBuffer(draw: boolean): void {
+    private setDrawBuffer(draw: boolean): void {
         this.draw = draw;
     }
 

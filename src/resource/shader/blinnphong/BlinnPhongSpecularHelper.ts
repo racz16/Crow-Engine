@@ -14,16 +14,19 @@ export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
             this.loadTexture2D();
             this.loadGlossiness();
         } else if (this.isColorUsable()) {
-            this.loadColor3();
+            this.loadDefaultTexture2D();
+            this.loadColor4();
         } else {
+            this.loadDefaultTexture2D();
             this.loadDefaultColor4(BlinnPhongSpecularHelper.defaultValue);
         }
     }
 
     private loadGlossiness(): void {
+        //debugger;
         const slot = this.getSlot();
         const sp = this.getSp();
-        const isThereGlossiness = slot.getParameters().getValue(MaterialSlot.USE_GLOSSINESS);
+        const isThereGlossiness = slot.getParameters().get(MaterialSlot.USE_GLOSSINESS);
         if (isThereGlossiness == null || isThereGlossiness != 1) {
             const color = slot.getColor();
             sp.loadBoolean(this.getIsThereGlossinessName(), false);

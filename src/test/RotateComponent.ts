@@ -4,7 +4,7 @@ import { Time } from "../core/Time";
 
 export class RotateComponent extends Component {
 
-    public private_update(): void {
+    protected updateComponent(): void {
         this.getGameObject().getTransform().rotate(vec3.fromValues(0, Time.getDeltaTimeFactor(), 0));
     }
 }

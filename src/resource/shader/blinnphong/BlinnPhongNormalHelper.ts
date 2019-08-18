@@ -27,14 +27,14 @@ export class BlinnPhongNormalHelper extends BlinnPhongHelper {
 
     private loadPom(): void {
         const sp = this.getSp();
-        const usePom = this.material.getParameters().getValue(MaterialSlot.USE_POM);
+        const usePom = this.material.getParameters().get(MaterialSlot.USE_POM);
         if (usePom != null && usePom == 1) {
             sp.loadBoolean(this.getIsTherePomName(), true);
-            let value = this.material.getParameters().getValue(MaterialSlot.POM_SCALE) as number;
+            let value = this.material.getParameters().get(MaterialSlot.POM_SCALE) as number;
             sp.loadFloat(this.getPomScaleName(), value == null ? BlinnPhongNormalHelper.defPOMScale : value);
-            value = this.material.getParameters().getValue(MaterialSlot.POM_MIN_LAYERS) as number;
+            value = this.material.getParameters().get(MaterialSlot.POM_MIN_LAYERS) as number;
             sp.loadFloat(this.getPomMinLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMinLayers : value);
-            value = this.material.getParameters().getValue(MaterialSlot.POM_MAX_LAYERS) as number;
+            value = this.material.getParameters().get(MaterialSlot.POM_MAX_LAYERS) as number;
             sp.loadFloat(this.getPomMaxLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMaxLayers : value);
         } else {
             sp.loadBoolean(this.getIsTherePomName(), false);

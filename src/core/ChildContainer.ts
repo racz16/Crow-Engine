@@ -51,7 +51,7 @@ export class ChildContainer {
         }
     }
 
-    public private_removeChild(child: GameObject): void {
+    private removeChild(child: GameObject): void {
         const index = this.children.indexOf(child);
         Utility.removeElement(this.children, index);
     }
@@ -60,7 +60,7 @@ export class ChildContainer {
         child.setParent(this.gameObject);
     }
 
-    public private_addChild(child: GameObject): void {
+    private addChild(child: GameObject): void {
         this.children.push(child);
     }
 

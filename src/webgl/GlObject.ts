@@ -8,7 +8,7 @@ export abstract class GlObject implements IResource {
     private id = GlObject.INVALID_ID;
 
     public constructor() {
-        ResourceManager.private_add(this);
+        (ResourceManager as any).add(this);
     }
 
     public getId(): number {

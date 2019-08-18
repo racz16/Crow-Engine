@@ -9,7 +9,7 @@ export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLight
 
     public constructor() {
         super();
-        BlinnPhongLightContainer.getInstance().private_addLight(this);
+        BlinnPhongLightContainer.getInstance().addLight(this);
     }
 
     public getConstant(): number {

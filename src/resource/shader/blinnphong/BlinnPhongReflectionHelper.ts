@@ -10,6 +10,7 @@ export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
         if (this.isCubeMapTextureUsable()) {
             this.loadCubeMapTexture();
         } else {
+            this.loadDefaultCubeMapTexture();
             sp.loadBoolean(this.getIsThereMapName(), false);
         }
     }
