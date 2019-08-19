@@ -1,16 +1,19 @@
 import { GameObject } from "./GameObject";
 import { Log } from "../utility/log/Log";
+import { LogLevel } from "../utility/log/LogLevel";
+import { LogType } from "../utility/log/LogType";
 
 export class GameObjectContainer {
 
     private gameObjects = new Array<GameObject>();
 
     private updateComponents(): void {
-        Log.logLifeCycleInfo('updading components started');
+        Log.startGroup('updating components');
         for (const gameObject of this.gameObjects) {
             (gameObject as any).update();
         }
-        Log.logLifeCycleInfo('updading components finished');
+        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'updating components finished');
+        Log.endGroup();
     }
 
     private addGameObject(gameObject: GameObject): void {

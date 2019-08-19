@@ -1,5 +1,4 @@
 import { IResource } from "./IResource";
-import { Utility } from "../utility/Utility";
 
 export class ResourceManager {
 

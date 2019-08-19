@@ -9,6 +9,8 @@ import { Gl } from "../../webgl/Gl";
 import { CubeMapTexture } from "../../resource/texture/CubeMapTexture";
 import { vec2 } from "gl-matrix";
 import { Log } from "../../utility/log/Log";
+import { LogLevel } from "../../utility/log/LogLevel";
+import { LogType } from "../../utility/log/LogType";
 
 export class SkyBoxRenderer extends Renderer {
 
@@ -22,7 +24,7 @@ export class SkyBoxRenderer extends Renderer {
     }
 
     public render(): void {
-        Log.logRenderingInfo('skybox renderer started');
+        Log.startGroup('SkyBox renderer')
         const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
@@ -33,7 +35,8 @@ export class SkyBoxRenderer extends Renderer {
         this.box.draw();
 
         Gl.gl.depthFunc(Gl.gl.LESS);
-        Log.logRenderingInfo('skybox renderer started');
+        Log.logString(LogLevel.INFO_2, LogType.RENDERING, 'SkyBox finished rendering');
+        Log.endGroup();
     }
 
     private prepare(): void {

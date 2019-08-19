@@ -1,4 +1,7 @@
 import { Gl } from "./Gl";
+import { Log } from "../utility/log/Log";
+import { LogLevel } from "../utility/log/LogLevel";
+import { LogType } from "../utility/log/LogType";
 
 export class GlConstants {
     //general
@@ -53,6 +56,7 @@ export class GlConstants {
         //FBO
         GlConstants._MAX_COLOR_ATTACHMENTS = gl.getParameter(gl.MAX_COLOR_ATTACHMENTS);
         GlConstants._MAX_DRAW_BUFFERS = gl.getParameter(gl.MAX_DRAW_BUFFERS);
+        Log.logString(LogLevel.INFO_3, LogType.RESOURCES, 'WebGL constants initialized');
     }
 
     //general

@@ -1,6 +1,6 @@
 export enum LogType {
-    LIFE_CYCLE,
-    GL,
-    RESOURCES,
-    RENDERING
+    ENGINE = 1,
+    RESOURCES = 2,
+    RENDERING = 4,
+    OTHER = 1024,
 }

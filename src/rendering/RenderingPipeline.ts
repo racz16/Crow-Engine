@@ -14,6 +14,8 @@ import { BlinnPhongRenderer } from "./renderer/BlinnPhongRenderer";
 import { ScreenRenderer } from "./ScreenRenderer";
 import { Log } from "../utility/log/Log";
 import { BindingPoint } from "./BindingPoint";
+import { LogLevel } from "../utility/log/LogLevel";
+import { LogType } from "../utility/log/LogType";
 
 export class RenderingPipeline {
 
@@ -40,6 +42,7 @@ export class RenderingPipeline {
         //TODO: parameterts
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
+        Log.logString(LogLevel.INFO_2,LogType.RENDERING, 'Rendering Pipeline initialized');
     }
 
     public static getRenderableContainer(): RenderableContainer {
@@ -111,7 +114,7 @@ export class RenderingPipeline {
     }
 
     public static render(): void {
-        Log.logLifeCycleInfo('rendering started');
+        Log.startGroup('rendering');
         this.beforeRender();
         Gl.setEnableDepthTest(true);
         //prepare
@@ -124,7 +127,7 @@ export class RenderingPipeline {
         //Gl.clear(true, true, false);
         //this.screenRenderer.render();
         //this.getParameters().set(this.WORK, null);
-        Log.logLifeCycleInfo('rendering finished');
+        Log.endGroup();
     }
 
     private static beforeRender(): void {

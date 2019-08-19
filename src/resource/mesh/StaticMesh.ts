@@ -20,7 +20,7 @@ export class StaticMesh implements IMesh {
     private furthestVertexDistance: number;
 
     public constructor(path: string) {
-        Utility.loadResource(path, (result: string) => {
+        Utility.loadResource<string>(path, (result) => {
             const mesh = new Mesh(result, { calcTangentsAndBitangents: true });
             this.vertexCount = mesh.indices.length;
             this.faceCount = this.vertexCount / 3;
@@ -92,7 +92,7 @@ export class StaticMesh implements IMesh {
     }
 
     public isUsable(): boolean {
-        return this.vao.isUsable();
+        return Utility.isUsable(this.vao);
     }
 
     public release(): void {

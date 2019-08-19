@@ -41,7 +41,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
                 this.bufferSource.buffer = data;
                 this.loaded = true;
             });
-        }, true, 'arraybuffer');
+        }, 'arraybuffer');
     }
 
     public start(): void {

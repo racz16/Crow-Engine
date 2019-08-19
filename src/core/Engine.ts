@@ -6,6 +6,7 @@ import { RenderingPipeline } from "../rendering/RenderingPipeline";
 import { Audio } from "../resource/Audio";
 import { Log } from "../utility/log/Log";
 import { LogLevel } from "../utility/log/LogLevel";
+import { LogType } from "../utility/log/LogType";
 
 export class Engine {
 
@@ -15,22 +16,24 @@ export class Engine {
 
     private constructor() { }
 
-    public static initialize(canvas: HTMLCanvasElement, logLevel = this.DEBUG ? LogLevel.INFO : LogLevel.ERROR): void {
+    public static initialize(canvas: HTMLCanvasElement, logLevel = this.DEBUG ? LogLevel.WARNING : LogLevel.INFO_1): void {
         try {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
-            Log.logError(error);
+            Log.logObject(LogLevel.ERROR, LogType.ENGINE, error);
             ResourceManager.releaseResources();
         }
     }
 
     private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
+        Log.startGroup('initialization');
         Log.initialize(logLevel);
         Gl.initialize(canvas);
         Audio.initialize();
         RenderingPipeline.initialize();
         Engine.initialized = true;
-        Log.logLifeCycleInfo('engine initialized');
+        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine initialized');
+        Log.endGroup();
     }
 
     public static start(): void {
@@ -40,27 +43,27 @@ export class Engine {
         if (Engine.started) {
             throw new Error('The engine is already started');
         }
-        Engine.createNextFrame();
         Engine.started = true;
-        Log.logLifeCycleInfo('engine started');
+        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'engine started');
+        Engine.createNextFrame();
     }
 
     private static createNextFrame(): void {
         try {
             Engine.createNextFrameUnsafe();
         } catch (error) {
-            Log.logError(error);
+            Log.logObject(LogLevel.ERROR, LogType.ENGINE, error);
             ResourceManager.releaseResources();
         }
     }
 
     private static createNextFrameUnsafe(): void {
+        Log.startGroup(`frame ${Time.getFrameCount()}`);
         (Time as any).update();
-        Log.logLifeCycleInfo(`FRAME ${Time.getFrameCount()} started`);
         (Scene.getGameObjects() as any).updateComponents();
         RenderingPipeline.render();
+        Log.endGroup(); Log.endGroup();//ne kérdezd
         window.requestAnimationFrame(Engine.createNextFrame);
-        Log.logLifeCycleInfo(`FRAME ${Time.getFrameCount()} finished`);
     }
 
     public static isInitialized(): boolean {

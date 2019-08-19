@@ -20,10 +20,6 @@ export class GameObject {
         (Scene.getGameObjects() as any).addGameObject(this);
     }
 
-    public asd(){
-        console.log('asd');
-    }
-
     protected update(): void {
         (this.transform as any).update();
         (this.components as any).update();

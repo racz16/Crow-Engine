@@ -7,10 +7,11 @@ export class SkyBoxShader extends Shader {
 
     public constructor() {
         super();
-        Utility.bindUniformBlockToBindingPoint(this.getShaderProgram(), RenderingPipeline.CAMERA_BINDING_POINT);
     }
 
     public setUniforms() {
+        Utility.bindUniformBlockToBindingPoint(this.getShaderProgram(), RenderingPipeline.CAMERA_BINDING_POINT);
+
         const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX);
         skybox.bindToTextureUnit(0);
         this.getShaderProgram().loadBoolean("isThereCubeMap", true);

@@ -19,6 +19,8 @@ import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
 import { ObbBoundingShape } from "./component/renderable/boundingshape/ObbBoundingShape";
+import { Log } from "./utility/log/Log";
+import { LogType } from "./utility/log/LogType";
 
 
 window.onload = () => {

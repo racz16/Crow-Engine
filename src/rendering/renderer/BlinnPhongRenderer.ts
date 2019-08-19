@@ -4,7 +4,6 @@ import { BlinnPhongDirectionalLightComponent } from "../../component/light/blinn
 import { BlinnPhongShader } from "../../resource/shader/blinnphong/BlinnPhongShader";
 import { RenderingPipeline } from "../RenderingPipeline";
 import { Utility } from "../../utility/Utility";
-import { CameraComponent } from "../../component/camera/CameraComponent";
 import { Gl } from "../../webgl/Gl";
 import { IRenderable } from "../../resource/IRenderable";
 import { BlinnPhongLightContainer } from "../../component/light/blinnphong/BlinnPhongLightContainer";
@@ -13,6 +12,9 @@ import { Log } from "../../utility/log/Log";
 import { IRenderableComponent } from "../../component/renderable/IRenderableComponent";
 import { Scene } from "../../core/Scene";
 import { ICameraComponent } from "../../component/camera/ICameraComponent";
+import { LogLevel } from "../../utility/log/LogLevel";
+import { LogType } from "../../utility/log/LogType";
+import { CameraComponent } from "../../component/camera/CameraComponent";
 
 export class BlinnPhongRenderer extends Renderer {
 
@@ -25,17 +27,22 @@ export class BlinnPhongRenderer extends Renderer {
     }
 
     public render(): void {
-        Log.logRenderingInfo('Blinn-Phong renderer started');
+        if (!Utility.isUsable(this.shader)) {
+            Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The Blinn-Phong shader is not usable');
+            return;
+        }
+        Log.startGroup('Blinn-Phong renderer')
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getRenderableComponentIterator()) {
-            if (renderableComponent.isActive() && this.isVisible(renderableComponent, camera) && this.isInsideFrustum(renderableComponent)) {
+            if (renderableComponent.getRenderable().isUsable() && renderableComponent.isActive() && this.isVisible(renderableComponent, camera) && this.isInsideFrustum(renderableComponent)) {
                 this.beforeDrawInstance(renderableComponent);
                 renderableComponent.draw();
             }
         }
-        Log.logRenderingInfo('Blinn-Phong renderer finished');
+        Log.logString(LogLevel.INFO_2, LogType.RENDERING, 'Blinn-Phong finished rendering');
+        Log.endGroup();
     }
 
     private isInsideFrustum(renderableComponent: IRenderableComponent<IRenderable>): boolean {
@@ -55,9 +62,9 @@ export class BlinnPhongRenderer extends Renderer {
     }
 
     private beforeDrawShader(): void {
-        if (!Utility.isUsable(this.shader)) {
+        /*if (!Utility.isUsable(this.shader)) {
             this.shader = new BlinnPhongShader();
-        }
+        }*/
 
         BlinnPhongLightContainer.getInstance().refreshUbo();
         BlinnPhongLightContainer.getInstance().useLightsUbo();

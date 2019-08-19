@@ -8,6 +8,8 @@ import { ICameraComponent } from "../../camera/ICameraComponent";
 import { Utility } from "../../../utility/Utility";
 import { Log } from "../../../utility/log/Log";
 import { RenderingPipeline } from "../../../rendering/RenderingPipeline";
+import { LogLevel } from "../../../utility/log/LogLevel";
+import { LogType } from "../../../utility/log/LogType";
 
 export class BlinnPhongLightContainer {
 
@@ -39,7 +41,7 @@ export class BlinnPhongLightContainer {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
             this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
-            Log.logResourceInfo('Lights ubo created');
+            Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'lights ubo created');
         }
     }
 
@@ -57,7 +59,7 @@ export class BlinnPhongLightContainer {
         this.sortPositionalLights();
         this.refreshPositionalLightsInUbo();
         this.refreshRemainingSlotsInUbo();
-        Log.logResourceInfo('Lights ubo refreshed');
+        Log.logString(LogLevel.INFO_2, LogType.RESOURCES, 'lights ubo refreshed');
     }
 
     private refreshDirectionalLightInUbo(): void {

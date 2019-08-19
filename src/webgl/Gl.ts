@@ -2,6 +2,9 @@ import { BlendFunc, BlendFuncResolver } from "./enum/BlendFunc";
 import { CullFace, CullFaceResolver } from "./enum/CullFace";
 import { GlConstants } from "./GlConstants";
 import { vec2 } from "gl-matrix";
+import { Log } from "../utility/log/Log";
+import { LogLevel } from "../utility/log/LogLevel";
+import { LogType } from "../utility/log/LogType";
 
 export class Gl {
 
@@ -22,6 +25,7 @@ export class Gl {
         Gl.setEnableBlend(true);
         Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
+        Log.logString(LogLevel.INFO_2, LogType.RESOURCES, 'WebGL initialized');
     }
 
     public static get gl(): WebGL2RenderingContext {

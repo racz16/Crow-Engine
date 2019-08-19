@@ -10,6 +10,8 @@ import { Log } from "../../utility/log/Log";
 import { Frustum } from "./frustum/Frustum";
 import { RenderingPipeline } from "../../rendering/RenderingPipeline";
 import { IFrustum } from "./frustum/IFrustum";
+import { LogLevel } from "../../utility/log/LogLevel";
+import { LogType } from "../../utility/log/LogType";
 
 export class CameraComponent extends Component implements ICameraComponent {
 
@@ -43,7 +45,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo = new Ubo();
         this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
         this.useCameraUbo();
-        Log.logResourceInfo('camera ubo created');
+        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'camera ubo created');
     }
 
     public static useCameraUbo(): void {
@@ -63,7 +65,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo.storewithOffset(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
         this.ubo.storewithOffset(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         this.uboValid = true;
-        Log.logResourceInfo('camera ubo refreshed');
+        Log.logString(LogLevel.INFO_2,LogType.RESOURCES,'camera ubo refreshed');
     }
 
     public static releaseUbo(): void {
@@ -71,12 +73,12 @@ export class CameraComponent extends Component implements ICameraComponent {
         if (this.isUboUsable()) {
             this.ubo.release();
             this.ubo = null;
-            Log.logResourceInfo('camera ubo released');
+            Log.logString(LogLevel.INFO_1,LogType.RESOURCES,'camera ubo released');
         }
     }
 
     public static isUboUsable(): boolean {
-        return Utility.isUsable(CameraComponent.ubo);
+        return Utility.isUsable(this.ubo);
     }
 
     private static invalidateMainCamera(): void {

@@ -8,14 +8,15 @@ export abstract class Shader {
     private shaderProgram: GlShaderProgram;
     private vertexSource = "";
     private fragmentSource = "";
+    private loaded = false;
 
     public constructor() {
         this.shaderProgram = new GlShaderProgram();
-        Utility.loadResource(this.getVertexShaderPath(), (source: string) => {
+        Utility.loadResource<string>(this.getVertexShaderPath(), (source) => {
             this.vertexSource = source;
             this.createShader();
         });
-        Utility.loadResource(this.getFragmentShaderPath(), (source: string) => {
+        Utility.loadResource<string>(this.getFragmentShaderPath(), (source) => {
             this.fragmentSource = source;
             this.createShader();
         });
@@ -34,6 +35,7 @@ export abstract class Shader {
             if (!this.shaderProgram.isLinkValid() || !this.shaderProgram.isProgramValid()) {
                 throw new Error(this.shaderProgram.getLinkErrorMessage());
             }
+            this.loaded = true;
         }
     }
 
@@ -62,7 +64,7 @@ export abstract class Shader {
     }
 
     public isUsable(): boolean {
-        return this.shaderProgram.isUsable();
+        return this.loaded && this.shaderProgram.isUsable();
     }
 
     public release(): void {
