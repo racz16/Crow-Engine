@@ -20,14 +20,18 @@ export class StaticMesh implements IMesh {
     private furthestVertexDistance: number;
 
     public constructor(path: string) {
-        Utility.loadResource<string>(path, (result) => {
-            const mesh = new Mesh(result, { calcTangentsAndBitangents: true });
-            this.vertexCount = mesh.indices.length;
-            this.faceCount = this.vertexCount / 3;
-            this.computeFrustumCullingData(mesh);
-            this.loadMesh(mesh);
-        });
+        this.load(path);
         (ResourceManager as any).add(this);
+    }
+
+    private async load(path: string): Promise<void> {
+        const response = await fetch(path);
+        const text = await response.text();
+        const mesh = new Mesh(text, { calcTangentsAndBitangents: true });
+        this.vertexCount = mesh.indices.length;
+        this.faceCount = this.vertexCount / 3;
+        this.computeFrustumCullingData(mesh);
+        this.loadMesh(mesh);
     }
 
     //

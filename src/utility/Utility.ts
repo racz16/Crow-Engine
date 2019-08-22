@@ -94,18 +94,4 @@ export class Utility {
         shader.bindUniformBlockToBindingPoint(bindingPoint.name, bindingPoint.bindingPoint);
     }
 
-    public static loadResource<T>(path: string, callback: (resource: T) => void, responseType?: XMLHttpRequestResponseType): void {
-        const xhttp = new XMLHttpRequest();
-        if (responseType) {
-            xhttp.responseType = responseType;
-        }
-        xhttp.onreadystatechange = () => {
-            if (xhttp.readyState == 4 && xhttp.status == 200) {
-                callback(xhttp.response);
-            }
-        }
-        xhttp.open("GET", path, true);
-        xhttp.send();
-    }
-
 }

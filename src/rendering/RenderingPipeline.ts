@@ -42,6 +42,7 @@ export class RenderingPipeline {
         //TODO: parameterts
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
+        this.skyboxRenderer = new SkyBoxRenderer();
         Log.logString(LogLevel.INFO_2,LogType.RENDERING, 'Rendering Pipeline initialized');
     }
 
@@ -105,12 +106,12 @@ export class RenderingPipeline {
                 throw new Error();
             }
         }*/
-        if (!Utility.isUsable(this.screenRenderer)) {
+        /*if (!Utility.isUsable(this.screenRenderer)) {
             this.screenRenderer = new ScreenRenderer();
         }
         if (!Utility.isUsable(this.skyboxRenderer)) {
             this.skyboxRenderer = new SkyBoxRenderer();
-        }
+        }*/
     }
 
     public static render(): void {

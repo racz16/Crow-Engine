@@ -1,5 +1,4 @@
 import { Component } from "../Component";
-import { Utility } from "../../utility/Utility";
 import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelType";
 import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";
 import { GameObject } from "../../core/GameObject";
@@ -34,14 +33,13 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         return asc;
     }
 
-    public setAudioSource(soundPath: string): void {
+    public async setAudioSource(soundPath: string): Promise<void> {
         const ctx = Audio.context;
-        Utility.loadResource<ArrayBuffer>(soundPath, (res) => {
-            ctx.decodeAudioData(res, (data) => {
-                this.bufferSource.buffer = data;
-                this.loaded = true;
-            });
-        }, 'arraybuffer');
+        const response = await fetch(soundPath);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        this.bufferSource.buffer = audioBuffer;
+        this.loaded = true;
     }
 
     public start(): void {

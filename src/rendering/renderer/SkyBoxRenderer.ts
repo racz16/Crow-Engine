@@ -24,11 +24,16 @@ export class SkyBoxRenderer extends Renderer {
     }
 
     public render(): void {
-        Log.startGroup('SkyBox renderer')
+        if (!Utility.isUsable(this.shader)) {
+            Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The SkyBox shader is not usable');
+            return;
+        }
+        Log.startGroup('SkyBox renderer');
         const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
         }
+
         this.prepare();
 
         this.shader.setUniforms();
@@ -41,12 +46,12 @@ export class SkyBoxRenderer extends Renderer {
 
     private prepare(): void {
         if (!this.isUsable()) {
-            this.shader = new SkyBoxShader();
+            //this.shader = new SkyBoxShader();
         }
         this.shader.start();
         //RenderingPipeline.bindFbo();
         Gl.gl.depthFunc(Gl.gl.LEQUAL);
-        Gl.setViewport(RenderingPipeline.getRenderingSize(),vec2.create());
+        Gl.setViewport(RenderingPipeline.getRenderingSize(), vec2.create());
     }
 
     public release(): void {

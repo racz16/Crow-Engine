@@ -1,11 +1,13 @@
-import { LogLevel } from "./LogLevel";
-import { LogType } from "./LogType";
+import { LogLevel, LogLevelResolver } from "./LogLevel";
+import { LogType, LogTypeResolver } from "./LogType";
 import { mat4, mat3, vec3, vec4 } from "gl-matrix";
 
 export class Log {
 
     private static logLevel: LogLevel;
     private static logTypes: number;
+    private static groups = new Array<string>();
+    private static opened = 0;
 
     private Log() { }
 
@@ -31,42 +33,22 @@ export class Log {
         this.logTypes = logTypes;
     }
 
-    protected static LogLevelToString(logLevel: LogLevel): string {
-        switch (logLevel) {
-            case LogLevel.NONE: return 'NO';
-            case LogLevel.ERROR: return 'ER';
-            case LogLevel.WARNING: return 'WA';
-            case LogLevel.INFO_1: return 'I1';
-            case LogLevel.INFO_2: return 'I2';
-            case LogLevel.INFO_3: return 'I3';
-            default: return '??';
-        }
-    }
-
-    protected static LogTypeToString(logType: LogType): string {
-        switch (logType) {
-            case LogType.ENGINE: return 'ENG';
-            case LogType.RESOURCES: return 'RES';
-            case LogType.RENDERING: return 'REN';
-            case LogType.OTHER: return 'OTH';
-            default: return '???';
-        }
-    }
-
-    public static startGroup(title = 'group', collapsed = true): void {
-        if (collapsed) {
-            console.groupCollapsed(title);
-        } else {
-            console.group(title);
-        }
+    public static startGroup(title = 'group'): void {
+        this.groups.push(title);
     }
 
     public static endGroup(): void {
-        console.groupEnd();
+        if (this.opened === 0) {
+            this.groups.pop();
+        } else {
+            console.groupEnd();
+            this.opened--;
+        }
     }
 
     public static logString(logLevel: LogLevel, logType: LogType, message: string): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             if (logLevel === LogLevel.ERROR) {
                 console.error(this.toString(logLevel, logType, message));
             } else if (logLevel === LogLevel.WARNING) {
@@ -79,6 +61,7 @@ export class Log {
 
     public static logObject(logLevel: LogLevel, logType: LogType, object: any): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             if (logLevel === LogLevel.ERROR) {
                 console.error(object);
             } else if (logLevel === LogLevel.WARNING) {
@@ -91,6 +74,7 @@ export class Log {
 
     public static logStackTrace(logLevel: LogLevel, logType: LogType, message: any = 'stack trace'): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             console.trace(message);
         }
     }
@@ -105,12 +89,14 @@ export class Log {
 
     private static logVec(logLevel: LogLevel, logType: LogType, vec: Float32Array): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             console.table([vec]);
         }
     }
 
     public static logMat3(logLevel: LogLevel, logType: LogType, mat: mat3): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             console.table([
                 [mat[0], mat[3], mat[6]],
                 [mat[1], mat[4], mat[7]],
@@ -121,6 +107,7 @@ export class Log {
 
     public static logMat4(logLevel: LogLevel, logType: LogType, mat: mat4): void {
         if (this.canLog(logLevel, logType)) {
+            this.openGroups();
             console.table([
                 [mat[0], mat[4], mat[8], mat[12]],
                 [mat[1], mat[5], mat[9], mat[13]],
@@ -134,8 +121,18 @@ export class Log {
         return logLevel <= this.logLevel && !!(this.logTypes & logType);
     }
 
+    private static openGroups(): void {
+        for (const group of this.groups) {
+            console.group(group);
+            this.opened++;
+        }
+        this.groups = [];
+    }
+
     protected static toString(logLevel: LogLevel, logType: LogType, message: string): string {
-        return `${this.LogLevelToString(logLevel)} ${this.LogTypeToString(logType)} ${message}`;
+        const logLevelString = LogLevelResolver.toString(logLevel);
+        const logTypeString = LogTypeResolver.toString(logType);
+        return `${logLevelString} ${logTypeString} ${message}`;
     }
 
 }

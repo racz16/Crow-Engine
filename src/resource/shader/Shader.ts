@@ -1,7 +1,6 @@
 import { ShaderStage } from "../../webgl/enum/ShaderStage";
 import { GlShader } from "../../webgl/shader/GlShader";
 import { GlShaderProgram } from "../../webgl/shader/GlShaderProgram";
-import { Utility } from "../../utility/Utility";
 
 export abstract class Shader {
 
@@ -12,14 +11,17 @@ export abstract class Shader {
 
     public constructor() {
         this.shaderProgram = new GlShaderProgram();
-        Utility.loadResource<string>(this.getVertexShaderPath(), (source) => {
-            this.vertexSource = source;
-            this.createShader();
-        });
-        Utility.loadResource<string>(this.getFragmentShaderPath(), (source) => {
-            this.fragmentSource = source;
-            this.createShader();
-        });
+        this.load();
+    }
+
+    private async load(): Promise<void> {
+        const [vertexText, fragmentText] = await Promise.all([
+            (await fetch(this.getVertexShaderPath())).text(),
+            (await fetch(this.getFragmentShaderPath())).text(),
+        ]);
+        this.vertexSource = vertexText;
+        this.fragmentSource = fragmentText;
+        this.createShader();
     }
 
     protected abstract getVertexShaderPath(): string;

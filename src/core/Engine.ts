@@ -44,13 +44,22 @@ export class Engine {
             throw new Error('The engine is already started');
         }
         Engine.started = true;
-        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'engine started');
+        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine started');
         Engine.createNextFrame();
+    }
+
+    public static stop(): void {
+        if (Engine.started) {
+            this.started = false;
+            Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine stopped');
+        }
     }
 
     private static createNextFrame(): void {
         try {
-            Engine.createNextFrameUnsafe();
+            if (Engine.started) {
+                Engine.createNextFrameUnsafe();
+            }
         } catch (error) {
             Log.logObject(LogLevel.ERROR, LogType.ENGINE, error);
             ResourceManager.releaseResources();
@@ -62,7 +71,7 @@ export class Engine {
         (Time as any).update();
         (Scene.getGameObjects() as any).updateComponents();
         RenderingPipeline.render();
-        Log.endGroup(); Log.endGroup();//ne kérdezd
+        Log.endGroup();
         window.requestAnimationFrame(Engine.createNextFrame);
     }
 
