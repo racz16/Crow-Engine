@@ -3,7 +3,6 @@ import { ChildContainer } from "./ChildContainer";
 import { vec3 } from "gl-matrix";
 import { Scene } from "./Scene";
 import { Transform } from "./Transform";
-
 export class GameObject {
 
     private components: ComponentContainer;

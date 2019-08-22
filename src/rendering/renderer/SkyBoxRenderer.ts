@@ -28,19 +28,18 @@ export class SkyBoxRenderer extends Renderer {
             Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The SkyBox shader is not usable');
             return;
         }
-        Log.startGroup('SkyBox renderer');
+        
         const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
         }
-
+        Log.startGroup('SkyBox renderer');
         this.prepare();
 
         this.shader.setUniforms();
         this.box.draw();
 
         Gl.gl.depthFunc(Gl.gl.LESS);
-        Log.logString(LogLevel.INFO_2, LogType.RENDERING, 'SkyBox finished rendering');
         Log.endGroup();
     }
 

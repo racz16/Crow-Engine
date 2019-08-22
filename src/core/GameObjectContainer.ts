@@ -12,7 +12,6 @@ export class GameObjectContainer {
         for (const gameObject of this.gameObjects) {
             (gameObject as any).update();
         }
-        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'updating components finished');
         Log.endGroup();
     }
 

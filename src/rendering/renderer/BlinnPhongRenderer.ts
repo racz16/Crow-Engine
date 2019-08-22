@@ -41,7 +41,6 @@ export class BlinnPhongRenderer extends Renderer {
                 renderableComponent.draw();
             }
         }
-        Log.logString(LogLevel.INFO_2, LogType.RENDERING, 'Blinn-Phong finished rendering');
         Log.endGroup();
     }
 

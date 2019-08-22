@@ -16,7 +16,7 @@ export class Engine {
 
     private constructor() { }
 
-    public static initialize(canvas: HTMLCanvasElement, logLevel = this.DEBUG ? LogLevel.WARNING : LogLevel.INFO_1): void {
+    public static initialize(canvas: HTMLCanvasElement, logLevel = this.DEBUG ? LogLevel.INFO_1 : LogLevel.WARNING): void {
         try {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
@@ -32,7 +32,6 @@ export class Engine {
         Audio.initialize();
         RenderingPipeline.initialize();
         Engine.initialized = true;
-        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine initialized');
         Log.endGroup();
     }
 

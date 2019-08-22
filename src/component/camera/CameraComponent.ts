@@ -45,7 +45,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo = new Ubo();
         this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
         this.useCameraUbo();
-        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'camera ubo created');
+        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'Camera ubo created');
     }
 
     public static useCameraUbo(): void {
@@ -65,7 +65,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.ubo.storewithOffset(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
         this.ubo.storewithOffset(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         this.uboValid = true;
-        Log.logString(LogLevel.INFO_2,LogType.RESOURCES,'camera ubo refreshed');
+        Log.logString(LogLevel.INFO_2, LogType.RESOURCES, 'Camera ubo refreshed');
     }
 
     public static releaseUbo(): void {
@@ -73,7 +73,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         if (this.isUboUsable()) {
             this.ubo.release();
             this.ubo = null;
-            Log.logString(LogLevel.INFO_1,LogType.RESOURCES,'camera ubo released');
+            Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'Camera ubo released');
         }
     }
 

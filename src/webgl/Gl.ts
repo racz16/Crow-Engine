@@ -25,7 +25,7 @@ export class Gl {
         Gl.setEnableBlend(true);
         Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
-        Log.logString(LogLevel.INFO_2, LogType.RESOURCES, 'WebGL initialized');
+        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'WebGL initialized');
     }
 
     public static get gl(): WebGL2RenderingContext {

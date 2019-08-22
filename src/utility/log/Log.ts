@@ -14,7 +14,7 @@ export class Log {
     public static initialize(logLevel = LogLevel.WARNING, logTypes = LogType.ENGINE | LogType.OTHER | LogType.RENDERING | LogType.RESOURCES): void {
         this.setLogLevel(logLevel);
         this.setLogTypes(logTypes);
-        this.logString(LogLevel.INFO_2, LogType.ENGINE, 'Logging initialized');
+        this.logString(LogLevel.INFO_1, LogType.ENGINE, 'Logging initialized');
     }
 
     public static getLogLevel(): LogLevel {

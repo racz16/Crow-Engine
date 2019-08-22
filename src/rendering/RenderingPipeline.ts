@@ -43,7 +43,7 @@ export class RenderingPipeline {
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
         this.skyboxRenderer = new SkyBoxRenderer();
-        Log.logString(LogLevel.INFO_2,LogType.RENDERING, 'Rendering Pipeline initialized');
+        Log.logString(LogLevel.INFO_1, LogType.RENDERING, 'Rendering Pipeline initialized');
     }
 
     public static getRenderableContainer(): RenderableContainer {
