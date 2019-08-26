@@ -1,6 +1,6 @@
-import { Billboard } from "./Billboard";
-import { vec3, mat4 } from "gl-matrix";
-import { Utility } from "../../../utility/Utility";
+import { Billboard } from './Billboard';
+import { vec3, mat4 } from 'gl-matrix';
+import { Utility } from '../../../utility/Utility';
 
 export class ArbitraryAxisCylindricalBillboard extends Billboard {
 

@@ -1,11 +1,11 @@
-import { vec3, vec4 } from "gl-matrix";
+import { vec3, vec4 } from 'gl-matrix';
 
-import { MaterialSlot } from "../../../material/MaterialSlot";
-import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
-import { Texture2D } from "../../texture/Texture2D";
-import { Material } from "../../../material/Material";
-import { CubeMapTexture } from "../../texture/CubeMapTexture";
-import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+import { MaterialSlot } from '../../../material/MaterialSlot';
+import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
+import { Texture2D } from '../../texture/Texture2D';
+import { Material } from '../../../material/Material';
+import { CubeMapTexture } from '../../texture/CubeMapTexture';
+import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 
 export abstract class BlinnPhongHelper {
 

@@ -1,7 +1,7 @@
-import { Component } from "../Component";
-import { GameObject } from "../../core/GameObject";
-import { Scene } from "../../core/Scene";
-import { Audio } from "../../resource/Audio";
+import { Component } from '../Component';
+import { GameObject } from '../../core/GameObject';
+import { Scene } from '../../core/Scene';
+import { Audio } from '../../resource/Audio';
 
 export class AudioListenerComponent extends Component {
 

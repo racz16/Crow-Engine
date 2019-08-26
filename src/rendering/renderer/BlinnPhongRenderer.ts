@@ -1,23 +1,23 @@
-import { Renderer } from "../Renderer";
-import { ParameterKey } from "../../utility/parameter/ParameterKey";
-import { BlinnPhongDirectionalLightComponent } from "../../component/light/blinnphong/BlinnPhongDirectionalLightComponent";
-import { BlinnPhongShader } from "../../resource/shader/blinnphong/BlinnPhongShader";
-import { RenderingPipeline } from "../RenderingPipeline";
-import { Utility } from "../../utility/Utility";
-import { Gl } from "../../webgl/Gl";
-import { IRenderable } from "../../resource/IRenderable";
-import { BlinnPhongLightContainer } from "../../component/light/blinnphong/BlinnPhongLightContainer";
-import { vec2, vec3 } from "gl-matrix";
-import { Log } from "../../utility/log/Log";
-import { IRenderableComponent } from "../../component/renderable/IRenderableComponent";
-import { Scene } from "../../core/Scene";
-import { ICameraComponent } from "../../component/camera/ICameraComponent";
-import { LogLevel } from "../../utility/log/LogLevel";
-import { LogType } from "../../utility/log/LogType";
+import { Renderer } from '../Renderer';
+import { ParameterKey } from '../../utility/parameter/ParameterKey';
+import { BlinnPhongDirectionalLightComponent } from '../../component/light/blinnphong/BlinnPhongDirectionalLightComponent';
+import { BlinnPhongShader } from '../../resource/shader/blinnphong/BlinnPhongShader';
+import { RenderingPipeline } from '../RenderingPipeline';
+import { Utility } from '../../utility/Utility';
+import { Gl } from '../../webgl/Gl';
+import { IRenderable } from '../../resource/IRenderable';
+import { BlinnPhongLightContainer } from '../../component/light/blinnphong/BlinnPhongLightContainer';
+import { vec2, vec3 } from 'gl-matrix';
+import { Log } from '../../utility/log/Log';
+import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
+import { Scene } from '../../core/Scene';
+import { ICameraComponent } from '../../component/camera/ICameraComponent';
+import { LogLevel } from '../../utility/log/LogLevel';
+import { LogType } from '../../utility/log/LogType';
 
 export class BlinnPhongRenderer extends Renderer {
 
-    public static readonly MAIN_DIRECTIONAL_LIGHT = new ParameterKey<BlinnPhongDirectionalLightComponent>(BlinnPhongDirectionalLightComponent, "MAIN_DIRECTIONAL_LIGHT");
+    public static readonly MAIN_DIRECTIONAL_LIGHT = new ParameterKey<BlinnPhongDirectionalLightComponent>(BlinnPhongDirectionalLightComponent, 'MAIN_DIRECTIONAL_LIGHT');
     private shader: BlinnPhongShader;
 
     public constructor() {

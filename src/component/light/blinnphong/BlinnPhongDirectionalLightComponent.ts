@@ -1,8 +1,8 @@
-import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
-import { Ubo } from "../../../webgl/buffer/Ubo";
-import { BlinnPhongLightContainer } from "./BlinnPhongLightContainer";
-import { Scene } from "../../../core/Scene";
-import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
+import { Ubo } from '../../../webgl/buffer/Ubo';
+import { BlinnPhongLightContainer } from './BlinnPhongLightContainer';
+import { Scene } from '../../../core/Scene';
+import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 
 export class BlinnPhongDirectionalLightComponent extends BlinnPhongLightComponent {
 

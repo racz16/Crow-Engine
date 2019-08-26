@@ -1,5 +1,5 @@
-import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
-import { BlinnPhongLightContainer } from "./BlinnPhongLightContainer";
+import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
+import { BlinnPhongLightContainer } from './BlinnPhongLightContainer';
 
 export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLightComponent {
 

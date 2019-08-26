@@ -1,6 +1,6 @@
-import { IRenderable } from "../resource/IRenderable";
-import { Utility } from "../utility/Utility";
-import { IRenderableComponent } from "../component/renderable/IRenderableComponent";
+import { IRenderable } from '../resource/IRenderable';
+import { Utility } from '../utility/Utility';
+import { IRenderableComponent } from '../component/renderable/IRenderableComponent';
 
 export class RenderableContainer {
 

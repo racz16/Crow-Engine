@@ -1,4 +1,4 @@
-import { Shader } from "./Shader";
+import { Shader } from './Shader';
 
 export class TexturedQuadShader extends Shader {
 

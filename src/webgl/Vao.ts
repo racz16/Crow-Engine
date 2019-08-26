@@ -1,9 +1,9 @@
-import { VertexAttribArray } from "./VertexAttribArray";
-import { Ebo } from "./buffer/Ebo";
-import { Utility } from "../utility/Utility";
-import { GlObject } from "./GlObject";
-import { GlConstants } from "./GlConstants";
-import { Gl } from "./Gl";
+import { VertexAttribArray } from './VertexAttribArray';
+import { Ebo } from './buffer/Ebo';
+import { Utility } from '../utility/Utility';
+import { GlObject } from './GlObject';
+import { GlConstants } from './GlConstants';
+import { Gl } from './Gl';
 
 export class Vao extends GlObject {
 

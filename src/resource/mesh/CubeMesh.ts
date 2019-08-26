@@ -1,12 +1,12 @@
-import { IMesh } from "./IMesh";
-import { Vao } from "../../webgl/Vao";
-import { ResourceManager } from "../ResourceManager";
-import { vec3 } from "gl-matrix";
-import { Gl } from "../../webgl/Gl";
-import { Vbo } from "../../webgl/buffer/Vbo";
-import { BufferObjectUsage } from "../../webgl/enum/BufferObjectUsage";
-import { VertexAttribPointer } from "../../webgl/VertexAttribPointer";
-import { Utility } from "../../utility/Utility";
+import { IMesh } from './IMesh';
+import { Vao } from '../../webgl/Vao';
+import { ResourceManager } from '../ResourceManager';
+import { vec3 } from 'gl-matrix';
+import { Gl } from '../../webgl/Gl';
+import { Vbo } from '../../webgl/buffer/Vbo';
+import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
+import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
+import { Utility } from '../../utility/Utility';
 
 export class CubeMesh implements IMesh {
 

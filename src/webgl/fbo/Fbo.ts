@@ -1,11 +1,11 @@
-import { GlObject } from "../GlObject";
-import { FboAttachmentContainer } from "./FboAttachmentContainer";
-import { Gl } from "../Gl";
-import { GlConstants } from "../GlConstants";
-import { FboAttachmentSlot, AttachmentSlotResolver } from "../enum/FboAttachmentSlot";
-import { FboCompleteness, FboCompletenessResolver } from "../enum/FboCompleteness";
-import { vec2 } from "gl-matrix";
-import { Utility } from "../../utility/Utility";
+import { GlObject } from '../GlObject';
+import { FboAttachmentContainer } from './FboAttachmentContainer';
+import { Gl } from '../Gl';
+import { GlConstants } from '../GlConstants';
+import { FboAttachmentSlot, AttachmentSlotResolver } from '../enum/FboAttachmentSlot';
+import { FboCompleteness, FboCompletenessResolver } from '../enum/FboCompleteness';
+import { vec2 } from 'gl-matrix';
+import { Utility } from '../../utility/Utility';
 
 export class Fbo extends GlObject {
 

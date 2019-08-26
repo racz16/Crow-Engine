@@ -1,10 +1,10 @@
-import { GlCubeMapTexture } from "./GlCubeMapTexture";
-import { CubeMapSide, CubeMapSideResolver } from "../enum/CubeMapSide";
-import { InternalFormat } from "../enum/InternalFormat";
-import { vec2 } from "gl-matrix";
-import { IFboAttachment } from "../fbo/IFboAttachment";
-import { TextureWrap } from "../enum/TextureWrap";
-import { Gl } from "../Gl";
+import { GlCubeMapTexture } from './GlCubeMapTexture';
+import { CubeMapSide, CubeMapSideResolver } from '../enum/CubeMapSide';
+import { InternalFormat } from '../enum/InternalFormat';
+import { vec2 } from 'gl-matrix';
+import { IFboAttachment } from '../fbo/IFboAttachment';
+import { TextureWrap } from '../enum/TextureWrap';
+import { Gl } from '../Gl';
 
 export class GlCubeMapTextureSide implements IFboAttachment {
 

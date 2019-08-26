@@ -1,6 +1,6 @@
-import { IMesh } from "../../resource/mesh/IMesh";
-import { RenderableComponent } from "./RenderableComponent";
-import { Gl } from "../../webgl/Gl";
+import { IMesh } from '../../resource/mesh/IMesh';
+import { RenderableComponent } from './RenderableComponent';
+import { Gl } from '../../webgl/Gl';
 
 export class MeshComponent extends RenderableComponent<IMesh>{
 

@@ -1,6 +1,6 @@
-import { ParameterKey } from "./ParameterKey";
-import { IInvalidatable } from "../invalidatable/IInvalidatable";
-import { Utility } from "../Utility";
+import { ParameterKey } from './ParameterKey';
+import { IInvalidatable } from '../invalidatable/IInvalidatable';
+import { Utility } from '../Utility';
 
 export class ParameterContainer {
 

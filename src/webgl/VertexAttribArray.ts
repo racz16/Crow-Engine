@@ -1,9 +1,9 @@
-import { Vao } from "./Vao";
-import { Vbo } from "./buffer/Vbo";
-import { VertexAttribPointer } from "./VertexAttribPointer";
-import { Gl } from "./Gl";
-import { Utility } from "../utility/Utility";
-import { VertexAttribPointerTypeResolver } from "./enum/VertexAttribPointerType";
+import { Vao } from './Vao';
+import { Vbo } from './buffer/Vbo';
+import { VertexAttribPointer } from './VertexAttribPointer';
+import { Gl } from './Gl';
+import { Utility } from '../utility/Utility';
+import { VertexAttribPointerTypeResolver } from './enum/VertexAttribPointerType';
 
 export class VertexAttribArray {
 

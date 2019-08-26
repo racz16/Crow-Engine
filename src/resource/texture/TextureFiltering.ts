@@ -1,5 +1,5 @@
-import { Gl } from "../../webgl/Gl";
-import { TextureFilter } from "../../webgl/enum/TextureFilter";
+import { Gl } from '../../webgl/Gl';
+import { TextureFilter } from '../../webgl/enum/TextureFilter';
 
 export enum TextureFiltering {
     None,

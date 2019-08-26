@@ -1,5 +1,5 @@
-import { Utility } from "../Utility";
-import { IInvalidatable } from "./IInvalidatable";
+import { Utility } from '../Utility';
+import { IInvalidatable } from './IInvalidatable';
 
 export class InvalidatableContainer {
 

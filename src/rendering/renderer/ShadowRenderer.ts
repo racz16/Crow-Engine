@@ -1,14 +1,14 @@
-import { Renderer } from "../Renderer";
-import { mat4, vec2 } from "gl-matrix";
-import { ShadowShader } from "../../resource/shader/ShadowShader";
-import { Fbo } from "../../webgl/fbo/Fbo";
-import { RenderingPipeline } from "../RenderingPipeline";
-import { FboAttachmentSlot } from "../../webgl/enum/FboAttachmentSlot";
-import { Gl } from "../../webgl/Gl";
-import { CullFace } from "../../webgl/enum/CullFace";
-import { GlTexture2D } from "../../webgl/texture/GlTexture2D";
-import { InternalFormat } from "../../webgl/enum/InternalFormat";
-import { Utility } from "../../utility/Utility";
+import { Renderer } from '../Renderer';
+import { mat4, vec2 } from 'gl-matrix';
+import { ShadowShader } from '../../resource/shader/ShadowShader';
+import { Fbo } from '../../webgl/fbo/Fbo';
+import { RenderingPipeline } from '../RenderingPipeline';
+import { FboAttachmentSlot } from '../../webgl/enum/FboAttachmentSlot';
+import { Gl } from '../../webgl/Gl';
+import { CullFace } from '../../webgl/enum/CullFace';
+import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
+import { InternalFormat } from '../../webgl/enum/InternalFormat';
+import { Utility } from '../../utility/Utility';
 
 export class ShadowRenderer extends Renderer {
 

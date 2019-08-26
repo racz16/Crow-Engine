@@ -1,10 +1,10 @@
-import { BlendFunc, BlendFuncResolver } from "./enum/BlendFunc";
-import { CullFace, CullFaceResolver } from "./enum/CullFace";
-import { GlConstants } from "./GlConstants";
-import { vec2 } from "gl-matrix";
-import { Log } from "../utility/log/Log";
-import { LogLevel } from "../utility/log/LogLevel";
-import { LogType } from "../utility/log/LogType";
+import { BlendFunc, BlendFuncResolver } from './enum/BlendFunc';
+import { CullFace, CullFaceResolver } from './enum/CullFace';
+import { GlConstants } from './GlConstants';
+import { vec2 } from 'gl-matrix';
+import { Log } from '../utility/log/Log';
+import { LogLevel } from '../utility/log/LogLevel';
+import { LogType } from '../utility/log/LogType';
 
 export class Gl {
 

@@ -1,11 +1,11 @@
-import { GlObject } from "../GlObject";
-import { vec2 } from "gl-matrix";
-import { InternalFormat, InternalFormatResolver } from "../enum/InternalFormat";
-import { TextureFilter, TextureFilterResolver } from "../enum/TextureFilter";
-import { TextureWrap, TextureWrapResolver } from "../enum/TextureWrap";
-import { GlConstants } from "../GlConstants";
-import { Gl } from "../Gl";
-import { IResource } from "../../resource/IResource";
+import { GlObject } from '../GlObject';
+import { vec2 } from 'gl-matrix';
+import { InternalFormat, InternalFormatResolver } from '../enum/InternalFormat';
+import { TextureFilter, TextureFilterResolver } from '../enum/TextureFilter';
+import { TextureWrap, TextureWrapResolver } from '../enum/TextureWrap';
+import { GlConstants } from '../GlConstants';
+import { Gl } from '../Gl';
+import { IResource } from '../../resource/IResource';
 
 export abstract class GlTexture extends GlObject implements IResource {
 

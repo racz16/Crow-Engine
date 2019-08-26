@@ -1,7 +1,7 @@
-import { BoundingShape } from "./BoundingShape";
-import { vec3, vec4 } from "gl-matrix";
-import { Scene } from "../../../core/Scene";
-import { ICameraComponent } from "../../camera/ICameraComponent";
+import { BoundingShape } from './BoundingShape';
+import { vec3, vec4 } from 'gl-matrix';
+import { Scene } from '../../../core/Scene';
+import { ICameraComponent } from '../../camera/ICameraComponent';
 
 export class AabbBoundingShape extends BoundingShape {
 

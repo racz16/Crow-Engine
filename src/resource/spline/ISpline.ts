@@ -1,5 +1,5 @@
-import { IRenderable } from "../IRenderable";
-import { vec3 } from "gl-matrix";
+import { IRenderable } from '../IRenderable';
+import { vec3 } from 'gl-matrix';
 
 export interface ISpline extends IRenderable {
 

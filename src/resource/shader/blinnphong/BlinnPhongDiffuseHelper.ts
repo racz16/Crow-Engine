@@ -1,8 +1,8 @@
-import { vec3 } from "gl-matrix";
-import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
-import { Material } from "../../../material/Material";
-import { BlinnPhongHelper } from "./BlinnPhongHelper";
-import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+import { vec3 } from 'gl-matrix';
+import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
+import { Material } from '../../../material/Material';
+import { BlinnPhongHelper } from './BlinnPhongHelper';
+import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 
 export class BlinnPhongDiffuseHelper extends BlinnPhongHelper {
 

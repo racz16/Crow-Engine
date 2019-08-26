@@ -1,6 +1,6 @@
-import { PanningModelType } from "./enum/PanningModelType";
-import { DistanceModelType } from "./enum/DistanceModelType";
-import { IComponent } from "../IComponent";
+import { PanningModelType } from './enum/PanningModelType';
+import { DistanceModelType } from './enum/DistanceModelType';
+import { IComponent } from '../IComponent';
 
 export interface IAudioSourceComponent extends IComponent {
 

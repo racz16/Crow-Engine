@@ -1,7 +1,7 @@
-import { BlinnPhongHelper } from "./BlinnPhongHelper";
-import { Material } from "../../../material/Material";
-import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
-import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+import { BlinnPhongHelper } from './BlinnPhongHelper';
+import { Material } from '../../../material/Material';
+import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
+import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 
 export class BlinnPhongRefractionHelper extends BlinnPhongHelper {
 

@@ -1,9 +1,9 @@
-import { GlTexture2D } from "../../webgl/texture/GlTexture2D";
-import { InternalFormat } from "../../webgl/enum/InternalFormat";
-import { vec2 } from "gl-matrix";
-import { ITexture2D } from "./ITexture2D";
-import { TextureFiltering, TextureFilteringResolver } from "./TextureFiltering";
-import { Utility } from "../../utility/Utility";
+import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
+import { InternalFormat } from '../../webgl/enum/InternalFormat';
+import { vec2 } from 'gl-matrix';
+import { ITexture2D } from './ITexture2D';
+import { TextureFiltering, TextureFilteringResolver } from './TextureFiltering';
+import { Utility } from '../../utility/Utility';
 
 export class Texture2D implements ITexture2D {
 
@@ -36,7 +36,7 @@ export class Texture2D implements ITexture2D {
 
     private createTextureFromImage(path: string, textureFiltering: TextureFiltering): void {
         const image = new Image();
-        image.decoding = "async";
+        image.decoding = 'async';
         image.src = path;
         image.onload = () => {
             this.texture = new GlTexture2D();

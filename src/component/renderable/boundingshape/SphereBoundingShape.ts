@@ -1,6 +1,6 @@
-import { BoundingShape } from "./BoundingShape";
-import { Utility } from "../../../utility/Utility";
-import { Scene } from "../../../core/Scene";
+import { BoundingShape } from './BoundingShape';
+import { Utility } from '../../../utility/Utility';
+import { Scene } from '../../../core/Scene';
 
 export class SphereBoundingShape extends BoundingShape {
 

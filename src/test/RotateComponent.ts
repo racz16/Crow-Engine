@@ -1,6 +1,6 @@
-import { Component } from "../component/Component";
-import { vec3 } from "gl-matrix";
-import { Time } from "../core/Time";
+import { Component } from '../component/Component';
+import { vec3 } from 'gl-matrix';
+import { Time } from '../core/Time';
 
 export class RotateComponent extends Component {
 

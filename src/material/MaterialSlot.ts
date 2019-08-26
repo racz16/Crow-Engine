@@ -1,16 +1,16 @@
-import { vec4, vec2 } from "gl-matrix";
-import { ParameterKey } from "../utility/parameter/ParameterKey";
-import { ParameterContainer } from "../utility/parameter/ParameterContainer";
-import { ITexture2D } from "../resource/texture/ITexture2D";
-import { ICubeMapTexture } from "../resource/texture/ICubeMapTexture";
+import { vec4, vec2 } from 'gl-matrix';
+import { ParameterKey } from '../utility/parameter/ParameterKey';
+import { ParameterContainer } from '../utility/parameter/ParameterContainer';
+import { ITexture2D } from '../resource/texture/ITexture2D';
+import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
 
 export class MaterialSlot {
 
-    public static readonly USE_GLOSSINESS = new ParameterKey<Number>(Number, "PARAM_USE_GLOSSINESS");
-    public static readonly USE_POM = new ParameterKey<Number>(Number, "PARAM_USE_POM");
-    public static readonly POM_SCALE = new ParameterKey<Number>(Number, "PARAM_POM_SCALE");
-    public static readonly POM_MIN_LAYERS = new ParameterKey<Number>(Number, "PARAM_POM_MIN_LAYERS");
-    public static readonly POM_MAX_LAYERS = new ParameterKey<Number>(Number, "PARAM_POM_MAX_LAYERS");
+    public static readonly USE_GLOSSINESS = new ParameterKey<Number>(Number, 'PARAM_USE_GLOSSINESS');
+    public static readonly USE_POM = new ParameterKey<Number>(Number, 'PARAM_USE_POM');
+    public static readonly POM_SCALE = new ParameterKey<Number>(Number, 'PARAM_POM_SCALE');
+    public static readonly POM_MIN_LAYERS = new ParameterKey<Number>(Number, 'PARAM_POM_MIN_LAYERS');
+    public static readonly POM_MAX_LAYERS = new ParameterKey<Number>(Number, 'PARAM_POM_MAX_LAYERS');
     private readonly textureTile = vec2.fromValues(1, 1);
     private readonly textureOffset = vec2.create();
     private readonly parameters = new ParameterContainer();

@@ -1,11 +1,11 @@
-import { ICubeMapTexture } from "./ICubeMapTexture";
-import { GlCubeMapTexture } from "../../webgl/texture/GlCubeMapTexture";
-import { InternalFormat } from "../../webgl/enum/InternalFormat";
-import { vec2 } from "gl-matrix";
-import { CubeMapSideResolver } from "../../webgl/enum/CubeMapSide";
-import { TextureFiltering, TextureFilteringResolver } from "./TextureFiltering";
-import { Gl } from "../../webgl/Gl";
-import { Utility } from "../../utility/Utility";
+import { ICubeMapTexture } from './ICubeMapTexture';
+import { GlCubeMapTexture } from '../../webgl/texture/GlCubeMapTexture';
+import { InternalFormat } from '../../webgl/enum/InternalFormat';
+import { vec2 } from 'gl-matrix';
+import { CubeMapSideResolver } from '../../webgl/enum/CubeMapSide';
+import { TextureFiltering, TextureFilteringResolver } from './TextureFiltering';
+import { Gl } from '../../webgl/Gl';
+import { Utility } from '../../utility/Utility';
 
 export class CubeMapTexture implements ICubeMapTexture {
 

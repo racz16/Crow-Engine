@@ -1,9 +1,9 @@
-import { BlinnPhongHelper } from "./BlinnPhongHelper";
-import { Material } from "../../../material/Material";
-import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
-import { vec4 } from "gl-matrix";
-import { MaterialSlot } from "../../../material/MaterialSlot";
-import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
+import { BlinnPhongHelper } from './BlinnPhongHelper';
+import { Material } from '../../../material/Material';
+import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
+import { vec4 } from 'gl-matrix';
+import { MaterialSlot } from '../../../material/MaterialSlot';
+import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 
 export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
 

@@ -1,9 +1,9 @@
-import { IComponent } from "../IComponent";
-import { IRenderable } from "../../resource/IRenderable";
-import { Material } from "../../material/Material";
-import { IBoundingShape } from "./boundingshape/IBoundingShape";
-import { vec2, mat4 } from "gl-matrix";
-import { IBillboard } from "./billboard/IBillboard";
+import { IComponent } from '../IComponent';
+import { IRenderable } from '../../resource/IRenderable';
+import { Material } from '../../material/Material';
+import { IBoundingShape } from './boundingshape/IBoundingShape';
+import { vec2, mat4 } from 'gl-matrix';
+import { IBillboard } from './billboard/IBillboard';
 
 export interface IRenderableComponent<T extends IRenderable> extends IComponent {
 

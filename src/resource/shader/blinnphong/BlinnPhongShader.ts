@@ -1,17 +1,17 @@
-import { Shader } from "../Shader";
-import { mat3, vec3 } from "gl-matrix";
-import { Material } from "../../../material/Material";
-import { IRenderable } from "../../IRenderable";
-import { BlinnPhongDiffuseHelper } from "./BlinnPhongDiffuseHelper";
-import { BlinnPhongSpecularHelper } from "./BlinnPhongSpecularHelper";
-import { BlinnPhongNormalHelper } from "./BlinnPhongNormalHelper";
-import { BlinnPhongHelper } from "./BlinnPhongHelper";
-import { BlinnPhongReflectionHelper } from "./BlinnPhongReflectionHelper";
-import { BlinnPhongRefractionHelper } from "./BlinnPhongRefractionHelper";
-import { BlinnPhongEnvironmentHelper } from "./BlinnPhongEnvironmentHelper";
-import { IRenderableComponent } from "../../../component/renderable/IRenderableComponent";
-import { RenderingPipeline } from "../../../rendering/RenderingPipeline";
-import { Utility } from "../../../utility/Utility";
+import { Shader } from '../Shader';
+import { mat3, vec3 } from 'gl-matrix';
+import { Material } from '../../../material/Material';
+import { IRenderable } from '../../IRenderable';
+import { BlinnPhongDiffuseHelper } from './BlinnPhongDiffuseHelper';
+import { BlinnPhongSpecularHelper } from './BlinnPhongSpecularHelper';
+import { BlinnPhongNormalHelper } from './BlinnPhongNormalHelper';
+import { BlinnPhongHelper } from './BlinnPhongHelper';
+import { BlinnPhongReflectionHelper } from './BlinnPhongReflectionHelper';
+import { BlinnPhongRefractionHelper } from './BlinnPhongRefractionHelper';
+import { BlinnPhongEnvironmentHelper } from './BlinnPhongEnvironmentHelper';
+import { IRenderableComponent } from '../../../component/renderable/IRenderableComponent';
+import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
+import { Utility } from '../../../utility/Utility';
 
 export class BlinnPhongShader extends Shader {
 
@@ -47,9 +47,9 @@ export class BlinnPhongShader extends Shader {
     }
 
     public connect(): void {
-        //this.getShaderProgram().connectTextureUnit("shadowMap", 0);
-        this.getShaderProgram().connectTextureUnit("material.reflection", 4);
-        this.getShaderProgram().connectTextureUnit("material.refraction", 5);
+        //this.getShaderProgram().connectTextureUnit('shadowMap', 0);
+        this.getShaderProgram().connectTextureUnit('material.reflection', 4);
+        this.getShaderProgram().connectTextureUnit('material.refraction', 5);
     }
 
     protected getVertexShaderPath(): string {

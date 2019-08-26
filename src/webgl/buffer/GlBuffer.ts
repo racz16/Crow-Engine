@@ -1,6 +1,6 @@
-import { GlObject } from "../GlObject";
-import { BufferObjectUsage, BufferObjectUsageResolver } from "../enum/BufferObjectUsage";
-import { Gl } from "../Gl";
+import { GlObject } from '../GlObject';
+import { BufferObjectUsage, BufferObjectUsageResolver } from '../enum/BufferObjectUsage';
+import { Gl } from '../Gl';
 
 export abstract class GlBuffer extends GlObject {
 

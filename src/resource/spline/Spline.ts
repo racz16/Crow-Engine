@@ -1,13 +1,13 @@
-import { ISpline } from "./ISpline";
-import { ResourceManager } from "../ResourceManager";
-import { vec3 } from "gl-matrix";
-import { Vao } from "../../webgl/Vao";
-import { Utility } from "../../utility/Utility";
-import { Gl } from "../../webgl/Gl";
-import { Vbo } from "../../webgl/buffer/Vbo";
-import { VertexAttribPointer } from "../../webgl/VertexAttribPointer";
-import { BufferObjectUsage } from "../../webgl/enum/BufferObjectUsage";
-import { SplinePoint } from "./SplinePoint";
+import { ISpline } from './ISpline';
+import { ResourceManager } from '../ResourceManager';
+import { vec3 } from 'gl-matrix';
+import { Vao } from '../../webgl/Vao';
+import { Utility } from '../../utility/Utility';
+import { Gl } from '../../webgl/Gl';
+import { Vbo } from '../../webgl/buffer/Vbo';
+import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
+import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
+import { SplinePoint } from './SplinePoint';
 
 export class Spline implements ISpline {
     protected controlPoints: Array<SplinePoint> = [];

@@ -1,5 +1,5 @@
-import { IResource } from "../resource/IResource";
-import { ResourceManager } from "../resource/ResourceManager";
+import { IResource } from '../resource/IResource';
+import { ResourceManager } from '../resource/ResourceManager';
 
 export abstract class GlObject implements IResource {
 

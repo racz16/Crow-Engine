@@ -1,4 +1,4 @@
-import { VertexAttribPointerType } from "./enum/VertexAttribPointerType";
+import { VertexAttribPointerType } from './enum/VertexAttribPointerType';
 
 export class VertexAttribPointer {
 

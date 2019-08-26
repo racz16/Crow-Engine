@@ -1,11 +1,11 @@
-import { Renderer } from "./Renderer";
-import { QuadMesh } from "../resource/mesh/QuadMesh";
-import { RenderingPipeline } from "./RenderingPipeline";
-import { Fbo } from "../webgl/fbo/Fbo";
-import { TexturedQuadShader } from "../resource/Shader/TexturedQuadShader";
-import { Gl } from "../webgl/Gl";
-import { vec2 } from "gl-matrix";
-import { Utility } from "../utility/Utility";
+import { Renderer } from './Renderer';
+import { QuadMesh } from '../resource/mesh/QuadMesh';
+import { RenderingPipeline } from './RenderingPipeline';
+import { Fbo } from '../webgl/fbo/Fbo';
+import { TexturedQuadShader } from '../resource/Shader/TexturedQuadShader';
+import { Gl } from '../webgl/Gl';
+import { vec2 } from 'gl-matrix';
+import { Utility } from '../utility/Utility';
 
 export class ScreenRenderer extends Renderer {
 

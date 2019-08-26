@@ -1,12 +1,12 @@
-import { GlTexture2D } from "../texture/GlTexture2D";
-import { Rbo } from "./Rbo";
-import { Utility } from "../../utility/Utility";
-import { FboAttachmentSlot, AttachmentSlotResolver } from "../enum/FboAttachmentSlot";
-import { GlCubeMapTextureSide } from "../texture/GlCubeMapTextureSide";
-import { IFboAttachment } from "./IFboAttachment";
-import { Fbo } from "./Fbo";
-import { Gl } from "../Gl";
-import { CubeMapSideResolver } from "../enum/CubeMapSide";
+import { GlTexture2D } from '../texture/GlTexture2D';
+import { Rbo } from './Rbo';
+import { Utility } from '../../utility/Utility';
+import { FboAttachmentSlot, AttachmentSlotResolver } from '../enum/FboAttachmentSlot';
+import { GlCubeMapTextureSide } from '../texture/GlCubeMapTextureSide';
+import { IFboAttachment } from './IFboAttachment';
+import { Fbo } from './Fbo';
+import { Gl } from '../Gl';
+import { CubeMapSideResolver } from '../enum/CubeMapSide';
 
 export class FboAttachmentContainer {
 

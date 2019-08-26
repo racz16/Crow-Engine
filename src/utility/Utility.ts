@@ -1,8 +1,8 @@
-import { mat4, vec3 } from "gl-matrix";
-import { IResource } from "../resource/IResource";
-import { Gl } from "../webgl/Gl";
-import { GlShaderProgram } from "../webgl/shader/GlShaderProgram";
-import { BindingPoint } from "../rendering/BindingPoint";
+import { mat4, vec3 } from 'gl-matrix';
+import { IResource } from '../resource/IResource';
+import { Gl } from '../webgl/Gl';
+import { GlShaderProgram } from '../webgl/shader/GlShaderProgram';
+import { BindingPoint } from '../rendering/BindingPoint';
 
 export class Utility {
 

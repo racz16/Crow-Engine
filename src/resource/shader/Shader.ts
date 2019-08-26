@@ -1,12 +1,12 @@
-import { ShaderStage } from "../../webgl/enum/ShaderStage";
-import { GlShader } from "../../webgl/shader/GlShader";
-import { GlShaderProgram } from "../../webgl/shader/GlShaderProgram";
+import { ShaderStage } from '../../webgl/enum/ShaderStage';
+import { GlShader } from '../../webgl/shader/GlShader';
+import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 
 export abstract class Shader {
 
     private shaderProgram: GlShaderProgram;
-    private vertexSource = "";
-    private fragmentSource = "";
+    private vertexSource = '';
+    private fragmentSource = '';
     private loaded = false;
 
     public constructor() {

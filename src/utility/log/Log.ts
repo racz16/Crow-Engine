@@ -1,6 +1,6 @@
-import { LogLevel, LogLevelResolver } from "./LogLevel";
-import { LogType, LogTypeResolver } from "./LogType";
-import { mat4, mat3, vec3, vec4 } from "gl-matrix";
+import { LogLevel, LogLevelResolver } from './LogLevel';
+import { LogType, LogTypeResolver } from './LogType';
+import { mat4, mat3, vec3, vec4 } from 'gl-matrix';
 
 export class Log {
 

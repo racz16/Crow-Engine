@@ -1,13 +1,13 @@
-import { Time } from "./Time";
-import { Gl } from "../webgl/Gl";
-import { Scene } from "./Scene";
-import { ResourceManager } from "../resource/ResourceManager";
-import { RenderingPipeline } from "../rendering/RenderingPipeline";
-import { Audio } from "../resource/Audio";
-import { Log } from "../utility/log/Log";
-import { LogLevel } from "../utility/log/LogLevel";
-import { LogType } from "../utility/log/LogType";
-import { CameraComponent } from "../component/camera/CameraComponent";
+import { Time } from './Time';
+import { Gl } from '../webgl/Gl';
+import { Scene } from './Scene';
+import { ResourceManager } from '../resource/ResourceManager';
+import { RenderingPipeline } from '../rendering/RenderingPipeline';
+import { Audio } from '../resource/Audio';
+import { Log } from '../utility/log/Log';
+import { LogLevel } from '../utility/log/LogLevel';
+import { LogType } from '../utility/log/LogType';
+import { CameraComponent } from '../component/camera/CameraComponent';
 
 export class Engine {
 

@@ -1,6 +1,6 @@
-import { Billboard } from "./Billboard";
-import { mat4, vec3 } from "gl-matrix";
-import { Utility } from "../../../utility/Utility";
+import { Billboard } from './Billboard';
+import { mat4, vec3 } from 'gl-matrix';
+import { Utility } from '../../../utility/Utility';
 
 export class RealSphericalBillboard extends Billboard {
 

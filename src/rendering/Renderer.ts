@@ -1,4 +1,4 @@
-import { Log } from "../utility/log/Log";
+import { Log } from '../utility/log/Log';
 
 export abstract class Renderer {
 

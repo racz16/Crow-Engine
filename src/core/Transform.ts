@@ -1,8 +1,8 @@
-import { vec3, mat4, quat } from "gl-matrix";
-import { GameObject } from "./GameObject";
-import { Utility } from "../utility/Utility";
-import { IInvalidatable } from "../utility/invalidatable/IInvalidatable";
-import { InvalidatableContainer } from "../utility/invalidatable/InvalidatableContainer";
+import { vec3, mat4, quat } from 'gl-matrix';
+import { GameObject } from './GameObject';
+import { Utility } from '../utility/Utility';
+import { IInvalidatable } from '../utility/invalidatable/IInvalidatable';
+import { InvalidatableContainer } from '../utility/invalidatable/InvalidatableContainer';
 
 export class Transform implements IInvalidatable {
 

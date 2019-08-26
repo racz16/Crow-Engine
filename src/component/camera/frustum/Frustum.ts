@@ -1,11 +1,11 @@
-import { FrustumCornerPoint, FrustumCornerPointResolver } from "./FrustumCornerPoint";
-import { vec3, mat4, vec4 } from "gl-matrix";
-import { ICameraComponent } from "../ICameraComponent";
-import { FrustumPlane } from "./FrustumPlane";
-import { FrustumSide, FrustumSideResolver } from "./FrustumSide";
-import { IFrustum } from "./IFrustum";
-import { IInvalidatable } from "../../../utility/invalidatable/IInvalidatable";
-import { Utility } from "../../../utility/Utility";
+import { FrustumCornerPoint, FrustumCornerPointResolver } from './FrustumCornerPoint';
+import { vec3, mat4, vec4 } from 'gl-matrix';
+import { ICameraComponent } from '../ICameraComponent';
+import { FrustumPlane } from './FrustumPlane';
+import { FrustumSide, FrustumSideResolver } from './FrustumSide';
+import { IFrustum } from './IFrustum';
+import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
+import { Utility } from '../../../utility/Utility';
 
 export class Frustum implements IFrustum, IInvalidatable {
 

@@ -1,5 +1,5 @@
-import { FboAttachmentSlot } from "./FboAttachmentSlot";
-import { Gl } from "../Gl";
+import { FboAttachmentSlot } from './FboAttachmentSlot';
+import { Gl } from '../Gl';
 
 export enum InternalFormat {
     R8,

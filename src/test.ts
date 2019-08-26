@@ -1,25 +1,25 @@
-import { Engine } from "./core/Engine";
-import { StaticMesh } from "./resource/mesh/StaticMesh";
-import { GameObject } from "./core/GameObject";
-import { MeshComponent } from "./component/renderable/MeshComponent";
-import { Material } from "./material/Material";
-import { CameraComponent } from "./component/camera/CameraComponent";
-import { vec3, vec4, vec2 } from "gl-matrix";
-import { Scene } from "./core/Scene";
-import { InfoComponent } from "./test/InfoComponent";
-import { RotateComponent } from "./test/RotateComponent";
-import { BlinnPhongDirectionalLightComponent } from "./component/light/blinnphong/BlinnPhongDirectionalLightComponent";
-import { AudioSourceComponent } from "./component/audio/AudioSourceComponent";
-import { AudioListenerComponent } from "./component/audio/AudioListenerComponent";
-import { SplineComponent } from "./component/renderable/SplineComponent";
-import { BezierSpline } from "./resource/spline/BezierSpline";
-import { Texture2D } from "./resource/texture/Texture2D";
-import { CubeMapTexture } from "./resource/texture/CubeMapTexture";
-import { MaterialSlot } from "./material/MaterialSlot";
-import { PlayerComponent } from "./test/PlayerComponent";
-import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
-import { ObbBoundingShape } from "./component/renderable/boundingshape/ObbBoundingShape";
-import { TextureFiltering } from "./resource/texture/TextureFiltering";
+import { Engine } from './core/Engine';
+import { StaticMesh } from './resource/mesh/StaticMesh';
+import { GameObject } from './core/GameObject';
+import { MeshComponent } from './component/renderable/MeshComponent';
+import { Material } from './material/Material';
+import { CameraComponent } from './component/camera/CameraComponent';
+import { vec3, vec4, vec2 } from 'gl-matrix';
+import { Scene } from './core/Scene';
+import { InfoComponent } from './test/InfoComponent';
+import { RotateComponent } from './test/RotateComponent';
+import { BlinnPhongDirectionalLightComponent } from './component/light/blinnphong/BlinnPhongDirectionalLightComponent';
+import { AudioSourceComponent } from './component/audio/AudioSourceComponent';
+import { AudioListenerComponent } from './component/audio/AudioListenerComponent';
+import { SplineComponent } from './component/renderable/SplineComponent';
+import { BezierSpline } from './resource/spline/BezierSpline';
+import { Texture2D } from './resource/texture/Texture2D';
+import { CubeMapTexture } from './resource/texture/CubeMapTexture';
+import { MaterialSlot } from './material/MaterialSlot';
+import { PlayerComponent } from './test/PlayerComponent';
+import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
+import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
+import { TextureFiltering } from './resource/texture/TextureFiltering';
 
 
 window.onload = () => {

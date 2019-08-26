@@ -1,4 +1,4 @@
-import { FrustumCornerPoint } from "./FrustumCornerPoint";
+import { FrustumCornerPoint } from './FrustumCornerPoint';
 
 export enum FrustumSide {
     RIGHT,

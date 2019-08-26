@@ -1,7 +1,7 @@
-import { Component } from "../component/Component";
-import { Time } from "../core/Time";
-import { Audio } from "../resource/Audio";
-import { Gl } from "../webgl/Gl";
+import { Component } from '../component/Component';
+import { Time } from '../core/Time';
+import { Audio } from '../resource/Audio';
+import { Gl } from '../webgl/Gl';
 
 export class InfoComponent extends Component {
 
@@ -9,8 +9,8 @@ export class InfoComponent extends Component {
 
     public constructor() {
         super();
-        const htmlElement = document.getElementById("fps");
-        this.textNode = document.createTextNode("");
+        const htmlElement = document.getElementById('fps');
+        this.textNode = document.createTextNode('');
         htmlElement.appendChild(this.textNode);
         document.getElementById('mute').onclick = this.mute;
         document.getElementById('unmute').onclick = this.unmute;

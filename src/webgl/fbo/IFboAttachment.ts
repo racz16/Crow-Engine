@@ -1,5 +1,5 @@
-import { vec2 } from "gl-matrix";
-import { InternalFormat } from "../enum/InternalFormat";
+import { vec2 } from 'gl-matrix';
+import { InternalFormat } from '../enum/InternalFormat';
 
 export interface IFboAttachment {
 

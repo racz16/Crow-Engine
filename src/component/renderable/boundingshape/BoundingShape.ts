@@ -1,7 +1,7 @@
-import { IBoundingShape } from "./IBoundingShape";
-import { IRenderable } from "../../../resource/IRenderable";
-import { vec4, vec3 } from "gl-matrix";
-import { IRenderableComponent } from "../IRenderableComponent";
+import { IBoundingShape } from './IBoundingShape';
+import { IRenderable } from '../../../resource/IRenderable';
+import { vec4, vec3 } from 'gl-matrix';
+import { IRenderableComponent } from '../IRenderableComponent';
 
 export abstract class BoundingShape implements IBoundingShape {
 

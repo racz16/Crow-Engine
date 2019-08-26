@@ -1,6 +1,6 @@
-import { Component } from "../component/Component";
-import { Time } from "../core/Time";
-import { vec3 } from "gl-matrix";
+import { Component } from '../component/Component';
+import { Time } from '../core/Time';
+import { vec3 } from 'gl-matrix';
 
 export class PlayerComponent extends Component {
 

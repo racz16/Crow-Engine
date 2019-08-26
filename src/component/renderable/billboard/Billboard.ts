@@ -1,10 +1,10 @@
-import { IBillboard } from "./IBillboard";
-import { mat4, vec3 } from "gl-matrix";
-import { ICameraComponent } from "../../camera/ICameraComponent";
-import { IRenderableComponent } from "../IRenderableComponent";
-import { IRenderable } from "../../../resource/IRenderable";
-import { Scene } from "../../../core/Scene";
-import { Utility } from "../../../utility/Utility";
+import { IBillboard } from './IBillboard';
+import { mat4, vec3 } from 'gl-matrix';
+import { ICameraComponent } from '../../camera/ICameraComponent';
+import { IRenderableComponent } from '../IRenderableComponent';
+import { IRenderable } from '../../../resource/IRenderable';
+import { Scene } from '../../../core/Scene';
+import { Utility } from '../../../utility/Utility';
 
 export abstract class Billboard implements IBillboard {
 

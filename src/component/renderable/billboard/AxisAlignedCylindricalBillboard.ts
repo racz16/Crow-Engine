@@ -1,7 +1,7 @@
-import { Billboard } from "./Billboard";
-import { BillboardAxis } from "./BillboardAxis";
-import { mat4, vec3 } from "gl-matrix";
-import { Utility } from "../../../utility/Utility";
+import { Billboard } from './Billboard';
+import { BillboardAxis } from './BillboardAxis';
+import { mat4, vec3 } from 'gl-matrix';
+import { Utility } from '../../../utility/Utility';
 
 export class AxisAlignedCylindricalBillboard extends Billboard {
 

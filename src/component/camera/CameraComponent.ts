@@ -1,17 +1,17 @@
-import { Component } from "../Component";
-import { ICameraComponent } from "./ICameraComponent";
-import { Ubo } from "../../webgl/buffer/Ubo";
-import { mat4 } from "gl-matrix";
-import { Scene } from "../../core/Scene";
-import { BufferObjectUsage } from "../../webgl/enum/BufferObjectUsage";
-import { Utility } from "../../utility/Utility";
-import { GameObject } from "../../core/GameObject";
-import { Log } from "../../utility/log/Log";
-import { Frustum } from "./frustum/Frustum";
-import { RenderingPipeline } from "../../rendering/RenderingPipeline";
-import { IFrustum } from "./frustum/IFrustum";
-import { LogLevel } from "../../utility/log/LogLevel";
-import { LogType } from "../../utility/log/LogType";
+import { Component } from '../Component';
+import { ICameraComponent } from './ICameraComponent';
+import { Ubo } from '../../webgl/buffer/Ubo';
+import { mat4 } from 'gl-matrix';
+import { Scene } from '../../core/Scene';
+import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
+import { Utility } from '../../utility/Utility';
+import { GameObject } from '../../core/GameObject';
+import { Log } from '../../utility/log/Log';
+import { Frustum } from './frustum/Frustum';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { IFrustum } from './frustum/IFrustum';
+import { LogLevel } from '../../utility/log/LogLevel';
+import { LogType } from '../../utility/log/LogType';
 
 export class CameraComponent extends Component implements ICameraComponent {
 

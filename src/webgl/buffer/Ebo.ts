@@ -1,5 +1,5 @@
-import { GlBuffer } from "./GlBuffer";
-import { Gl } from "../Gl";
+import { GlBuffer } from './GlBuffer';
+import { Gl } from '../Gl';
 
 export class Ebo extends GlBuffer {
 

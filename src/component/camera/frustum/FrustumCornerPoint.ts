@@ -1,4 +1,4 @@
-import { vec4 } from "gl-matrix";
+import { vec4 } from 'gl-matrix';
 
 export enum FrustumCornerPoint {
     FAR_TOP_LEFT,

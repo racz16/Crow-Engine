@@ -1,5 +1,5 @@
-import { GameObject } from "./GameObject";
-import { Log } from "../utility/log/Log";
+import { GameObject } from './GameObject';
+import { Log } from '../utility/log/Log';
 
 export class GameObjectContainer {
 

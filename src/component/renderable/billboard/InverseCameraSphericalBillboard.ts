@@ -1,5 +1,5 @@
-import { Billboard } from "./Billboard";
-import { mat4, vec3 } from "gl-matrix";
+import { Billboard } from './Billboard';
+import { mat4, vec3 } from 'gl-matrix';
 
 export class InverseCameraSphericalBillboard extends Billboard {
 

@@ -1,9 +1,9 @@
-import { GlTexture } from "./GlTexture";
-import { TextureWrap, TextureWrapResolver } from "../enum/TextureWrap";
-import { CubeMapSide, CubeMapSideResolver } from "../enum/CubeMapSide";
-import { Gl } from "../Gl";
-import { GlCubeMapTextureSide } from "./GlCubeMapTextureSide";
-import { ICubeMapTexture } from "../../resource/texture/ICubeMapTexture";
+import { GlTexture } from './GlTexture';
+import { TextureWrap, TextureWrapResolver } from '../enum/TextureWrap';
+import { CubeMapSide, CubeMapSideResolver } from '../enum/CubeMapSide';
+import { Gl } from '../Gl';
+import { GlCubeMapTextureSide } from './GlCubeMapTextureSide';
+import { ICubeMapTexture } from '../../resource/texture/ICubeMapTexture';
 
 export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
 

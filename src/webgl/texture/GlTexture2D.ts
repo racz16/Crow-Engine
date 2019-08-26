@@ -1,8 +1,8 @@
-import { GlTexture } from "./GlTexture";
-import { vec2 } from "gl-matrix";
-import { IFboAttachment } from "../fbo/IFboAttachment";
-import { Gl } from "../Gl";
-import { ITexture2D } from "../../resource/texture/ITexture2D";
+import { GlTexture } from './GlTexture';
+import { vec2 } from 'gl-matrix';
+import { IFboAttachment } from '../fbo/IFboAttachment';
+import { Gl } from '../Gl';
+import { ITexture2D } from '../../resource/texture/ITexture2D';
 
 export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment {
 

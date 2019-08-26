@@ -1,8 +1,8 @@
-import { Component } from "../../Component";
-import { vec3 } from "gl-matrix";
-import { GameObject } from "../../../core/GameObject";
-import { Utility } from "../../../utility/Utility";
-import { Ubo } from "../../../webgl/buffer/Ubo";
+import { Component } from '../../Component';
+import { vec3 } from 'gl-matrix';
+import { GameObject } from '../../../core/GameObject';
+import { Utility } from '../../../utility/Utility';
+import { Ubo } from '../../../webgl/buffer/Ubo';
 
 export abstract class BlinnPhongLightComponent extends Component {
 

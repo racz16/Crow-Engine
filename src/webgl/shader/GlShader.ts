@@ -1,6 +1,6 @@
-import { GlObject } from "../GlObject";
-import { Gl } from "../Gl";
-import { ShaderStage, ShaderStageResolver } from "../enum/ShaderStage";
+import { GlObject } from '../GlObject';
+import { Gl } from '../Gl';
+import { ShaderStage, ShaderStageResolver } from '../enum/ShaderStage';
 
 export class GlShader extends GlObject {
 

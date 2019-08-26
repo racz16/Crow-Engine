@@ -1,6 +1,6 @@
-import { IComponent } from "../IComponent";
-import { mat4 } from "gl-matrix";
-import { IFrustum } from "./frustum/IFrustum";
+import { IComponent } from '../IComponent';
+import { mat4 } from 'gl-matrix';
+import { IFrustum } from './frustum/IFrustum';
 
 export interface ICameraComponent extends IComponent {
 

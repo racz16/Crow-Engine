@@ -1,11 +1,11 @@
-import { GameObjectContainer } from "./GameObjectContainer";
-import { ParameterContainer } from "../utility/parameter/ParameterContainer";
-import { ParameterKey } from "../utility/parameter/ParameterKey";
-import { ICameraComponent } from "../component/camera/ICameraComponent";
-import { CameraComponent } from "../component/camera/CameraComponent";
-import { AudioListenerComponent } from "../component/audio/AudioListenerComponent";
-import { CubeMapTexture } from "../resource/texture/CubeMapTexture";
-import { ICubeMapTexture } from "../resource/texture/ICubeMapTexture";
+import { GameObjectContainer } from './GameObjectContainer';
+import { ParameterContainer } from '../utility/parameter/ParameterContainer';
+import { ParameterKey } from '../utility/parameter/ParameterKey';
+import { ICameraComponent } from '../component/camera/ICameraComponent';
+import { CameraComponent } from '../component/camera/CameraComponent';
+import { AudioListenerComponent } from '../component/audio/AudioListenerComponent';
+import { CubeMapTexture } from '../resource/texture/CubeMapTexture';
+import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
 
 export class Scene {
 

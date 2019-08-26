@@ -1,15 +1,15 @@
-import { Ubo } from "../../../webgl/buffer/Ubo";
-import { BufferObjectUsage } from "../../../webgl/enum/BufferObjectUsage";
-import { BlinnPhongDirectionalLightComponent } from "./BlinnPhongDirectionalLightComponent";
-import { BlinnPhongPositionalLightComponent } from "./BlinnPhongPositionalLightComponent";
-import { Scene } from "../../../core/Scene";
-import { vec3 } from "gl-matrix";
-import { ICameraComponent } from "../../camera/ICameraComponent";
-import { Utility } from "../../../utility/Utility";
-import { Log } from "../../../utility/log/Log";
-import { RenderingPipeline } from "../../../rendering/RenderingPipeline";
-import { LogLevel } from "../../../utility/log/LogLevel";
-import { LogType } from "../../../utility/log/LogType";
+import { Ubo } from '../../../webgl/buffer/Ubo';
+import { BufferObjectUsage } from '../../../webgl/enum/BufferObjectUsage';
+import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLightComponent';
+import { BlinnPhongPositionalLightComponent } from './BlinnPhongPositionalLightComponent';
+import { Scene } from '../../../core/Scene';
+import { vec3 } from 'gl-matrix';
+import { ICameraComponent } from '../../camera/ICameraComponent';
+import { Utility } from '../../../utility/Utility';
+import { Log } from '../../../utility/log/Log';
+import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
+import { LogLevel } from '../../../utility/log/LogLevel';
+import { LogType } from '../../../utility/log/LogType';
 
 export class BlinnPhongLightContainer {
 

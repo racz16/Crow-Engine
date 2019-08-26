@@ -1,8 +1,8 @@
-import { ICameraComponent } from "../component/camera/ICameraComponent";
-import { vec3, mat4, vec4 } from "gl-matrix";
-import { GameObject } from "../core/GameObject";
-import { Scene } from "../core/Scene";
-import { Utility } from "./Utility";
+import { ICameraComponent } from '../component/camera/ICameraComponent';
+import { vec3, mat4, vec4 } from 'gl-matrix';
+import { GameObject } from '../core/GameObject';
+import { Scene } from '../core/Scene';
+import { Utility } from './Utility';
 
 export class ShadowMapMatrixSolver {
 

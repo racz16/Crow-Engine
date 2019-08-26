@@ -1,8 +1,8 @@
-import { vec3 } from "gl-matrix";
-import { IAudioSourceComponent } from "../component/audio/IAudioSourceComponent";
-import { Log } from "../utility/log/Log";
-import { LogLevel } from "../utility/log/LogLevel";
-import { LogType } from "../utility/log/LogType";
+import { vec3 } from 'gl-matrix';
+import { IAudioSourceComponent } from '../component/audio/IAudioSourceComponent';
+import { Log } from '../utility/log/Log';
+import { LogLevel } from '../utility/log/LogLevel';
+import { LogType } from '../utility/log/LogType';
 
 export class Audio {
 

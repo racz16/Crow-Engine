@@ -1,9 +1,9 @@
-import { Component } from "../Component";
-import { PanningModelType, PanningModelTypeResolver } from "./enum/PanningModelType";
-import { DistanceModelType, DistanceModelTypeResolver } from "./enum/DistanceModelType";
-import { GameObject } from "../../core/GameObject";
-import { Audio } from "../../resource/Audio";
-import { IAudioSourceComponent } from "./IAudioSourceComponent";
+import { Component } from '../Component';
+import { PanningModelType, PanningModelTypeResolver } from './enum/PanningModelType';
+import { DistanceModelType, DistanceModelTypeResolver } from './enum/DistanceModelType';
+import { GameObject } from '../../core/GameObject';
+import { Audio } from '../../resource/Audio';
+import { IAudioSourceComponent } from './IAudioSourceComponent';
 
 export class AudioSourceComponent extends Component implements IAudioSourceComponent {
 

@@ -1,5 +1,5 @@
-import { CubicSpline } from "./CubicSpline";
-import { vec3, mat4, vec4 } from "gl-matrix";
+import { CubicSpline } from './CubicSpline';
+import { vec3, mat4, vec4 } from 'gl-matrix';
 
 export class CatmullRomSpline extends CubicSpline {
     private tension: number;

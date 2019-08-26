@@ -1,27 +1,27 @@
-import { RenderableContainer } from "../core/RenderableContainer";
-import { Gl } from "../webgl/Gl";
-import { Scene } from "../core/Scene";
-import { ParameterContainer } from "../utility/parameter/ParameterContainer";
-import { ParameterKey } from "../utility/parameter/ParameterKey";
-import { ITexture2D } from "../resource/texture/ITexture2D";
-import { GlTexture2D } from "../webgl/texture/GlTexture2D";
-import { Utility } from "../utility/Utility";
-import { Fbo } from "../webgl/fbo/Fbo";
-import { FboAttachmentSlot } from "../webgl/enum/FboAttachmentSlot";
-import { vec2, mat4 } from "gl-matrix";
-import { SkyBoxRenderer } from "./renderer/SkyBoxRenderer";
-import { BlinnPhongRenderer } from "./renderer/BlinnPhongRenderer";
-import { ScreenRenderer } from "./ScreenRenderer";
-import { Log } from "../utility/log/Log";
-import { BindingPoint } from "./BindingPoint";
-import { LogLevel } from "../utility/log/LogLevel";
-import { LogType } from "../utility/log/LogType";
+import { RenderableContainer } from '../core/RenderableContainer';
+import { Gl } from '../webgl/Gl';
+import { Scene } from '../core/Scene';
+import { ParameterContainer } from '../utility/parameter/ParameterContainer';
+import { ParameterKey } from '../utility/parameter/ParameterKey';
+import { ITexture2D } from '../resource/texture/ITexture2D';
+import { GlTexture2D } from '../webgl/texture/GlTexture2D';
+import { Utility } from '../utility/Utility';
+import { Fbo } from '../webgl/fbo/Fbo';
+import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
+import { vec2, mat4 } from 'gl-matrix';
+import { SkyBoxRenderer } from './renderer/SkyBoxRenderer';
+import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
+import { ScreenRenderer } from './ScreenRenderer';
+import { Log } from '../utility/log/Log';
+import { BindingPoint } from './BindingPoint';
+import { LogLevel } from '../utility/log/LogLevel';
+import { LogType } from '../utility/log/LogType';
 
 export class RenderingPipeline {
 
-    public static readonly SHADOWMAP = new ParameterKey<GlTexture2D>(GlTexture2D, "SHADOWMAP");
-    public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>(mat4, "SHADOW_PROJECTION_VIEW_MATRIX");
-    public static readonly GAMMA = new ParameterKey<Number>(Number, "GAMMA");
+    public static readonly SHADOWMAP = new ParameterKey<GlTexture2D>(GlTexture2D, 'SHADOWMAP');
+    public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>(mat4, 'SHADOW_PROJECTION_VIEW_MATRIX');
+    public static readonly GAMMA = new ParameterKey<Number>(Number, 'GAMMA');
 
     private static renderingScale = 1;
     private static renderables = new RenderableContainer();
@@ -34,7 +34,7 @@ export class RenderingPipeline {
     public static readonly CAMERA_BINDING_POINT = new BindingPoint(1, 'Camera');
     public static readonly LIGHTS_BINDING_POINT = new BindingPoint(2, 'Lights');
 
-    public static readonly WORK = new ParameterKey<ITexture2D>(GlTexture2D, "WORK");
+    public static readonly WORK = new ParameterKey<ITexture2D>(GlTexture2D, 'WORK');
 
     private constructor() { }
 
@@ -83,9 +83,9 @@ export class RenderingPipeline {
     }
 
     private static refresh(): void {
-        const ext = Gl.gl.getExtension("EXT_color_buffer_float");
+        const ext = Gl.gl.getExtension('EXT_color_buffer_float');
         if (!ext) {
-            alert("need EXT_color_buffer_float");
+            alert('need EXT_color_buffer_float');
             return;
         }
         this.refreshIfCanvasResized();

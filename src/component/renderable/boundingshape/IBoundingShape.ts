@@ -1,6 +1,6 @@
-import { IRenderable } from "../../../resource/IRenderable";
-import { IInvalidatable } from "../../../utility/invalidatable/IInvalidatable";
-import { IRenderableComponent } from "../IRenderableComponent";
+import { IRenderable } from '../../../resource/IRenderable';
+import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
+import { IRenderableComponent } from '../IRenderableComponent';
 
 export interface IBoundingShape extends IInvalidatable {
 

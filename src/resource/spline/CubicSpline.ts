@@ -1,5 +1,5 @@
-import { mat4, vec3 } from "gl-matrix";
-import { Spline } from "./Spline";
+import { mat4, vec3 } from 'gl-matrix';
+import { Spline } from './Spline';
 
 export abstract class CubicSpline extends Spline {
 

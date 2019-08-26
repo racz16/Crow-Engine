@@ -1,4 +1,4 @@
-import { IResource } from "./IResource";
+import { IResource } from './IResource';
 
 export class ResourceManager {
 

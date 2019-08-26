@@ -1,5 +1,5 @@
-import { CubicSpline } from "./CubicSpline";
-import { vec3, vec4, mat4 } from "gl-matrix";
+import { CubicSpline } from './CubicSpline';
+import { vec3, vec4, mat4 } from 'gl-matrix';
 
 export class BezierSpline extends CubicSpline {
 

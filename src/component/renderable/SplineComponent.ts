@@ -1,5 +1,5 @@
-import { RenderableComponent } from "./RenderableComponent";
-import { ISpline } from "../../resource/spline/ISpline";
+import { RenderableComponent } from './RenderableComponent';
+import { ISpline } from '../../resource/spline/ISpline';
 
 export class SplineComponent extends RenderableComponent<ISpline>{
 

@@ -1,5 +1,5 @@
-import { IResource } from "./IResource";
-import { vec3 } from "gl-matrix";
+import { IResource } from './IResource';
+import { vec3 } from 'gl-matrix';
 
 export interface IRenderable extends IResource {
 

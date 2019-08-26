@@ -1,6 +1,6 @@
-import { GlBuffer } from "./GlBuffer";
-import { GlConstants } from "../GlConstants";
-import { Gl } from "../Gl";
+import { GlBuffer } from './GlBuffer';
+import { GlConstants } from '../GlConstants';
+import { Gl } from '../Gl';
 
 export class Ubo extends GlBuffer {
 

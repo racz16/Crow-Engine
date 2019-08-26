@@ -1,14 +1,14 @@
-import { IRenderable } from "../../resource/IRenderable";
-import { Component } from "../Component";
-import { GameObject } from "../../core/GameObject";
-import { RenderingPipeline } from "../../rendering/RenderingPipeline";
-import { Material } from "../../material/Material";
-import { IBoundingShape } from "./boundingshape/IBoundingShape";
-import { SphereBoundingShape } from "./boundingshape/SphereBoundingShape";
-import { IRenderableComponent } from "./IRenderableComponent";
-import { vec2, mat4 } from "gl-matrix";
-import { IBillboard } from "./billboard/IBillboard";
-import { BlinnPhongRenderer } from "../../rendering/renderer/BlinnPhongRenderer";
+import { IRenderable } from '../../resource/IRenderable';
+import { Component } from '../Component';
+import { GameObject } from '../../core/GameObject';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { Material } from '../../material/Material';
+import { IBoundingShape } from './boundingshape/IBoundingShape';
+import { SphereBoundingShape } from './boundingshape/SphereBoundingShape';
+import { IRenderableComponent } from './IRenderableComponent';
+import { vec2, mat4 } from 'gl-matrix';
+import { IBillboard } from './billboard/IBillboard';
+import { BlinnPhongRenderer } from '../../rendering/renderer/BlinnPhongRenderer';
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 

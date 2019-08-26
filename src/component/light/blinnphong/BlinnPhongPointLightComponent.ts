@@ -1,6 +1,6 @@
-import { BlinnPhongPositionalLightComponent } from "./BlinnPhongPositionalLightComponent";
-import { Ubo } from "../../../webgl/buffer/Ubo";
-import { BlinnPhongLightComponent } from "./BlinnPhongLightComponent";
+import { BlinnPhongPositionalLightComponent } from './BlinnPhongPositionalLightComponent';
+import { Ubo } from '../../../webgl/buffer/Ubo';
+import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 
 export class BlinnPhongPointLightComponent extends BlinnPhongPositionalLightComponent {
 

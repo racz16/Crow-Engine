@@ -1,5 +1,5 @@
-import { GameObject } from "./GameObject";
-import { Utility } from "../utility/Utility";
+import { GameObject } from './GameObject';
+import { Utility } from '../utility/Utility';
 
 export class ChildContainer {
 

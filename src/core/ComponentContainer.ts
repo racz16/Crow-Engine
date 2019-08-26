@@ -1,7 +1,7 @@
-import { GameObject } from "./GameObject";
-import { Component } from "../component/Component";
-import { Utility } from "../utility/Utility";
-import { IComponent } from "../component/IComponent";
+import { GameObject } from './GameObject';
+import { Component } from '../component/Component';
+import { Utility } from '../utility/Utility';
+import { IComponent } from '../component/IComponent';
 
 export class ComponentContainer {
 

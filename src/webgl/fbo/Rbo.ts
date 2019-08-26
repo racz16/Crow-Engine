@@ -1,9 +1,9 @@
-import { GlObject } from "../GlObject";
-import { IFboAttachment } from "./IFboAttachment";
-import { vec2 } from "gl-matrix";
-import { InternalFormat, InternalFormatResolver } from "../enum/InternalFormat";
-import { Gl } from "../Gl";
-import { GlConstants } from "../GlConstants";
+import { GlObject } from '../GlObject';
+import { IFboAttachment } from './IFboAttachment';
+import { vec2 } from 'gl-matrix';
+import { InternalFormat, InternalFormatResolver } from '../enum/InternalFormat';
+import { Gl } from '../Gl';
+import { GlConstants } from '../GlConstants';
 
 export class Rbo extends GlObject implements IFboAttachment {
 
