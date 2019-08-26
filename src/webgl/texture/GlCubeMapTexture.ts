@@ -21,7 +21,7 @@ export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
         }
     }
 
-    getNativeTexture(): GlCubeMapTexture {
+    public getNativeTexture(): GlCubeMapTexture {
         return this;
     }
 

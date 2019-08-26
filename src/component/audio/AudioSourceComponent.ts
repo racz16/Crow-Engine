@@ -22,7 +22,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         this.gain = ctx.createGain();
         this.bufferSource.connect(this.panner).connect(this.gain).connect(ctx.destination);
         this.gain.gain.value = this.volume;
-        (Audio as any).add(this);
+        Audio.addAudioSource(this);
     }
 
     public static createAmbientAudioSourceComponent(soundPath: string): AudioSourceComponent {

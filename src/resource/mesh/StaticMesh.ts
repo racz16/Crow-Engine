@@ -21,7 +21,7 @@ export class StaticMesh implements IMesh {
 
     public constructor(path: string) {
         this.load(path);
-        (ResourceManager as any).add(this);
+        ResourceManager.add(this);
     }
 
     private async load(path: string): Promise<void> {

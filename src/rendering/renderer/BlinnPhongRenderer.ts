@@ -14,7 +14,6 @@ import { Scene } from "../../core/Scene";
 import { ICameraComponent } from "../../component/camera/ICameraComponent";
 import { LogLevel } from "../../utility/log/LogLevel";
 import { LogType } from "../../utility/log/LogType";
-import { CameraComponent } from "../../component/camera/CameraComponent";
 
 export class BlinnPhongRenderer extends Renderer {
 
@@ -22,16 +21,15 @@ export class BlinnPhongRenderer extends Renderer {
     private shader: BlinnPhongShader;
 
     public constructor() {
-        super();
+        super('Blinn-Phong Renderer');
         this.shader = new BlinnPhongShader();
     }
 
-    public render(): void {
+    protected renderUnsafe(): void {
         if (!Utility.isUsable(this.shader)) {
             Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The Blinn-Phong shader is not usable');
             return;
         }
-        Log.startGroup('Blinn-Phong renderer')
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
@@ -41,7 +39,6 @@ export class BlinnPhongRenderer extends Renderer {
                 renderableComponent.draw();
             }
         }
-        Log.endGroup();
     }
 
     private isInsideFrustum(renderableComponent: IRenderableComponent<IRenderable>): boolean {

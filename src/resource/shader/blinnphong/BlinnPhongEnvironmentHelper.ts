@@ -2,13 +2,14 @@ import { BlinnPhongHelper } from "./BlinnPhongHelper";
 import { Material } from "../../../material/Material";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
 import { vec3 } from "gl-matrix";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongEnvironmentHelper extends BlinnPhongHelper {
 
     private defaultIntensity = vec3.fromValues(1, 1, 1)
-    private material: Material;
+    private material: Material<BlinnPhongRenderer>;
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.material = material;
         this.setValues(material.getSlot(Material.ENVIRONMENT_INTENSITY), sp);
         if (this.isTexture2DUsable()) {

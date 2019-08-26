@@ -7,6 +7,7 @@ import { Audio } from "../resource/Audio";
 import { Log } from "../utility/log/Log";
 import { LogLevel } from "../utility/log/LogLevel";
 import { LogType } from "../utility/log/LogType";
+import { CameraComponent } from "../component/camera/CameraComponent";
 
 export class Engine {
 
@@ -52,6 +53,13 @@ export class Engine {
             this.started = false;
             Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine stopped');
         }
+    }
+
+    public static release(): void {
+        if (Engine.started) {
+            throw Error();
+        }
+        ResourceManager.releaseResources();
     }
 
     private static createNextFrame(): void {

@@ -18,29 +18,27 @@ export class SkyBoxRenderer extends Renderer {
     private box: CubeMesh;
 
     public constructor() {
-        super();
+        super('SkyBox Renderer');
         this.shader = new SkyBoxShader();
         this.box = CubeMesh.getInstance();
     }
 
-    public render(): void {
+    protected renderUnsafe(): void {
         if (!Utility.isUsable(this.shader)) {
             Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The SkyBox shader is not usable');
             return;
         }
-        
+
         const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
         }
-        Log.startGroup('SkyBox renderer');
         this.prepare();
 
         this.shader.setUniforms();
         this.box.draw();
 
         Gl.gl.depthFunc(Gl.gl.LESS);
-        Log.endGroup();
     }
 
     private prepare(): void {

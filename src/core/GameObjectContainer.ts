@@ -1,7 +1,5 @@
 import { GameObject } from "./GameObject";
 import { Log } from "../utility/log/Log";
-import { LogLevel } from "../utility/log/LogLevel";
-import { LogType } from "../utility/log/LogType";
 
 export class GameObjectContainer {
 
@@ -15,7 +13,7 @@ export class GameObjectContainer {
         Log.endGroup();
     }
 
-    private addGameObject(gameObject: GameObject): void {
+    public addGameObject(gameObject: GameObject): void {
         if (!gameObject) {
             throw new Error();
         }

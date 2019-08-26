@@ -2,12 +2,13 @@ import { vec3 } from "gl-matrix";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
 import { Material } from "../../../material/Material";
 import { BlinnPhongHelper } from "./BlinnPhongHelper";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongDiffuseHelper extends BlinnPhongHelper {
 
     private static readonly defaultValue = vec3.fromValues(0.5, 0.5, 0.5);
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.setValues(material.getSlot(Material.DIFFUSE), sp);
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();

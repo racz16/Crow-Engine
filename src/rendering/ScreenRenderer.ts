@@ -5,7 +5,6 @@ import { Fbo } from "../webgl/fbo/Fbo";
 import { TexturedQuadShader } from "../resource/Shader/TexturedQuadShader";
 import { Gl } from "../webgl/Gl";
 import { vec2 } from "gl-matrix";
-import { TestSceneBuilder } from "../test";
 import { Utility } from "../utility/Utility";
 
 export class ScreenRenderer extends Renderer {
@@ -14,12 +13,12 @@ export class ScreenRenderer extends Renderer {
     private quad: QuadMesh;
 
     public constructor() {
-        super();
+        super('Screen Renderer');
         this.shader = new TexturedQuadShader();
         this.quad = QuadMesh.getInstance();
     }
 
-    public render(): void {
+    protected renderUnsafe(): void {
         this.beforeShader();
         this.shader.start();
         this.beforeDrawQuad();

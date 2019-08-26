@@ -18,15 +18,15 @@ export class RenderableContainer {
         return this.renderables.values();
     }
 
-    private add(renderable: IRenderableComponent<IRenderable>): void {
-        if (!this.renderables.includes(renderable)) {
+    public add(renderable: IRenderableComponent<IRenderable>): void {
+        if (!this.renderables.includes(renderable) && renderable.getGameObject()) {
             this.renderables.push(renderable);
         }
     }
 
-    private remove(renderable: IRenderableComponent<IRenderable>): void {
+    public remove(renderable: IRenderableComponent<IRenderable>): void {
         const index = this.renderables.indexOf(renderable);
-        if (index !== -1) {
+        if (index !== -1 && !renderable.getGameObject()) {
             Utility.removeElement(this.renderables, index);
         }
     }

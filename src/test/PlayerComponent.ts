@@ -4,18 +4,21 @@ import { vec3 } from "gl-matrix";
 
 export class PlayerComponent extends Component {
 
-    private keyPresses = new Array<KeyboardEvent>();
+    private keysDown = new Map<string, KeyboardEvent>();
 
     public constructor() {
         super();
         document.onkeydown = (ev: KeyboardEvent) => {
-            this.keyPresses.push(ev);
+            this.keysDown.set(ev.code, ev);
+        };
+        document.onkeyup = (ev: KeyboardEvent) => {
+            this.keysDown.delete(ev.code);
         };
     }
 
     private includes(code: string): boolean {
-        for (const kp of this.keyPresses) {
-            if (kp.code === code) {
+        for (const keyCode of this.keysDown.keys()) {
+            if (keyCode === code) {
                 return true;
             }
         }
@@ -23,7 +26,7 @@ export class PlayerComponent extends Component {
     }
 
     protected updateComponent(): void {
-        const moveSpeed = 1;
+        const moveSpeed = 0.5;
         const rotateSpeed = 1;
         const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * Time.getDeltaTimeFactor());
         const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * Time.getDeltaTimeFactor());
@@ -55,7 +58,6 @@ export class PlayerComponent extends Component {
         if (this.includes('KeyE')) {
             this.getGameObject().getTransform().rotate(vec3.fromValues(0, -rotateSpeed * Time.getDeltaTimeFactor(), 0));
         }
-
-        this.keyPresses = [];
     }
+
 }

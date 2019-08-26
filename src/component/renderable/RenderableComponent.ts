@@ -8,12 +8,13 @@ import { SphereBoundingShape } from "./boundingshape/SphereBoundingShape";
 import { IRenderableComponent } from "./IRenderableComponent";
 import { vec2, mat4 } from "gl-matrix";
 import { IBillboard } from "./billboard/IBillboard";
+import { BlinnPhongRenderer } from "../../rendering/renderer/BlinnPhongRenderer";
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 
     private renderable: T;
     private boundingShape: IBoundingShape;
-    private material: Material;
+    private material: Material<any>;
     private readonly visibilityInterval = vec2.fromValues(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
     private materialActive = true;
     private castShadow = true;
@@ -21,7 +22,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     private reflectable = false;
     private billboard: IBillboard;
 
-    public constructor(renderable: T, material = new Material(), boundingShape: IBoundingShape = new SphereBoundingShape()) {
+    public constructor(renderable: T, material: Material<any> = new Material(BlinnPhongRenderer), boundingShape: IBoundingShape = new SphereBoundingShape()) {
         super();
         this.setRenderable(renderable);
         this.setMaterial(material);
@@ -40,11 +41,11 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.invalidate();
     }
 
-    public getMaterial(): Material {
+    public getMaterial(): Material<any> {
         return this.material;
     }
 
-    public setMaterial(material: Material): void {
+    public setMaterial(material: Material<any>): void {
         if (!material) {
             throw new Error();
         }
@@ -170,13 +171,13 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     protected attachToGameObject(gameObject: GameObject): void {
         super.attachToGameObject(gameObject);
         gameObject.getTransform().getInvalidatables().addInvalidatable(this);
-        (RenderingPipeline.getRenderableContainer() as any).add(this);
+        RenderingPipeline.getRenderableContainer().add(this);
     }
 
     protected detachFromGameObject(): void {
         this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
         super.detachFromGameObject();
-        (RenderingPipeline.getRenderableContainer() as any).remove(this);
+        RenderingPipeline.getRenderableContainer().remove(this);
     }
 
 }

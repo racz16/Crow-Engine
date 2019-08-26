@@ -6,7 +6,7 @@ export class ResourceManager {
 
     private constructor() { }
 
-    private static add(resource: IResource): void {
+    public static add(resource: IResource): void {
         if (!ResourceManager.contains(resource)) {
             ResourceManager.resources.push(resource);
         }
@@ -20,7 +20,7 @@ export class ResourceManager {
         return ResourceManager.resources.values();
     }
 
-    public static getResources<T>(type: new () => T): Array<T> {
+    public static getResources<T>(type: new (..._) => T): Array<T> {
         let ret = new Array<T>();
         for (const resource of ResourceManager.resources) {
             if (resource instanceof type) {

@@ -1,14 +1,15 @@
 import { BlinnPhongHelper } from "./BlinnPhongHelper";
 import { Material } from "../../../material/Material";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongRefractionHelper extends BlinnPhongHelper {
 
     private static readonly defaultRefractionIndex = 1 / 1.33;
 
-    private material: Material;
+    private material: Material<BlinnPhongRenderer>;
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.material = material;
         this.setValues(material.getSlot(Material.REFRACTION), sp);
         if (this.isCubeMapTextureUsable()) {

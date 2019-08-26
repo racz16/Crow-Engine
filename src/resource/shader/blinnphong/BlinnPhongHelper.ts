@@ -5,13 +5,14 @@ import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
 import { Texture2D } from "../../texture/Texture2D";
 import { Material } from "../../../material/Material";
 import { CubeMapTexture } from "../../texture/CubeMapTexture";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export abstract class BlinnPhongHelper {
 
     private slot: MaterialSlot;
     private sp: GlShaderProgram;
 
-    public abstract loadSlot(material: Material, sp: GlShaderProgram): void;
+    public abstract loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void;
 
     protected setValues(slot: MaterialSlot, sp: GlShaderProgram): void {
         this.slot = slot;
@@ -81,7 +82,7 @@ export abstract class BlinnPhongHelper {
     protected loadDefaultColor3(defaultColor: vec3): void {
         this.sp.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
         this.sp.loadBoolean(this.getIsThereMapName(), false);
-        
+
     }
 
     protected loadDefaultColor4(defaultColor: vec4): void {

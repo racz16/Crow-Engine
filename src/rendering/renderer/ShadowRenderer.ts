@@ -21,7 +21,7 @@ export class ShadowRenderer extends Renderer {
     private farDistance = 10000;
 
     public constructor() {
-        super();
+        super('Shadow Renderer');
         this.shader = new ShadowShader();
     }
 
@@ -91,7 +91,7 @@ export class ShadowRenderer extends Renderer {
 
     }
 
-    public render(): void {
+    protected renderUnsafe(): void {
         this.refresh();
 
         this.beforeShader();

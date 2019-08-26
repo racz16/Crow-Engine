@@ -1,8 +1,9 @@
 import { ParameterKey } from "../utility/parameter/ParameterKey";
 import { MaterialSlot } from "./MaterialSlot";
 import { ParameterContainer } from "../utility/parameter/ParameterContainer";
+import { Renderer } from "../rendering/Renderer";
 
-export class Material {
+export class Material<T extends Renderer> {
 
     public static readonly REFRACTION_INDEX = new ParameterKey<Number>(Number, "REFRACTION_INDEX");
     public static readonly DIFFUSE = new ParameterKey<MaterialSlot>(MaterialSlot, "DIFFUSE");
@@ -13,18 +14,16 @@ export class Material {
     public static readonly ENVIRONMENT_INTENSITY = new ParameterKey<MaterialSlot>(MaterialSlot, "ENVIRONMENT_INTENSITY");
     private readonly slots = new ParameterContainer();
     private readonly parameters = new ParameterContainer();
-    //private Class<? extends GeometryRenderer> renderer;
 
-    /*public constructor(renderer: Class<? extends GeometryRenderer> ){
-        if(!renderer){
-            throw new Error();
-        }
-        this.renderer = renderer;
+    private rendererType: new (..._) => T;
+
+    public constructor(rendererType: new (..._) => T) {
+        this.rendererType = rendererType;
     }
 
-    public Class<? extends GeometryRenderer> getRenderer(){
-        return renderer;
-    }*/
+    public getRenderer(): new (..._) => T {
+        return this.rendererType;
+    }
 
     public getSlot(key: ParameterKey<MaterialSlot>): MaterialSlot {
         return this.slots.get(key);

@@ -1,10 +1,11 @@
 import { BlinnPhongHelper } from "./BlinnPhongHelper";
 import { Material } from "../../../material/Material";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.setValues(material.getSlot(Material.REFLECTION), sp);
         sp.loadBoolean(this.getIsThereParallaxCorrectionName(), false);
         if (this.isCubeMapTextureUsable()) {

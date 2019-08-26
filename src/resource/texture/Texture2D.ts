@@ -36,6 +36,7 @@ export class Texture2D implements ITexture2D {
 
     private createTextureFromImage(path: string, textureFiltering: TextureFiltering): void {
         const image = new Image();
+        image.decoding = "async";
         image.src = path;
         image.onload = () => {
             this.texture = new GlTexture2D();

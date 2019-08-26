@@ -25,7 +25,7 @@ export class Spline implements ISpline {
     protected furthestVertexDistance: number;
 
     public constructor() {
-        (ResourceManager as any).add(this);
+        ResourceManager.add(this);
     }
 
     protected refresh(): void {

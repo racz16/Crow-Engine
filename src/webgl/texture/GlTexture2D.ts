@@ -10,7 +10,7 @@ export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment
         return Gl.gl.TEXTURE_2D;
     }
 
-    getNativeTexture(): GlTexture2D {
+    public getNativeTexture(): GlTexture2D {
         return this;
     }
 

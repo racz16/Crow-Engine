@@ -19,7 +19,7 @@ export class Audio {
         Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'Web Audio API initialized');
     }
 
-    private static add(audioSource: IAudioSourceComponent): void {
+    public static addAudioSource(audioSource: IAudioSourceComponent): void {
         if (!this.audioSources.includes(audioSource)) {
             this.audioSources.push(audioSource);
         }

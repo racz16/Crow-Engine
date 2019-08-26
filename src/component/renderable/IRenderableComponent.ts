@@ -9,7 +9,7 @@ export interface IRenderableComponent<T extends IRenderable> extends IComponent 
 
     getRenderable(): T;
 
-    getMaterial(): Material;
+    getMaterial(): Material<any>;
 
     getBoundingShape(): IBoundingShape;
 

@@ -3,12 +3,13 @@ import { Material } from "../../../material/Material";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
 import { vec4 } from "gl-matrix";
 import { MaterialSlot } from "../../../material/MaterialSlot";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
 
     private static readonly defaultValue = vec4.fromValues(0.5, 0.5, 0.5, 0.5);
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.setValues(material.getSlot(Material.SPECULAR), sp);
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();

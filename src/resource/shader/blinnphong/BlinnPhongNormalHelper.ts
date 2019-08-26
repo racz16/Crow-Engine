@@ -2,7 +2,7 @@ import { BlinnPhongHelper } from "./BlinnPhongHelper";
 import { Material } from "../../../material/Material";
 import { GlShaderProgram } from "../../../webgl/shader/GlShaderProgram";
 import { MaterialSlot } from "../../../material/MaterialSlot";
-import { Texture2D } from "../../texture/Texture2D";
+import { BlinnPhongRenderer } from "../../../rendering/renderer/BlinnPhongRenderer";
 
 export class BlinnPhongNormalHelper extends BlinnPhongHelper {
 
@@ -10,9 +10,9 @@ export class BlinnPhongNormalHelper extends BlinnPhongHelper {
     private static readonly defPOMMinLayers = 15;
     private static readonly defPOMMaxLayers = 30;
 
-    private material: Material;
+    private material: Material<BlinnPhongRenderer>;
 
-    public loadSlot(material: Material, sp: GlShaderProgram): void {
+    public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.material = material;
         this.setValues(material.getSlot(Material.NORMAL), sp);
         if (this.isTexture2DUsable()) {

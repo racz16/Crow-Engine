@@ -19,8 +19,7 @@ import { MaterialSlot } from "./material/MaterialSlot";
 import { PlayerComponent } from "./test/PlayerComponent";
 import { BlinnPhongRenderer } from "./rendering/renderer/BlinnPhongRenderer";
 import { ObbBoundingShape } from "./component/renderable/boundingshape/ObbBoundingShape";
-import { Log } from "./utility/log/Log";
-import { LogType } from "./utility/log/LogType";
+import { TextureFiltering } from "./resource/texture/TextureFiltering";
 
 
 window.onload = () => {
@@ -137,7 +136,7 @@ export class TestSceneBuilder {
 
     public createDiffuseBox(): void {
         const go = new GameObject();
-        const ma = new Material();
+        const ma = new Material(BlinnPhongRenderer);
 
         const ds = new MaterialSlot();
         ds.setTexture2D(this.diffuse);
@@ -156,7 +155,7 @@ export class TestSceneBuilder {
     public createNormalBox(): void {
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(2.5, 0, 0));
-        const ma = new Material();
+        const ma = new Material(BlinnPhongRenderer);
 
         const ns = new MaterialSlot();
         ns.setTexture2D(this.normal9);
@@ -170,7 +169,7 @@ export class TestSceneBuilder {
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
 
-        const ma = new Material();
+        const ma = new Material(BlinnPhongRenderer);
         ma.getParameters().set(MaterialSlot.USE_POM, 1);
         ma.getParameters().set(MaterialSlot.POM_SCALE, 0.2);
         ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 50);
@@ -184,7 +183,7 @@ export class TestSceneBuilder {
         rc.setVisibilityInterval(vec2.fromValues(0, 1));
         go.getComponents().add(rc);
 
-        const ma2 = new Material();
+        const ma2 = new Material(BlinnPhongRenderer);
         ma2.setSlot(Material.NORMAL, ns);
 
         const rc2 = new MeshComponent(this.box, ma2);
@@ -195,7 +194,7 @@ export class TestSceneBuilder {
     public createReflectionBox(): void {
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(7.5, 0, 0));
-        const ma = new Material();
+        const ma = new Material(BlinnPhongRenderer);
 
         const rs = new MaterialSlot();
         rs.setCubeMapTexture(this.elyHills);
@@ -214,7 +213,7 @@ export class TestSceneBuilder {
         go.getTransform().setRelativePosition(vec3.fromValues(10, -0.5, 0));
         go.getTransform().setRelativeScale(vec3.fromValues(0.1, 0.1, 0.1));
 
-        const mc = new MeshComponent(this.dragon, new Material(), new ObbBoundingShape());
+        const mc = new MeshComponent(this.dragon, new Material(BlinnPhongRenderer), new ObbBoundingShape());
         go.getComponents().add(mc);
 
         const rc = new RotateComponent();
@@ -235,7 +234,7 @@ export class TestSceneBuilder {
         }
         bs.normalizeHelperPoints(5);
         bs.setLoop(true);
-        const sc = new SplineComponent(bs, new Material());
+        const sc = new SplineComponent(bs, new Material(BlinnPhongRenderer));
         go.getComponents().add(sc);
     }
 
