@@ -183,14 +183,12 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         return this.loaded && this.getGameObject() && this.isActive();
     }
 
-    protected attachToGameObject(gameObject: GameObject): void {
-        super.attachToGameObject(gameObject);
-        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
+    protected handleAttach(attached: GameObject): void {
+        attached.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
-    protected detachFromGameObject(): void {
-        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.detachFromGameObject();
+    protected handleDetach(detached: GameObject): void {
+        detached.getTransform().getInvalidatables().removeInvalidatable(this);
         this.stop();
     }
 

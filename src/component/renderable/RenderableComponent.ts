@@ -168,15 +168,13 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.renderable.update();
     }
 
-    protected attachToGameObject(gameObject: GameObject): void {
-        super.attachToGameObject(gameObject);
-        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
+    protected handleAttach(attached: GameObject): void {
+        attached.getTransform().getInvalidatables().addInvalidatable(this);
         RenderingPipeline.getRenderableContainer().add(this);
     }
 
-    protected detachFromGameObject(): void {
-        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.detachFromGameObject();
+    protected handleDetach(detached: GameObject): void {
+        detached.getTransform().getInvalidatables().removeInvalidatable(this);
         RenderingPipeline.getRenderableContainer().remove(this);
     }
 

@@ -48,11 +48,22 @@ export class Component implements IComponent {
     protected attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
         this.invalidate();
+        this.handleAttach(gameObject);
+    }
+
+    protected handleAttach(attached: GameObject): void {
+
     }
 
     protected detachFromGameObject(): void {
+        const detached = this.gameObject;
         this.gameObject = null;
         this.invalidate();
+        this.handleDetach(detached);
+    }
+
+    protected handleDetach(detached: GameObject): void {
+
     }
 
     protected updateComponent(): void { }

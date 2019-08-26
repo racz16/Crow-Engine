@@ -26,14 +26,12 @@ export class AudioListenerComponent extends Component {
         }
     }
 
-    protected attachToGameObject(gameObject: GameObject): void {
-        super.attachToGameObject(gameObject);
-        gameObject.getTransform().getInvalidatables().addInvalidatable(this);
+    protected handleAttach(attached: GameObject): void {
+        attached.getTransform().getInvalidatables().addInvalidatable(this);
     }
 
-    protected detachFromGameObject(): void {
-        this.getGameObject().getTransform().getInvalidatables().removeInvalidatable(this);
-        super.detachFromGameObject();
+    protected handleDetach(detached: GameObject): void {
+        detached.getTransform().getInvalidatables().removeInvalidatable(this);
         if (this.isTheMainAudioListener()) {
             Audio.setAudioListenerToDefault();
         }

@@ -19,7 +19,6 @@ import { MaterialSlot } from './material/MaterialSlot';
 import { PlayerComponent } from './test/PlayerComponent';
 import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
 import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
-import { TextureFiltering } from './resource/texture/TextureFiltering';
 
 
 window.onload = () => {
@@ -86,8 +85,6 @@ export class TestSceneBuilder {
     public initialize(): void {
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
         Engine.initialize(canvas);
-
-        //Log.setInfoLog(LogType.LIFE_CYCLE, true);
     }
 
     public loadResources(): void {

@@ -74,7 +74,7 @@ export class ComponentContainer {
         return ret.values();
     }
 
-    public getFirst<T extends IComponent>(type: new (..._) => T): T {
+    public getFirst<T extends Component>(type: new (..._) => T): T {
         for (const component of this.components) {
             if (component instanceof type) {
                 return component;
