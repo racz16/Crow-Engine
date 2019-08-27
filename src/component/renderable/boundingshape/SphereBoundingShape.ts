@@ -8,7 +8,7 @@ export class SphereBoundingShape extends BoundingShape {
 
     public isInsideMainCameraFrustum(): boolean {
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        if (camera && this.isUsable()) {
+        if (camera && camera.getGameObject() && this.isUsable()) {
             const position = this.getRenderableComponent().getGameObject().getTransform().getAbsolutePosition();
             for (const plane of camera.getFrustum().getPlanesIterator()) {
                 if (plane.computeDistanceFrom(position) + this.getWorldSpaceRadius() < 0) {
@@ -20,16 +20,15 @@ export class SphereBoundingShape extends BoundingShape {
     }
 
     private refresh(): void {
-        if (!this.isValid() && this.isUsable()) {
+        if (!this.isValid()) {
             this.refreshUnsafe();
             this.setValid(true);
         }
     }
 
     private refreshUnsafe(): void {
-        const renderableComponent = this.getRenderableComponent();
-        const osRadius = renderableComponent.getRenderable().getObjectSpaceRadius();
-        const absoluteScale = renderableComponent.getGameObject().getTransform().getAbsoluteScale();
+        const osRadius = this.getObjectSpaceRadius();
+        const absoluteScale = this.getRenderableComponent().getGameObject().getTransform().getAbsoluteScale();
         this.radius = osRadius * Utility.getMaxCoordinate(absoluteScale);
     }
 

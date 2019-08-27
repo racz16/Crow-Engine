@@ -2,7 +2,6 @@ import { vec3 } from 'gl-matrix';
 import { IAudioSourceComponent } from '../component/audio/IAudioSourceComponent';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
-import { LogType } from '../utility/log/LogType';
 
 export class Audio {
 
@@ -16,7 +15,7 @@ export class Audio {
     public static initialize(): void {
         this.ctx = new AudioContext();
         this.deprecated = this.ctx.listener.positionX === undefined;
-        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'Web Audio API initialized');
+        Log.logString(LogLevel.INFO_1, 'Web Audio API initialized');
     }
 
     public static addAudioSource(audioSource: IAudioSourceComponent): void {

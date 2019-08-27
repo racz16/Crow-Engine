@@ -14,7 +14,7 @@ export class RenderableContainer {
         return this.renderables.length;
     }
 
-    public getRenderableComponentIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
+    public getRenderableComponentsIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
         return this.renderables.values();
     }
 

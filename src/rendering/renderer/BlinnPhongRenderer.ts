@@ -13,7 +13,6 @@ import { IRenderableComponent } from '../../component/renderable/IRenderableComp
 import { Scene } from '../../core/Scene';
 import { ICameraComponent } from '../../component/camera/ICameraComponent';
 import { LogLevel } from '../../utility/log/LogLevel';
-import { LogType } from '../../utility/log/LogType';
 
 export class BlinnPhongRenderer extends Renderer {
 
@@ -27,13 +26,13 @@ export class BlinnPhongRenderer extends Renderer {
 
     protected renderUnsafe(): void {
         if (!Utility.isUsable(this.shader)) {
-            Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The Blinn-Phong shader is not usable');
+            Log.logString(LogLevel.WARNING, 'The Blinn-Phong shader is not usable');
             return;
         }
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
-        for (const renderableComponent of renderables.getRenderableComponentIterator()) {
+        for (const renderableComponent of renderables.getRenderableComponentsIterator()) {
             if (renderableComponent.getRenderable().isUsable() && renderableComponent.isActive() && this.isVisible(renderableComponent, camera) && this.isInsideFrustum(renderableComponent)) {
                 this.beforeDrawInstance(renderableComponent);
                 renderableComponent.draw();
@@ -78,6 +77,9 @@ export class BlinnPhongRenderer extends Renderer {
 
 
     private beforeDrawInstance(rc: IRenderableComponent<IRenderable>): void {
+        //TODO: ezt az ősosztályba ki kéne szervezni
+        Gl.setEnableCullFace(!rc.isTwoSided());
+
         this.setNumberOfRenderedElements(this.getNumberOfRenderedElements() + 1);
         this.setNumberOfRenderedFaces(this.getNumberOfRenderedFaces() + rc.getFaceCount());
         this.shader.setUniforms(rc);

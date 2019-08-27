@@ -17,7 +17,7 @@ export class ParameterContainer {
         const invalidatables = this.invalidatables.get(key.getKey());
         this.removeInvalidatablesFromParameter(oldParameter, true, invalidatables);
         this.addInvalidatablesToParameter(parameter, true, invalidatables);
-        this.invalidateInvalidatables(key);
+        this.invalidateInvalidatables(invalidatables);
     }
 
     private removeInvalidatablesFromParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
@@ -46,10 +46,9 @@ export class ParameterContainer {
         }
     }
 
-    private invalidateInvalidatables<T>(key: ParameterKey<T>) {
-        const invalidatablesArray = this.invalidatables.get(key.getKey());
-        if (invalidatablesArray) {
-            for (const invalidatable of invalidatablesArray) {
+    private invalidateInvalidatables(invalidatables: Array<IInvalidatable>) {
+        if (invalidatables) {
+            for (const invalidatable of invalidatables) {
                 invalidatable.invalidate();
             }
         }
@@ -63,15 +62,15 @@ export class ParameterContainer {
     }
 
     private addInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
-        let invalidatableArray = this.invalidatables.get(key.getKey());
-        if (invalidatableArray == null) {
-            invalidatableArray = new Array<IInvalidatable>();
-            this.invalidatables.set(key.getKey(), invalidatableArray);
+        let invalidatables = this.invalidatables.get(key.getKey());
+        if (!invalidatables) {
+            invalidatables = new Array<IInvalidatable>();
+            this.invalidatables.set(key.getKey(), invalidatables);
         }
-        if (!invalidatableArray.includes(invalidatable)) {
+        if (!invalidatables.includes(invalidatable)) {
             const parameter = this.get(key);
             this.addInvalidatablesToParameter(parameter, false, [invalidatable]);
-            invalidatableArray.push(invalidatable);
+            invalidatables.push(invalidatable);
         }
     }
 
@@ -83,16 +82,31 @@ export class ParameterContainer {
     }
 
     private removeInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
-        const invalidatableArray = this.invalidatables.get(key.getKey());
-        if (invalidatableArray && invalidatableArray.includes(invalidatable)) {
+        const invalidatables = this.invalidatables.get(key.getKey());
+        if (invalidatables && invalidatables.includes(invalidatable)) {
             const parameter = this.get(key);
             this.removeInvalidatablesFromParameter(parameter, false, [invalidatable]);
-            const index = invalidatableArray.indexOf(invalidatable);
-            Utility.removeElement(invalidatableArray, index);
-            if (invalidatableArray.length === 0) {
+            const index = invalidatables.indexOf(invalidatable);
+            Utility.removeElement(invalidatables, index);
+            if (invalidatables.length === 0) {
                 this.invalidatables.delete(key.getKey());
             }
         }
+    }
+
+    public containsInvalidatable<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): boolean {
+        const invalidatables = this.invalidatables.get(key.getKey());
+        return invalidatables ? invalidatables.includes(invalidatable) : false;
+    }
+
+    public getInvalidatableIterator<T>(key: ParameterKey<T>): IterableIterator<IInvalidatable> {
+        const invalidatables = this.invalidatables.get(key.getKey());
+        return invalidatables ? invalidatables.values() : [].values();
+    }
+
+    public getInvalidatableCount<T>(key: ParameterKey<T>): number {
+        const invalidatables = this.invalidatables.get(key.getKey());
+        return invalidatables ? invalidatables.length : 0;
     }
 
 }

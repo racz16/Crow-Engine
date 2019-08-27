@@ -4,12 +4,13 @@ import { GlConstants } from './GlConstants';
 import { vec2 } from 'gl-matrix';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
-import { LogType } from '../utility/log/LogType';
 
 export class Gl {
 
     private static context: WebGL2RenderingContext;
     private static canvas: HTMLCanvasElement;
+    private static vendor: string;
+    private static renderer: string;
 
     private constructor() { }
 
@@ -20,12 +21,17 @@ export class Gl {
         }
         Gl.canvas = canvas;
         GlConstants.initialize();
+        const debugInfo = Gl.gl.getExtension('WEBGL_debug_renderer_info');
+        Gl.vendor = Gl.gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+        Gl.renderer = Gl.gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         Gl.setEnableCullFace(true);
         Gl.setCullFace(CullFace.BACK);
         Gl.setEnableBlend(true);
         Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
-        Log.logString(LogLevel.INFO_1, LogType.RESOURCES, 'WebGL initialized');
+        Log.logString(LogLevel.INFO_1, 'WebGL initialized');
+        Log.logString(LogLevel.INFO_2, 'Vendor: ' + this.vendor);
+        Log.logString(LogLevel.INFO_2, 'Renderer: ' + this.renderer);
     }
 
     public static get gl(): WebGL2RenderingContext {
@@ -34,6 +40,14 @@ export class Gl {
 
     public static getCanvas(): HTMLCanvasElement {
         return Gl.canvas;
+    }
+
+    public static getVendor(): string {
+        return Gl.vendor;
+    }
+
+    public static getRenderer(): string {
+        return Gl.renderer;
     }
 
     public static isFaceCulling(): boolean {

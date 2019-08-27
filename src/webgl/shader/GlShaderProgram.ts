@@ -2,6 +2,7 @@ import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
 import { vec2, vec3, vec4, mat4, mat3 } from 'gl-matrix';
 import { GlShader } from './GlShader';
+import { BindingPoint } from '../../rendering/BindingPoint';
 
 export class GlShaderProgram extends GlObject {
 
@@ -78,8 +79,12 @@ export class GlShaderProgram extends GlObject {
         return this.attributes.entries();
     }
 
-    public bindUniformBlockToBindingPoint(uniformBlock: string, bindingPoint: number): void {
+    public bindUniformBlock(uniformBlock: string, bindingPoint: number): void {
         Gl.gl.uniformBlockBinding(this.getId(), Gl.gl.getUniformBlockIndex(this.getId(), uniformBlock), bindingPoint);
+    }
+
+    public bindUniformBlockToBindingPoint(bindingPoint: BindingPoint): void {
+        this.bindUniformBlock(bindingPoint.name, bindingPoint.bindingPoint);
     }
 
     public loadFloat(uniform: string, value: number): void {

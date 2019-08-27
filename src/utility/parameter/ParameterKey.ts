@@ -1,4 +1,3 @@
-
 export class ParameterKey<T>{
 
     private returnType: new (..._) => T;

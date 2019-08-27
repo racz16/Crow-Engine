@@ -28,13 +28,9 @@ export class InvalidatableContainer {
         return this.invalidatables.includes(invalidatable);;
     }
 
-    public getInvalidatable(index: number): IInvalidatable {
-        return this.invalidatables[index];
-    }
-
     public removeInvalidatable(invalidatable: IInvalidatable): void {
         const index = this.invalidatables.indexOf(invalidatable);
-        if (index >= 0) {
+        if (index !== -1) {
             Utility.removeElement(this.invalidatables, index);
         }
     }
@@ -43,7 +39,7 @@ export class InvalidatableContainer {
         return this.invalidatables.length;
     }
 
-    public getIterator(): IterableIterator<IInvalidatable> {
+    public getInvalidatablesIterator(): IterableIterator<IInvalidatable> {
         return this.invalidatables.values();
     }
 

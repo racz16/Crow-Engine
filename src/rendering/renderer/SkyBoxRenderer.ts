@@ -3,14 +3,12 @@ import { SkyBoxShader } from '../../resource/shader/SkyBoxShader';
 import { CubeMesh } from '../../resource/mesh/CubeMesh';
 import { Utility } from '../../utility/Utility';
 import { Scene } from '../../core/Scene';
-import { CameraComponent } from '../../component/camera/CameraComponent';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { Gl } from '../../webgl/Gl';
 import { CubeMapTexture } from '../../resource/texture/CubeMapTexture';
 import { vec2 } from 'gl-matrix';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
-import { LogType } from '../../utility/log/LogType';
 
 export class SkyBoxRenderer extends Renderer {
 
@@ -25,7 +23,7 @@ export class SkyBoxRenderer extends Renderer {
 
     protected renderUnsafe(): void {
         if (!Utility.isUsable(this.shader)) {
-            Log.logString(LogLevel.WARNING, LogType.RESOURCES, 'The SkyBox shader is not usable');
+            Log.logString(LogLevel.WARNING, 'The SkyBox shader is not usable');
             return;
         }
 

@@ -5,7 +5,6 @@ import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ParameterKey } from '../utility/parameter/ParameterKey';
 import { ITexture2D } from '../resource/texture/ITexture2D';
 import { GlTexture2D } from '../webgl/texture/GlTexture2D';
-import { Utility } from '../utility/Utility';
 import { Fbo } from '../webgl/fbo/Fbo';
 import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
 import { vec2, mat4 } from 'gl-matrix';
@@ -15,7 +14,6 @@ import { ScreenRenderer } from './ScreenRenderer';
 import { Log } from '../utility/log/Log';
 import { BindingPoint } from './BindingPoint';
 import { LogLevel } from '../utility/log/LogLevel';
-import { LogType } from '../utility/log/LogType';
 
 export class RenderingPipeline {
 
@@ -43,7 +41,7 @@ export class RenderingPipeline {
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
         this.skyboxRenderer = new SkyBoxRenderer();
-        Log.logString(LogLevel.INFO_1, LogType.RENDERING, 'Rendering Pipeline initialized');
+        Log.logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
     }
 
     public static getRenderableContainer(): RenderableContainer {

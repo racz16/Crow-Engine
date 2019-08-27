@@ -12,10 +12,10 @@ export class Material<T extends Renderer> {
     public static readonly REFLECTION = new ParameterKey<MaterialSlot>(MaterialSlot, 'REFLECTION');
     public static readonly REFRACTION = new ParameterKey<MaterialSlot>(MaterialSlot, 'REFRACTION');
     public static readonly ENVIRONMENT_INTENSITY = new ParameterKey<MaterialSlot>(MaterialSlot, 'ENVIRONMENT_INTENSITY');
+
     private readonly slots = new ParameterContainer();
     private readonly parameters = new ParameterContainer();
-
-    private rendererType: new (..._) => T;
+    private readonly rendererType: new (..._) => T;
 
     public constructor(rendererType: new (..._) => T) {
         this.rendererType = rendererType;

@@ -11,6 +11,7 @@ export class MaterialSlot {
     public static readonly POM_SCALE = new ParameterKey<Number>(Number, 'PARAM_POM_SCALE');
     public static readonly POM_MIN_LAYERS = new ParameterKey<Number>(Number, 'PARAM_POM_MIN_LAYERS');
     public static readonly POM_MAX_LAYERS = new ParameterKey<Number>(Number, 'PARAM_POM_MAX_LAYERS');
+    
     private readonly textureTile = vec2.fromValues(1, 1);
     private readonly textureOffset = vec2.create();
     private readonly parameters = new ParameterContainer();

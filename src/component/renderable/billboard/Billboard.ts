@@ -1,12 +1,12 @@
-import { IBillboard } from './IBillboard';
 import { mat4, vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../../camera/ICameraComponent';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
 import { Scene } from '../../../core/Scene';
 import { Utility } from '../../../utility/Utility';
+import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 
-export abstract class Billboard implements IBillboard {
+export abstract class Billboard implements IInvalidatable {
 
     private renderableComponent: IRenderableComponent<IRenderable>;
     private camera: ICameraComponent;
@@ -14,7 +14,7 @@ export abstract class Billboard implements IBillboard {
     private modelMatrix: mat4;
     private inverseModelMatrix: mat4;
 
-    public private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    private setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
         }

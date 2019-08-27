@@ -1,9 +1,9 @@
-import { IBoundingShape } from './IBoundingShape';
 import { IRenderable } from '../../../resource/IRenderable';
 import { vec4, vec3 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
+import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 
-export abstract class BoundingShape implements IBoundingShape {
+export abstract class BoundingShape implements IInvalidatable {
 
     private renderableComponent: IRenderableComponent<IRenderable>;
     private valid = false;
@@ -18,6 +18,22 @@ export abstract class BoundingShape implements IBoundingShape {
 
     protected setValid(valid: boolean): void {
         this.valid = valid;
+    }
+
+    protected getObjectSpaceAabbMin(): vec3 {
+        if (this.renderableComponent) {
+            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMin();
+        } else {
+            return null;
+        }
+    }
+
+    protected getObjectSpaceAabbMax(): vec3 {
+        if (this.renderableComponent) {
+            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMax();
+        } else {
+            return null;
+        }
     }
 
     protected computeObjectSpaceAabbCornerPoints(): Array<vec4> {
@@ -39,23 +55,7 @@ export abstract class BoundingShape implements IBoundingShape {
         return cornerPoints;
     }
 
-    protected getObjectSpaceAabbMin(): vec3 {
-        if (this.renderableComponent) {
-            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMin();
-        } else {
-            return null;
-        }
-    }
-
-    protected getObjectSpaceAabbMax(): vec3 {
-        if (this.renderableComponent) {
-            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMax();
-        } else {
-            return null;
-        }
-    }
-
-    public private_setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    private setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
         }

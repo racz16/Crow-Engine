@@ -1,9 +1,9 @@
 import { IComponent } from '../IComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { Material } from '../../material/Material';
-import { IBoundingShape } from './boundingshape/IBoundingShape';
 import { vec2, mat4 } from 'gl-matrix';
-import { IBillboard } from './billboard/IBillboard';
+import { BoundingShape } from './boundingshape/BoundingShape';
+import { Billboard } from './billboard/Billboard';
 
 export interface IRenderableComponent<T extends IRenderable> extends IComponent {
 
@@ -11,15 +11,17 @@ export interface IRenderableComponent<T extends IRenderable> extends IComponent 
 
     getMaterial(): Material<any>;
 
-    getBoundingShape(): IBoundingShape;
+    getBoundingShape(): BoundingShape;
 
-    getBillboard(): IBillboard;
+    getBillboard(): Billboard;
 
     isReflectable(): boolean;
 
     isCastShadow(): boolean;
 
     isReceiveShadows(): boolean;
+
+    isTwoSided(): boolean;
 
     isMaterialActive(): boolean;
 

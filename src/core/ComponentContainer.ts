@@ -44,7 +44,7 @@ export class ComponentContainer {
 
     public remove(component: Component): void {
         const index = this.components.indexOf(component);
-        if (index >= 0) {
+        if (index !== -1) {
             (this.components[index] as any).detachFromGameObject();
             Utility.removeElement(this.components, index);
         }
@@ -91,7 +91,7 @@ export class ComponentContainer {
         return this.components.length;
     }
 
-    public getComponentIterator(): IterableIterator<Component> {
+    public getComponentsIterator(): IterableIterator<Component> {
         return this.components.values();
     }
 

@@ -3,26 +3,27 @@ import { Component } from '../Component';
 import { GameObject } from '../../core/GameObject';
 import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { Material } from '../../material/Material';
-import { IBoundingShape } from './boundingshape/IBoundingShape';
 import { SphereBoundingShape } from './boundingshape/SphereBoundingShape';
 import { IRenderableComponent } from './IRenderableComponent';
 import { vec2, mat4 } from 'gl-matrix';
-import { IBillboard } from './billboard/IBillboard';
 import { BlinnPhongRenderer } from '../../rendering/renderer/BlinnPhongRenderer';
+import { BoundingShape } from './boundingshape/BoundingShape';
+import { Billboard } from './billboard/Billboard';
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 
     private renderable: T;
-    private boundingShape: IBoundingShape;
     private material: Material<any>;
+    private boundingShape: BoundingShape;
+    private billboard: Billboard;
     private readonly visibilityInterval = vec2.fromValues(Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
     private materialActive = true;
     private castShadow = true;
     private receiveShadow = true;
     private reflectable = false;
-    private billboard: IBillboard;
+    private twoSided = false;
 
-    public constructor(renderable: T, material: Material<any> = new Material(BlinnPhongRenderer), boundingShape: IBoundingShape = new SphereBoundingShape()) {
+    public constructor(renderable: T, material: Material<any> = new Material(BlinnPhongRenderer), boundingShape: BoundingShape = new SphereBoundingShape()) {
         super();
         this.setRenderable(renderable);
         this.setMaterial(material);
@@ -53,35 +54,35 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.invalidate();
     }
 
-    public getBoundingShape(): IBoundingShape {
+    public getBoundingShape(): BoundingShape {
         return this.boundingShape;
     }
 
-    public setBoundingShape(boundingShape: IBoundingShape): void {
+    public setBoundingShape(boundingShape: BoundingShape): void {
         if (!boundingShape || boundingShape.getRenderableComponent()) {
             throw new Error();
         }
         if (this.boundingShape) {
-            this.boundingShape.private_setRenderableComponent(null);
+            (this.boundingShape as any).setRenderableComponent(null);
         }
         this.boundingShape = boundingShape;
-        this.boundingShape.private_setRenderableComponent(this);
+        (this.boundingShape as any).setRenderableComponent(this);
         this.invalidate();
     }
 
-    public getBillboard(): IBillboard {
+    public getBillboard(): Billboard {
         return this.billboard;
     }
 
-    public setBillboard(billboard: IBillboard): void {
+    public setBillboard(billboard: Billboard): void {
         if (billboard && billboard.getRenderableComponent()) {
             throw new Error();
         }
         if (this.billboard) {
-            this.billboard.private_setRenderableComponent(null);
+            (this.billboard as any).setRenderableComponent(null);
         }
         this.billboard = billboard;
-        this.billboard.private_setRenderableComponent(this);
+        (this.billboard as any).setRenderableComponent(this);
         this.invalidate();
     }
 
@@ -110,6 +111,14 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     public setReceiveShadows(receiveShadows: boolean): void {
         this.receiveShadow = receiveShadows;
         this.invalidate();
+    }
+
+    public isTwoSided(): boolean {
+        return this.twoSided;
+    }
+
+    public setTwoSided(twoSided: boolean): void {
+        this.twoSided = twoSided;
     }
 
     public isMaterialActive(): boolean {

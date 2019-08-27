@@ -16,12 +16,8 @@ export class InfoComponent extends Component {
         document.getElementById('unmute').onclick = this.unmute;
         document.getElementById('expand').onclick = this.toggleFullscreen;
         document.getElementById('compress').onclick = this.toggleFullscreen;
-
-        var debugInfo = Gl.gl.getExtension('WEBGL_debug_renderer_info');
-        var vendor = Gl.gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-        var renderer = Gl.gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-        document.getElementById('vendor').textContent = vendor;
-        document.getElementById('renderer').textContent = renderer;
+        document.getElementById('vendor').textContent = Gl.getVendor();
+        document.getElementById('renderer').textContent = Gl.getRenderer();
     }
 
     private mute(): void {

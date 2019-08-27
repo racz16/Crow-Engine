@@ -6,8 +6,6 @@ import { RenderingPipeline } from '../rendering/RenderingPipeline';
 import { Audio } from '../resource/Audio';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
-import { LogType } from '../utility/log/LogType';
-import { CameraComponent } from '../component/camera/CameraComponent';
 
 export class Engine {
 
@@ -21,7 +19,7 @@ export class Engine {
         try {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
-            Log.logObject(LogLevel.ERROR, LogType.ENGINE, error);
+            Log.logObject(LogLevel.ERROR, error);
             ResourceManager.releaseResources();
         }
     }
@@ -44,14 +42,14 @@ export class Engine {
             throw new Error('The engine is already started');
         }
         Engine.started = true;
-        Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine started');
+        Log.logString(LogLevel.INFO_1, 'Engine started');
         Engine.createNextFrame();
     }
 
     public static stop(): void {
         if (Engine.started) {
             this.started = false;
-            Log.logString(LogLevel.INFO_1, LogType.ENGINE, 'Engine stopped');
+            Log.logString(LogLevel.INFO_1, 'Engine stopped');
         }
     }
 
@@ -68,7 +66,7 @@ export class Engine {
                 Engine.createNextFrameUnsafe();
             }
         } catch (error) {
-            Log.logObject(LogLevel.ERROR, LogType.ENGINE, error);
+            Log.logObject(LogLevel.ERROR, error);
             ResourceManager.releaseResources();
         }
     }
@@ -79,6 +77,7 @@ export class Engine {
         (Scene.getGameObjects() as any).updateComponents();
         RenderingPipeline.render();
         Log.endGroup();
+        Log.endFrame();
         window.requestAnimationFrame(Engine.createNextFrame);
     }
 

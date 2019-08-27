@@ -9,7 +9,7 @@ export class ObbBoundingShape extends BoundingShape {
     private camera: ICameraComponent;
 
     public isInsideMainCameraFrustum(): boolean {
-        if (this.isUsable() && !this.getRenderableComponent().getBillboard()) {
+        if (this.isUsable()) {
             this.refresh();
             if (this.camera) {
                 this.isInsideMainCameraFrustumUnsafe();
@@ -47,7 +47,7 @@ export class ObbBoundingShape extends BoundingShape {
 
     private refresh(): void {
         this.handleMainCameraChange();
-        if (!this.isValid() && !this.getRenderableComponent().getBillboard() && this.isUsable() && this.camera) {
+        if (!this.isValid() && this.camera) {
             this.refreshUnsafe();
             this.setValid(true);
         }
@@ -81,14 +81,19 @@ export class ObbBoundingShape extends BoundingShape {
         this.clipSpaceObbCornerPoints = cornerPoints;
     }
 
+    protected isUsable(): boolean {
+        return super.isUsable() && !this.getRenderableComponent().getBillboard();
+    }
+
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
-        if (this.isUsable() && !this.getRenderableComponent().getBillboard()) {
+        if (this.isUsable()) {
             this.refresh();
             if (this.camera) {
                 return this.clipSpaceObbCornerPoints.values();
             }
+        } else {
+            return null;
         }
-        return null;
     }
 
 }

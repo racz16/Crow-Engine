@@ -30,8 +30,8 @@ export class BlinnPhongShader extends Shader {
     }
 
     public setUniforms(rc: IRenderableComponent<IRenderable>): void {
-        Utility.bindUniformBlockToBindingPoint(this.getShaderProgram(), RenderingPipeline.CAMERA_BINDING_POINT);
-        Utility.bindUniformBlockToBindingPoint(this.getShaderProgram(), RenderingPipeline.LIGHTS_BINDING_POINT);
+        this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
+        this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT);
 
         const model = rc.getModelMatrix();
         const inverseModel3x3 = mat3.fromMat4(mat3.create(), rc.getInverseModelMatrix());
@@ -42,6 +42,8 @@ export class BlinnPhongShader extends Shader {
 
         const material = rc.getMaterial();
         for (const helper of this.slotHelpers) {
+            //TODO: ellenőrizni, hogy a slot aktív-e slot.isActive()
+            //mellesleg ezt a többi shaderben is kéne
             helper.loadSlot(material, sp);
         }
     }

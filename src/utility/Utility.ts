@@ -1,8 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
-import { GlShaderProgram } from '../webgl/shader/GlShaderProgram';
-import { BindingPoint } from '../rendering/BindingPoint';
 
 export class Utility {
 
@@ -49,7 +47,7 @@ export class Utility {
     }
 
     public static getCanvasAspectRatio(): number {
-        return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;;
+        return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;
     }
 
     public static toRadians(angle: number): number {
@@ -62,14 +60,6 @@ export class Utility {
 
     public static removeElement<T>(array: Array<T>, index: number): void {
         array.splice(index, 1);
-    }
-
-    public static copy<T>(array: Array<T>): Array<T> {
-        let ret = new Array<T>();
-        for (const element of array) {
-            ret.push(element);
-        }
-        return ret;
     }
 
     public static isUsable(resource: IResource): boolean {
@@ -88,10 +78,6 @@ export class Utility {
             }
         }
         return max;
-    }
-
-    public static bindUniformBlockToBindingPoint(shader: GlShaderProgram, bindingPoint: BindingPoint): void {
-        shader.bindUniformBlockToBindingPoint(bindingPoint.name, bindingPoint.bindingPoint);
     }
 
 }
