@@ -3,6 +3,8 @@ import { vec3, mat4, vec4 } from 'gl-matrix';
 import { GameObject } from '../core/GameObject';
 import { Scene } from '../core/Scene';
 import { Utility } from './Utility';
+import { Log } from './log/Log';
+import { LogLevel } from './log/LogLevel';
 
 export class ShadowMapMatrixSolver {
 
@@ -25,7 +27,9 @@ export class ShadowMapMatrixSolver {
         this.initializeMinMax();
         this.refreshMinMaxValues();
         this.refreshLightPosition();
-        return this.computeResult(nearDistance, farDistance);
+        const result = this.computeResult(nearDistance, farDistance);
+        Log.logString(LogLevel.INFO_3, 'Shadow matrix computed');
+        return result;
     }
 
     private static initializeCamera(): void {

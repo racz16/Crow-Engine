@@ -5,7 +5,7 @@ import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 
 export abstract class BoundingShape implements IInvalidatable {
 
-    private renderableComponent: IRenderableComponent<IRenderable>;
+    protected renderableComponent: IRenderableComponent<IRenderable>;
     private valid = false;
 
     public getRenderableComponent(): IRenderableComponent<IRenderable> {
@@ -22,7 +22,7 @@ export abstract class BoundingShape implements IInvalidatable {
 
     protected getObjectSpaceAabbMin(): vec3 {
         if (this.renderableComponent) {
-            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMin();
+            return this.renderableComponent.getRenderable().getObjectSpaceAabbMin();
         } else {
             return null;
         }
@@ -30,7 +30,7 @@ export abstract class BoundingShape implements IInvalidatable {
 
     protected getObjectSpaceAabbMax(): vec3 {
         if (this.renderableComponent) {
-            return this.getRenderableComponent().getRenderable().getObjectSpaceAabbMax();
+            return this.renderableComponent.getRenderable().getObjectSpaceAabbMax();
         } else {
             return null;
         }
@@ -55,7 +55,7 @@ export abstract class BoundingShape implements IInvalidatable {
         return cornerPoints;
     }
 
-    private setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
         }

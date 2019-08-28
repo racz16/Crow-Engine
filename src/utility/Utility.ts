@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
 
@@ -78,6 +78,15 @@ export class Utility {
             }
         }
         return max;
+    }
+
+    public static clone(vectors: Array<vec4>): Array<vec4> {
+        const newArray = new Array<vec4>();
+        for (const vector of vectors) {
+            const newVector = vec4.clone(vector);
+            newArray.push(newVector);
+        }
+        return newArray;
     }
 
 }

@@ -29,7 +29,6 @@ export class Log {
     public static addHandler(handler: ILogHandler): void {
         if (!this.containsHandler(handler)) {
             this.logHandlers.push(handler);
-            Log.logString(LogLevel.INFO_2, 'Log handler added');
         }
     }
 
@@ -37,7 +36,6 @@ export class Log {
         const index = this.logHandlers.indexOf(handler);
         if (index !== -1) {
             Utility.removeElement(this.logHandlers, index);
-            Log.logString(LogLevel.INFO_2, 'Log handler removed');
         }
     }
 

@@ -4,8 +4,8 @@ import { Utility } from '../Utility';
 
 export class ParameterContainer {
 
-    private parameters = new Map<string, any>();
-    private invalidatables = new Map<string, Array<IInvalidatable>>();
+    protected parameters = new Map<string, any>();
+    protected invalidatables = new Map<string, Array<IInvalidatable>>();
 
     public get<T>(key: ParameterKey<T>): T {
         return this.parameters.get(key.getKey());
@@ -20,7 +20,7 @@ export class ParameterContainer {
         this.invalidateInvalidatables(invalidatables);
     }
 
-    private removeInvalidatablesFromParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
+    protected removeInvalidatablesFromParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
         if (parameter && typeof parameter.getParameterInvalidatables === 'function') {
             if (invalidate) {
                 parameter.invalidate(this);
@@ -33,7 +33,7 @@ export class ParameterContainer {
         }
     }
 
-    private addInvalidatablesToParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
+    protected addInvalidatablesToParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
         if (parameter && typeof parameter.getParameterInvalidatables === 'function') {
             if (invalidate) {
                 parameter.invalidate(this);
@@ -46,7 +46,7 @@ export class ParameterContainer {
         }
     }
 
-    private invalidateInvalidatables(invalidatables: Array<IInvalidatable>) {
+    protected invalidateInvalidatables(invalidatables: Array<IInvalidatable>) {
         if (invalidatables) {
             for (const invalidatable of invalidatables) {
                 invalidatable.invalidate();
@@ -61,7 +61,7 @@ export class ParameterContainer {
         this.addInvalidatableUnsafe(key, invalidatable);
     }
 
-    private addInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
+    protected addInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
         let invalidatables = this.invalidatables.get(key.getKey());
         if (!invalidatables) {
             invalidatables = new Array<IInvalidatable>();
@@ -81,7 +81,7 @@ export class ParameterContainer {
         this.removeInvalidatableUnsafe(key, invalidatable);
     }
 
-    private removeInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
+    protected removeInvalidatableUnsafe<T>(key: ParameterKey<T>, invalidatable: IInvalidatable): void {
         const invalidatables = this.invalidatables.get(key.getKey());
         if (invalidatables && invalidatables.includes(invalidatable)) {
             const parameter = this.get(key);

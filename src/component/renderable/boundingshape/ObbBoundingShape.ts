@@ -1,24 +1,26 @@
 import { BoundingShape } from './BoundingShape';
-import { ICameraComponent } from '../../camera/ICameraComponent';
 import { vec4, mat4 } from 'gl-matrix';
 import { Scene } from '../../../core/Scene';
+import { Log } from '../../../utility/log/Log';
+import { LogLevel } from '../../../utility/log/LogLevel';
+import { Utility } from '../../../utility/Utility';
+import { IRenderableComponent } from '../IRenderableComponent';
+import { IRenderable } from '../../../resource/IRenderable';
 
 export class ObbBoundingShape extends BoundingShape {
 
-    private clipSpaceObbCornerPoints: Array<vec4>;
-    private camera: ICameraComponent;
+    protected clipSpaceObbCornerPoints: Array<vec4>;
 
     public isInsideMainCameraFrustum(): boolean {
         if (this.isUsable()) {
             this.refresh();
-            if (this.camera) {
-                this.isInsideMainCameraFrustumUnsafe();
-            }
+            return this.isInsideMainCameraFrustumUnsafe();
+        } else {
+            return true;
         }
-        return true;
     }
 
-    private isInsideMainCameraFrustumUnsafe(): boolean {
+    protected isInsideMainCameraFrustumUnsafe(): boolean {
         for (let i = 0; i < 3; i++) {
             if (this.isOutsidePositivePlane(i) || this.isOutsideNegativePlane(i)) {
                 return false;
@@ -27,7 +29,7 @@ export class ObbBoundingShape extends BoundingShape {
         return true;
     }
 
-    private isOutsidePositivePlane(coordinate: number) {
+    protected isOutsidePositivePlane(coordinate: number) {
         for (const cp of this.clipSpaceObbCornerPoints) {
             if (cp[coordinate] <= cp[3]) {
                 return false;
@@ -36,7 +38,7 @@ export class ObbBoundingShape extends BoundingShape {
         return true;
     }
 
-    private isOutsideNegativePlane(coordinate: number) {
+    protected isOutsideNegativePlane(coordinate: number) {
         for (const cp of this.clipSpaceObbCornerPoints) {
             if (cp[coordinate] >= -cp[3]) {
                 return false;
@@ -46,51 +48,46 @@ export class ObbBoundingShape extends BoundingShape {
     }
 
     private refresh(): void {
-        this.handleMainCameraChange();
-        if (!this.isValid() && this.camera) {
+        if (!this.isValid()) {
             this.refreshUnsafe();
             this.setValid(true);
+            Log.logString(LogLevel.INFO_3, 'OBB bounding shape refreshed');
         }
     }
 
-    private handleMainCameraChange(): void {
-        const mainCamera = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        if (mainCamera != this.camera) {
-            this.changeCamera(mainCamera);
-        }
-    }
-
-    private changeCamera(mainCamera: ICameraComponent) {
-        if (this.camera) {
-            this.camera.getInvalidatables().removeInvalidatable(this);
-        }
-        this.camera = mainCamera;
-        if (this.camera) {
-            this.camera.getInvalidatables().addInvalidatable(this);
-        }
-        this.invalidate();
-    }
-
-    private refreshUnsafe(): void {
+    protected refreshUnsafe(): void {
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         const cornerPoints = this.computeObjectSpaceAabbCornerPoints();
         const MVP = mat4.create();
-        mat4.mul(MVP, this.camera.getProjectionMatrix(), mat4.mul(MVP, this.camera.getViewMatrix(), this.getRenderableComponent().getModelMatrix()));
+        mat4.mul(MVP, camera.getProjectionMatrix(), mat4.mul(MVP, camera.getViewMatrix(), this.renderableComponent.getModelMatrix()));
         for (const cornerPoint of cornerPoints) {
             vec4.transformMat4(cornerPoint, cornerPoint, MVP);
         }
         this.clipSpaceObbCornerPoints = cornerPoints;
     }
 
+    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+        if (this.renderableComponent) {
+            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+            Scene.getParameters().removeInvalidatable(Scene.MAIN_CAMERA, this);
+        }
+        this.renderableComponent = renderableComponent;
+        if (this.renderableComponent) {
+            this.renderableComponent.getInvalidatables().addInvalidatable(this);
+            Scene.getParameters().addInvalidatable(Scene.MAIN_CAMERA, this);
+        }
+        this.invalidate();
+    }
+
     protected isUsable(): boolean {
-        return super.isUsable() && !this.getRenderableComponent().getBillboard();
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        return !this.renderableComponent.getBillboard() && camera && camera.getGameObject() && super.isUsable();
     }
 
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
         if (this.isUsable()) {
             this.refresh();
-            if (this.camera) {
-                return this.clipSpaceObbCornerPoints.values();
-            }
+            return Utility.clone(this.clipSpaceObbCornerPoints).values();
         } else {
             return null;
         }

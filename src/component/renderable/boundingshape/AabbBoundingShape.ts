@@ -2,11 +2,13 @@ import { BoundingShape } from './BoundingShape';
 import { vec3, vec4 } from 'gl-matrix';
 import { Scene } from '../../../core/Scene';
 import { ICameraComponent } from '../../camera/ICameraComponent';
+import { Log } from '../../../utility/log/Log';
+import { LogLevel } from '../../../utility/log/LogLevel';
 
 export class AabbBoundingShape extends BoundingShape {
 
-    private readonly aabbMin = vec3.create();
-    private readonly aabbMax = vec3.create();
+    protected readonly aabbMin = vec3.create();
+    protected readonly aabbMax = vec3.create();
 
     public isInsideMainCameraFrustum(): boolean {
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
@@ -17,7 +19,7 @@ export class AabbBoundingShape extends BoundingShape {
         return true;
     }
 
-    private isInsideMainCameraFrustumUnsafe(camera: ICameraComponent): boolean {
+    protected isInsideMainCameraFrustumUnsafe(camera: ICameraComponent): boolean {
         for (const plane of camera.getFrustum().getPlanesIterator()) {
             const pVertex = this.computeNormalAlignedAabbVertexMax(this.aabbMin, this.aabbMax, plane.normalVector);
             let distance = plane.computeDistanceFrom(pVertex);
@@ -28,7 +30,7 @@ export class AabbBoundingShape extends BoundingShape {
         return true;
     }
 
-    private computeNormalAlignedAabbVertexMax(aabbMin: vec3, aabbMax: vec3, normalVector: vec3): vec3 {
+    protected computeNormalAlignedAabbVertexMax(aabbMin: vec3, aabbMax: vec3, normalVector: vec3): vec3 {
         const result = vec3.create();
         result[0] = normalVector[0] >= 0 ? aabbMax[0] : aabbMin[0];
         result[1] = normalVector[1] >= 0 ? aabbMax[1] : aabbMin[1];
@@ -40,10 +42,11 @@ export class AabbBoundingShape extends BoundingShape {
         if (!this.isValid()) {
             this.refreshUnsafe();
             this.setValid(true);
+            Log.logString(LogLevel.INFO_3, 'AABB bounding shape refreshed');
         }
     }
 
-    private refreshUnsafe(): void {
+    protected refreshUnsafe(): void {
         const wsBoundingBoxCornerPoints = this.computeWorldSpaceBoundingBoxCornerPoints();
         this.aabbMin.set(vec3.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
         this.aabbMax.set(vec3.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY));
@@ -52,16 +55,16 @@ export class AabbBoundingShape extends BoundingShape {
         }
     }
 
-    private computeWorldSpaceBoundingBoxCornerPoints(): Array<vec4> {
+    protected computeWorldSpaceBoundingBoxCornerPoints(): Array<vec4> {
         const boundingBoxCornerPoints = this.computeObjectSpaceAabbCornerPoints();
-        const modelMatrix = this.getRenderableComponent().getModelMatrix();
+        const modelMatrix = this.renderableComponent.getModelMatrix();
         for (const anAabb of boundingBoxCornerPoints) {
             vec4.transformMat4(anAabb, anAabb, modelMatrix);
         }
         return boundingBoxCornerPoints;
     }
 
-    private refreshAabbCornerPoint(bbCornerPoint: vec4): void {
+    protected refreshAabbCornerPoint(bbCornerPoint: vec4): void {
         for (let i = 0; i < 3; i++) {
             if (bbCornerPoint[i] < this.aabbMin[i]) {
                 this.aabbMin[i] = bbCornerPoint[i];
@@ -73,7 +76,7 @@ export class AabbBoundingShape extends BoundingShape {
     }
 
     protected isUsable(): boolean {
-        return super.isUsable() && !this.getRenderableComponent().getBillboard();
+        return super.isUsable() && !this.renderableComponent.getBillboard();
     }
 
     public getObjectSpaceAabbMin(): vec3 {

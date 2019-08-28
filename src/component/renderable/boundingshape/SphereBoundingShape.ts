@@ -1,15 +1,17 @@
 import { BoundingShape } from './BoundingShape';
 import { Utility } from '../../../utility/Utility';
 import { Scene } from '../../../core/Scene';
+import { Log } from '../../../utility/log/Log';
+import { LogLevel } from '../../../utility/log/LogLevel';
 
 export class SphereBoundingShape extends BoundingShape {
 
-    private radius: number;
+    protected radius: number;
 
     public isInsideMainCameraFrustum(): boolean {
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         if (camera && camera.getGameObject() && this.isUsable()) {
-            const position = this.getRenderableComponent().getGameObject().getTransform().getAbsolutePosition();
+            const position = this.renderableComponent.getGameObject().getTransform().getAbsolutePosition();
             for (const plane of camera.getFrustum().getPlanesIterator()) {
                 if (plane.computeDistanceFrom(position) + this.getWorldSpaceRadius() < 0) {
                     return false;
@@ -23,18 +25,19 @@ export class SphereBoundingShape extends BoundingShape {
         if (!this.isValid()) {
             this.refreshUnsafe();
             this.setValid(true);
+            Log.logString(LogLevel.INFO_3, 'Sphere bounding shape refreshed');
         }
     }
 
-    private refreshUnsafe(): void {
+    protected refreshUnsafe(): void {
         const osRadius = this.getObjectSpaceRadius();
-        const absoluteScale = this.getRenderableComponent().getGameObject().getTransform().getAbsoluteScale();
+        const absoluteScale = this.renderableComponent.getGameObject().getTransform().getAbsoluteScale();
         this.radius = osRadius * Utility.getMaxCoordinate(absoluteScale);
     }
 
     public getObjectSpaceRadius(): number {
-        if (this.getRenderableComponent()) {
-            return this.getRenderableComponent().getRenderable().getObjectSpaceRadius();
+        if (this.renderableComponent) {
+            return this.renderableComponent.getRenderable().getObjectSpaceRadius();
         } else {
             return null;
         }

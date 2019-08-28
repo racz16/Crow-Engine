@@ -3,11 +3,11 @@ import { IInvalidatable } from './IInvalidatable';
 
 export class InvalidatableContainer {
 
-    private invalidatables = new Array<IInvalidatable>();
-    private readonly container: object;
+    protected invalidatables = new Array<IInvalidatable>();
+    protected readonly container: any;
     private invalidatable = true;
 
-    public constructor(container: object) {
+    public constructor(container: any) {
         this.container = container;
     }
 
