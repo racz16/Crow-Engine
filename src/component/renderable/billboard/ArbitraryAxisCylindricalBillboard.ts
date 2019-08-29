@@ -24,7 +24,7 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
     }
 
     protected refreshUnsafe(): void {
-        const cameraTransform = this.getCamera().getGameObject().getTransform();
+        const cameraTransform = this.getMainCameraTransform();
         const cameraPosition = cameraTransform.getAbsolutePosition();
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
@@ -41,8 +41,8 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
         forward = vec3.cross(vec3.create(), right, this.axis);
         const modelMatrix = this.createBillboard(forward, this.axis, right);
         const inverseModelMatrix = mat4.invert(mat4.create(), modelMatrix);
-        this.setModelMatrix(modelMatrix);
-        this.setInverseModelMatrix(inverseModelMatrix);
+        this.modelMatrix = modelMatrix;
+        this.inverseModelMatrix = inverseModelMatrix;
     }
 
 }

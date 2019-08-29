@@ -1,26 +1,27 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { ICameraComponent } from '../../camera/ICameraComponent';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
 import { Scene } from '../../../core/Scene';
 import { Utility } from '../../../utility/Utility';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
+import { Transform } from '../../../core/Transform';
 
 export abstract class Billboard implements IInvalidatable {
 
-    private renderableComponent: IRenderableComponent<IRenderable>;
-    private camera: ICameraComponent;
+    protected renderableComponent: IRenderableComponent<IRenderable>;
+    protected modelMatrix: mat4;
+    protected inverseModelMatrix: mat4;
     private valid = false;
-    private modelMatrix: mat4;
-    private inverseModelMatrix: mat4;
 
-    private setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+            Scene.getParameters().removeInvalidatable(Scene.MAIN_CAMERA, this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().addInvalidatable(this);
+            Scene.getParameters().addInvalidatable(Scene.MAIN_CAMERA, this);
         }
         this.invalidate();
     }
@@ -35,18 +36,6 @@ export abstract class Billboard implements IInvalidatable {
 
     protected setValid(valid: boolean): void {
         this.valid = valid;
-    }
-
-    protected getCamera(): ICameraComponent {
-        return this.camera;
-    }
-
-    protected setModelMatrix(modelMatrix: mat4): void {
-        this.modelMatrix = modelMatrix;
-    }
-
-    protected setInverseModelMatrix(inverseModelMatrix: mat4): void {
-        this.inverseModelMatrix = inverseModelMatrix;
     }
 
     protected setMatricesToDefault(): void {
@@ -64,22 +53,11 @@ export abstract class Billboard implements IInvalidatable {
     }
 
     protected refresh(): void {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        if (!this.valid || this.camera != camera) {
-            if (this.camera != camera) {
-                this.changeCamera(camera);
-            }
+        if (!this.valid) {
             this.refreshUnsafe();
             this.valid = true;
+            console.log('refresh');
         }
-    }
-
-    private changeCamera(camera: ICameraComponent): void {
-        if (this.camera) {
-            this.camera.getInvalidatables().removeInvalidatable(this);
-        }
-        this.camera = camera;
-        this.camera.getInvalidatables().addInvalidatable(this);
     }
 
     protected abstract refreshUnsafe(): void;
@@ -110,18 +88,12 @@ export abstract class Billboard implements IInvalidatable {
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const scale = transform.getAbsoluteScale();
-        const mat = this.createMatrixFromVectors(forward, up, right, position);
+        const mat = Utility.computeModelMatrixFromDirectionVectorsAndPosition(forward, up, right, position);
         mat4.scale(mat, mat, scale);
         return mat;
     }
 
-    private createMatrixFromVectors(forward: vec3, up: vec3, right: vec3, position: vec3): mat4 {
-        return mat4.fromValues(
-            right[0], right[1], right[2], 0,
-            up[0], up[1], up[2], 0,
-            forward[0], forward[1], forward[2], 0,
-            position[0], position[1], position[2], 1
-        );
+    protected getMainCameraTransform(): Transform {
+        return Scene.getParameters().get(Scene.MAIN_CAMERA).getGameObject().getTransform();
     }
-
 }

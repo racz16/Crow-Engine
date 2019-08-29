@@ -21,6 +21,15 @@ export class Utility {
         return model;
     }
 
+    public static computeModelMatrixFromDirectionVectorsAndPosition(forward: vec3, up: vec3, right: vec3, position: vec3): mat4 {
+        return mat4.fromValues(
+            right[0], right[1], right[2], 0,
+            up[0], up[1], up[2], 0,
+            forward[0], forward[1], forward[2], 0,
+            position[0], position[1], position[2], 1
+        );
+    }
+
     public static computeInverseModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
         let model = mat4.create();
         mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));

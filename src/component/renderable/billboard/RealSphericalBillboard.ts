@@ -5,8 +5,9 @@ import { Utility } from '../../../utility/Utility';
 export class RealSphericalBillboard extends Billboard {
 
     protected refreshUnsafe(): void {
-        const cameraPosition = this.getCamera().getGameObject().getTransform().getAbsolutePosition();
-        const cameraUp = this.getCamera().getGameObject().getTransform().getUpVector();
+        const cameraTransform = this.getMainCameraTransform();
+        const cameraPosition = cameraTransform.getAbsolutePosition();
+        const cameraUp = cameraTransform.getUpVector();
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const forward = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), cameraPosition, position));
@@ -22,8 +23,8 @@ export class RealSphericalBillboard extends Billboard {
         const up = vec3.cross(vec3.create(), forward, right);
         const modelMatrix = this.createBillboard(forward, up, right);
         const inverseModelMatrix = mat4.invert(mat4.create(), modelMatrix);
-        this.setModelMatrix(modelMatrix);
-        this.setInverseModelMatrix(inverseModelMatrix);
+        this.modelMatrix = modelMatrix;
+        this.inverseModelMatrix = inverseModelMatrix;
     }
 
 }
