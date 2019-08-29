@@ -56,7 +56,6 @@ export abstract class Billboard implements IInvalidatable {
         if (!this.valid) {
             this.refreshUnsafe();
             this.valid = true;
-            console.log('refresh');
         }
     }
 

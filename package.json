@@ -1,0 +1,33 @@
+{
+  "name": "crow-engine",
+  "version": "1.0.0",
+  "description": "TypeScript based 3D game engine.",
+  "main": "index.js",
+  "dependencies": {
+    "gl-matrix": "^3.1.0",
+    "webgl-obj-loader": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watch.bat"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/racz16/Crow-Engine.git"
+  },
+  "keywords": [
+    "game",
+    "engine",
+    "3d",
+    "TypeScript",
+    "WebGL"
+  ],
+  "author": "Rácz Zalán <racz1666@gmail.com> (https://github.com/racz16)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/racz16/Crow-Engine/issues",
+    "email": "racz1666@gmail.com"
+  },
+  "homepage": "https://github.com/racz16/Crow-Engine#readme"
+}

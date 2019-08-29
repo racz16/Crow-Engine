@@ -1,0 +1,1 @@
+start tsc -w && start watchify out/classes/src/test.js -o out/crow-engine.js && start lite-server

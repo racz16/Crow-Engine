@@ -3,7 +3,7 @@
         "module": "none",
         "target": "es2018",
         "outDir": "out/classes",
-        //"declaration": true,
+        "declaration": false
     },
     "exclude": [
         "node_modules",
