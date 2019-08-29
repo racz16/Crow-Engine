@@ -1,16 +1,10 @@
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
-import { BlinnPhongLightContainer } from './BlinnPhongLightContainer';
 
 export abstract class BlinnPhongPositionalLightComponent extends BlinnPhongLightComponent {
 
     private constant = 1.0;
     private linear = 0.022;
     private quadratic = 0.0019;
-
-    public constructor() {
-        super();
-        BlinnPhongLightContainer.getInstance().addLight(this);
-    }
 
     public getConstant(): number {
         return this.constant;

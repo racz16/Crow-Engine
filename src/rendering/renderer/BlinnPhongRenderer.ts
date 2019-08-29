@@ -15,8 +15,7 @@ import { ICameraComponent } from '../../component/camera/ICameraComponent';
 import { LogLevel } from '../../utility/log/LogLevel';
 
 export class BlinnPhongRenderer extends Renderer {
-
-    public static readonly MAIN_DIRECTIONAL_LIGHT = new ParameterKey<BlinnPhongDirectionalLightComponent>(BlinnPhongDirectionalLightComponent, 'MAIN_DIRECTIONAL_LIGHT');
+    
     private shader: BlinnPhongShader;
 
     public constructor() {

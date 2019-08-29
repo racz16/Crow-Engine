@@ -126,7 +126,6 @@ export class TestSceneBuilder {
         const dlc = new BlinnPhongDirectionalLightComponent();
         dlgo.getComponents().add(dlc);
         dlgo.getTransform().setRelativeRotation(vec3.fromValues(-45, 45, 0));
-        Scene.getParameters().set(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT, dlc);
     }
 
     public createUi(): void {

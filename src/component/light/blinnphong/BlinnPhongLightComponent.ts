@@ -3,6 +3,7 @@ import { vec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { Ubo } from '../../../webgl/buffer/Ubo';
+import { BlinnPhongLightContainer } from './BlinnPhongLightContainer';
 
 export abstract class BlinnPhongLightComponent extends Component {
 
@@ -20,6 +21,11 @@ export abstract class BlinnPhongLightComponent extends Component {
     private diffuseColor = vec3.fromValues(1, 1, 1);
     private specularColor = vec3.fromValues(1, 1, 1);
     private ambientColor = vec3.fromValues(0.1, 0.1, 0.1);
+
+    public constructor() {
+        super();
+        BlinnPhongLightContainer.getInstance().addLight(this);
+    }
 
     protected computeOffset(offset: number, index: number): number {
         return index * BlinnPhongLightComponent.LIGHT_DATASIZE + offset;

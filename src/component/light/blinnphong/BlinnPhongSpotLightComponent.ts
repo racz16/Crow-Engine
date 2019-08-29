@@ -39,7 +39,7 @@ export class BlinnPhongSpotLightComponent extends BlinnPhongPositionalLightCompo
     }
 
     public setOuterCutoff(outerCutoff: number): void {
-        if (this.cutoff >= outerCutoff) {
+        if (this.cutoff >= outerCutoff || outerCutoff > 90) {
             throw new Error();
         }
         this.outerCutoff = outerCutoff;

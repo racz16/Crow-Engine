@@ -9,6 +9,7 @@ import { Utility } from '../../../utility/Utility';
 import { Log } from '../../../utility/log/Log';
 import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
 import { LogLevel } from '../../../utility/log/LogLevel';
+import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 
 export class BlinnPhongLightContainer {
 
@@ -18,9 +19,7 @@ export class BlinnPhongLightContainer {
     private static readonly LIGHT_COUNT = 16;
 
     private ubo: Ubo;
-    private mainDirectionalLight: BlinnPhongDirectionalLightComponent;
-    private refreshDirectional = false;
-    private positionalLights = new Array<BlinnPhongPositionalLightComponent>();
+    private lights = new Array<BlinnPhongLightComponent>();
     private addedLightCount = 0;
 
     private constructor() { }
@@ -39,7 +38,7 @@ export class BlinnPhongLightContainer {
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
-            this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT + 1), BufferObjectUsage.STATIC_DRAW);
+            this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT), BufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
         }
     }
@@ -48,39 +47,26 @@ export class BlinnPhongLightContainer {
         if (this.isUsable()) {
             this.ubo.release();
             this.ubo = null;
-            this.refreshDirectional = true;
             Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo released');
         }
     }
 
     public refreshUbo(): void {
         this.createUboIfNotUsable();
-        this.refreshDirectionalLightInUbo();
-        this.sortPositionalLights();
-        this.refreshPositionalLightsInUbo();
+        this.sortLights();
+        this.refreshLightsInUbo();
         this.refreshRemainingSlotsInUbo();
-        Log.logString(LogLevel.INFO_2, 'Blinn-Phong Lights ubo refreshed');
+        Log.logString(LogLevel.INFO_2, `Blinn-Phong Lights ubo refreshed (${this.addedLightCount} light sources)`);
     }
 
-    private refreshDirectionalLightInUbo(): void {
-        if (this.refreshDirectional) {
-            if (this.mainDirectionalLight && this.mainDirectionalLight.isActive() && this.mainDirectionalLight.getGameObject()) {
-                (this.mainDirectionalLight as any).refresh(this.ubo);
-            } else {
-                this.ubo.storewithOffset(new Int32Array([0]), BlinnPhongLightContainer.ACTIVE_OFFSET);
-            }
-            this.refreshDirectional = false;
-        }
-    }
-
-    private refreshPositionalLightsInUbo(): void {
+    private refreshLightsInUbo(): void {
         this.addedLightCount = 0;
-        for (const light of this.positionalLights) {
+        for (const light of this.lights) {
             if (this.addedLightCount === BlinnPhongLightContainer.LIGHT_COUNT) {
                 return;
             }
             if (light.isActive() && light.getGameObject()) {
-                (light as any).refresh(this.ubo, this.addedLightCount + 1);
+                (light as any).refresh(this.ubo, this.addedLightCount);
                 this.addedLightCount++;
             }
         }
@@ -88,57 +74,42 @@ export class BlinnPhongLightContainer {
 
     private refreshRemainingSlotsInUbo(): void {
         for (let i = this.addedLightCount; i < BlinnPhongLightContainer.LIGHT_COUNT; i++) {
-            this.ubo.storewithOffset(new Int32Array([0]), (i + 1) * BlinnPhongLightContainer.LIGHT_DATASIZE + BlinnPhongLightContainer.ACTIVE_OFFSET);
+            this.ubo.storewithOffset(new Int32Array([0]), i * BlinnPhongLightContainer.LIGHT_DATASIZE + BlinnPhongLightContainer.ACTIVE_OFFSET);
         }
     }
 
-    private sortPositionalLights(): void {
+    private sortLights(): void {
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        this.positionalLights.sort((a, b) => {
-            const ad = this.computePositionalLightDistanceFromCamera(a, camera);
-            const bd = this.computePositionalLightDistanceFromCamera(b, camera);
+        this.lights.sort((a, b) => {
+            const ad = this.computeLightDistanceFromCamera(a, camera);
+            const bd = this.computeLightDistanceFromCamera(b, camera);
             return ad - bd;
         });
     }
 
-    private computePositionalLightDistanceFromCamera(light: BlinnPhongPositionalLightComponent, camera: ICameraComponent): number {
+    private computeLightDistanceFromCamera(light: BlinnPhongLightComponent, camera: ICameraComponent): number {
         if (!light.isActive() || !light.getGameObject()) {
             return Number.POSITIVE_INFINITY;
+        } else if (light instanceof BlinnPhongDirectionalLightComponent) {
+            return 0;
         }
         const cameraPosition = camera.getGameObject().getTransform().getAbsolutePosition();
         const lightPosition = light.getGameObject().getTransform().getAbsolutePosition();
         return vec3.distance(cameraPosition, lightPosition);
     }
 
-    public addLight(light: BlinnPhongPositionalLightComponent): void {
-        if (!this.positionalLights.includes(light)) {
-            this.positionalLights.push(light);
+    public addLight(light: BlinnPhongLightComponent): void {
+        if (!this.lights.includes(light)) {
+            this.lights.push(light);
         }
     }
 
-    public refreshDirectionalLight(): void {
-        this.refreshDirectional = true;
-    }
-
-    public setDirectionalLight(dirLight: BlinnPhongDirectionalLightComponent): void {
-        this.mainDirectionalLight = dirLight;
-        this.refreshDirectionalLight();
-    }
-
-    public getPositionalLight(index: number): BlinnPhongPositionalLightComponent {
-        return this.positionalLights[index];
-    }
-
-    public getPositionalLightCount(): number {
+    public getLightCount(): number {
         return BlinnPhongLightContainer.LIGHT_COUNT;
     }
 
-    public getPositionalLightsIterator(): IterableIterator<BlinnPhongPositionalLightComponent> {
-        return this.positionalLights.values();
-    }
-
-    public getDirectionalLight(): BlinnPhongDirectionalLightComponent {
-        return this.mainDirectionalLight;
+    public getLightsIterator(): IterableIterator<BlinnPhongLightComponent> {
+        return this.lights.values();
     }
 
     public isUsable(): boolean {

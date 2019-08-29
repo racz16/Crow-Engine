@@ -74,8 +74,7 @@ uniform sampler2D shadowMap;
 uniform bool receiveShadow;
 
 layout(std140) uniform Lights { //binding point: 2
-    Light directionalLight;     //112
-    Light[16] positionalLights; //1904
+    Light[16] positionalLights; //1792
 };
 
 out vec4 o_color;
@@ -105,9 +104,10 @@ void main(){
     vec3 diffuseColor = getDiffuseColor(textureCoordinates, viewDirection, normalVector);
     vec4 specularColor = getSpecularColor(textureCoordinates);
     //directional light
-    vec3 result = calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, directionalLight);
+    vec3 result = vec3(0);
+    //vec3 result = calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, directionalLight);
     //shadows
-    result *= calculateShadow(receiveShadow, io_fragmentPositionLightSpace, normalVector);
+    //result *= calculateShadow(receiveShadow, io_fragmentPositionLightSpace, normalVector);
     //point and spotlights
     for(int i=0; i<16; i++){
         if(positionalLights[i].lightActive){
@@ -156,17 +156,17 @@ float calculateCutOff(vec3 lightToFragmentDirection, vec3 lightDirection, vec2 l
     return clamp((theta - lightCutOff.y) / epsilon, 0.0f, 1.0f);
 }
 
-float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector){
+float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector, vec3 lightDirection){
     if(!receiveShadow){
         return 1.0f;
-    }else if(dot(normalVector, -directionalLight.direction) < 0.0f){
+    }else if(dot(normalVector, -lightDirection) < 0.0f){
         return 0.3f;
     }
     vec2 texelSize = vec2(1 / textureSize(shadowMap, 0));
     vec3 projectionCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
     projectionCoordinates = projectionCoordinates * 0.5f + 0.5f;
     float currentDepth = projectionCoordinates.z;
-    float bias = max(0.00005f * (1.0f - dot(normalVector, directionalLight.direction)    ), 0.000005f)  * texelSize.x * 3500.0f;
+    float bias = max(0.00005f * (1.0f - dot(normalVector, lightDirection)    ), 0.000005f)  * texelSize.x * 3500.0f;
     float shadow = 0.0f;
     for(int x = -1; x <= 1; ++x){
         for(int y = -1; y <= 1; ++y){
