@@ -2,6 +2,8 @@ import { IRenderable } from '../../../resource/IRenderable';
 import { vec4, vec3 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
+import { Log } from '../../../utility/log/Log';
+import { LogLevel } from '../../../utility/log/LogLevel';
 
 export abstract class BoundingShape implements IInvalidatable {
 
@@ -19,6 +21,16 @@ export abstract class BoundingShape implements IInvalidatable {
     protected setValid(valid: boolean): void {
         this.valid = valid;
     }
+
+    protected refresh(): void {
+        if (!this.isValid()) {
+            this.refreshUnsafe();
+            this.setValid(true);
+            Log.logString(LogLevel.INFO_3, 'Bounding shape refreshed');
+        }
+    }
+
+    protected abstract refreshUnsafe(): void;
 
     protected getObjectSpaceAabbMin(): vec3 {
         if (this.renderableComponent) {

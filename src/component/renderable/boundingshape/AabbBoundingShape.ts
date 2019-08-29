@@ -2,8 +2,6 @@ import { BoundingShape } from './BoundingShape';
 import { vec3, vec4 } from 'gl-matrix';
 import { Scene } from '../../../core/Scene';
 import { ICameraComponent } from '../../camera/ICameraComponent';
-import { Log } from '../../../utility/log/Log';
-import { LogLevel } from '../../../utility/log/LogLevel';
 
 export class AabbBoundingShape extends BoundingShape {
 
@@ -36,14 +34,6 @@ export class AabbBoundingShape extends BoundingShape {
         result[1] = normalVector[1] >= 0 ? aabbMax[1] : aabbMin[1];
         result[2] = normalVector[2] >= 0 ? aabbMax[2] : aabbMin[2];
         return result;
-    }
-
-    private refresh(): void {
-        if (!this.isValid()) {
-            this.refreshUnsafe();
-            this.setValid(true);
-            Log.logString(LogLevel.INFO_3, 'AABB bounding shape refreshed');
-        }
     }
 
     protected refreshUnsafe(): void {

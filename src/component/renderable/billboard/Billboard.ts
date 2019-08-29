@@ -5,6 +5,8 @@ import { Scene } from '../../../core/Scene';
 import { Utility } from '../../../utility/Utility';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 import { Transform } from '../../../core/Transform';
+import { Log } from '../../../utility/log/Log';
+import { LogLevel } from '../../../utility/log/LogLevel';
 
 export abstract class Billboard implements IInvalidatable {
 
@@ -52,17 +54,19 @@ export abstract class Billboard implements IInvalidatable {
         this.valid = false;
     }
 
-    protected refresh(): void {
+    private refresh(): void {
         if (!this.valid) {
             this.refreshUnsafe();
             this.valid = true;
+            Log.logString(LogLevel.INFO_3, 'Billboard matrices refreshed');
         }
     }
 
     protected abstract refreshUnsafe(): void;
 
     protected isUsable(): boolean {
-        return this.renderableComponent && this.renderableComponent.getGameObject() && Scene.getParameters().get(Scene.MAIN_CAMERA) != null;
+        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        return this.renderableComponent && this.renderableComponent.getGameObject() && camera && camera.getGameObject() != null;
     }
 
     public getModelMatrix(): mat4 {

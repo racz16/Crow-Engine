@@ -11,6 +11,10 @@ export class RealSphericalBillboard extends Billboard {
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const forward = vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), cameraPosition, position));
+        this.refreshMatricesOrSetToDefault(forward, cameraUp);
+    }
+
+    private refreshMatricesOrSetToDefault(forward: vec3, cameraUp: vec3): void {
         if (Utility.isParallel(forward, cameraUp)) {
             this.setMatricesToDefault();
         } else {

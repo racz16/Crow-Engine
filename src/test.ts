@@ -22,6 +22,7 @@ import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundi
 import { AabbBoundingShape } from './component/renderable/boundingshape/AabbBoundingShape';
 import { AxisAlignedCylindricalBillboard } from './component/renderable/billboard/AxisAlignedCylindricalBillboard';
 import { BillboardAxis } from './component/renderable/billboard/BillboardAxis';
+import { InverseCameraSphericalBillboard } from './component/renderable/billboard/InverseCameraSphericalBillboard';
 
 
 window.onload = () => {
@@ -147,8 +148,6 @@ export class TestSceneBuilder {
         ma.setSlot(Material.SPECULAR, ss);
 
         const rc = new MeshComponent(this.box, ma);
-        rc.setBillboard(new AxisAlignedCylindricalBillboard(BillboardAxis.Y_AXIS));
-        //go.getTransform().setRelativeScale(vec3.fromValues(2, 2, 2));
         go.getComponents().add(rc);
     }
 

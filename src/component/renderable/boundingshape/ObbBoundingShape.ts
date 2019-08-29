@@ -1,8 +1,6 @@
 import { BoundingShape } from './BoundingShape';
 import { vec4, mat4 } from 'gl-matrix';
 import { Scene } from '../../../core/Scene';
-import { Log } from '../../../utility/log/Log';
-import { LogLevel } from '../../../utility/log/LogLevel';
 import { Utility } from '../../../utility/Utility';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
@@ -45,14 +43,6 @@ export class ObbBoundingShape extends BoundingShape {
             }
         }
         return true;
-    }
-
-    private refresh(): void {
-        if (!this.isValid()) {
-            this.refreshUnsafe();
-            this.setValid(true);
-            Log.logString(LogLevel.INFO_3, 'OBB bounding shape refreshed');
-        }
     }
 
     protected refreshUnsafe(): void {

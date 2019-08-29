@@ -1,8 +1,6 @@
 import { BoundingShape } from './BoundingShape';
 import { Utility } from '../../../utility/Utility';
 import { Scene } from '../../../core/Scene';
-import { Log } from '../../../utility/log/Log';
-import { LogLevel } from '../../../utility/log/LogLevel';
 
 export class SphereBoundingShape extends BoundingShape {
 
@@ -19,14 +17,6 @@ export class SphereBoundingShape extends BoundingShape {
             }
         }
         return true;
-    }
-
-    private refresh(): void {
-        if (!this.isValid()) {
-            this.refreshUnsafe();
-            this.setValid(true);
-            Log.logString(LogLevel.INFO_3, 'Sphere bounding shape refreshed');
-        }
     }
 
     protected refreshUnsafe(): void {

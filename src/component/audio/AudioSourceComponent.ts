@@ -43,9 +43,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public start(): void {
-        if (this.getGameObject() && this.isActive()) {
-            this.bufferSource.start();
-        }
+        this.bufferSource.start();
     }
 
     public stop(): void {
@@ -61,7 +59,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
             throw new Error();
         }
         this.volume = volume;
-        this.gain.gain.setValueAtTime(volume * Audio.getVolume(), 0);
+        this.gain.gain.setValueAtTime(volume * Audio.getVolume(), Audio.context.currentTime);
     }
 
     public isLoop(): boolean {
@@ -80,7 +78,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         if (speed < 0) {
             throw new Error();
         }
-        this.bufferSource.playbackRate.setValueAtTime(speed, 0);
+        this.bufferSource.playbackRate.setValueAtTime(speed, Audio.context.currentTime);
     }
 
     public getPanningModel(): PanningModelType {
@@ -146,7 +144,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public setOuterAngleVolume(volume: number): void {
-        if (volume > 0 || volume > 100) {
+        if (volume > 0 || volume > 1) {
             throw new Error();
         }
         this.panner.coneOuterGain = volume;
@@ -181,6 +179,10 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
 
     public isUsable(): boolean {
         return this.loaded && this.getGameObject() && this.isActive();
+    }
+
+    public isLoaded(): boolean {
+        return this.loaded;
     }
 
     protected handleAttach(attached: GameObject): void {

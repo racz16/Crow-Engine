@@ -135,6 +135,7 @@ export class RenderingPipeline {
         Gl.clear(true, true, false);
 
         const mainCamera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        //TODO: miért ne mehetne tovább a renderelés PBR-ral, mert nincs Blinn-Phong directional light?
         const dirLight = Scene.getParameters().get(BlinnPhongRenderer.MAIN_DIRECTIONAL_LIGHT);
         if (!mainCamera || !mainCamera.isActive() || !dirLight || !dirLight.isActive()) {
             throw new Error();
