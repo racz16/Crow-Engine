@@ -16,7 +16,7 @@ export class GameObject {
         this.root = this;
         this.components = new ComponentContainer(this);
         this.children = new ChildContainer(this);
-        Scene.getGameObjects().addGameObject(this);
+        Scene.getGameObjects().add(this);
     }
 
     protected update(): void {

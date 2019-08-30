@@ -1,15 +1,12 @@
 export class Time {
 
     private static readonly ONE_SECOND = 1000;
-    private static readonly TARGET_FPS = 60;
-    private static readonly TARGET_FRAME_TIME = Time.ONE_SECOND / Time.TARGET_FPS;
     private static readonly START_MOMENT = performance.now();
     private static currentFps = 0;
     private static lastFps = 0;
     private static frameTimeSum = 0;
     private static lastFrameTime = 0;
     private static lastFrameMoment = Time.START_MOMENT;
-    private static deltaTimeFactor = 0;
     private static frameCount = 0;
 
     private constructor() { }
@@ -23,7 +20,6 @@ export class Time {
         const currentMoment = performance.now();
         this.lastFrameTime = currentMoment - this.lastFrameMoment;
         this.frameTimeSum += this.lastFrameTime;
-        this.deltaTimeFactor = this.lastFrameTime / this.TARGET_FRAME_TIME;
         this.lastFrameMoment = currentMoment;
     }
 
@@ -38,15 +34,11 @@ export class Time {
     }
 
     public static getDeltaTimeFactor(): number {
-        return this.deltaTimeFactor;
+        return this.lastFrameTime;
     }
 
     public static getFps(): number {
         return this.lastFps;
-    }
-
-    public static getLastFrameTime(): number {
-        return this.lastFrameTime;
     }
 
     public static getTimeInMillisecs(): number {

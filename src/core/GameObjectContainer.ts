@@ -13,7 +13,7 @@ export class GameObjectContainer {
         Log.endGroup();
     }
 
-    public addGameObject(gameObject: GameObject): void {
+    public add(gameObject: GameObject): void {
         if (!gameObject) {
             throw new Error();
         }
@@ -22,15 +22,11 @@ export class GameObjectContainer {
         }
     }
 
-    public getGameObjectsIterator(): IterableIterator<GameObject> {
+    public getIterator(): IterableIterator<GameObject> {
         return this.gameObjects.values();
     }
 
-    public getGameObject(index: number): GameObject {
-        return this.gameObjects[index];
-    }
-
-    public getGameObjectCount(): number {
+    public getCount(): number {
         return this.gameObjects.length;
     }
 

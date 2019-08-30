@@ -31,7 +31,7 @@ export class BlinnPhongRenderer extends Renderer {
         const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
-        for (const renderableComponent of renderables.getRenderableComponentsIterator()) {
+        for (const renderableComponent of renderables.getIterator()) {
             if (renderableComponent.getRenderable().isUsable() && renderableComponent.isActive() && this.isVisible(renderableComponent, camera) && this.isInsideFrustum(renderableComponent)) {
                 this.beforeDrawInstance(renderableComponent);
                 renderableComponent.draw();

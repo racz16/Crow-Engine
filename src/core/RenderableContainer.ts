@@ -6,15 +6,11 @@ export class RenderableContainer {
 
     private renderables = new Array<IRenderableComponent<IRenderable>>();
 
-    public getRenderableComponent(index: number): IRenderableComponent<IRenderable> {
-        return this.renderables[index];
-    }
-
-    public getRenderableComponentCount(): number {
+    public getCount(): number {
         return this.renderables.length;
     }
 
-    public getRenderableComponentsIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
+    public getIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
         return this.renderables.values();
     }
 

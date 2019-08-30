@@ -98,7 +98,7 @@ export class ShadowRenderer extends Renderer {
         this.shader.start();
 
         const renderables = RenderingPipeline.getRenderableContainer();
-        for (const renderableComponent of renderables.getRenderableComponentsIterator()) {
+        for (const renderableComponent of renderables.getIterator()) {
             if (renderableComponent.isActive() && renderableComponent
                 .isCastShadow()) {
                 //beforeDrawMeshInstance(projectionViewMatrix, renderableComponent.getModelMatrix());

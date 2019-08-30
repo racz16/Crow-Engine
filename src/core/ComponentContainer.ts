@@ -1,7 +1,6 @@
 import { GameObject } from './GameObject';
 import { Component } from '../component/Component';
 import { Utility } from '../utility/Utility';
-import { IComponent } from '../component/IComponent';
 
 export class ComponentContainer {
 
@@ -24,13 +23,12 @@ export class ComponentContainer {
     }
 
     public add(component: Component): void {
-        if (this.contains(component)) {
-            return;
-        }
         if (component.getGameObject()) {
             throw new Error();
         }
-        this.addUnsafe(component);
+        if (!this.contains(component)) {
+            this.addUnsafe(component);
+        }
     }
 
     private addUnsafe(component: Component): void {
@@ -83,15 +81,11 @@ export class ComponentContainer {
         return null;
     }
 
-    public get(index: number): Component {
-        return this.components[index];
-    }
-
-    public getComponentCount(): number {
+    public getCount(): number {
         return this.components.length;
     }
 
-    public getComponentsIterator(): IterableIterator<Component> {
+    public getIterator(): IterableIterator<Component> {
         return this.components.values();
     }
 
