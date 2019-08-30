@@ -140,7 +140,7 @@ export class RenderingPipeline {
             throw new Error();
         }
         CameraStruct.getInstance().refreshUbo();
-        CameraStruct.getInstance().useCameraMatricesUbo();
+        CameraStruct.getInstance().useUbo();
     }
 
     private static refreshIfCanvasResized(): void {

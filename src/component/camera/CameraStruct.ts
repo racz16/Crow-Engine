@@ -26,7 +26,7 @@ export class CameraStruct implements IInvalidatable {
         return this.instance;
     }
 
-    public useCameraMatricesUbo(): void {
+    public useUbo(): void {
         this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
     }
 

@@ -30,7 +30,7 @@ export class BlinnPhongLightsStruct {
         return this.instance;
     }
 
-    public useLightsUbo(): void {
+    public useUbo(): void {
         this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT.bindingPoint);
     }
 
@@ -98,6 +98,9 @@ export class BlinnPhongLightsStruct {
     }
 
     public addLight(light: BlinnPhongLightComponent): void {
+        if (!light) {
+            throw new Error();
+        }
         if (!this.lights.includes(light)) {
             this.lights.push(light);
         }

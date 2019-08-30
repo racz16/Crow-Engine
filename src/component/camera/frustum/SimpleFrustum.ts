@@ -35,6 +35,9 @@ export class SimpleFrustum extends Frustum {
     }
 
     public getCornerPoint(cornerPoint: FrustumCornerPoint): vec3 {
+        if (!cornerPoint) {
+            throw new Error();
+        }
         if (this.isUsable()) {
             this.refresh();
             return vec3.clone(this.cornerPoints.get(cornerPoint));
@@ -53,6 +56,9 @@ export class SimpleFrustum extends Frustum {
     }
 
     public getPlane(side: FrustumSide): FrustumPlane {
+        if (!side) {
+            throw new Error();
+        }
         if (this.isUsable()) {
             this.refresh();
             return this.planes.get(side);

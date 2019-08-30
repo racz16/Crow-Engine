@@ -61,7 +61,7 @@ export class BlinnPhongRenderer extends Renderer {
         }*/
 
         BlinnPhongLightsStruct.getInstance().refreshUbo();
-        BlinnPhongLightsStruct.getInstance().useLightsUbo();
+        BlinnPhongLightsStruct.getInstance().useUbo();
         this.shader.start();
         //RenderingPipeline.bindFbo();
         Gl.setViewport(RenderingPipeline.getRenderingSize(), vec2.create());

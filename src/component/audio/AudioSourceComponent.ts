@@ -120,6 +120,9 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public setReductionSpeed(reductionSpeed: number): void {
+        if (reductionSpeed < 0 || reductionSpeed > 0) {
+            throw new Error();
+        }
         this.panner.rolloffFactor = reductionSpeed;
     }
 
@@ -128,6 +131,9 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public setInnerAngle(angle: number): void {
+        if (angle > this.getInnerAngle()) {
+            throw new Error();
+        }
         this.panner.coneInnerAngle = angle;
     }
 
@@ -136,6 +142,9 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public setOuterAngle(angle: number): void {
+        if (angle > 360 || angle < this.getInnerAngle()) {
+            throw new Error();
+        }
         this.panner.coneOuterAngle = angle;
     }
 

@@ -22,11 +22,17 @@ export class Log {
     }
 
     public static setLogLevel(logLevel: LogLevel): void {
+        if (!logLevel) {
+            throw new Error();
+        }
         this.logLevel = logLevel;
         Log.logString(LogLevel.INFO_1, 'Log level changed');
     }
 
     public static addHandler(handler: ILogHandler): void {
+        if (!handler) {
+            throw new Error();
+        }
         if (!this.containsHandler(handler)) {
             this.logHandlers.push(handler);
         }
