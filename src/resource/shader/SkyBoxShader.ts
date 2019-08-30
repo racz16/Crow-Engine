@@ -1,7 +1,6 @@
 import { Shader } from './Shader';
 import { Scene } from '../../core/Scene';
 import { RenderingPipeline } from '../../rendering/RenderingPipeline';
-import { Utility } from '../../utility/Utility';
 
 export class SkyBoxShader extends Shader {
 

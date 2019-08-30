@@ -16,7 +16,7 @@ export class BezierSpline extends CubicSpline {
             const cps = new Array<vec3>(4);
             cps[0] = this.controlPoints[startIndex].getPoint();
             cps[1] = this.controlPoints[startIndex].getRight();
-            if (startIndex + 1 == this.getNumberOfControlPoints() && this.isLoop()) {
+            if (startIndex + 1 === this.getNumberOfControlPoints() && this.isLoop()) {
                 cps[2] = this.controlPoints[0].getLeft();
                 cps[3] = this.controlPoints[0].getPoint();
             } else {

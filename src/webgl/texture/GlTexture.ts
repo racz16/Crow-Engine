@@ -181,7 +181,7 @@ export abstract class GlTexture extends GlObject implements IResource {
     }
 
     public issRgb(): boolean {
-        return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat == InternalFormat.SRGB8;
+        return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat === InternalFormat.SRGB8;
     }
 
     public bindToTextureUnit(textureUnit: number): void {

@@ -6,7 +6,7 @@ import { RenderingPipeline } from '../RenderingPipeline';
 import { Utility } from '../../utility/Utility';
 import { Gl } from '../../webgl/Gl';
 import { IRenderable } from '../../resource/IRenderable';
-import { BlinnPhongLightContainer } from '../../component/light/blinnphong/BlinnPhongLightContainer';
+import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStrct';
 import { vec2, vec3 } from 'gl-matrix';
 import { Log } from '../../utility/log/Log';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
@@ -15,7 +15,7 @@ import { ICameraComponent } from '../../component/camera/ICameraComponent';
 import { LogLevel } from '../../utility/log/LogLevel';
 
 export class BlinnPhongRenderer extends Renderer {
-    
+
     private shader: BlinnPhongShader;
 
     public constructor() {
@@ -45,7 +45,7 @@ export class BlinnPhongRenderer extends Renderer {
 
     private isVisible(renderableComponent: IRenderableComponent<IRenderable>, camera: ICameraComponent): boolean {
         const visibility = renderableComponent.getVisibilityInterval();
-        if (visibility[0] === Number.NEGATIVE_INFINITY && visibility[1] == Number.POSITIVE_INFINITY) {
+        if (visibility[0] === Number.NEGATIVE_INFINITY && visibility[1] === Number.POSITIVE_INFINITY) {
             return true;
         }
         const renderablePosition = renderableComponent.getGameObject().getTransform().getAbsolutePosition();
@@ -60,8 +60,8 @@ export class BlinnPhongRenderer extends Renderer {
             this.shader = new BlinnPhongShader();
         }*/
 
-        BlinnPhongLightContainer.getInstance().refreshUbo();
-        BlinnPhongLightContainer.getInstance().useLightsUbo();
+        BlinnPhongLightsStruct.getInstance().refreshUbo();
+        BlinnPhongLightsStruct.getInstance().useLightsUbo();
         this.shader.start();
         //RenderingPipeline.bindFbo();
         Gl.setViewport(RenderingPipeline.getRenderingSize(), vec2.create());

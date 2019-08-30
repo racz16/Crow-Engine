@@ -26,7 +26,7 @@ export class PlayerComponent extends Component {
     }
 
     protected updateComponent(): void {
-        const moveSpeed = 0.5;
+        const moveSpeed = 0.25;
         const rotateSpeed = 1;
         const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * Time.getDeltaTimeFactor());
         const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * Time.getDeltaTimeFactor());

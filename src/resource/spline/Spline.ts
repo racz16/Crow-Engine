@@ -109,7 +109,7 @@ export class Spline implements ISpline {
         t = t < 0 ? t % -1 : t % 1;
         if (this.getNumberOfControlPoints() < 1) {
             return null;
-        } else if (this.getVertexCount() == 1) {
+        } else if (this.getVertexCount() === 1) {
             return this.getControlPoint(0);
         } else {
             this.refreshLength();
@@ -135,11 +135,11 @@ export class Spline implements ISpline {
     protected getValue(startIndex: number, t: number): vec3 {
         if (this.getNumberOfControlPoints() < 1) {
             return null;
-        } else if (this.getVertexCount() == 1) {
+        } else if (this.getVertexCount() === 1) {
             return this.getControlPoint(0);
         } else {
             const first = vec3.scale(vec3.create(), vec3.clone(this.getControlPoint(startIndex)), 1 - t);
-            const second = vec3.clone(this.getControlPoint(startIndex == this.getVertexCount() - 1 ? 0 : startIndex + 1));
+            const second = vec3.clone(this.getControlPoint(startIndex === this.getVertexCount() - 1 ? 0 : startIndex + 1));
             return vec3.add(vec3.create(), first, vec3.scale(vec3.create(), second, t));
         }
     }

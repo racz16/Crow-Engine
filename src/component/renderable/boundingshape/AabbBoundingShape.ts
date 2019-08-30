@@ -19,7 +19,7 @@ export class AabbBoundingShape extends BoundingShape {
 
     protected isInsideMainCameraFrustumUnsafe(camera: ICameraComponent): boolean {
         for (const plane of camera.getFrustum().getPlanesIterator()) {
-            const pVertex = this.computeNormalAlignedAabbVertexMax(this.aabbMin, this.aabbMax, plane.normalVector);
+            const pVertex = this.computeNormalAlignedAabbVertexMax(this.aabbMin, this.aabbMax, plane.getNormalVector());
             let distance = plane.computeDistanceFrom(pVertex);
             if (distance < 0) {
                 return false;

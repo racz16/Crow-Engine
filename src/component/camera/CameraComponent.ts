@@ -1,25 +1,19 @@
 import { Component } from '../Component';
 import { ICameraComponent } from './ICameraComponent';
-import { Ubo } from '../../webgl/buffer/Ubo';
 import { mat4 } from 'gl-matrix';
 import { Scene } from '../../core/Scene';
-import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { Utility } from '../../utility/Utility';
 import { GameObject } from '../../core/GameObject';
-import { Log } from '../../utility/log/Log';
+import { SimpleFrustum } from './frustum/SimpleFrustum';
 import { Frustum } from './frustum/Frustum';
-import { RenderingPipeline } from '../../rendering/RenderingPipeline';
-import { IFrustum } from './frustum/IFrustum';
+import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 
 export class CameraComponent extends Component implements ICameraComponent {
 
-    private static ubo: Ubo;
-    private static uboValid = false;
-
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
-    private frustum: IFrustum;
+    private frustum: Frustum;
     private nearPlaneDistance: number;
     private farPlaneDistance: number;
     private fov: number;
@@ -27,64 +21,11 @@ export class CameraComponent extends Component implements ICameraComponent {
 
     public constructor(fov = 55, aspectRatio = 1, nearPlane = 0.1, farPlane = 200) {
         super();
-        this.setFrustum(new Frustum());
+        this.setFrustum(new SimpleFrustum());
         this.setFov(fov);
         this.setAspectRatio(aspectRatio);
         this.setNearPlaneDistance(nearPlane);
         this.setFarPlaneDistance(farPlane);
-    }
-
-    private static createUboIfNotExists(): void {
-        if (!this.isUboUsable()) {
-            this.createUboUnsafe();
-        }
-    }
-
-    private static createUboUnsafe(): void {
-        this.ubo = new Ubo();
-        this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
-        this.useCameraUbo();
-        Log.logString(LogLevel.INFO_1, 'Camera ubo created');
-    }
-
-    public static useCameraUbo(): void {
-        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
-    }
-
-    public static refreshUbo(): void {
-        const cam = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        if (!this.uboValid && cam && cam instanceof CameraComponent) {
-            this.createUboIfNotExists();
-            this.refreshUboUnsafe(cam);
-        }
-    }
-
-    private static refreshUboUnsafe(camera: CameraComponent): void {
-        this.ubo.store(new Float32Array(camera.getViewMatrix()));
-        this.ubo.storewithOffset(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
-        this.ubo.storewithOffset(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
-        this.uboValid = true;
-        Log.logString(LogLevel.INFO_2, 'Camera ubo refreshed');
-    }
-
-    public static releaseUbo(): void {
-        this.invalidateMainCamera();
-        if (this.isUboUsable()) {
-            this.ubo.release();
-            this.ubo = null;
-            Log.logString(LogLevel.INFO_1, 'Camera ubo released');
-        }
-    }
-
-    public static isUboUsable(): boolean {
-        return Utility.isUsable(this.ubo);
-    }
-
-    private static invalidateMainCamera(): void {
-        const cam = Scene.getParameters().get(Scene.MAIN_CAMERA);
-        if (cam) {
-            cam.invalidate();
-        }
     }
 
     public getFov(): number {
@@ -135,13 +76,6 @@ export class CameraComponent extends Component implements ICameraComponent {
         this.invalidate();
     }
 
-    public invalidate(sender?: any): void {
-        super.invalidate();
-        if (this.isTheMainCamera()) {
-            CameraComponent.uboValid = false;
-        }
-    }
-
     protected refresh(): void {
         if (!this.isValid()) {
             if (this.isTheMainCamera()) {
@@ -149,7 +83,7 @@ export class CameraComponent extends Component implements ICameraComponent {
             }
             this.refreshProjectionMatrix();
             this.refreshViewMatrix();
-            this.setValid(true);
+            Log.logString(LogLevel.INFO_3, 'Camera matrices refreshed');
         }
     }
 
@@ -163,6 +97,7 @@ export class CameraComponent extends Component implements ICameraComponent {
             const position = transform.getAbsolutePosition();
             const rotation = transform.getAbsoluteRotation();
             this.viewMatrix = Utility.computeViewMatrix(position, rotation);
+            this.setValid(true);
         }
     }
 
@@ -180,30 +115,24 @@ export class CameraComponent extends Component implements ICameraComponent {
         return mat4.clone(this.projectionMatrix);
     }
 
-    public getFrustum(): IFrustum {
+    public getFrustum(): Frustum {
         return this.frustum;
     }
 
-    public setFrustum(frustum: IFrustum): void {
+    public setFrustum(frustum: Frustum): void {
         if (!frustum || frustum.getCameraComponent()) {
             throw new Error();
         }
         if (this.frustum) {
-            this.frustum.private_setCameraComponent(null);
+            (this.frustum as any).setCameraComponent(null);
         }
         this.frustum = frustum;
-        this.frustum.private_setCameraComponent(this);
+        (this.frustum as any).setCameraComponent(this);
         this.invalidate();
     }
 
     public isTheMainCamera(): boolean {
         return Scene.getParameters().get(Scene.MAIN_CAMERA) == this;
-    }
-
-    protected updateComponent(): void {
-        if (this.isTheMainCamera()) {
-            CameraComponent.refreshUbo();
-        }
     }
 
     protected handleAttach(attached: GameObject): void {

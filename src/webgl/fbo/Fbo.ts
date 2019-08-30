@@ -123,11 +123,11 @@ export class Fbo extends GlObject {
 
     //status------------------------------------------------------------------------------------------------------------
     public isReadComplete(): boolean {
-        return this.getReadStatus() == FboCompleteness.COMPLETE;
+        return this.getReadStatus() === FboCompleteness.COMPLETE;
     }
 
     public isDrawComplete(): boolean {
-        return this.getDrawStatus() == FboCompleteness.COMPLETE;
+        return this.getDrawStatus() === FboCompleteness.COMPLETE;
     }
 
     public getReadStatus(): FboCompleteness {

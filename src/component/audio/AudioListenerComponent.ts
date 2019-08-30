@@ -16,7 +16,7 @@ export class AudioListenerComponent extends Component {
     }
 
     public isTheMainAudioListener(): boolean {
-        return Scene.getParameters().get(Scene.MAIN_AUDIO_LISTENER) === this;
+        return Scene.getParameters().get(Scene.MAIN_AUDIO_LISTENER) == this;
     }
 
     public setActive(active: boolean): void {

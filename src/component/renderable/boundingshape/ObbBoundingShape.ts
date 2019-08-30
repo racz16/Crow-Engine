@@ -77,7 +77,7 @@ export class ObbBoundingShape extends BoundingShape {
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
         if (this.isUsable()) {
             this.refresh();
-            return Utility.clone(this.clipSpaceObbCornerPoints).values();
+            return Utility.cloneVec4(this.clipSpaceObbCornerPoints.values()).values();
         } else {
             return null;
         }

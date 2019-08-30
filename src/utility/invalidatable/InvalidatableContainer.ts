@@ -12,7 +12,7 @@ export class InvalidatableContainer {
     }
 
     public addInvalidatable(invalidatable: IInvalidatable): void {
-        if (!invalidatable || invalidatable === this.container) {
+        if (!invalidatable || invalidatable == this.container) {
             throw new Error();
         }
         this.addInvalidatableUnsafe(invalidatable);

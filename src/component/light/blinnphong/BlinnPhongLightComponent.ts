@@ -3,7 +3,7 @@ import { vec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { Ubo } from '../../../webgl/buffer/Ubo';
-import { BlinnPhongLightContainer } from './BlinnPhongLightContainer';
+import { BlinnPhongLightsStruct } from './BlinnPhongLightsStrct';
 
 export abstract class BlinnPhongLightComponent extends Component {
 
@@ -24,7 +24,7 @@ export abstract class BlinnPhongLightComponent extends Component {
 
     public constructor() {
         super();
-        BlinnPhongLightContainer.getInstance().addLight(this);
+        BlinnPhongLightsStruct.getInstance().addLight(this);
     }
 
     protected computeOffset(offset: number, index: number): number {

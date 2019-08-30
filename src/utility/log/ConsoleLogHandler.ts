@@ -20,9 +20,9 @@ export class ConsoleLogEventHandler implements ILogEventHandler {
         }
     }
 
-    public endFrame(): void { 
+    public endFrame(): void {
         this.startedGroups = [];
-        while(this.reallyStartedGroupCount>0){
+        while (this.reallyStartedGroupCount > 0) {
             console.groupEnd();
             this.reallyStartedGroupCount--;
         }
@@ -57,12 +57,12 @@ export class ConsoleLogEventHandler implements ILogEventHandler {
 
     public logVec3(logLevel: LogLevel, vec: vec3): void {
         this.openGroups();
-        console.table([vec]);
+        console.table(vec);
     }
 
     public logVec4(logLevel: LogLevel, vec: vec4): void {
         this.openGroups();
-        console.table([vec]);
+        console.table(vec);
     }
 
     public logMat3(logLevel: LogLevel, mat: mat3): void {

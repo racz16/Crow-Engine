@@ -1,7 +1,6 @@
 import { Ubo } from '../../../webgl/buffer/Ubo';
 import { BufferObjectUsage } from '../../../webgl/enum/BufferObjectUsage';
 import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLightComponent';
-import { BlinnPhongPositionalLightComponent } from './BlinnPhongPositionalLightComponent';
 import { Scene } from '../../../core/Scene';
 import { vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../../camera/ICameraComponent';
@@ -11,9 +10,9 @@ import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 
-export class BlinnPhongLightContainer {
+export class BlinnPhongLightsStruct {
 
-    private static instance: BlinnPhongLightContainer;
+    private static instance: BlinnPhongLightsStruct;
     private static readonly ACTIVE_OFFSET = 108;
     private static readonly LIGHT_DATASIZE = 112;
     private static readonly LIGHT_COUNT = 16;
@@ -24,9 +23,9 @@ export class BlinnPhongLightContainer {
 
     private constructor() { }
 
-    public static getInstance(): BlinnPhongLightContainer {
+    public static getInstance(): BlinnPhongLightsStruct {
         if (!this.instance) {
-            this.instance = new BlinnPhongLightContainer();
+            this.instance = new BlinnPhongLightsStruct();
         }
         return this.instance;
     }
@@ -38,7 +37,7 @@ export class BlinnPhongLightContainer {
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
-            this.ubo.allocate(BlinnPhongLightContainer.LIGHT_DATASIZE * (BlinnPhongLightContainer.LIGHT_COUNT), BufferObjectUsage.STATIC_DRAW);
+            this.ubo.allocate(BlinnPhongLightsStruct.LIGHT_DATASIZE * (BlinnPhongLightsStruct.LIGHT_COUNT), BufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
         }
     }
@@ -62,7 +61,7 @@ export class BlinnPhongLightContainer {
     private refreshLightsInUbo(): void {
         this.addedLightCount = 0;
         for (const light of this.lights) {
-            if (this.addedLightCount === BlinnPhongLightContainer.LIGHT_COUNT) {
+            if (this.addedLightCount === BlinnPhongLightsStruct.LIGHT_COUNT) {
                 return;
             }
             if (light.isActive() && light.getGameObject()) {
@@ -73,8 +72,8 @@ export class BlinnPhongLightContainer {
     }
 
     private refreshRemainingSlotsInUbo(): void {
-        for (let i = this.addedLightCount; i < BlinnPhongLightContainer.LIGHT_COUNT; i++) {
-            this.ubo.storewithOffset(new Int32Array([0]), i * BlinnPhongLightContainer.LIGHT_DATASIZE + BlinnPhongLightContainer.ACTIVE_OFFSET);
+        for (let i = this.addedLightCount; i < BlinnPhongLightsStruct.LIGHT_COUNT; i++) {
+            this.ubo.storewithOffset(new Int32Array([0]), i * BlinnPhongLightsStruct.LIGHT_DATASIZE + BlinnPhongLightsStruct.ACTIVE_OFFSET);
         }
     }
 
@@ -105,7 +104,7 @@ export class BlinnPhongLightContainer {
     }
 
     public getLightCount(): number {
-        return BlinnPhongLightContainer.LIGHT_COUNT;
+        return BlinnPhongLightsStruct.LIGHT_COUNT;
     }
 
     public getLightsIterator(): IterableIterator<BlinnPhongLightComponent> {

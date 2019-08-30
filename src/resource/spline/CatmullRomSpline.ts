@@ -17,19 +17,19 @@ export class CatmullRomSpline extends CubicSpline {
             const cps = new Array<vec3>(4);
             for (let i = -1; i < 3; i++) {
                 if (this.isLoop()) {
-                    if (startIndex + i == -1) {
+                    if (startIndex + i === -1) {
                         cps[i + 1] = this.getControlPoint(this.getNumberOfControlPoints() - 1);
-                    } else if (startIndex + i == this.getNumberOfControlPoints()) {
+                    } else if (startIndex + i === this.getNumberOfControlPoints()) {
                         cps[i + 1] = this.getControlPoint(0);
-                    } else if (startIndex + i == this.getNumberOfControlPoints() + 1) {
+                    } else if (startIndex + i === this.getNumberOfControlPoints() + 1) {
                         cps[i + 1] = this.getControlPoint(1);
                     } else {
                         cps[i + 1] = this.getControlPoint(startIndex + i);
                     }
                 } else {
-                    if (startIndex + i == -1) {
+                    if (startIndex + i === -1) {
                         cps[i + 1] = vec3.add(vec3.create(), this.getControlPoint(0), vec3.sub(vec3.create(), this.getControlPoint(0), this.getControlPoint(1)));
-                    } else if (startIndex + i == this.getNumberOfControlPoints()) {
+                    } else if (startIndex + i === this.getNumberOfControlPoints()) {
                         cps[i + 1] = vec3.add(vec3.create(), this.getControlPoint(startIndex + i - 1), vec3.sub(vec3.create(), this.getControlPoint(startIndex + i - 1), this.getControlPoint(startIndex + i - 2)));
                     } else {
                         cps[i + 1] = this.getControlPoint(startIndex + i);

@@ -28,7 +28,7 @@ export class BlinnPhongNormalHelper extends BlinnPhongHelper {
     private loadPom(): void {
         const sp = this.getSp();
         const usePom = this.material.getParameters().get(MaterialSlot.USE_POM);
-        if (usePom != null && usePom == 1) {
+        if (usePom != null && usePom === 1) {
             sp.loadBoolean(this.getIsTherePomName(), true);
             let value = this.material.getParameters().get(MaterialSlot.POM_SCALE) as number;
             sp.loadFloat(this.getPomScaleName(), value == null ? BlinnPhongNormalHelper.defPOMScale : value);

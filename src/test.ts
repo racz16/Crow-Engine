@@ -178,14 +178,14 @@ export class TestSceneBuilder {
         ma.setSlot(Material.NORMAL, ns);
 
         const rc = new MeshComponent(this.box, ma);
-        rc.setVisibilityInterval(vec2.fromValues(0, 1));
+        rc.setVisibilityInterval(vec2.fromValues(0, 5));
         go.getComponents().add(rc);
 
         const ma2 = new Material(BlinnPhongRenderer);
         ma2.setSlot(Material.NORMAL, ns);
 
         const rc2 = new MeshComponent(this.box, ma2);
-        rc2.setVisibilityInterval(vec2.fromValues(1, 100));
+        rc2.setVisibilityInterval(vec2.fromValues(5, 100));
         go.getComponents().add(rc2);
     }
 
@@ -226,7 +226,7 @@ export class TestSceneBuilder {
         const bs = new BezierSpline();
         bs.setStep(0.01);
         for (let i = 0; i < 6; i++) {
-            const x = i % 2 == 0 ? 5 : -5;
+            const x = i % 2 === 0 ? 5 : -5;
             const y = 3 * i - 10;
             bs.addControlPointToTheEnd(vec3.fromValues(x, y, 0));
         }

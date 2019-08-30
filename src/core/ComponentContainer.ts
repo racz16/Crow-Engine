@@ -39,7 +39,7 @@ export class ComponentContainer {
     }
 
     public contains(component: Component): boolean {
-        return component && component.getGameObject() === this.gameObject;
+        return component && component.getGameObject() == this.gameObject;
     }
 
     public remove(component: Component): void {

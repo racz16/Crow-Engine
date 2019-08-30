@@ -14,6 +14,7 @@ import { ScreenRenderer } from './ScreenRenderer';
 import { Log } from '../utility/log/Log';
 import { BindingPoint } from './BindingPoint';
 import { LogLevel } from '../utility/log/LogLevel';
+import { CameraStruct } from '../component/camera/CameraStruct';
 
 export class RenderingPipeline {
 
@@ -138,6 +139,8 @@ export class RenderingPipeline {
         if (!mainCamera || !mainCamera.isActive()) {
             throw new Error();
         }
+        CameraStruct.getInstance().refreshUbo();
+        CameraStruct.getInstance().useCameraMatricesUbo();
     }
 
     private static refreshIfCanvasResized(): void {

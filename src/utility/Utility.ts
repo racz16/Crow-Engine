@@ -89,7 +89,16 @@ export class Utility {
         return max;
     }
 
-    public static clone(vectors: Array<vec4>): Array<vec4> {
+    public static cloneVec3(vectors: IterableIterator<vec3>): Array<vec3> {
+        const newArray = new Array<vec3>();
+        for (const vector of vectors) {
+            const newVector = vec3.clone(vector);
+            newArray.push(newVector);
+        }
+        return newArray;
+    }
+
+    public static cloneVec4(vectors: IterableIterator<vec4>): Array<vec4> {
         const newArray = new Array<vec4>();
         for (const vector of vectors) {
             const newVector = vec4.clone(vector);
