@@ -1,12 +1,12 @@
 import { Ubo } from '../../webgl/buffer/Ubo';
 import { Utility } from '../../utility/Utility';
-import { Scene } from '../../core/Scene';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { ICameraComponent } from './ICameraComponent';
 import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { IInvalidatable } from '../../utility/invalidatable/IInvalidatable';
+import { Engine } from '../../core/Engine';
 
 export class CameraStruct implements IInvalidatable {
 
@@ -16,7 +16,7 @@ export class CameraStruct implements IInvalidatable {
     private static instance: CameraStruct;
 
     private constructor() {
-        Scene.getParameters().addInvalidatable(Scene.MAIN_CAMERA, this);
+        Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
     }
 
     public static getInstance(): CameraStruct {
@@ -40,7 +40,7 @@ export class CameraStruct implements IInvalidatable {
 
     public refreshUbo(): void {
         this.createUboIfNotUsable();
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         if (!this.valid && camera && camera.getGameObject()) {
             this.refreshUboUnsafe(camera);
         }

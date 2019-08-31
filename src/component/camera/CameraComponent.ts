@@ -1,13 +1,13 @@
-import { Component } from '../Component';
-import { ICameraComponent } from './ICameraComponent';
 import { mat4 } from 'gl-matrix';
-import { Scene } from '../../core/Scene';
 import { Utility } from '../../utility/Utility';
 import { GameObject } from '../../core/GameObject';
 import { SimpleFrustum } from './frustum/SimpleFrustum';
 import { Frustum } from './frustum/Frustum';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
+import { Engine } from '../../core/Engine';
+import { ICameraComponent as ICameraComponent } from './ICameraComponent';
+import { Component } from '../Component';
 
 export class CameraComponent extends Component implements ICameraComponent {
 
@@ -132,7 +132,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     public isTheMainCamera(): boolean {
-        return Scene.getParameters().get(Scene.MAIN_CAMERA) == this;
+        return Engine.getMainCamera() == this;
     }
 
     protected handleAttach(attached: GameObject): void {

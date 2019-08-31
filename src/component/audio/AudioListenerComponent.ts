@@ -1,7 +1,7 @@
 import { Component } from '../Component';
 import { GameObject } from '../../core/GameObject';
-import { Scene } from '../../core/Scene';
 import { Audio } from '../../resource/Audio';
+import { Engine } from '../../core/Engine';
 
 export class AudioListenerComponent extends Component {
 
@@ -16,7 +16,7 @@ export class AudioListenerComponent extends Component {
     }
 
     public isTheMainAudioListener(): boolean {
-        return Scene.getParameters().get(Scene.MAIN_AUDIO_LISTENER) == this;
+        return Engine.getMainAudioListener() == this;
     }
 
     public setActive(active: boolean): void {

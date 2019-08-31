@@ -1,6 +1,6 @@
 import { Shader } from './Shader';
-import { Scene } from '../../core/Scene';
 import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { Engine } from '../../core/Engine';
 
 export class SkyBoxShader extends Shader {
 
@@ -11,7 +11,7 @@ export class SkyBoxShader extends Shader {
     public setUniforms() {
         this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
 
-        const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX);
+        const skybox = Engine.getParameters().get(Engine.MAIN_SKYBOX);
         skybox.bindToTextureUnit(0);
         this.getShaderProgram().loadBoolean('isThereCubeMap', true);
     }

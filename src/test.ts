@@ -5,7 +5,6 @@ import { MeshComponent } from './component/renderable/MeshComponent';
 import { Material } from './material/Material';
 import { CameraComponent } from './component/camera/CameraComponent';
 import { vec3, vec4, vec2 } from 'gl-matrix';
-import { Scene } from './core/Scene';
 import { InfoComponent } from './test/InfoComponent';
 import { RotateComponent } from './test/RotateComponent';
 import { BlinnPhongDirectionalLightComponent } from './component/light/blinnphong/BlinnPhongDirectionalLightComponent';
@@ -19,10 +18,6 @@ import { MaterialSlot } from './material/MaterialSlot';
 import { PlayerComponent } from './test/PlayerComponent';
 import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
 import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
-import { AabbBoundingShape } from './component/renderable/boundingshape/AabbBoundingShape';
-import { AxisAlignedCylindricalBillboard } from './component/renderable/billboard/AxisAlignedCylindricalBillboard';
-import { BillboardAxis } from './component/renderable/billboard/BillboardAxis';
-import { InverseCameraSphericalBillboard } from './component/renderable/billboard/InverseCameraSphericalBillboard';
 
 
 window.onload = () => {
@@ -103,14 +98,14 @@ export class TestSceneBuilder {
 
     public setUpScene(): void {
         //skybox
-        Scene.getParameters().set(Scene.MAIN_SKYBOX, this.elyHills);
+        Engine.getParameters().set(Engine.MAIN_SKYBOX, this.elyHills);
 
         //camera
         const go = new GameObject();
         go.getTransform().setRelativePosition(vec3.fromValues(0, 0, 10));
         const cc = new CameraComponent();
         go.getComponents().add(cc);
-        Scene.getParameters().set(Scene.MAIN_CAMERA, cc);
+        Engine.setMainCamera(cc);
 
         //input
         const pc = new PlayerComponent();
@@ -119,7 +114,7 @@ export class TestSceneBuilder {
         //audio listener
         const alc = new AudioListenerComponent();
         go.getComponents().add(alc);
-        Scene.getParameters().set(Scene.MAIN_AUDIO_LISTENER, alc);
+        Engine.setMainAudioListener(alc);
 
         //directional light
         const dlgo = new GameObject();

@@ -1,10 +1,11 @@
-import { ICameraComponent } from '../component/camera/ICameraComponent';
+
 import { vec3, mat4, vec4 } from 'gl-matrix';
 import { GameObject } from '../core/GameObject';
-import { Scene } from '../core/Scene';
 import { Utility } from './Utility';
 import { Log } from './log/Log';
 import { LogLevel } from './log/LogLevel';
+import { Engine } from '../core/Engine';
+import { ICameraComponent } from '../component/camera/ICameraComponent';
 
 export class ShadowMapMatrixSolver {
 
@@ -33,7 +34,7 @@ export class ShadowMapMatrixSolver {
     }
 
     private static initializeCamera(): void {
-        this.camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        this.camera = Engine.getMainCamera();
     }
 
     private static initializeLight(lightGameObject: GameObject, distance: number): void {

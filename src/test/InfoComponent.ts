@@ -1,7 +1,7 @@
 import { Component } from '../component/Component';
-import { Time } from '../core/Time';
 import { Audio } from '../resource/Audio';
 import { Gl } from '../webgl/Gl';
+import { Engine } from '../core/Engine';
 
 export class InfoComponent extends Component {
 
@@ -46,7 +46,7 @@ export class InfoComponent extends Component {
     }
 
     protected updateComponent(): void {
-        this.textNode.nodeValue = Time.getFps() + '';
+        this.textNode.nodeValue = Engine.getTimeManager().getFps() + '';
     }
 
 }

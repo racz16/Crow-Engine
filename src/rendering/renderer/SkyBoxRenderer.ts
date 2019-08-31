@@ -2,13 +2,13 @@ import { Renderer } from '../Renderer';
 import { SkyBoxShader } from '../../resource/shader/SkyBoxShader';
 import { CubeMesh } from '../../resource/mesh/CubeMesh';
 import { Utility } from '../../utility/Utility';
-import { Scene } from '../../core/Scene';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { Gl } from '../../webgl/Gl';
 import { CubeMapTexture } from '../../resource/texture/CubeMapTexture';
 import { vec2 } from 'gl-matrix';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
+import { Engine } from '../../core/Engine';
 
 export class SkyBoxRenderer extends Renderer {
 
@@ -27,7 +27,7 @@ export class SkyBoxRenderer extends Renderer {
             return;
         }
 
-        const skybox = Scene.getParameters().get(Scene.MAIN_SKYBOX) as CubeMapTexture;
+        const skybox = Engine.getParameters().get(Engine.MAIN_SKYBOX) as CubeMapTexture;
         if (!skybox || !skybox.allResourcesLoaded()) {
             return;
         }

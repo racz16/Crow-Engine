@@ -1,6 +1,5 @@
 import { RenderableContainer } from '../core/RenderableContainer';
 import { Gl } from '../webgl/Gl';
-import { Scene } from '../core/Scene';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ParameterKey } from '../utility/parameter/ParameterKey';
 import { ITexture2D } from '../resource/texture/ITexture2D';
@@ -15,12 +14,13 @@ import { Log } from '../utility/log/Log';
 import { BindingPoint } from './BindingPoint';
 import { LogLevel } from '../utility/log/LogLevel';
 import { CameraStruct } from '../component/camera/CameraStruct';
+import { Engine } from '../core/Engine';
 
 export class RenderingPipeline {
 
-    public static readonly SHADOWMAP = new ParameterKey<GlTexture2D>(GlTexture2D, 'SHADOWMAP');
-    public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>(mat4, 'SHADOW_PROJECTION_VIEW_MATRIX');
-    public static readonly GAMMA = new ParameterKey<Number>(Number, 'GAMMA');
+    public static readonly SHADOWMAP = new ParameterKey<ITexture2D>('SHADOWMAP');
+    public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>('SHADOW_PROJECTION_VIEW_MATRIX');
+    public static readonly GAMMA = new ParameterKey<number>('GAMMA');
 
     private static renderingScale = 1;
     private static renderables = new RenderableContainer();
@@ -33,7 +33,7 @@ export class RenderingPipeline {
     public static readonly CAMERA_BINDING_POINT = new BindingPoint(1, 'Camera');
     public static readonly LIGHTS_BINDING_POINT = new BindingPoint(2, 'Lights');
 
-    public static readonly WORK = new ParameterKey<ITexture2D>(GlTexture2D, 'WORK');
+    public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
 
     private constructor() { }
 
@@ -135,7 +135,7 @@ export class RenderingPipeline {
         //this.bindFbo();
         Gl.clear(true, true, false);
 
-        const mainCamera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const mainCamera = Engine.getMainCamera();
         if (!mainCamera || !mainCamera.isActive()) {
             throw new Error();
         }
@@ -148,7 +148,7 @@ export class RenderingPipeline {
         if (canvas.clientWidth !== canvas.width || canvas.clientHeight !== canvas.height) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
-            const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+            const camera = Engine.getMainCamera();
             if (camera) {
                 camera.invalidate();
             }

@@ -1,29 +1,27 @@
-export class Time {
+export class TimeManager {
 
-    private static readonly ONE_SECOND = 1000;
-    private static readonly START_MOMENT = performance.now();
-    private static currentFps = 0;
-    private static lastFps = 0;
-    private static frameTimeSum = 0;
-    private static lastFrameTime = 0;
-    private static lastFrameMoment = Time.START_MOMENT;
-    private static frameCount = 0;
+    private readonly ONE_SECOND = 1000;
+    private readonly START_MOMENT = performance.now();
+    private currentFps = 0;
+    private lastFps = 0;
+    private frameTimeSum = 0;
+    private lastFrameTime = 0;
+    private lastFrameMoment = this.START_MOMENT;
+    private frameCount = 0;
 
-    private constructor() { }
-
-    private static update(): void {
+    private update(): void {
         this.refreshDeltaTimeFactor();
         this.refreshFps();
     }
 
-    private static refreshDeltaTimeFactor(): void {
+    private refreshDeltaTimeFactor(): void {
         const currentMoment = performance.now();
         this.lastFrameTime = currentMoment - this.lastFrameMoment;
         this.frameTimeSum += this.lastFrameTime;
         this.lastFrameMoment = currentMoment;
     }
 
-    private static refreshFps(): void {
+    private refreshFps(): void {
         this.frameCount++;
         this.currentFps++;
         if (this.frameTimeSum >= this.ONE_SECOND) {
@@ -33,24 +31,24 @@ export class Time {
         }
     }
 
-    public static getDeltaTimeFactor(): number {
+    public getDeltaTimeFactor(): number {
         return this.lastFrameTime;
     }
 
-    public static getFps(): number {
+    public getFps(): number {
         return this.lastFps;
     }
 
-    public static getTimeInMillisecs(): number {
+    public getTimeInMillisecs(): number {
         const currentMoment = performance.now();
         return currentMoment - this.START_MOMENT;
     }
 
-    public static getTimeInSecs(): number {
+    public getTimeInSecs(): number {
         return this.getTimeInMillisecs() / this.ONE_SECOND;
     }
 
-    public static getFrameCount(): number {
+    public getFrameCount(): number {
         return this.frameCount;
     }
 

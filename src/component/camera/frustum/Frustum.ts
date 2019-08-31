@@ -2,8 +2,8 @@ import { vec3 } from 'gl-matrix';
 import { FrustumCornerPoint } from './FrustumCornerPoint';
 import { FrustumPlane } from './FrustumPlane';
 import { FrustumSide } from './FrustumSide';
-import { ICameraComponent } from '../ICameraComponent';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
+import { ICameraComponent } from '../ICameraComponent';
 
 export abstract class Frustum implements IInvalidatable {
 

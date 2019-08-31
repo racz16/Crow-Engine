@@ -1,14 +1,14 @@
 import { Ubo } from '../../../webgl/buffer/Ubo';
 import { BufferObjectUsage } from '../../../webgl/enum/BufferObjectUsage';
 import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLightComponent';
-import { Scene } from '../../../core/Scene';
 import { vec3 } from 'gl-matrix';
-import { ICameraComponent } from '../../camera/ICameraComponent';
 import { Utility } from '../../../utility/Utility';
 import { Log } from '../../../utility/log/Log';
 import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
+import { Engine } from '../../../core/Engine';
+import { ICameraComponent } from '../../camera/ICameraComponent';
 
 export class BlinnPhongLightsStruct {
 
@@ -78,7 +78,7 @@ export class BlinnPhongLightsStruct {
     }
 
     private sortLights(): void {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         this.lights.sort((a, b) => {
             const ad = this.computeLightDistanceFromCamera(a, camera);
             const bd = this.computeLightDistanceFromCamera(b, camera);

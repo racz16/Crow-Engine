@@ -1,9 +1,9 @@
 import { BoundingShape } from './BoundingShape';
 import { vec4, mat4 } from 'gl-matrix';
-import { Scene } from '../../../core/Scene';
 import { Utility } from '../../../utility/Utility';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
+import { Engine } from '../../../core/Engine';
 
 export class ObbBoundingShape extends BoundingShape {
 
@@ -46,7 +46,7 @@ export class ObbBoundingShape extends BoundingShape {
     }
 
     protected refreshUnsafe(): void {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         const cornerPoints = this.computeObjectSpaceAabbCornerPoints();
         const MVP = mat4.create();
         mat4.mul(MVP, camera.getProjectionMatrix(), mat4.mul(MVP, camera.getViewMatrix(), this.renderableComponent.getModelMatrix()));
@@ -59,18 +59,18 @@ export class ObbBoundingShape extends BoundingShape {
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
-            Scene.getParameters().removeInvalidatable(Scene.MAIN_CAMERA, this);
+            Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().addInvalidatable(this);
-            Scene.getParameters().addInvalidatable(Scene.MAIN_CAMERA, this);
+            Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.invalidate();
     }
 
     protected isUsable(): boolean {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         return !this.renderableComponent.getBillboard() && camera && camera.getGameObject() && super.isUsable();
     }
 

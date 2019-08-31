@@ -3,7 +3,7 @@ import { vec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { Ubo } from '../../../webgl/buffer/Ubo';
-import { BlinnPhongLightsStruct } from './BlinnPhongLightsStrct';
+import { BlinnPhongLightsStruct } from './BlinnPhongLightsStruct';
 
 export abstract class BlinnPhongLightComponent extends Component {
 

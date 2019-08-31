@@ -1,8 +1,8 @@
 import { ComponentContainer } from './ComponentContainer';
 import { ChildContainer } from './ChildContainer';
 import { vec3 } from 'gl-matrix';
-import { Scene } from './Scene';
 import { Transform } from './Transform';
+import { Engine } from './Engine';
 export class GameObject {
 
     private components: ComponentContainer;
@@ -16,7 +16,7 @@ export class GameObject {
         this.root = this;
         this.components = new ComponentContainer(this);
         this.children = new ChildContainer(this);
-        Scene.getGameObjects().add(this);
+        Engine.getGameObjectContainer().add(this);
     }
 
     protected update(): void {
@@ -30,7 +30,7 @@ export class GameObject {
 
     private setRoot(root: GameObject): void {
         this.root = root;
-        for (const child of this.children.getChildrenIterator()) {
+        for (const child of this.children.getIterator()) {
             child.setRoot(root);
         }
     }
@@ -40,33 +40,33 @@ export class GameObject {
     }
 
     public setParent(parent: GameObject): void {
-        if (parent == this.getParent()) {
-            return;
-        }
         if (parent == this || this.children.containsDeep(parent)) {
             throw new Error();
         }
-        this.setParentUnsafe(parent);
+        if (parent != this.getParent()) {
+            this.setParentUnsafe(parent);
+        }
     }
 
     private setParentUnsafe(parent: GameObject): void {
-        const holder = this.getCurrentTransformData();
+        const transformData = this.getTransformData();
         this.removeParent();
         this.addParent(parent);
-        this.setTransformHolder(holder);
+        this.setTransformData(transformData);
     }
 
-    private getCurrentTransformData(): TransformHolder {
-        return new TransformHolder(
+    private getTransformData(): [vec3, vec3, vec3] {
+        return [
             this.transform.getAbsolutePosition(),
             this.transform.getAbsoluteRotation(),
-            this.transform.getAbsoluteScale());
+            this.transform.getAbsoluteScale()
+        ];
     }
 
-    private setTransformHolder(holder: TransformHolder): void {
-        this.transform.setAbsolutePosition(holder.getPosition());
-        this.transform.setAbsoluteRotation(holder.getRotation());
-        this.transform.setAbsoluteScale(holder.getScale());
+    private setTransformData([position, rotation, scale]: [vec3, vec3, vec3]): void {
+        this.transform.setAbsolutePosition(position);
+        this.transform.setAbsoluteRotation(rotation);
+        this.transform.setAbsoluteScale(scale);
     }
 
     private removeParent(): void {
@@ -96,6 +96,7 @@ export class GameObject {
             throw new Error();
         }
         this.transform = transform;
+        (transform as any).attachToGameObject(this);
     }
 
     public getComponents(): ComponentContainer {
@@ -105,21 +106,4 @@ export class GameObject {
     public getChildren(): ChildContainer {
         return this.children;
     }
-}
-
-class TransformHolder {
-
-    public constructor(private position: vec3, private rotation: vec3, private scale: vec3) { }
-
-    public getPosition(): vec3 {
-        return this.position;
-    }
-
-    public getRotation(): vec3 {
-        return this.rotation;
-    }
-    public getScale(): vec3 {
-        return this.scale;
-    }
-
 }

@@ -1,12 +1,12 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
-import { Scene } from '../../../core/Scene';
 import { Utility } from '../../../utility/Utility';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 import { Transform } from '../../../core/Transform';
 import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
+import { Engine } from '../../../core/Engine';
 
 export abstract class Billboard implements IInvalidatable {
 
@@ -18,12 +18,12 @@ export abstract class Billboard implements IInvalidatable {
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().removeInvalidatable(this);
-            Scene.getParameters().removeInvalidatable(Scene.MAIN_CAMERA, this);
+            Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().addInvalidatable(this);
-            Scene.getParameters().addInvalidatable(Scene.MAIN_CAMERA, this);
+            Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.invalidate();
     }
@@ -65,7 +65,7 @@ export abstract class Billboard implements IInvalidatable {
     protected abstract refreshUnsafe(): void;
 
     protected isUsable(): boolean {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         return this.renderableComponent && this.renderableComponent.getGameObject() && camera && camera.getGameObject() != null;
     }
 
@@ -97,6 +97,6 @@ export abstract class Billboard implements IInvalidatable {
     }
 
     protected getMainCameraTransform(): Transform {
-        return Scene.getParameters().get(Scene.MAIN_CAMERA).getGameObject().getTransform();
+        return Engine.getMainCamera().getGameObject().getTransform();
     }
 }

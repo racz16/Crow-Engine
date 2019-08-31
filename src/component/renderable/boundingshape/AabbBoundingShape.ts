@@ -1,6 +1,6 @@
 import { BoundingShape } from './BoundingShape';
 import { vec3, vec4 } from 'gl-matrix';
-import { Scene } from '../../../core/Scene';
+import { Engine } from '../../../core/Engine';
 import { ICameraComponent } from '../../camera/ICameraComponent';
 
 export class AabbBoundingShape extends BoundingShape {
@@ -9,7 +9,7 @@ export class AabbBoundingShape extends BoundingShape {
     protected readonly aabbMax = vec3.create();
 
     public isInsideMainCameraFrustum(): boolean {
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         if (camera && camera.getGameObject() && this.isUsable()) {
             this.refresh();
             return this.isInsideMainCameraFrustumUnsafe(camera);

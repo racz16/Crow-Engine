@@ -231,11 +231,6 @@ export class Transform implements IInvalidatable {
         this.invalidate();
     }
 
-    protected detachFromGameObject(): void {
-        this.gameObject = null;
-        this.invalidate();
-    }
-
     public getGameObject(): GameObject {
         return this.gameObject;
     }

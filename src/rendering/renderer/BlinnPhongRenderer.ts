@@ -1,18 +1,16 @@
 import { Renderer } from '../Renderer';
-import { ParameterKey } from '../../utility/parameter/ParameterKey';
-import { BlinnPhongDirectionalLightComponent } from '../../component/light/blinnphong/BlinnPhongDirectionalLightComponent';
 import { BlinnPhongShader } from '../../resource/shader/blinnphong/BlinnPhongShader';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { Utility } from '../../utility/Utility';
 import { Gl } from '../../webgl/Gl';
 import { IRenderable } from '../../resource/IRenderable';
-import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStrct';
+import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 import { vec2, vec3 } from 'gl-matrix';
 import { Log } from '../../utility/log/Log';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
-import { Scene } from '../../core/Scene';
-import { ICameraComponent } from '../../component/camera/ICameraComponent';
 import { LogLevel } from '../../utility/log/LogLevel';
+import { Engine } from '../../core/Engine';
+import { ICameraComponent } from '../../component/camera/ICameraComponent';
 
 export class BlinnPhongRenderer extends Renderer {
 
@@ -28,7 +26,7 @@ export class BlinnPhongRenderer extends Renderer {
             Log.logString(LogLevel.WARNING, 'The Blinn-Phong shader is not usable');
             return;
         }
-        const camera = Scene.getParameters().get(Scene.MAIN_CAMERA);
+        const camera = Engine.getMainCamera();
         this.beforeDrawShader();
         const renderables = RenderingPipeline.getRenderableContainer();
         for (const renderableComponent of renderables.getIterator()) {

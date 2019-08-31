@@ -25,23 +25,19 @@ export class ChildContainer {
     }
 
     private containsNonChildDescendant(child: GameObject): boolean {
-        for (const loopChildren of this.children) {
-            if (loopChildren.getChildren().containsDeep(child)) {
+        for (const loopChild of this.children) {
+            if (loopChild.getChildren().containsDeep(child)) {
                 return true;
             }
         }
         return false;
     }
 
-    public get(index: number): GameObject {
-        return this.children[index];
-    }
-
-    public getChildCount(): number {
+    public getCount(): number {
         return this.children.length;
     }
 
-    public getChildrenIterator(): IterableIterator<GameObject> {
+    public getIterator(): IterableIterator<GameObject> {
         return this.children.values();
     }
 

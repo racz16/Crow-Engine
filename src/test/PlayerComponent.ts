@@ -1,6 +1,7 @@
 import { Component } from '../component/Component';
-import { Time } from '../core/Time';
+import { TimeManager } from '../core/TimeManager';
 import { vec3 } from 'gl-matrix';
+import { Engine } from '../core/Engine';
 
 export class PlayerComponent extends Component {
 
@@ -26,11 +27,12 @@ export class PlayerComponent extends Component {
     }
 
     protected updateComponent(): void {
-        const moveSpeed = 0.25;
-        const rotateSpeed = 1;
-        const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * Time.getDeltaTimeFactor());
-        const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * Time.getDeltaTimeFactor());
-        const upSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getUpVector(), moveSpeed * Time.getDeltaTimeFactor());
+        const moveSpeed = 0.025;
+        const rotateSpeed = 0.075;
+        const deltaTime = Engine.getTimeManager().getDeltaTimeFactor();
+        const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * deltaTime);
+        const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * deltaTime);
+        const upSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getUpVector(), moveSpeed * deltaTime);
 
         //move
         if (this.includes('KeyW')) {
@@ -53,10 +55,10 @@ export class PlayerComponent extends Component {
         }
         //rotate
         if (this.includes('KeyQ')) {
-            this.getGameObject().getTransform().rotate(vec3.fromValues(0, rotateSpeed * Time.getDeltaTimeFactor(), 0));
+            this.getGameObject().getTransform().rotate(vec3.fromValues(0, rotateSpeed * TimeManager.getDeltaTimeFactor(), 0));
         }
         if (this.includes('KeyE')) {
-            this.getGameObject().getTransform().rotate(vec3.fromValues(0, -rotateSpeed * Time.getDeltaTimeFactor(), 0));
+            this.getGameObject().getTransform().rotate(vec3.fromValues(0, -rotateSpeed * TimeManager.getDeltaTimeFactor(), 0));
         }
     }
 
