@@ -16,7 +16,7 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
     }
 
     public setAxis(axis: vec3): void {
-        if (!axis) {
+        if (!axis || Utility.isNullVector(axis)) {
             throw new Error();
         }
         this.axis = vec3.normalize(vec3.create(), axis);

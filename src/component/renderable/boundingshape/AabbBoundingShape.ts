@@ -65,10 +65,6 @@ export class AabbBoundingShape extends BoundingShape {
         }
     }
 
-    protected isUsable(): boolean {
-        return super.isUsable() && !this.renderableComponent.getBillboard();
-    }
-
     public getObjectSpaceAabbMin(): vec3 {
         return super.getObjectSpaceAabbMin();
     }
@@ -93,6 +89,10 @@ export class AabbBoundingShape extends BoundingShape {
         } else {
             return null;
         }
+    }
+
+    protected isValid(): boolean {
+        return super.isValid() && !this.renderableComponent.getBillboard();
     }
 
 }

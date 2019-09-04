@@ -71,7 +71,7 @@ export class ObbBoundingShape extends BoundingShape {
 
     protected isUsable(): boolean {
         const camera = Engine.getMainCamera();
-        return !this.renderableComponent.getBillboard() && camera && camera.getGameObject() && super.isUsable();
+        return camera && camera.getGameObject() && super.isUsable();
     }
 
     public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
@@ -81,6 +81,10 @@ export class ObbBoundingShape extends BoundingShape {
         } else {
             return null;
         }
+    }
+
+    protected isValid(): boolean {
+        return super.isValid() && !this.renderableComponent.getBillboard();
     }
 
 }

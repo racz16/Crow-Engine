@@ -16,7 +16,7 @@ export class RotationBuilder {
     }
 
     private quaternionFromAxisAngle(axis: vec3, angle: number): quat {
-        if (!axis || !vec3.length(axis)) {
+        if (!axis || Utility.isNullVector(axis)) {
             throw new Error();
         }
         const normalizedAxis = vec3.normalize(vec3.create(), axis);

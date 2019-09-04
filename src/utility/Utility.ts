@@ -42,7 +42,9 @@ export class Utility {
         mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
         const axis = vec3.create();
         const angle = quat.getAxisAngle(axis, rotation);
-        mat4.rotate(model, model, -angle, axis);
+        if (!Number.isNaN(angle)) {
+            mat4.rotate(model, model, -angle, axis);
+        }
         mat4.translate(model, model, vec3.negate(vec3.create(), position));
         return model;
     }
@@ -112,6 +114,10 @@ export class Utility {
             newArray.push(newVector);
         }
         return newArray;
+    }
+
+    public static isNullVector(vector: vec3): boolean {
+        return vec3.length(vector) === 0;
     }
 
 }
