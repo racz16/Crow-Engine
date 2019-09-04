@@ -1,6 +1,6 @@
 import { ComponentContainer } from './ComponentContainer';
 import { ChildContainer } from './ChildContainer';
-import { vec3 } from 'gl-matrix';
+import { vec3, quat } from 'gl-matrix';
 import { Transform } from './Transform';
 import { Engine } from './Engine';
 export class GameObject {
@@ -55,7 +55,7 @@ export class GameObject {
         this.setTransformData(transformData);
     }
 
-    private getTransformData(): [vec3, vec3, vec3] {
+    private getTransformData(): [vec3, quat, vec3] {
         return [
             this.transform.getAbsolutePosition(),
             this.transform.getAbsoluteRotation(),
@@ -63,7 +63,7 @@ export class GameObject {
         ];
     }
 
-    private setTransformData([position, rotation, scale]: [vec3, vec3, vec3]): void {
+    private setTransformData([position, rotation, scale]: [vec3, quat, vec3]): void {
         this.transform.setAbsolutePosition(position);
         this.transform.setAbsoluteRotation(rotation);
         this.transform.setAbsoluteScale(scale);

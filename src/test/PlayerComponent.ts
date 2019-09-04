@@ -1,7 +1,8 @@
 import { Component } from '../component/Component';
-import { TimeManager } from '../core/TimeManager';
 import { vec3 } from 'gl-matrix';
 import { Engine } from '../core/Engine';
+import { RotationBuilder } from '../utility/RotationBuilder';
+import { Axis } from '../utility/Axis';
 
 export class PlayerComponent extends Component {
 
@@ -27,8 +28,8 @@ export class PlayerComponent extends Component {
     }
 
     protected updateComponent(): void {
-        const moveSpeed = 0.025;
-        const rotateSpeed = 0.075;
+        const moveSpeed = 0.01;
+        const rotateSpeed = 0.05;
         const deltaTime = Engine.getTimeManager().getDeltaTimeFactor();
         const forwardSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getForwardVector(), moveSpeed * deltaTime);
         const rightSpeed = vec3.scale(vec3.create(), this.getGameObject().getTransform().getRightVector(), moveSpeed * deltaTime);
@@ -55,10 +56,12 @@ export class PlayerComponent extends Component {
         }
         //rotate
         if (this.includes('KeyQ')) {
-            this.getGameObject().getTransform().rotate(vec3.fromValues(0, rotateSpeed * TimeManager.getDeltaTimeFactor(), 0));
+            const rotation = RotationBuilder.createRotation(Axis.Y, rotateSpeed * deltaTime).getQuaternion();
+            this.getGameObject().getTransform().rotate(rotation);
         }
         if (this.includes('KeyE')) {
-            this.getGameObject().getTransform().rotate(vec3.fromValues(0, -rotateSpeed * TimeManager.getDeltaTimeFactor(), 0));
+            const rotation = RotationBuilder.createRotation(Axis.Y_NEGATE, rotateSpeed * deltaTime).getQuaternion();
+            this.getGameObject().getTransform().rotate(rotation);
         }
     }
 

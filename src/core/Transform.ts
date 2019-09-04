@@ -3,14 +3,15 @@ import { GameObject } from './GameObject';
 import { Utility } from '../utility/Utility';
 import { IInvalidatable } from '../utility/invalidatable/IInvalidatable';
 import { InvalidatableContainer } from '../utility/invalidatable/InvalidatableContainer';
+import { Axis } from '../utility/Axis';
 
 export class Transform implements IInvalidatable {
 
     private relativePosition = vec3.create();
-    private relativeRotation = vec3.create();
+    private relativeRotation = quat.create();
     private relativeScale = vec3.fromValues(1, 1, 1);
     private absolutePosition = vec3.create();
-    private absoluteRotation = vec3.create();
+    private absoluteRotation = quat.create();
     private absoluteScale = vec3.fromValues(1, 1, 1);
     private modelMatrix = mat4.create();
     private inverseModelMatrix = mat4.create();
@@ -18,15 +19,9 @@ export class Transform implements IInvalidatable {
     private right = vec3.create();
     private up = vec3.create();
     private gameObject: GameObject;
-    private valid: boolean;
+    private valid = false;
     private readonly invalidatables = new InvalidatableContainer(this);
     private readonly parameterInvalidatables = new InvalidatableContainer(this);
-
-    public Transform(position: vec3, rotation: vec3, scale: vec3) {
-        this.setRelativePosition(position);
-        this.setRelativeRotation(rotation);
-        this.setRelativeScale(scale);
-    }
 
     public getRelativePosition(): vec3 {
         return vec3.clone(this.relativePosition);
@@ -38,29 +33,16 @@ export class Transform implements IInvalidatable {
     }
 
     public getAbsolutePosition(): vec3 {
-        this.refresh();
+        this.refreshFromRelative();
         return vec3.clone(this.absolutePosition);
     }
 
     public setAbsolutePosition(position: vec3): void {
         if (this.haveParent()) {
-            const relPos = this.computeRelativePositionFromAbsolutePosition(position);
-            this.setRelativePosition(relPos);
+            this.refreshFromAbsolute(position, this.getAbsoluteRotation(), this.getAbsoluteScale());
         } else {
             this.setRelativePosition(position);
         }
-    }
-
-    private computeRelativePositionFromAbsolutePosition(absolutePosition: vec3): vec3 {
-        const parentPosition = this.gameObject.getParent().getTransform().getAbsolutePosition();
-        const parentRotation = this.gameObject.getParent().getTransform().getAbsoluteRotation();
-        let rotation = quat.create();
-        quat.rotateX(rotation, rotation, Utility.toRadians(-parentRotation[0]));
-        quat.rotateY(rotation, rotation, Utility.toRadians(-parentRotation[1]));
-        quat.rotateZ(rotation, rotation, Utility.toRadians(-parentRotation[2]));
-        let relPos = vec3.create();
-        vec3.sub(relPos, absolutePosition, parentPosition);
-        return vec3.transformQuat(relPos, relPos, rotation);
     }
 
     public move(movement: vec3): void {
@@ -68,35 +50,30 @@ export class Transform implements IInvalidatable {
         this.invalidate();
     }
 
-    public getRelativeRotation(): vec3 {
-        return vec3.clone(this.relativeRotation);
+    public getRelativeRotation(): quat {
+        return quat.clone(this.relativeRotation);
     }
 
-    public setRelativeRotation(rotation: vec3): void {
-        vec3.copy(this.relativeRotation, rotation);
+    public setRelativeRotation(rotation: quat): void {
+        quat.copy(this.relativeRotation, rotation);
         this.invalidate();
     }
 
-    public getAbsoluteRotation(): vec3 {
-        this.refresh();
-        return vec3.clone(this.absoluteRotation);
+    public getAbsoluteRotation(): quat {
+        this.refreshFromRelative();
+        return quat.clone(this.absoluteRotation);
     }
 
-    public setAbsoluteRotation(rotation: vec3): void {
+    public setAbsoluteRotation(rotation: quat): void {
         if (this.haveParent()) {
-            const relRot = this.computeRelativeRotationFromAbsoluteRotation(rotation);
-            this.setRelativeRotation(relRot);
+            this.refreshFromAbsolute(this.getAbsolutePosition(), rotation, this.getAbsoluteScale());
         } else {
             this.setRelativeRotation(rotation);
         }
     }
 
-    private computeRelativeRotationFromAbsoluteRotation(absoluteRotation: vec3): vec3 {
-        return vec3.sub(vec3.create(), absoluteRotation, this.gameObject.getParent().getTransform().getAbsoluteRotation())
-    }
-
-    public rotate(rotation: vec3): void {
-        vec3.add(this.relativeRotation, this.relativeRotation, rotation);
+    public rotate(rotation: quat): void {
+        quat.mul(this.relativeRotation, rotation, this.relativeRotation);
         this.invalidate();
     }
 
@@ -110,113 +87,117 @@ export class Transform implements IInvalidatable {
     }
 
     public getAbsoluteScale(): vec3 {
-        this.refresh();
+        this.refreshFromRelative();
         return vec3.clone(this.absoluteScale);
     }
 
     public setAbsoluteScale(scale: vec3): void {
         if (this.haveParent()) {
-            const relScale = this.computeRelativeScaleFromAbsoluteScale(scale);
-            this.setRelativeScale(relScale);
+            this.refreshFromAbsolute(this.getAbsolutePosition(), this.getAbsoluteRotation(), scale);
         } else {
             this.setRelativeScale(scale);
         }
     }
 
-    private computeRelativeScaleFromAbsoluteScale(absoluteScale: vec3): vec3 {
-        const parentAbsoluteScale = this.gameObject.getParent().getTransform().getAbsoluteScale();
-        return vec3.div(vec3.create(), absoluteScale, parentAbsoluteScale);
-    }
 
+    //
+    //matrices------------------------------------------------------------------
+    //
     public getModelMatrix(): mat4 {
-        this.refresh();
+        this.refreshFromRelative();
         return mat4.clone(this.modelMatrix);
     }
 
     public getInverseModelMatrix(): mat4 {
-        this.refresh();
+        this.refreshFromRelative();
         return mat4.clone(this.inverseModelMatrix);
-    }
-
-    //
-    //refreshing----------------------------------------------------------------
-    //
-    protected refresh(): void {
-        if (!this.valid) {
-            this.refreshAbsoluteTransform();
-            this.refreshMatrices();
-            this.refreshDirectionVectors();
-            this.valid = true;
-        }
-    }
-
-    private refreshMatrices(): void {
-        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
-        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
-    }
-
-    private refreshAbsoluteTransform(): void {
-        if (!this.haveParent()) {
-            this.refreshAbsoluteTransformWhenNoParent();
-        } else {
-            this.refreshAbsolutePosition();
-            this.refreshAbsoluteRotation();
-            this.refreshAbsoluteScale();
-        }
-    }
-
-    private refreshAbsolutePosition(): void {
-        const position = this.getRelativePosition();
-        const parentRotation = this.gameObject.getParent().getTransform().getAbsoluteRotation();
-        let rotation = quat.create();
-        quat.rotateX(rotation, rotation, Utility.toRadians(parentRotation[0]));
-        quat.rotateY(rotation, rotation, Utility.toRadians(parentRotation[1]));
-        quat.rotateZ(rotation, rotation, Utility.toRadians(parentRotation[2]));
-        vec3.copy(this.absolutePosition, vec3.transformQuat(vec3.create(), position, rotation));
-        vec3.add(this.absolutePosition, this.absolutePosition, this.gameObject.getParent().getTransform().getAbsolutePosition());
-    }
-
-    private refreshAbsoluteRotation(): void {
-        const parentAbsoluteRotation = this.gameObject.getParent().getTransform().getAbsoluteRotation();
-        vec3.copy(this.absoluteRotation, vec3.add(vec3.create(), parentAbsoluteRotation, this.relativeRotation));
-    }
-
-    private refreshAbsoluteScale(): void {
-        const parentAbsoluteScale = this.gameObject.getParent().getTransform().getAbsoluteScale();
-        vec3.copy(this.absoluteScale, vec3.mul(vec3.create(), parentAbsoluteScale, this.relativeScale));
-    }
-
-    private refreshAbsoluteTransformWhenNoParent(): void {
-        vec3.copy(this.absolutePosition, this.relativePosition);
-        vec3.copy(this.absoluteRotation, this.relativeRotation);
-        vec3.copy(this.absoluteScale, this.relativeScale);
     }
 
     //
     //direction vectors---------------------------------------------------------
     //
     public getForwardVector(): vec3 {
-        this.refresh();
+        this.refreshFromRelative();
         return vec3.clone(this.forward);
     }
 
     public getRightVector(): vec3 {
-        this.refresh();
+        this.refreshFromRelative();
         return vec3.clone(this.right);
     }
 
     public getUpVector(): vec3 {
-        this.refresh();
+        this.refreshFromRelative();
         return vec3.clone(this.up);
     }
 
+    //
+    //refreshing----------------------------------------------------------------
+    //
+    private refreshFromAbsolute(absolutePosition: vec3, absoluteRotation: quat, absoluteScale: vec3): void {
+        this.refreshAbsoluteFromAbsolute(absolutePosition, absoluteRotation, absoluteScale);
+        this.refreshMatricesFromAbsolute();
+        this.refreshRelativeFromAbsolte();
+        this.refreshDirectionVectors();
+        this.valid = true;
+    }
+
+    private refreshAbsoluteFromAbsolute(absolutePosition: vec3, absoluteRotation: quat, absoluteScale: vec3): void {
+        vec3.copy(this.absolutePosition, absolutePosition);
+        quat.copy(this.absoluteRotation, absoluteRotation);
+        vec3.copy(this.absoluteScale, absoluteScale);
+    }
+
+    private refreshMatricesFromAbsolute(): void {
+        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+    }
+
+    private refreshRelativeFromAbsolte(): void {
+        const inverseParentModelMatrix = this.gameObject.getParent().getTransform().getInverseModelMatrix();
+        const localModelMatrix = mat4.mul(mat4.create(), this.modelMatrix, inverseParentModelMatrix);
+        mat4.getTranslation(this.relativePosition, localModelMatrix);
+        mat4.getRotation(this.relativeRotation, localModelMatrix);
+        mat4.getScaling(this.relativeScale, localModelMatrix);
+    }
+
+    protected refreshFromRelative(): void {
+        if (!this.valid) {
+            this.refreshAbsoluteFromRelative();
+            this.refreshDirectionVectors();
+            this.valid = true;
+        }
+    }
+
+    private refreshAbsoluteFromRelative(): void {
+        if (!this.haveParent()) {
+            this.refreshWhenAbsoluteEqualsRelative();
+        } else {
+            this.refreshWhenAbsoluteNotEqualsRelative();
+        }
+    }
+
+    private refreshWhenAbsoluteEqualsRelative(): void {
+        vec3.copy(this.absolutePosition, this.relativePosition);
+        quat.copy(this.absoluteRotation, this.relativeRotation);
+        vec3.copy(this.absoluteScale, this.relativeScale);
+        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+    }
+
+    private refreshWhenAbsoluteNotEqualsRelative(): void {
+        const localModelMatrix = Utility.computeModelMatrix(this.relativePosition, this.relativeRotation, this.relativeScale);
+        const parentModelMatrix = this.gameObject.getParent().getTransform().getModelMatrix();
+        mat4.mul(this.modelMatrix, parentModelMatrix, localModelMatrix);
+        mat4.getTranslation(this.absolutePosition, this.modelMatrix);
+        mat4.getRotation(this.absoluteRotation, this.modelMatrix);
+        mat4.getScaling(this.absoluteScale, this.modelMatrix);
+        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+    }
+
     private refreshDirectionVectors(): void {
-        let rotation = quat.create();
-        quat.rotateX(rotation, rotation, Utility.toRadians(this.absoluteRotation[0]));
-        quat.rotateY(rotation, rotation, Utility.toRadians(this.absoluteRotation[1]));
-        quat.rotateZ(rotation, rotation, Utility.toRadians(this.absoluteRotation[2]));
-        vec3.copy(this.forward, vec3.transformQuat(vec3.create(), vec3.fromValues(0, 0, -1), rotation));
-        vec3.copy(this.right, vec3.transformQuat(vec3.create(), vec3.fromValues(1, 0, 0), rotation));
+        vec3.copy(this.forward, vec3.transformQuat(vec3.create(), Axis.Z_NEGATE, this.absoluteRotation));
+        vec3.copy(this.right, vec3.transformQuat(vec3.create(), Axis.X, this.absoluteRotation));
         vec3.cross(this.up, this.right, this.forward);
     }
 

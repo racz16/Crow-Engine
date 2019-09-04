@@ -39,8 +39,8 @@ export class StaticMesh implements IMesh {
     //
     private computeFrustumCullingData(mesh: Mesh): void {
         let max = 0;
-        let aabbMax = vec3.create();
-        let aabbMin = vec3.create();
+        const aabbMax = vec3.create();
+        const aabbMin = vec3.create();
         let currentVec = vec3.create();
 
         for (let i = 0; i < mesh.vertices.length; i += 3) {

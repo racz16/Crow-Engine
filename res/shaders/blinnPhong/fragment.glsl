@@ -64,7 +64,6 @@ in vec3 io_normal;
 in vec2 io_textureCoordinates;
 in vec3 io_viewPosition;
 in mat3 io_TBN;
-in mat3 io_inverseModelMatrix3x3;
 in mat4 io_shadowProjectionViewMatrix;
 in vec4 io_fragmentPositionLightSpace;
 
@@ -287,8 +286,8 @@ vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
         vec3 normal = texture(material.normal, textureCoordinates * material.normalTile + material.normalOffset).rgb;
         normal = normalize(normal * 2.0 - 1.0);
-        normal = io_TBN * normal;
-        return normalize(normal * io_inverseModelMatrix3x3);
+        normal = normalize(io_TBN * normal);
+        return normal;
     }else{
         return normalize(io_normal);
     }
@@ -300,6 +299,7 @@ vec2 getTextureCoordinates(){
         vec3 tangentFragmentPosition = io_fragmentPosition * io_TBN;
         return parallaxMapping(normalize(tangentViewPosition - tangentFragmentPosition), io_textureCoordinates * material.normalTile + material.normalOffset);
     }else{
+        //TODO: nem kéne ide is tile meg offset?
         return io_textureCoordinates;
     }
 }

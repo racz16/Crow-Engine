@@ -30,6 +30,7 @@ export class BlinnPhongShader extends Shader {
     }
 
     public setUniforms(rc: IRenderableComponent<IRenderable>): void {
+        //FIXME: na ezt tutira nem itt kéne
         this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
         this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT);
 

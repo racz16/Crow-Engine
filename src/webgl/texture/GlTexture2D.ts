@@ -17,12 +17,9 @@ export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment
     //
     //store-------------------------------------------------------------------------------------------------------------
     //
-    public store(data: HTMLImageElement): void {
-        this.storeWithOffset(vec2.create(), data);
-    }
-
-    public storeWithOffset(offset: vec2, data: HTMLImageElement): void {
+    public store(data: HTMLImageElement, flipYAxis = true, offset = vec2.create()): void {
         this.bind();
+        Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis)
         Gl.gl.texSubImage2D(this.getTarget(), 0, offset[0], offset[1], Gl.gl.RGBA, Gl.gl.UNSIGNED_BYTE, data);
     }
 

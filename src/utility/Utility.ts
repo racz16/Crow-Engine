@@ -1,4 +1,4 @@
-import { mat4, vec3, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4, quat } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
 
@@ -11,40 +11,47 @@ export class Utility {
         return dot === 1 || dot === -1;
     }
 
-    public static computeModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
-        let model = mat4.create();
-        mat4.translate(model, model, position);
-        mat4.rotateZ(model, model, Utility.toRadians(rotation[2]));
-        mat4.rotateY(model, model, Utility.toRadians(rotation[1]));
-        mat4.rotateX(model, model, Utility.toRadians(rotation[0]));
-        mat4.scale(model, model, scale);
-        return model;
+    public static computeModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
+        return mat4.fromRotationTranslationScale(mat4.create(), rotation, position, scale);
     }
 
-    public static computeModelMatrixFromDirectionVectorsAndPosition(forward: vec3, up: vec3, right: vec3, position: vec3): mat4 {
-        return mat4.fromValues(
+    public static computeModelMatrixFromDirections(forward: vec3, up: vec3, right: vec3, position: vec3, scale: vec3): mat4 {
+        const mat = mat4.fromValues(
             right[0], right[1], right[2], 0,
             up[0], up[1], up[2], 0,
             forward[0], forward[1], forward[2], 0,
             position[0], position[1], position[2], 1
         );
+        mat4.scale(mat, mat, scale);
+        return mat;
     }
 
-    public static computeInverseModelMatrix(position: vec3, rotation: vec3, scale: vec3): mat4 {
-        let model = mat4.create();
+    public static computeInverseModelMatrixFromDirections(forward: vec3, up: vec3, right: vec3, position: vec3, scale: vec3): mat4 {
+        const scaleMatrix = mat4.fromScaling(mat4.create(), scale);
+        const rotationTranslationMatrix = mat4.fromValues(
+            right[0], up[0], forward[0], 0,
+            right[1], up[1], forward[1], 0,
+            right[2], up[2], forward[2], 0,
+            -position[0], -position[1], -position[2], 1
+        );
+        return mat4.mul(mat4.create(), scaleMatrix, rotationTranslationMatrix);
+    }
+
+    public static computeInverseModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
+        const model = mat4.create();
         mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
-        mat4.rotateX(model, model, Utility.toRadians(-rotation[0]));
-        mat4.rotateY(model, model, Utility.toRadians(-rotation[1]));
-        mat4.rotateZ(model, model, Utility.toRadians(-rotation[2]));
+        const axis = vec3.create();
+        const angle = quat.getAxisAngle(axis, rotation);
+        mat4.rotate(model, model, -angle, axis);
         mat4.translate(model, model, vec3.negate(vec3.create(), position));
         return model;
     }
 
-    public static computeViewMatrix(position: vec3, rotation: vec3): mat4 {
+    public static computeViewMatrix(position: vec3, rotation: quat): mat4 {
         return Utility.computeInverseModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
     }
 
-    public static computeInverseViewMatrix(position: vec3, rotation: vec3): mat4 {
+    public static computeInverseViewMatrix(position: vec3, rotation: quat): mat4 {
         return Utility.computeModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
     }
 

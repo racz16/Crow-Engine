@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, quat } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
 import { Utility } from '../../../utility/Utility';
@@ -7,12 +7,19 @@ import { Transform } from '../../../core/Transform';
 import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { Engine } from '../../../core/Engine';
+import { Axis } from '../../../utility/Axis';
+import { RotationBuilder } from '../../../utility/RotationBuilder';
 
 export abstract class Billboard implements IInvalidatable {
 
     protected renderableComponent: IRenderableComponent<IRenderable>;
     protected modelMatrix: mat4;
     protected inverseModelMatrix: mat4;
+    protected forward: vec3;
+    protected right: vec3;
+    protected up: vec3;
+    protected relativeRotation: quat;
+    protected absoluteRotation: quat;
     private valid = false;
 
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
@@ -43,7 +50,7 @@ export abstract class Billboard implements IInvalidatable {
     protected setMatricesToDefault(): void {
         this.modelMatrix = Utility.computeModelMatrix(
             this.renderableComponent.getGameObject().getTransform().getAbsolutePosition(),
-            vec3.fromValues(0, 0, 90),
+            RotationBuilder.createRotation(Axis.Z, 90).getQuaternion(),
             this.renderableComponent.getGameObject().getTransform().getAbsoluteScale()
         )
         this.inverseModelMatrix = mat4.create();
@@ -87,13 +94,76 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    protected createBillboard(forward: vec3, up: vec3, right: vec3): mat4 {
+    public getForwardVector(): vec3 {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.forward;
+        } else {
+            return null;
+        }
+    }
+
+    public getRightVector(): vec3 {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.right;
+        } else {
+            return null;
+        }
+    }
+
+    public getUpVector(): vec3 {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.up;
+        } else {
+            return null;
+        }
+    }
+
+    public getRelativeRotation(): quat {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.relativeRotation;
+        } else {
+            return null;
+        }
+    }
+
+    public getAbsoluteRotation(): quat {
+        if (this.isUsable()) {
+            this.refresh();
+            return this.absoluteRotation;
+        } else {
+            return null;
+        }
+    }
+
+    protected refreshDataFromDirections(forward: vec3, up: vec3, right: vec3): void {
+        this.refreshDirectionVectors(forward, up, right);
+        this.refreshMatrices();
+        this.refreshRotation();
+    }
+
+    private refreshDirectionVectors(forward: vec3, up: vec3, right: vec3): void {
+        this.forward = forward;
+        this.up = up;
+        this.right = right;
+    }
+
+    private refreshMatrices(): void {
         const transform = this.getRenderableComponent().getGameObject().getTransform();
         const position = transform.getAbsolutePosition();
         const scale = transform.getAbsoluteScale();
-        const mat = Utility.computeModelMatrixFromDirectionVectorsAndPosition(forward, up, right, position);
-        mat4.scale(mat, mat, scale);
-        return mat;
+        this.modelMatrix = Utility.computeModelMatrixFromDirections(this.forward, this.up, this.right, position, scale);
+        this.inverseModelMatrix = Utility.computeInverseModelMatrixFromDirections(this.forward, this.up, this.right, position, scale);
+    }
+
+    private refreshRotation(): void {
+        this.absoluteRotation = mat4.getRotation(quat.create(), this.modelMatrix);
+        const parentRotation = this.renderableComponent.getGameObject().getTransform().getAbsoluteRotation();
+        const parentInverseRotation = quat.invert(quat.create(), parentRotation);
+        this.relativeRotation = quat.mul(quat.create(), parentInverseRotation, this.absoluteRotation);
     }
 
     protected getMainCameraTransform(): Transform {

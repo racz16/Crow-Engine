@@ -12,7 +12,6 @@ out vec3 io_normal;
 out vec2 io_textureCoordinates;
 out vec3 io_viewPosition;
 out mat3 io_TBN;
-out mat3 io_inverseModelMatrix3x3;
 out mat4 io_shadowProjectionViewMatrix;
 out vec4 io_fragmentPositionLightSpace;
 
@@ -36,11 +35,11 @@ void main(){
     io_shadowProjectionViewMatrix = shadowProjectionViewMatrix;
     io_viewPosition = viewPosition;
     if(useNormalMap == 1.0f){
+        //FIXME: itt nem invert transzponálttal kéne szorozni?
         vec3 tangentColumn = normalize(mat3(modelMatrix) * i_tangent);
         vec3 normalColumn = normalize(mat3(modelMatrix) * i_normal);
         tangentColumn = normalize(tangentColumn - dot(tangentColumn, normalColumn) * normalColumn);
         vec3 bitangentColumn = cross(normalColumn, tangentColumn);
         io_TBN = mat3(tangentColumn, bitangentColumn, normalColumn);
-        io_inverseModelMatrix3x3 = inverseTransposedModelMatrix3x3;//FIXME
     }
 }

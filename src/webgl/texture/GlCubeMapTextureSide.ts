@@ -24,12 +24,9 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.side;
     }
 
-    public store(data: HTMLImageElement): void {
-        this.storeWithOffset(vec2.create(), data);
-    }
-
-    public storeWithOffset(offset: vec2, data: HTMLImageElement): void {
+    public store(data: HTMLImageElement, flipYAxis = false, offset = vec2.create()): void {
         this.cubeMapTexture.bind();
+        Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis)
         Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), 0, offset[0], offset[1], Gl.gl.RGBA, Gl.gl.UNSIGNED_BYTE, data);
     }
 

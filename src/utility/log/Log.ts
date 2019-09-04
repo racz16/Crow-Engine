@@ -9,7 +9,7 @@ export class Log {
     private static logHandlers = new Array<ILogHandler>();
     private static logLevel: LogLevel;
 
-    private Log() { }
+    private constructor() { }
 
     public static initialize(logLevel = LogLevel.WARNING): void {
         this.setLogLevel(logLevel);

@@ -1,5 +1,5 @@
 import { Billboard } from './Billboard';
-import { vec3, mat4 } from 'gl-matrix';
+import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 
 export class ArbitraryAxisCylindricalBillboard extends Billboard {
@@ -32,17 +32,14 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
         if (Utility.isParallel(forward, this.axis)) {
             this.setMatricesToDefault();
         } else {
-            this.refreshMatrices(forward);
+            this.refreshData(forward);
         }
     }
 
-    private refreshMatrices(forward: vec3): void {
+    private refreshData(forward: vec3): void {
         const right = vec3.cross(vec3.create(), this.axis, forward);
         forward = vec3.cross(vec3.create(), right, this.axis);
-        const modelMatrix = this.createBillboard(forward, this.axis, right);
-        const inverseModelMatrix = mat4.invert(mat4.create(), modelMatrix);
-        this.modelMatrix = modelMatrix;
-        this.inverseModelMatrix = inverseModelMatrix;
+        this.refreshDataFromDirections(forward, this.axis, right);
     }
 
 }

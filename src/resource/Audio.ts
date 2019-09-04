@@ -2,6 +2,7 @@ import { vec3 } from 'gl-matrix';
 import { IAudioSourceComponent } from '../component/audio/IAudioSourceComponent';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
+import { Axis } from '../utility/Axis';
 
 export class Audio {
 
@@ -64,8 +65,8 @@ export class Audio {
 
     public static setAudioListenerToDefault(): void {
         const position = vec3.create();
-        const forward = vec3.fromValues(0, 0, 1);
-        const up = vec3.fromValues(0, 1, 0);
+        const forward = Axis.Z;
+        const up = Axis.Y;
         this.setAudioListenerPosition(position);
         this.setAudioListenerDirections(forward, up);
     }

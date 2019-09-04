@@ -1,10 +1,14 @@
 import { Component } from '../component/Component';
-import { vec3 } from 'gl-matrix';
 import { Engine } from '../core/Engine';
+import { RotationBuilder } from '../utility/RotationBuilder';
+import { Axis } from '../utility/Axis';
 
 export class RotateComponent extends Component {
 
     protected updateComponent(): void {
-        this.getGameObject().getTransform().rotate(vec3.fromValues(0, Engine.getTimeManager().getDeltaTimeFactor() * 0.1, 0));
+        const rotationSpeed = 0.1;
+        const deltaTime = Engine.getTimeManager().getDeltaTimeFactor();
+        const rotation = RotationBuilder.createRotation(Axis.Y, rotationSpeed * deltaTime).getQuaternion();
+        this.getGameObject().getTransform().rotate(rotation);
     }
 }

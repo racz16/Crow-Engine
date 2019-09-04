@@ -18,7 +18,9 @@ import { MaterialSlot } from './material/MaterialSlot';
 import { PlayerComponent } from './test/PlayerComponent';
 import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
 import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
-
+import { RotationBuilder } from './utility/RotationBuilder';
+import { Axis } from './utility/Axis';
+import { RealSphericalBillboard } from './component/renderable/billboard/RealSphericalBillboard';
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -69,7 +71,7 @@ export class TestSceneBuilder {
     private boxPath = 'res/meshes/box.obj';
     private diffusePath = 'res/textures/diffuse1.png';
     private specularPath = 'res/textures/specular1.png';
-    private normal9Path = 'res/textures/normal9.jpg';
+    private normal9Path = 'res/textures/7259d9158be0b7e8c62c887fac57ed81.png';
     private normal6Path = 'res/textures/normal6.png';
     private musicPath = 'res/sounds/music.ogg';
     private elyHillsPaths = [
@@ -120,7 +122,12 @@ export class TestSceneBuilder {
         const dlgo = new GameObject();
         const dlc = new BlinnPhongDirectionalLightComponent();
         dlgo.getComponents().add(dlc);
-        dlgo.getTransform().setRelativeRotation(vec3.fromValues(-45, 45, 0));
+
+        const rotation = RotationBuilder
+            .createRotation(Axis.X, -45)
+            .thenRotate(Axis.Y, 45)
+            .getQuaternion();
+        dlgo.getTransform().setRelativeRotation(rotation);
     }
 
     public createUi(): void {
@@ -141,8 +148,8 @@ export class TestSceneBuilder {
         ss.setTexture2D(this.specular);
         ma.setSlot(Material.SPECULAR, ss);
 
-        const rc = new MeshComponent(this.box, ma);
-        go.getComponents().add(rc);
+        const mc = new MeshComponent(this.box, ma);
+        go.getComponents().add(mc);
     }
 
     public createNormalBox(): void {
@@ -154,8 +161,9 @@ export class TestSceneBuilder {
         ns.setTexture2D(this.normal9);
         ma.setSlot(Material.NORMAL, ns);
 
-        const rc = new MeshComponent(this.box, ma);
-        go.getComponents().add(rc);
+        const mc = new MeshComponent(this.box, ma);
+        //mc.setBillboard(new RealSphericalBillboard());
+        go.getComponents().add(mc);
     }
 
     public createNormalPomBox(): void {
@@ -165,8 +173,8 @@ export class TestSceneBuilder {
         const ma = new Material(BlinnPhongRenderer);
         ma.getParameters().set(MaterialSlot.USE_POM, 1);
         ma.getParameters().set(MaterialSlot.POM_SCALE, 0.2);
-        ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 50);
-        ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, 100);
+        ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 5);
+        ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, 10);
 
         const ns = new MaterialSlot();
         ns.setTexture2D(this.normal6);

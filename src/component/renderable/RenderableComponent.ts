@@ -5,7 +5,7 @@ import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { Material } from '../../material/Material';
 import { SphereBoundingShape } from './boundingshape/SphereBoundingShape';
 import { IRenderableComponent } from './IRenderableComponent';
-import { vec2, mat4 } from 'gl-matrix';
+import { vec2, mat4, vec3, quat } from 'gl-matrix';
 import { BlinnPhongRenderer } from '../../rendering/renderer/BlinnPhongRenderer';
 import { BoundingShape } from './boundingshape/BoundingShape';
 import { Billboard } from './billboard/Billboard';
@@ -160,6 +160,66 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
                 return this.billboard.getInverseModelMatrix();
             } else {
                 return this.getGameObject().getTransform().getInverseModelMatrix();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public getForwardVector(): vec3 {
+        if (this.getGameObject()) {
+            if (this.billboard) {
+                return this.billboard.getForwardVector();
+            } else {
+                return this.getGameObject().getTransform().getForwardVector();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public getRightVector(): vec3 {
+        if (this.getGameObject()) {
+            if (this.billboard) {
+                return this.billboard.getRightVector();
+            } else {
+                return this.getGameObject().getTransform().getRightVector();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public getUpVector(): vec3 {
+        if (this.getGameObject()) {
+            if (this.billboard) {
+                return this.billboard.getUpVector();
+            } else {
+                return this.getGameObject().getTransform().getUpVector();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public getRelativeRotation(): quat {
+        if (this.getGameObject()) {
+            if (this.billboard) {
+                return this.billboard.getRelativeRotation();
+            } else {
+                return this.getGameObject().getTransform().getRelativeRotation();
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public getAbsoluteRotation(): quat {
+        if (this.getGameObject()) {
+            if (this.billboard) {
+                return this.billboard.getAbsoluteRotation();
+            } else {
+                return this.getGameObject().getTransform().getAbsoluteRotation();
             }
         } else {
             return null;

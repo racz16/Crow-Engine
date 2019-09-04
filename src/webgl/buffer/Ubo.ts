@@ -15,7 +15,7 @@ export class Ubo extends GlBuffer {
     }
 
     public getBindingPoints(): Array<number> {
-        let ret = new Array<number>();
+        const ret = new Array<number>();
         for (const bp of Ubo.bindingPoints.keys()) {
             ret.push(bp);
         }

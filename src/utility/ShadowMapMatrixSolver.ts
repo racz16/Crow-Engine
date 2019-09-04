@@ -19,7 +19,7 @@ export class ShadowMapMatrixSolver {
     private static lightSpaceYMax: number;
     private static lightSpaceYMin: number;
 
-    private ShadowMapMatrixSolver() {
+    private constructor() {
     }
 
     public static computeMatrix(dirLight: GameObject, distance: number, nearDistance: number, farDistance: number): mat4 {
@@ -40,7 +40,7 @@ export class ShadowMapMatrixSolver {
     private static initializeLight(lightGameObject: GameObject, distance: number): void {
         this.lightRight = lightGameObject.getTransform().getRightVector();
         this.lightUp = lightGameObject.getTransform().getUpVector();
-        this.lightRotation = lightGameObject.getTransform().getAbsoluteRotation();
+        //this.lightRotation = lightGameObject.getTransform().getAbsoluteRotation();
         //this.lightPosition = this.camera.getFrustumCenter().add(lightGameObject.getTransform().getForwardVector().negate().mul(distance));
     }
 
@@ -90,7 +90,7 @@ export class ShadowMapMatrixSolver {
         const horizontalScale = (this.lightSpaceXMax - this.lightSpaceXMin) / 2;
         const verticalScale = (this.lightSpaceYMax - this.lightSpaceYMin) / 2;
         const lightProjectionMatrix = mat4.ortho(mat4.create(), -horizontalScale, horizontalScale, -verticalScale, verticalScale, near, far)
-        const lightViewMatrix = Utility.computeViewMatrix(this.lightPosition, this.lightRotation);
+        //const lightViewMatrix = Utility.computeViewMatrix(this.lightPosition, this.lightRotation);
         //return lightProjectionMatrix.mulOrthoAffine(lightViewMatrix);
         return null;
     }

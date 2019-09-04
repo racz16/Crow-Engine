@@ -21,7 +21,7 @@ export class ResourceManager {
     }
 
     public static getResources<T>(type: new (..._) => T): Array<T> {
-        let ret = new Array<T>();
+        const ret = new Array<T>();
         for (const resource of ResourceManager.resources) {
             if (resource instanceof type) {
                 ret.push(resource);

@@ -1,5 +1,5 @@
 export enum BillboardAxis {
-    X_AXIS = 0,
-    Y_AXIS = 1,
-    Z_AXIS = 2,
+    X = 0,
+    Y = 1,
+    Z = 2,
 }
