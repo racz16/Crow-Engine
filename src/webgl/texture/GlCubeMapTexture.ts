@@ -7,7 +7,7 @@ import { ICubeMapTexture } from '../../resource/texture/ICubeMapTexture';
 
 export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
 
-    public static SIDE_COUNT = 6;
+    public static readonly SIDE_COUNT = 6;
 
     private sides: Map<CubeMapSide, GlCubeMapTextureSide>;
     private wrapW = TextureWrap.REPEAT;

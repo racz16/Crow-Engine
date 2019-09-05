@@ -42,14 +42,14 @@ export abstract class GlTexture extends GlObject implements IResource {
         const glInternalFormat = InternalFormatResolver.enumToGl(this.internalFormat).code;
         this.bind();
         Gl.gl.texStorage2D(this.getTarget(), this.mipmapLevelCount, glInternalFormat, this.size[0], this.size[1]);
+        this.allocated = true;
     }
 
     protected allocationGeneral(internalFormat: InternalFormat, size: vec2, mipmaps: boolean): void {
         this.setInternalFormat(internalFormat);
         this.setSize(size);
-        this.setDataSize(this.computeDataSize());
-        this.allocated = true;
         this.setMipmapCount(mipmaps);
+        this.setDataSize(this.computeDataSize());
     }
 
     protected computeDataSize(): number {
@@ -199,7 +199,7 @@ export abstract class GlTexture extends GlObject implements IResource {
 
     public release(): void {
         Gl.gl.deleteTexture(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
         this.setDataSize(0);
         this.allocated = false;
     }

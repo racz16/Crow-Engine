@@ -4,10 +4,6 @@ import { Engine } from '../../core/Engine';
 
 export class SkyBoxShader extends Shader {
 
-    public constructor() {
-        super();
-    }
-
     public setUniforms() {
         this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
 

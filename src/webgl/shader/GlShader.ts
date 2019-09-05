@@ -1,6 +1,7 @@
 import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
 import { ShaderStage, ShaderStageResolver } from '../enum/ShaderStage';
+import { GlConstants } from '../GlConstants';
 
 export class GlShader extends GlObject {
 
@@ -15,6 +16,15 @@ export class GlShader extends GlObject {
     private createId(): number {
         const glStage = ShaderStageResolver.enumToGl(this.stage);
         return Gl.gl.createShader(glStage) as number;
+    }
+
+    public getTranslatedShaderSource(): string {
+        const debugExtension = GlConstants.DEBUG_SHADERS_EXTENSION;
+        if (debugExtension) {
+            return debugExtension.getTranslatedShaderSource(this.getId());
+        } else {
+            return null;
+        }
     }
 
     public getStage(): ShaderStage {

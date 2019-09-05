@@ -9,8 +9,6 @@ export class Gl {
 
     private static context: WebGL2RenderingContext;
     private static canvas: HTMLCanvasElement;
-    private static vendor: string;
-    private static renderer: string;
 
     private constructor() { }
 
@@ -21,17 +19,12 @@ export class Gl {
         }
         Gl.canvas = canvas;
         GlConstants.initialize();
-        const debugInfo = Gl.gl.getExtension('WEBGL_debug_renderer_info');
-        Gl.vendor = Gl.gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-        Gl.renderer = Gl.gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         Gl.setEnableCullFace(true);
         Gl.setCullFace(CullFace.BACK);
         Gl.setEnableBlend(true);
         Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
         Log.logString(LogLevel.INFO_1, 'WebGL initialized');
-        Log.logString(LogLevel.INFO_2, 'Vendor: ' + this.vendor);
-        Log.logString(LogLevel.INFO_2, 'Renderer: ' + this.renderer);
     }
 
     public static get gl(): WebGL2RenderingContext {
@@ -40,14 +33,6 @@ export class Gl {
 
     public static getCanvas(): HTMLCanvasElement {
         return Gl.canvas;
-    }
-
-    public static getVendor(): string {
-        return Gl.vendor;
-    }
-
-    public static getRenderer(): string {
-        return Gl.renderer;
     }
 
     public static isFaceCulling(): boolean {
@@ -107,6 +92,16 @@ export class Gl {
         } else {
             Gl.context.disable(Gl.context.DEPTH_TEST);
         }
+    }
+
+    public static getViewportSize(): vec2 {
+        const viewport = Gl.gl.getParameter(Gl.gl.VIEWPORT);
+        return vec2.fromValues(viewport[2], viewport[3]);
+    }
+
+    public static getViewportOffset(): vec2 {
+        const viewport = Gl.gl.getParameter(Gl.gl.VIEWPORT);
+        return vec2.fromValues(viewport[0], viewport[1]);
     }
 
     public static setViewport(size: vec2, offset: vec2): void {

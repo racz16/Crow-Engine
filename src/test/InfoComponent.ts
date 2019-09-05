@@ -1,7 +1,7 @@
 import { Component } from '../component/Component';
 import { Audio } from '../resource/Audio';
-import { Gl } from '../webgl/Gl';
 import { Engine } from '../core/Engine';
+import { GlConstants } from '../webgl/GlConstants';
 
 export class InfoComponent extends Component {
 
@@ -16,8 +16,8 @@ export class InfoComponent extends Component {
         document.getElementById('unmute').onclick = this.unmute;
         document.getElementById('expand').onclick = this.toggleFullscreen;
         document.getElementById('compress').onclick = this.toggleFullscreen;
-        document.getElementById('vendor').textContent = Gl.getVendor();
-        document.getElementById('renderer').textContent = Gl.getRenderer();
+        document.getElementById('vendor').textContent = GlConstants.UNMASKED_VENDOR;
+        document.getElementById('renderer').textContent = GlConstants.UNMASKED_RENDERER;
     }
 
     private mute(): void {
