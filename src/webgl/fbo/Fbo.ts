@@ -5,7 +5,6 @@ import { GlConstants } from '../GlConstants';
 import { FboAttachmentSlot, AttachmentSlotResolver } from '../enum/FboAttachmentSlot';
 import { FboCompleteness, FboCompletenessResolver } from '../enum/FboCompleteness';
 import { vec2 } from 'gl-matrix';
-import { Utility } from '../../utility/Utility';
 
 export class Fbo extends GlObject {
 
@@ -40,7 +39,7 @@ export class Fbo extends GlObject {
     }
 
     //attachments-------------------------------------------------------------------------------------------------------
-    public getAttachmentContainer(slot: FboAttachmentSlot, index: number): FboAttachmentContainer {
+    public getAttachmentContainer(slot: FboAttachmentSlot, index = -1): FboAttachmentContainer {
         switch (slot) {
             case FboAttachmentSlot.COLOR:
                 return this.color[index];
@@ -51,7 +50,7 @@ export class Fbo extends GlObject {
             case FboAttachmentSlot.DEPTH_STENCIL:
                 return this.depthStencil;
         }
-        return null;
+        throw new Error();
     }
 
     public static getMaxColorAttachments(): number {
@@ -104,13 +103,22 @@ export class Fbo extends GlObject {
     }
 
     public setDrawBuffers(...indices: Array<number>): void {
+        const attachments = new Array<number>();
         for (const fac of this.color) {
-            (fac as any).setDrawBuffer(indices.includes(fac.getIndex()));
+            const drawAttachment = indices.includes(fac.getIndex());
+            (fac as any).setDrawBuffer(drawAttachment);
+            if (drawAttachment) {
+                attachments.push(Gl.gl.COLOR_ATTACHMENT0 + fac.getIndex());
+            }
         }
-        if (indices.length === 0) {
-            indices.push(Gl.gl.NONE);
+        this.setDrawBuffersUnsafe(attachments);
+    }
+
+    private setDrawBuffersUnsafe(attachments: Array<number>): void {
+        if (attachments.length === 0) {
+            attachments.push(Gl.gl.NONE);
         }
-        Gl.gl.drawBuffers(indices);
+        Gl.gl.drawBuffers(attachments);
     }
 
     public static getMaxDrawBuffers(): number {
@@ -185,7 +193,7 @@ export class Fbo extends GlObject {
 
     public release(): void {
         Gl.gl.deleteFramebuffer(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
     }
 
 }

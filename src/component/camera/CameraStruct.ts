@@ -27,7 +27,7 @@ export class CameraStruct implements IInvalidatable {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT.bindingPoint);
+        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
     }
 
     private createUboIfNotUsable(): void {
@@ -48,8 +48,8 @@ export class CameraStruct implements IInvalidatable {
 
     private refreshUboUnsafe(camera: ICameraComponent): void {
         this.ubo.store(new Float32Array(camera.getViewMatrix()));
-        this.ubo.storewithOffset(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
-        this.ubo.storewithOffset(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
+        this.ubo.store(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
+        this.ubo.store(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
         this.valid = true;
         Log.logString(LogLevel.INFO_2, 'Camera Matrices ubo refreshed');
     }

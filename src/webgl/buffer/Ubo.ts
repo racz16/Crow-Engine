@@ -1,25 +1,20 @@
 import { GlBuffer } from './GlBuffer';
 import { GlConstants } from '../GlConstants';
 import { Gl } from '../Gl';
+import { BindingPoint } from '../../rendering/BindingPoint';
 
 export class Ubo extends GlBuffer {
 
-    private static bindingPoints = new Map<number, Ubo>();
     public static readonly MAT4_SIZE = 16 * 4;
     public static readonly VEC3_SIZE = 3 * 4 + 4;
     public static readonly VEC4_SIZE = 4 * 4;
 
-    public bindToBindingPoint(bindingPoint: number): void {
-        Ubo.bindingPoints.set(bindingPoint, this);
+    public bindTo(bindingPoint: number): void {
         Gl.gl.bindBufferBase(this.getTarget(), bindingPoint, this.getId());
     }
 
-    public getBindingPoints(): Array<number> {
-        const ret = new Array<number>();
-        for (const bp of Ubo.bindingPoints.keys()) {
-            ret.push(bp);
-        }
-        return ret;
+    public bindToBindingPoint(bindingPoint: BindingPoint): void {
+        this.bindTo(bindingPoint.bindingPoint);
     }
 
     public getTarget(): number {

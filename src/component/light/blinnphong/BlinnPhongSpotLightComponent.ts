@@ -11,15 +11,15 @@ export class BlinnPhongSpotLightComponent extends BlinnPhongPositionalLightCompo
     private outerCutoff = 15.0;
 
     protected refresh(ubo: Ubo, index: number) {
-        ubo.storewithOffset(new Float32Array(this.getAmbientColor()), this.computeOffset(BlinnPhongLightComponent.AMBIENT_OFFSET, index));
-        ubo.storewithOffset(new Float32Array(this.getDiffuseColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
-        ubo.storewithOffset(new Float32Array(this.getSpecularColor()), this.computeOffset(BlinnPhongLightComponent.SPECULAR_OFFSET, index));
-        ubo.storewithOffset(new Float32Array(this.getGameObject().getTransform().getForwardVector()), this.computeOffset(BlinnPhongLightComponent.DIRECTION_OFFSET, index));
-        ubo.storewithOffset(new Float32Array(this.getGameObject().getTransform().getAbsolutePosition()), this.computeOffset(BlinnPhongLightComponent.POSITION_OFFSET, index));
-        ubo.storewithOffset(new Float32Array([this.getConstant(), this.getLinear(), this.getQuadratic()]), this.computeOffset(BlinnPhongLightComponent.ATTENUATION_OFFSET, index));
-        ubo.storewithOffset(new Float32Array([Math.cos(Utility.toRadians(this.getCutoff())), Math.cos(Utility.toRadians(this.getOuterCutoff()))]), this.computeOffset(BlinnPhongLightComponent.CUTOFF_OFFSET, index));
-        ubo.storewithOffset(new Int32Array([BlinnPhongSpotLightComponent.SPOT_LIGHT_TYPE]), this.computeOffset(BlinnPhongLightComponent.TYPE_OFFSET, index));
-        ubo.storewithOffset(new Int32Array([this.isActive() ? 1 : 0]), this.computeOffset(BlinnPhongLightComponent.ACTIVE_OFFSET, index));
+        ubo.store(new Float32Array(this.getAmbientColor()), this.computeOffset(BlinnPhongLightComponent.AMBIENT_OFFSET, index));
+        ubo.store(new Float32Array(this.getDiffuseColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
+        ubo.store(new Float32Array(this.getSpecularColor()), this.computeOffset(BlinnPhongLightComponent.SPECULAR_OFFSET, index));
+        ubo.store(new Float32Array(this.getGameObject().getTransform().getForwardVector()), this.computeOffset(BlinnPhongLightComponent.DIRECTION_OFFSET, index));
+        ubo.store(new Float32Array(this.getGameObject().getTransform().getAbsolutePosition()), this.computeOffset(BlinnPhongLightComponent.POSITION_OFFSET, index));
+        ubo.store(new Float32Array([this.getConstant(), this.getLinear(), this.getQuadratic()]), this.computeOffset(BlinnPhongLightComponent.ATTENUATION_OFFSET, index));
+        ubo.store(new Float32Array([Math.cos(Utility.toRadians(this.getCutoff())), Math.cos(Utility.toRadians(this.getOuterCutoff()))]), this.computeOffset(BlinnPhongLightComponent.CUTOFF_OFFSET, index));
+        ubo.store(new Int32Array([BlinnPhongSpotLightComponent.SPOT_LIGHT_TYPE]), this.computeOffset(BlinnPhongLightComponent.TYPE_OFFSET, index));
+        ubo.store(new Int32Array([this.isActive() ? 1 : 0]), this.computeOffset(BlinnPhongLightComponent.ACTIVE_OFFSET, index));
     }
 
     public getCutoff(): number {

@@ -31,7 +31,7 @@ export class CubeMesh implements IMesh {
         const pos = new Vbo();
         pos.allocateAndStore(new Float32Array(this.positions), BufferObjectUsage.STATIC_DRAW);
         this.vao.getVertexAttribArray(0).setVbo(pos, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).enable();
+        this.vao.getVertexAttribArray(0).setEnabled(true);
     }
 
     public getVertexCount(): number {

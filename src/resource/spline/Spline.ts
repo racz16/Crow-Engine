@@ -46,7 +46,7 @@ export class Spline implements ISpline {
         this.vao = new Vao();
         const vbo = new Vbo();
         this.vao.getVertexAttribArray(0).setVbo(vbo, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).enable();
+        this.vao.getVertexAttribArray(0).setEnabled(true);
     }
 
     private refreshSpline(): void {

@@ -65,12 +65,7 @@ export abstract class GlBuffer extends GlObject {
     //data store--------------------------------------------------------
     //
     public store(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array): void {
-        this.storewithOffset(data, 0);
-    }
-
-    public storewithOffset(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array, offset: number): void {
+        Float64Array, offset = 0): void {
         this.bind();
         Gl.gl.bufferSubData(this.getTarget(), offset, data, 0);
     }
@@ -78,9 +73,9 @@ export abstract class GlBuffer extends GlObject {
     //
     //misc--------------------------------------------------------------
     //
-    public copyBufferDataFrom(readSource: GlBuffer, readOffset: number, writeOffset: number, size: number): void {
-        this.bindToRead();
-        readSource.bindToWrite();
+    public copyDataFrom(readSource: GlBuffer, readOffset: number, writeOffset: number, size: number): void {
+        this.bindToWrite()
+        readSource.bindToRead();
         Gl.gl.copyBufferSubData(Gl.gl.COPY_READ_BUFFER, Gl.gl.COPY_WRITE_BUFFER, readOffset, writeOffset, size);
     }
 
@@ -90,7 +85,7 @@ export abstract class GlBuffer extends GlObject {
 
     public release(): void {
         Gl.gl.deleteBuffer(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
         this.setDataSize(0);
         this.allocated = false;
     }

@@ -55,7 +55,7 @@ export class QuadMesh implements IMesh {
         const positionVbo = new Vbo();
         positionVbo.allocateAndStore(new Float32Array(positions), BufferObjectUsage.STATIC_DRAW);
         this.vao.getVertexAttribArray(0).setVbo(positionVbo, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).enable();
+        this.vao.getVertexAttribArray(0).setEnabled(true);
         //positionVbo.allocateAndStoreImmutable(positions, false);
         //this.vao.connectVbo(positionVbo, new VertexAttribPointer(0, 3));
 
@@ -63,7 +63,7 @@ export class QuadMesh implements IMesh {
         const uvVbo = new Vbo();
         uvVbo.allocateAndStore(new Float32Array(uv), BufferObjectUsage.STATIC_DRAW);
         this.vao.getVertexAttribArray(1).setVbo(uvVbo, new VertexAttribPointer(2));
-        this.vao.getVertexAttribArray(1).enable();
+        this.vao.getVertexAttribArray(1).setEnabled(true);
         //uvVbo.allocateAndStoreImmutable(uv, false);
         //this.vao.connectVbo(uvVbo, new VertexAttribPointer(1, 2));
 

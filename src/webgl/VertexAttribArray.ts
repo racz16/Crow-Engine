@@ -39,18 +39,18 @@ export class VertexAttribArray {
         return this.vap;
     }
 
-    public enable(): void {
-        Gl.gl.enableVertexAttribArray(this.index);
-        this.enabled = true;
-    }
-
-    public disable(): void {
-        Gl.gl.disableVertexAttribArray(this.index)
-        this.enabled = false;
-    }
-
     public isEnabled(): boolean {
         return this.enabled;
+    }
+
+    public setEnabled(enabled: boolean): void {
+        this.vao.bind();
+        if (enabled) {
+            Gl.gl.enableVertexAttribArray(this.index);
+        } else {
+            Gl.gl.disableVertexAttribArray(this.index)
+        }
+        this.enabled = enabled;
     }
 
     public getIndex(): number {

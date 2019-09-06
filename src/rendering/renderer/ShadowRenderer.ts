@@ -79,7 +79,7 @@ export class ShadowRenderer extends Renderer {
             //.getGameObject(), this.getShadowCameraDistance(), this.getShadowCameraNearDistance(), this.getShadowCameraFarDistance()));
             //RenderingPipeline.getParameters()
             //.set(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRIX, new Parameter<mat4>(mat4.from(this.projectionViewMatrix)));
-            if (!Utility.isUsable(this.fbo) || this.getResolution() != this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getAttachment().getSize()[0]) {
+            if (!Utility.isUsable(this.fbo) || this.getResolution() != this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getAttachment().getSize()[0]) {
                 this.releaseFbo();
                 this.generateFbo();
             }
@@ -108,7 +108,7 @@ export class ShadowRenderer extends Renderer {
             }
         }
         this.afterShader();
-        RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).getTextureAttachment());
+        RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getTextureAttachment());
     }
 
     private beforeShader(): void {
@@ -140,7 +140,7 @@ export class ShadowRenderer extends Renderer {
             //fbo.bind();
             const depthTexture = new GlTexture2D();
             depthTexture.allocate(InternalFormat.DEPTH16, vec2.fromValues(this.getResolution(), this.getResolution()), false);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).attachTexture2D(depthTexture);
+            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachTexture2D(depthTexture);
             //fbo.setActiveDraw(false, 0);
             //fbo.setReadBuffer(false, 0);
             this.fbo.setDrawBuffers();

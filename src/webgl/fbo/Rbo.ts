@@ -68,7 +68,7 @@ export class Rbo extends GlObject implements IFboAttachment {
     }
 
     public getSize(): vec2 {
-        return vec2.copy(vec2.create(), this.size);
+        return vec2.clone(this.size);
     }
 
     private setSize(size: vec2): void {
@@ -103,9 +103,13 @@ export class Rbo extends GlObject implements IFboAttachment {
         return GlConstants.MAX_SAMPLES_SAFE;
     }
 
+    public issRgb(): boolean {
+        return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat === InternalFormat.SRGB8;
+    }
+
     public release(): void {
         Gl.gl.deleteRenderbuffer(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
         this.setDataSize(0);
         this.allocated = false;
     }

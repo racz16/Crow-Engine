@@ -31,7 +31,7 @@ export class BlinnPhongLightsStruct {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT.bindingPoint);
+        this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT);
     }
 
     private createUboIfNotUsable(): void {
@@ -73,7 +73,7 @@ export class BlinnPhongLightsStruct {
 
     private refreshRemainingSlotsInUbo(): void {
         for (let i = this.addedLightCount; i < BlinnPhongLightsStruct.LIGHT_COUNT; i++) {
-            this.ubo.storewithOffset(new Int32Array([0]), i * BlinnPhongLightsStruct.LIGHT_DATASIZE + BlinnPhongLightsStruct.ACTIVE_OFFSET);
+            this.ubo.store(new Int32Array([0]), i * BlinnPhongLightsStruct.LIGHT_DATASIZE + BlinnPhongLightsStruct.ACTIVE_OFFSET);
         }
     }
 

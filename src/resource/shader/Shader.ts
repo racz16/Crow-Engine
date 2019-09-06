@@ -62,7 +62,7 @@ export abstract class Shader {
         shader.setSource(source);
         shader.compile();
         if (!shader.isCompileValid()) {
-            throw new Error(shader.getCompileErrorMessage());
+            throw new Error(shader.getCompileInfo());
         }
         this.shaderProgram.attachShader(shader);
         shader.release();

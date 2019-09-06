@@ -83,7 +83,7 @@ export class StaticMesh implements IMesh {
             const vbo = new Vbo();
             vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
             this.vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new VertexAttribPointer(vertexSize));
-            this.vao.getVertexAttribArray(vertexAttribArrayIndex).enable();
+            this.vao.getVertexAttribArray(vertexAttribArrayIndex).setEnabled(true);
         }
     }
 

@@ -59,6 +59,6 @@ export class Vao extends GlObject {
     //
     public release(): void {
         Gl.gl.deleteVertexArray(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
     }
 }

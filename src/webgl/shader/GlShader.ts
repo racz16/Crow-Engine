@@ -47,7 +47,7 @@ export class GlShader extends GlObject {
         return Gl.gl.getShaderParameter(this.getId(), Gl.gl.COMPILE_STATUS);
     }
 
-    public getCompileErrorMessage(): string {
+    public getCompileInfo(): string {
         return Gl.gl.getShaderInfoLog(this.getId());
     }
 

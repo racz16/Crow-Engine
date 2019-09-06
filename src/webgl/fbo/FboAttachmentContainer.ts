@@ -115,5 +115,4 @@ export class FboAttachmentContainer {
         this.fbo.setReadBuffer(this.index);
     }
 
-
 }
