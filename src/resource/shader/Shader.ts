@@ -33,9 +33,12 @@ export abstract class Shader {
             this.addShader(ShaderStage.VERTEX_SHADER, this.vertexSource);
             this.addShader(ShaderStage.FRAGMENT_SHADER, this.fragmentSource);
             this.shaderProgram.link();
+            if (!this.shaderProgram.isLinkValid()) {
+                throw new Error(this.shaderProgram.getValidationOrLinkInfo());
+            }
             this.shaderProgram.validate();
-            if (!this.shaderProgram.isLinkValid() || !this.shaderProgram.isProgramValid()) {
-                throw new Error(this.shaderProgram.getLinkErrorMessage());
+            if (!this.shaderProgram.isProgramValid()) {
+                throw new Error(this.shaderProgram.getValidationOrLinkInfo());
             }
             this.loaded = true;
         }

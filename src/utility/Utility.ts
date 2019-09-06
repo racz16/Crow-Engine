@@ -15,6 +15,18 @@ export class Utility {
         return mat4.fromRotationTranslationScale(mat4.create(), rotation, position, scale);
     }
 
+    public static computeInverseModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
+        const model = mat4.create();
+        mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
+        const axis = vec3.create();
+        const angle = quat.getAxisAngle(axis, rotation);
+        if (!Number.isNaN(angle)) {
+            mat4.rotate(model, model, -angle, axis);
+        }
+        mat4.translate(model, model, vec3.negate(vec3.create(), position));
+        return model;
+    }
+
     public static computeModelMatrixFromDirections(forward: vec3, up: vec3, right: vec3, position: vec3, scale: vec3): mat4 {
         const mat = mat4.fromValues(
             right[0], right[1], right[2], 0,
@@ -35,18 +47,6 @@ export class Utility {
             -position[0], -position[1], -position[2], 1
         );
         return mat4.mul(mat4.create(), scaleMatrix, rotationTranslationMatrix);
-    }
-
-    public static computeInverseModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
-        const model = mat4.create();
-        mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
-        const axis = vec3.create();
-        const angle = quat.getAxisAngle(axis, rotation);
-        if (!Number.isNaN(angle)) {
-            mat4.rotate(model, model, -angle, axis);
-        }
-        mat4.translate(model, model, vec3.negate(vec3.create(), position));
-        return model;
     }
 
     public static computeViewMatrix(position: vec3, rotation: quat): mat4 {

@@ -53,6 +53,6 @@ export class GlShader extends GlObject {
 
     public release(): void {
         Gl.gl.deleteShader(this.getId());
-        this.setId(-1);
+        this.setId(GlObject.INVALID_ID);
     }
 }
