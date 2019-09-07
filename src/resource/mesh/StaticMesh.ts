@@ -2,13 +2,13 @@ import { IMesh } from './../mesh/IMesh';
 import { vec3 } from 'gl-matrix';
 import { Vao } from '../../webgl/Vao';
 import { Gl } from '../../webgl/Gl';
-import { ResourceManager } from '../ResourceManager';
 import { Vbo } from '../../webgl/buffer/Vbo';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Ebo } from '../../webgl/buffer/Ebo';
 import { Mesh } from '../../../node_modules/webgl-obj-loader/src/index';
 import { Utility } from '../../utility/Utility';
+import { Engine } from '../../core/Engine';
 
 export class StaticMesh implements IMesh {
 
@@ -21,7 +21,7 @@ export class StaticMesh implements IMesh {
 
     public constructor(path: string) {
         this.load(path);
-        ResourceManager.add(this);
+        Engine.getResourceManager().add(this);
     }
 
     private async load(path: string): Promise<void> {

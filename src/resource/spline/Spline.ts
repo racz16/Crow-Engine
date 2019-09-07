@@ -1,5 +1,4 @@
 import { ISpline } from './ISpline';
-import { ResourceManager } from '../ResourceManager';
 import { vec3 } from 'gl-matrix';
 import { Vao } from '../../webgl/Vao';
 import { Utility } from '../../utility/Utility';
@@ -8,6 +7,7 @@ import { Vbo } from '../../webgl/buffer/Vbo';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { SplinePoint } from './SplinePoint';
+import { Engine } from '../../core/Engine';
 
 export class Spline implements ISpline {
     protected controlPoints: Array<SplinePoint> = [];
@@ -25,7 +25,7 @@ export class Spline implements ISpline {
     protected furthestVertexDistance: number;
 
     public constructor() {
-        ResourceManager.add(this);
+        Engine.getResourceManager().add(this);
     }
 
     protected refresh(): void {

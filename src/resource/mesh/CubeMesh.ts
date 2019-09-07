@@ -1,12 +1,12 @@
 import { IMesh } from './IMesh';
 import { Vao } from '../../webgl/Vao';
-import { ResourceManager } from '../ResourceManager';
 import { vec3 } from 'gl-matrix';
 import { Gl } from '../../webgl/Gl';
 import { Vbo } from '../../webgl/buffer/Vbo';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Utility } from '../../utility/Utility';
+import { Engine } from '../../core/Engine';
 
 export class CubeMesh implements IMesh {
 
@@ -16,7 +16,7 @@ export class CubeMesh implements IMesh {
 
     private constructor() {
         this.loadData();
-        ResourceManager.add(this);
+        Engine.getResourceManager().add(this);
     }
 
     public static getInstance(): CubeMesh {

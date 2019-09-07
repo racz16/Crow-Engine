@@ -1,5 +1,5 @@
 import { IResource } from '../resource/IResource';
-import { ResourceManager } from '../resource/ResourceManager';
+import { Engine } from '../core/Engine';
 
 export abstract class GlObject implements IResource {
 
@@ -8,7 +8,7 @@ export abstract class GlObject implements IResource {
     private id = GlObject.INVALID_ID;
 
     public constructor() {
-        ResourceManager.add(this);
+        Engine.getResourceManager().add(this);
     }
 
     public getId(): number {

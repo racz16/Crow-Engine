@@ -17,8 +17,9 @@ export class Engine {
     public static readonly MAIN_CAMERA = new ParameterKey<ICameraComponent>('MAIN_CAMERA');
     public static readonly MAIN_SKYBOX = new ParameterKey<ICubeMapTexture>('MAIN_SKYBOX');
     public static readonly MAIN_AUDIO_LISTENER = new ParameterKey<AudioListenerComponent>('MAIN_AUDIO_LISTENER');
-    public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>("GAMEOBJECT_CONTAINER");
-    public static readonly TIME_MANAGER = new ParameterKey<TimeManager>("TIME_MANAGER");
+    public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>('GAMEOBJECT_CONTAINER');
+    public static readonly TIME_MANAGER = new ParameterKey<TimeManager>('TIME_MANAGER');
+    public static readonly RESOURCE_MANAGER = new ParameterKey<ResourceManager>('RESOURCE_MANAGER');
 
     private static readonly PARAMETERS = new ParameterContainer();
 
@@ -33,17 +34,17 @@ export class Engine {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
             Log.logObject(LogLevel.ERROR, error);
-            ResourceManager.releaseResources();
+            this.getResourceManager().releaseResources();
         }
     }
 
     private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
         Log.startGroup('initialization');
         Log.initialize(logLevel);
+        this.initializeSystems();
         Gl.initialize(canvas);
         Audio.initialize();
         RenderingPipeline.initialize();
-        this.initializeSystems();
         Engine.initialized = true;
         Log.endGroup();
     }
@@ -51,6 +52,7 @@ export class Engine {
     private static initializeSystems(): void {
         this.setGameObjectContainer(new GameObjectContainer());
         this.setTimeManager(new TimeManager());
+        this.setResourceManager(new ResourceManager());
     }
 
     //
@@ -104,6 +106,17 @@ export class Engine {
         this.PARAMETERS.set(this.TIME_MANAGER, timeManager);
     }
 
+    public static getResourceManager(): ResourceManager {
+        return this.PARAMETERS.get(this.RESOURCE_MANAGER);
+    }
+
+    public static setResourceManager(resourceManager: ResourceManager): void {
+        if (!resourceManager) {
+            Log.logString(LogLevel.WARNING, 'Resource Manager set to null');
+        }
+        this.PARAMETERS.set(this.RESOURCE_MANAGER, resourceManager);
+    }
+
     //
     //engine lifecycle
     //
@@ -130,7 +143,7 @@ export class Engine {
         if (Engine.started) {
             throw Error();
         }
-        ResourceManager.releaseResources();
+        this.getResourceManager().releaseResources();
     }
 
     private static createNextFrame(): void {
@@ -140,7 +153,7 @@ export class Engine {
             }
         } catch (error) {
             Log.logObject(LogLevel.ERROR, error);
-            ResourceManager.releaseResources();
+            this.getResourceManager().releaseResources();
         }
     }
 

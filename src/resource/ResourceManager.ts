@@ -2,39 +2,38 @@ import { IResource } from './IResource';
 
 export class ResourceManager {
 
-    private static resources = new Array<IResource>();
+    private resources = new Array<IResource>();
 
-    private constructor() { }
+    public constructor() { }
 
-    public static add(resource: IResource): void {
-        if (!ResourceManager.contains(resource)) {
-            ResourceManager.resources.push(resource);
+    public add(resource: IResource): void {
+        if (!this.contains(resource)) {
+            this.resources.push(resource);
         }
     }
 
-    public static contains(resource: IResource): boolean {
-        return ResourceManager.resources.includes(resource);
+    public contains(resource: IResource): boolean {
+        return this.resources.includes(resource);
     }
 
-    public static getResourcesIterator(): IterableIterator<IResource> {
-        return ResourceManager.resources.values();
+    public getAllResourcesIterator(): IterableIterator<IResource> {
+        return this.resources.values();
     }
 
-    public static getResources<T>(type: new (..._) => T): Array<T> {
+    public getResourcesIterator<T>(type: new (..._) => T): IterableIterator<T> {
         const ret = new Array<T>();
-        for (const resource of ResourceManager.resources) {
+        for (const resource of this.resources) {
             if (resource instanceof type) {
                 ret.push(resource);
             }
         }
-        return ret;
+        return ret.values();
     }
 
-    public static releaseResources(): void {
-        for (const resource of ResourceManager.resources) {
+    public releaseResources(): void {
+        for (const resource of this.resources) {
             resource.release();
         }
-        ResourceManager.resources = [];
     }
 
 }

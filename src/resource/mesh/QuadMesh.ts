@@ -3,11 +3,11 @@ import { Vao } from '../../webgl/Vao';
 import { vec3 } from 'gl-matrix';
 import { Ebo } from '../../webgl/buffer/Ebo';
 import { Vbo } from '../../webgl/buffer/Vbo';
-import { ResourceManager } from '../ResourceManager';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Gl } from '../../webgl/Gl';
 import { Utility } from '../../utility/Utility';
+import { Engine } from '../../core/Engine';
 
 export class QuadMesh implements IMesh {
 
@@ -16,7 +16,7 @@ export class QuadMesh implements IMesh {
 
     private constructor() {
         this.loadData();
-        ResourceManager.add(this);
+        Engine.getResourceManager().add(this);
     }
 
     public static getInstance(): QuadMesh {

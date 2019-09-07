@@ -1,8 +1,6 @@
-import { vec3 } from 'gl-matrix';
 import { IAudioSourceComponent } from '../component/audio/IAudioSourceComponent';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
-import { Axis } from '../utility/Axis';
 
 export class Audio {
 
@@ -15,22 +13,22 @@ export class Audio {
 
     public static initialize(): void {
         this.ctx = new AudioContext();
-        this.deprecated = this.ctx.listener.positionX === undefined;
+        this.deprecated = this.ctx.listener.positionX === undefined; // a Firefox csak a régi API-t támogatja
         Log.logString(LogLevel.INFO_1, 'Web Audio API initialized');
     }
 
     public static addAudioSource(audioSource: IAudioSourceComponent): void {
-        if (!this.audioSources.includes(audioSource)) {
+        if (!this.containsAudioSource(audioSource)) {
             this.audioSources.push(audioSource);
         }
     }
 
-    public static getAudioSourceCount(): number {
-        return this.audioSources.length;
+    public static containsAudioSource(audioSource: IAudioSourceComponent): boolean {
+        return this.audioSources.includes(audioSource);
     }
 
-    public static getAudioSource(index: number): IAudioSourceComponent {
-        return this.audioSources[index];
+    public static getAudioSourceCount(): number {
+        return this.audioSources.length;
     }
 
     public static getAudioSourcesIterator(): IterableIterator<IAudioSourceComponent> {
@@ -59,49 +57,12 @@ export class Audio {
         return this.ctx.state === 'running';
     }
 
-    public static tryStartContext(): void {
+    public static resume(): void {
         this.ctx.resume();
     }
 
-    public static setAudioListenerToDefault(): void {
-        const position = vec3.create();
-        const forward = Axis.Z;
-        const up = Axis.Y;
-        this.setAudioListenerPosition(position);
-        this.setAudioListenerDirections(forward, up);
+    public static isDeprecated(): boolean {
+        return this.deprecated;
     }
 
-    public static setAudioListener(position: vec3, forward: vec3, up: vec3): void {
-        this.setAudioListenerPosition(position);
-        this.setAudioListenerDirections(forward, up);
-    }
-
-    private static setAudioListenerPosition(position: vec3): void {
-        const listener = this.context.listener;
-        if (this.deprecated) {
-            listener.setPosition(position[0], position[1], position[2]);
-        } else {
-            listener.positionX.setValueAtTime(position[0], 0);
-            listener.positionY.setValueAtTime(position[1], 0);
-            listener.positionZ.setValueAtTime(position[2], 0);
-        }
-    }
-
-    private static setAudioListenerDirections(forward: vec3, up: vec3): void {
-        const listener = this.context.listener;
-        if (this.deprecated) {
-            listener.setOrientation(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
-        } else {
-            this.setAudioListenerOrientation(listener, forward, up);
-        }
-    }
-
-    private static setAudioListenerOrientation(listener: AudioListener, forward: vec3, up: vec3): void {
-        listener.forwardX.setValueAtTime(forward[0], 0);
-        listener.forwardY.setValueAtTime(forward[1], 0);
-        listener.forwardZ.setValueAtTime(forward[2], 0);
-        listener.upX.setValueAtTime(up[0], 0);
-        listener.upY.setValueAtTime(up[1], 0);
-        listener.upZ.setValueAtTime(up[2], 0);
-    }
 }
