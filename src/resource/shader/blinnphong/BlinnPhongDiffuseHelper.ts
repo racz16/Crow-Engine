@@ -3,6 +3,7 @@ import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { Material } from '../../../material/Material';
 import { BlinnPhongHelper } from './BlinnPhongHelper';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongDiffuseHelper extends BlinnPhongHelper {
 
@@ -22,7 +23,7 @@ export class BlinnPhongDiffuseHelper extends BlinnPhongHelper {
     }
 
     protected getTextureUnit(): number {
-        return 1;
+        return Conventions.DIFFUSE_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

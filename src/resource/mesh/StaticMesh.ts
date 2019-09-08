@@ -9,6 +9,7 @@ import { Ebo } from '../../webgl/buffer/Ebo';
 import { Mesh } from '../../../node_modules/webgl-obj-loader/src/index';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
+import { Conventions } from '../Conventions';
 
 export class StaticMesh implements IMesh {
 
@@ -17,77 +18,92 @@ export class StaticMesh implements IMesh {
     private aabbMin = vec3.create();
     private aabbMax = vec3.create();
     private vao: Vao;
-    private furthestVertexDistance: number;
+    private radius: number;
     private textureCoordinates = false;
     private normals = false;
     private tangents = false;
 
     public constructor(path: string) {
-        this.load(path);
+        this.loadMesh(path);
         Engine.getResourceManager().add(this);
     }
 
-    private async load(path: string): Promise<void> {
+    private async loadMesh(path: string): Promise<void> {
         const response = await fetch(path);
         const text = await response.text();
         const mesh = new Mesh(text, { calcTangentsAndBitangents: true });
         this.vertexCount = mesh.indices.length;
         this.faceCount = this.vertexCount / 3;
         this.computeFrustumCullingData(mesh);
-        this.loadMesh(mesh);
+        this.createVao(mesh);
     }
 
     //
     //loading-saving------------------------------------------------------------
     //
     private computeFrustumCullingData(mesh: Mesh): void {
-        let max = 0;
-        const aabbMax = vec3.create();
-        const aabbMin = vec3.create();
-        let currentVec = vec3.create();
-
-        for (let i = 0; i < mesh.vertices.length; i += 3) {
-            currentVec = vec3.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]);
-            //furthest vertex distance
-            if (max < vec3.length(currentVec)) {
-                max = vec3.length(currentVec);
-            }
-            //aabb
-            for (let j = 0; j < 3; j++) {
-                if (currentVec[j] < aabbMin[j]) {
-                    aabbMin[j] = currentVec[j];
-                }
-                if (currentVec[j] > aabbMax[j]) {
-                    aabbMax[j] = currentVec[j];
-                }
-            }
-        }
-
-        this.aabbMin.set(aabbMin);
-        this.aabbMax.set(aabbMax);
-        this.furthestVertexDistance = max;
+        this.radius = 0;
+        this.aabbMax = vec3.create();
+        this.aabbMin = vec3.create();
+        this.computeFrustumCullingDataUnsafe(mesh);
     }
 
-    private loadMesh(mesh: Mesh): void {
+    private computeFrustumCullingDataUnsafe(mesh: Mesh): void {
+        const vertexPosition = vec3.create();
+        for (let i = 0; i < mesh.vertices.length; i += 3) {
+            vertexPosition.set(vec3.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]));
+            this.refreshRadius(vertexPosition);
+            this.refreshAabb(vertexPosition);
+        }
+    }
+
+    private refreshRadius(position: vec3): void {
+        if (this.radius < vec3.length(position)) {
+            this.radius = vec3.length(position);
+        }
+    }
+
+    private refreshAabb(position: vec3): void {
+        for (let j = 0; j < 3; j++) {
+            if (position[j] < this.aabbMin[j]) {
+                this.aabbMin[j] = position[j];
+            }
+            if (position[j] > this.aabbMax[j]) {
+                this.aabbMax[j] = position[j];
+            }
+        }
+    }
+
+    private createVao(mesh: Mesh): void {
         this.vao = new Vao();
+        this.addEbo(mesh.indices);
+        this.addVbo(mesh.vertices, Conventions.POSITIONS_VBO_INDEX, 3);
+        this.addVbo(mesh.textures, Conventions.TEXTURE_COORDINATES_VBO_INDEX, 2);
+        this.addVbo(mesh.vertexNormals, Conventions.NORMALS_VBO_INDEX, 3);
+        this.addVbo(mesh.tangents, Conventions.TANGENTS_VBO_INDEX, 3);
+    }
 
-        this.addVbo(mesh.vertices, 0, 3);
-        this.addVbo(mesh.textures, 1, 2);
-        this.addVbo(mesh.vertexNormals, 2, 3);
-        this.addVbo(mesh.tangents, 3, 3);
-
+    private addEbo(indices: Array<number>): void {
         const ebo = new Ebo();
-        ebo.allocateAndStore(new Uint32Array(mesh.indices), BufferObjectUsage.STATIC_DRAW);
         this.vao.setEbo(ebo);
+        ebo.allocateAndStore(new Uint32Array(indices), BufferObjectUsage.STATIC_DRAW); this.vao.bind();
     }
 
     private addVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
-        //TODO implementálni, hogy volt-e normal, tangent stb.
+        this.setFlag(vertexAttribArrayIndex, !!data);
         if (data) {
             const vbo = new Vbo();
             vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
             this.vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new VertexAttribPointer(vertexSize));
             this.vao.getVertexAttribArray(vertexAttribArrayIndex).setEnabled(true);
+        }
+    }
+
+    private setFlag(index: number, hasData: boolean): void {
+        switch (index) {
+            case Conventions.TEXTURE_COORDINATES_VBO_INDEX: this.textureCoordinates = hasData; break;
+            case Conventions.NORMALS_VBO_INDEX: this.normals = hasData; break;
+            case Conventions.TANGENTS_VBO_INDEX: this.tangents = hasData; break;
         }
     }
 
@@ -104,7 +120,10 @@ export class StaticMesh implements IMesh {
     }
 
     public release(): void {
-        this.vao.release();
+        if (this.isUsable()) {
+            this.vao.release();
+            this.vao = null;
+        }
     }
 
     //
@@ -123,7 +142,7 @@ export class StaticMesh implements IMesh {
     }
 
     public getObjectSpaceRadius(): number {
-        return this.furthestVertexDistance;
+        return this.radius;
     }
 
     public getObjectSpaceAabbMax(): vec3 {

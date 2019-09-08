@@ -4,9 +4,9 @@ import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { ICameraComponent } from './ICameraComponent';
-import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { IInvalidatable } from '../../utility/invalidatable/IInvalidatable';
 import { Engine } from '../../core/Engine';
+import { Conventions } from '../../resource/Conventions';
 
 export class CameraStruct implements IInvalidatable {
 
@@ -27,7 +27,7 @@ export class CameraStruct implements IInvalidatable {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
+        this.ubo.bindToBindingPoint(Conventions.CAMERA_BINDING_POINT);
     }
 
     private createUboIfNotUsable(): void {

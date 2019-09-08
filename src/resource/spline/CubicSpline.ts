@@ -9,7 +9,7 @@ export abstract class CubicSpline extends Spline {
     protected computeSplineData(): Array<number> {
         this.aabbMax = vec3.create();
         this.aabbMin = vec3.create();
-        this.furthestVertexDistance = 0;
+        this.radius = 0;
         const data = new Array<number>();
         for (let i = 0; i < this.getNumberOfControlPoints() - 1; i++) {
             this.addSplineSegmentToData(data, i);

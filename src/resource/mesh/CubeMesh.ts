@@ -7,7 +7,7 @@ import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
-import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { Conventions } from '../Conventions';
 
 export class CubeMesh implements IMesh {
 
@@ -69,8 +69,8 @@ export class CubeMesh implements IMesh {
             this.vao = new Vao();
             const pos = new Vbo();
             pos.allocateAndStore(new Float32Array(this.positions), BufferObjectUsage.STATIC_DRAW);
-            this.vao.getVertexAttribArray(RenderingPipeline.POSITIONS_VBO_INDEX).setVbo(pos, new VertexAttribPointer(3));
-            this.vao.getVertexAttribArray(RenderingPipeline.POSITIONS_VBO_INDEX).setEnabled(true);
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(pos, new VertexAttribPointer(3));
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
         }
     }
 

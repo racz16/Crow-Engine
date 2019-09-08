@@ -4,11 +4,11 @@ import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLigh
 import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 import { Log } from '../../../utility/log/Log';
-import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 import { Engine } from '../../../core/Engine';
 import { ICameraComponent } from '../../camera/ICameraComponent';
+import { Conventions } from '../../../resource/Conventions';
 
 export class BlinnPhongLightsStruct {
 
@@ -31,7 +31,7 @@ export class BlinnPhongLightsStruct {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT);
+        this.ubo.bindToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
     }
 
     private createUboIfNotUsable(): void {

@@ -8,7 +8,7 @@ import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Gl } from '../../webgl/Gl';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
-import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { Conventions } from '../Conventions';
 
 export class QuadMesh implements IMesh {
 
@@ -39,15 +39,15 @@ export class QuadMesh implements IMesh {
         if (!this.isUsable()) {
             this.vao = new Vao();
             this.addEbo();
-            this.addVbo(this.positions, RenderingPipeline.POSITIONS_VBO_INDEX, 3);
-            this.addVbo(this.uv, RenderingPipeline.TEXTURE_COORDINATES_VBO_INDEX, 2);
+            this.addVbo(this.positions, Conventions.POSITIONS_VBO_INDEX, 3);
+            this.addVbo(this.uv, Conventions.TEXTURE_COORDINATES_VBO_INDEX, 2);
         }
     }
 
     private addEbo(): void {
         const ebo = new Ebo();
-        ebo.allocateAndStore(new Uint32Array(this.indices), BufferObjectUsage.STATIC_DRAW);
         this.vao.setEbo(ebo);
+        ebo.allocateAndStore(new Uint32Array(this.indices), BufferObjectUsage.STATIC_DRAW);
     }
 
     private addVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {

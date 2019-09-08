@@ -3,6 +3,7 @@ import { Material } from '../../../material/Material';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongNormalHelper extends BlinnPhongHelper {
 
@@ -42,7 +43,7 @@ export class BlinnPhongNormalHelper extends BlinnPhongHelper {
     }
 
     protected getTextureUnit(): number {
-        return 3;
+        return Conventions.NORMAL_POM_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

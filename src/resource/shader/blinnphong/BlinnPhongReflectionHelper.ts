@@ -2,6 +2,7 @@ import { BlinnPhongHelper } from './BlinnPhongHelper';
 import { Material } from '../../../material/Material';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
 
@@ -17,7 +18,7 @@ export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
     }
 
     protected getTextureUnit(): number {
-        return 4;
+        return Conventions.REFLECTION_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

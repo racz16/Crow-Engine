@@ -3,6 +3,7 @@ import { Material } from '../../../material/Material';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { vec3 } from 'gl-matrix';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongEnvironmentHelper extends BlinnPhongHelper {
 
@@ -27,7 +28,7 @@ export class BlinnPhongEnvironmentHelper extends BlinnPhongHelper {
     }*/
 
     protected getTextureUnit(): number {
-        return 6;
+        return Conventions.ENVIRONMENT_INTENSITY_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

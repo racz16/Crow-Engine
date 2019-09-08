@@ -8,6 +8,7 @@ import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { SplinePoint } from './SplinePoint';
 import { Engine } from '../../core/Engine';
+import { Conventions } from '../Conventions';
 
 export class Spline implements ISpline {
     protected controlPoints: Array<SplinePoint> = [];
@@ -22,7 +23,7 @@ export class Spline implements ISpline {
 
     protected aabbMin = vec3.create();
     protected aabbMax = vec3.create();
-    protected furthestVertexDistance: number;
+    protected radius: number;
 
     public constructor() {
         Engine.getResourceManager().add(this);
@@ -45,14 +46,14 @@ export class Spline implements ISpline {
     private createVao(): void {
         this.vao = new Vao();
         const vbo = new Vbo();
-        this.vao.getVertexAttribArray(0).setVbo(vbo, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).setEnabled(true);
+        this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new VertexAttribPointer(3));
+        this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
     }
 
     private refreshSpline(): void {
         const data = this.computeSplineData();
         this.numberOfPoints = data.length / 3;
-        const vbo = this.vao.getVertexAttribArray(0).getVbo();
+        const vbo = this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).getVbo();
         vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
         this.valid = true;
     }
@@ -60,7 +61,7 @@ export class Spline implements ISpline {
     protected computeSplineData(): Array<number> {
         this.aabbMax = vec3.create();
         this.aabbMin = vec3.create();
-        this.furthestVertexDistance = 0;
+        this.radius = 0;
         const data = new Array<number>(this.getNumberOfControlPoints() * 3);
         let index = 0;
         for (let i = 0; i < this.getNumberOfControlPoints(); i++) {
@@ -74,9 +75,9 @@ export class Spline implements ISpline {
     }
 
     protected refreshAabbAndRadius(position: vec3): void {
-        //furthest vertex distance
-        if (this.furthestVertexDistance < vec3.length(position)) {
-            this.furthestVertexDistance = vec3.length(position);
+        //radius
+        if (this.radius < vec3.length(position)) {
+            this.radius = vec3.length(position);
         }
         //aabb
         for (let i = 0; i < 3; i++) {
@@ -239,7 +240,7 @@ export class Spline implements ISpline {
     //
     public getObjectSpaceRadius(): number {
         this.refresh();
-        return this.furthestVertexDistance;
+        return this.radius;
     }
 
     public getObjectSpaceAabbMin() {

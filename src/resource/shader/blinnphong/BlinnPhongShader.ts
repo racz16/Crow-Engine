@@ -9,7 +9,7 @@ import { BlinnPhongReflectionHelper } from './BlinnPhongReflectionHelper';
 import { BlinnPhongRefractionHelper } from './BlinnPhongRefractionHelper';
 import { BlinnPhongEnvironmentHelper } from './BlinnPhongEnvironmentHelper';
 import { IRenderableComponent } from '../../../component/renderable/IRenderableComponent';
-import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongShader extends Shader {
 
@@ -29,8 +29,8 @@ export class BlinnPhongShader extends Shader {
 
     public setUniforms(rc: IRenderableComponent<IRenderable>): void {
         //FIXME: na ezt tutira nem itt kéne
-        this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.CAMERA_BINDING_POINT);
-        this.getShaderProgram().bindUniformBlockToBindingPoint(RenderingPipeline.LIGHTS_BINDING_POINT);
+        this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
+        this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
 
         const model = rc.getModelMatrix();
         const inverseModel3x3 = mat3.fromMat4(mat3.create(), rc.getInverseModelMatrix());
@@ -49,8 +49,8 @@ export class BlinnPhongShader extends Shader {
 
     public connectTextureUnits(): void {
         //this.getShaderProgram().connectTextureUnit('shadowMap', 0);
-        this.getShaderProgram().connectTextureUnit('material.reflection', 4);
-        this.getShaderProgram().connectTextureUnit('material.refraction', 5);
+        this.getShaderProgram().connectTextureUnit('material.reflection', Conventions.REFLECTION_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('material.refraction', Conventions.REFRACTION_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {

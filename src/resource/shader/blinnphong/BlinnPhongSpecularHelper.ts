@@ -4,6 +4,7 @@ import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { vec4 } from 'gl-matrix';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Conventions } from '../../Conventions';
 
 export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
 
@@ -42,7 +43,7 @@ export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
     }
 
     protected getTextureUnit(): number {
-        return 2;
+        return Conventions.SPECULAR_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

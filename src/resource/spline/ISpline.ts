@@ -10,4 +10,5 @@ export interface ISpline extends IRenderable {
     getForwardVector(t: number): vec3;
 
     getApproximatedPosition(t: number): vec3;
+
 }
