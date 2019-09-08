@@ -11,6 +11,8 @@ import { AudioListenerComponent } from '../component/audio/AudioListenerComponen
 import { GameObjectContainer } from './GameObjectContainer';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
+import { GlTexture2D } from '../webgl/texture/GlTexture2D';
+import { GlCubeMapTexture } from '../webgl/texture/GlCubeMapTexture';
 
 export class Engine {
 
@@ -20,6 +22,8 @@ export class Engine {
     public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>('GAMEOBJECT_CONTAINER');
     public static readonly TIME_MANAGER = new ParameterKey<TimeManager>('TIME_MANAGER');
     public static readonly RESOURCE_MANAGER = new ParameterKey<ResourceManager>('RESOURCE_MANAGER');
+    public static readonly DEFAULT_TEXTURE_2D = new ParameterKey<GlTexture2D>('DEFAULT_TEXTURE_2D');
+    public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<GlCubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
 
     private static readonly PARAMETERS = new ParameterContainer();
 

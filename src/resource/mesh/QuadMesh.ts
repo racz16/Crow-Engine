@@ -8,14 +8,23 @@ import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Gl } from '../../webgl/Gl';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 
 export class QuadMesh implements IMesh {
 
     private static instace: QuadMesh;
     private vao: Vao;
+    private positions = [
+        -1, 1, 0,       //top left
+        1, 1, 0,        //top right
+        -1, -1, 0,      //bottom left
+        1, -1, 0,       //bottom right
+    ];
+    private indices = [0, 2, 3, 1, 0, 3];
+    private uv = [0, 1, 1, 1, 0, 0, 1, 0];
 
     private constructor() {
-        this.loadData();
+        this.create();
         Engine.getResourceManager().add(this);
     }
 
@@ -26,48 +35,26 @@ export class QuadMesh implements IMesh {
         return QuadMesh.instace;
     }
 
-    private loadData(): void {
-        const positions = new Array<number>();
-        //top left
-        positions.push(-1);
-        positions.push(1);
-        positions.push(0);
-        //top right
-        positions.push(1);
-        positions.push(1);
-        positions.push(0);
-        //bottom left
-        positions.push(-1);
-        positions.push(-1);
-        positions.push(0);
-        //bottom right
-        positions.push(1);
-        positions.push(-1);
-        positions.push(0);
+    public create(): void {
+        if (!this.isUsable()) {
+            this.vao = new Vao();
+            this.addEbo();
+            this.addVbo(this.positions, RenderingPipeline.POSITIONS_VBO_INDEX, 3);
+            this.addVbo(this.uv, RenderingPipeline.TEXTURE_COORDINATES_VBO_INDEX, 2);
+        }
+    }
 
-        this.vao = new Vao();
-
-        const indices = [0, 2, 3, 1, 0, 3];
+    private addEbo(): void {
         const ebo = new Ebo();
-        ebo.allocateAndStore(new Uint32Array(indices), BufferObjectUsage.STATIC_DRAW);
+        ebo.allocateAndStore(new Uint32Array(this.indices), BufferObjectUsage.STATIC_DRAW);
         this.vao.setEbo(ebo);
+    }
 
-        const positionVbo = new Vbo();
-        positionVbo.allocateAndStore(new Float32Array(positions), BufferObjectUsage.STATIC_DRAW);
-        this.vao.getVertexAttribArray(0).setVbo(positionVbo, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).setEnabled(true);
-        //positionVbo.allocateAndStoreImmutable(positions, false);
-        //this.vao.connectVbo(positionVbo, new VertexAttribPointer(0, 3));
-
-        const uv = [0, 1, 1, 1, 0, 0, 1, 0];
-        const uvVbo = new Vbo();
-        uvVbo.allocateAndStore(new Float32Array(uv), BufferObjectUsage.STATIC_DRAW);
-        this.vao.getVertexAttribArray(1).setVbo(uvVbo, new VertexAttribPointer(2));
-        this.vao.getVertexAttribArray(1).setEnabled(true);
-        //uvVbo.allocateAndStoreImmutable(uv, false);
-        //this.vao.connectVbo(uvVbo, new VertexAttribPointer(1, 2));
-
-        //uvVbo.release();
+    private addVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
+        const vbo = new Vbo();
+        vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
+        this.vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new VertexAttribPointer(vertexSize));
+        this.vao.getVertexAttribArray(vertexAttribArrayIndex).setEnabled(true);
     }
 
     public getVertexCount(): number {
@@ -91,26 +78,37 @@ export class QuadMesh implements IMesh {
     }
 
     public draw(): void {
-        if (!Utility.isUsable(this.vao)) {
-            this.loadData();
-        }
         this.vao.bind();
         Gl.gl.drawElements(Gl.gl.TRIANGLES, this.getVertexCount(), Gl.gl.UNSIGNED_INT, 0);
     }
 
     public getDataSize(): number {
-        return Utility.isUsable(this.vao) ? 104 : 0;
+        return this.isUsable() ? 104 : 0;
     }
 
     public release(): void {
-        this.vao.release();
-        this.vao = null;
+        if (this.isUsable()) {
+            this.vao.release();
+            this.vao = null;
+        }
     }
 
     public isUsable(): boolean {
-        return true;
+        return Utility.isUsable(this.vao);
     }
 
     public update(): void { }
+
+    public hasTextureCoordinates(): boolean {
+        return true;
+    }
+
+    public hasNormals(): boolean {
+        return false;
+    }
+
+    public hasTangents(): boolean {
+        return false;
+    }
 
 }

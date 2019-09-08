@@ -57,9 +57,9 @@ export enum InternalFormat {
 
 export class InternalFormatResolver {
 
-    public static enumToGl(internalFOrmat: InternalFormat): GlInternalFormat {
+    public static enumToGl(internalFormat: InternalFormat): GlInternalFormat {
         const gl = Gl.gl;
-        switch (internalFOrmat) {
+        switch (internalFormat) {
             case InternalFormat.R8: return new GlInternalFormat(gl.R8, 1, 8, FboAttachmentSlot.COLOR);
             case InternalFormat.RG8: return new GlInternalFormat(gl.RG8, 2, 16, FboAttachmentSlot.COLOR);
             case InternalFormat.RGB8: return new GlInternalFormat(gl.RGB8, 3, 24, FboAttachmentSlot.COLOR);

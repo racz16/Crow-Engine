@@ -2,10 +2,9 @@ import { vec3, vec4 } from 'gl-matrix';
 
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
-import { Texture2D } from '../../texture/Texture2D';
 import { Material } from '../../../material/Material';
-import { CubeMapTexture } from '../../texture/CubeMapTexture';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
+import { Engine } from '../../../core/Engine';
 
 export abstract class BlinnPhongHelper {
 
@@ -28,11 +27,11 @@ export abstract class BlinnPhongHelper {
     }
 
     protected isTexture2DUsable(): boolean {
-        return this.slot && this.slot.isActive() && this.slot.getTexture2D() && (this.slot.getTexture2D() as Texture2D).loaded;
+        return this.slot && this.slot.isActive() && this.slot.getTexture2D() && this.slot.getTexture2D().isUsable();
     }
 
     protected isCubeMapTextureUsable(): boolean {
-        return this.slot && this.slot.isActive() && this.slot.getCubeMapTexture() && (this.slot.getCubeMapTexture() as CubeMapTexture).loaded === 6;
+        return this.slot && this.slot.isActive() && this.slot.getCubeMapTexture() && this.slot.getCubeMapTexture().isUsable();
     }
 
     protected isColorUsable(): boolean {
@@ -42,7 +41,7 @@ export abstract class BlinnPhongHelper {
     protected loadTexture2D(): void {
         const texture = this.slot.getTexture2D();
         this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.sp.loadBoolean(this.getIsThereMapName(), true);
         this.sp.loadVector2(this.getTileName(), this.slot.getTextureTile());
         this.sp.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
@@ -51,7 +50,7 @@ export abstract class BlinnPhongHelper {
     protected loadCubeMapTexture(): void {
         const texture = this.slot.getCubeMapTexture();
         this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.sp.loadBoolean(this.getIsThereMapName(), true);
     }
 
@@ -68,15 +67,15 @@ export abstract class BlinnPhongHelper {
     }
 
     protected loadDefaultTexture2D(): void {
-        const texture = Texture2D.getDefaultTexture();
+        const texture = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D);
         this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
     }
 
     protected loadDefaultCubeMapTexture(): void {
-        const texture = CubeMapTexture.getDefaultTexture();
+        const texture = Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE);
         this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
     }
 
     protected loadDefaultColor3(defaultColor: vec3): void {

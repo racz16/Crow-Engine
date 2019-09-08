@@ -9,7 +9,7 @@ export class TexturedQuadShader extends Shader {
         return 'res/shaders/texturedQuad/fragment.glsl';
     }
 
-    public connect(): void {
+    public connectTextureUnits(): void {
         this.getShaderProgram().connectTextureUnit('image', 0);
     }
 

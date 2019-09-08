@@ -113,7 +113,9 @@ void main(){
             result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, positionalLights[i]);
         }
     }
-    o_color = vec4(result, 1);
+    //o_color = vec4(result, 1);
+    //TODO: ezt majd post processingbe
+    o_color = vec4(pow(result, vec3(1.0/2.2)), 1);
 }
 
 vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, Light light){
@@ -205,20 +207,20 @@ vec3 getDiffuseColor(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVec
     vec3 diffuse;
     if(material.isThereDiffuseMap){
         vec4 tex = texture(material.diffuse, textureCoordinates * material.diffuseTile + material.diffuseOffset);
-        if(tex.a == 0.0){
-            discard;
-        }
-        if(!sRgb){
-            diffuse = pow(tex.rgb, vec3(1.0f/2.2f));
-        }else
+        //if(tex.a == 0.0){
+        //    discard;
+        //}
+        //if(!sRgb){
+        //    diffuse = pow(tex.rgb, vec3(1.0f/2.2f));
+        //}else
             diffuse = tex.rgb;
         return diffuse;
     }else{
-        if(sRgb){
+        //if(sRgb){
             diffuse = pow(material.diffuseColor, vec3(2.2f));
-        }else{
-            diffuse = material.diffuseColor;
-        }
+        //}else{
+        //    diffuse = material.diffuseColor;
+        //}
     }
 
     vec3 reflectionColor;

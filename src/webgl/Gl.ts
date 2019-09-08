@@ -4,6 +4,10 @@ import { GlConstants } from './GlConstants';
 import { vec2 } from 'gl-matrix';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
+import { GlTexture2D } from './texture/GlTexture2D';
+import { InternalFormat } from './enum/InternalFormat';
+import { Engine } from '../core/Engine';
+import { GlCubeMapTexture } from './texture/GlCubeMapTexture';
 
 export class Gl {
 
@@ -18,13 +22,35 @@ export class Gl {
             throw new Error('WebGL 2.0 isn\'t supported in your browser');
         }
         Gl.canvas = canvas;
+        this.initializeUnsafe();
+        Log.logString(LogLevel.INFO_1, 'WebGL initialized');
+    }
+
+    private static initializeUnsafe(): void {
         GlConstants.initialize();
+        this.setGlDefaultStates();
+        this.createDefaultTexture2D();
+        this.createDefaultCubeMapTexture();
+    }
+
+    private static setGlDefaultStates(): void {
         Gl.setEnableCullFace(true);
         Gl.setCullFace(CullFace.BACK);
         Gl.setEnableBlend(true);
         Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
-        Log.logString(LogLevel.INFO_1, 'WebGL initialized');
+    }
+
+    private static createDefaultTexture2D(): void {
+        const texture = new GlTexture2D();
+        texture.allocate(InternalFormat.R8, vec2.fromValues(1, 1), false);
+        Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D, texture);
+    }
+
+    private static createDefaultCubeMapTexture(): void {
+        const texture = new GlCubeMapTexture();
+        texture.allocate(InternalFormat.R8, vec2.fromValues(1, 1), false);
+        Engine.getParameters().set(Engine.DEFAULT_CUBE_MAP_TEXTURE, texture);
     }
 
     public static get gl(): WebGL2RenderingContext {

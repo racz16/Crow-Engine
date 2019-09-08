@@ -15,4 +15,10 @@ export interface IRenderable extends IResource {
 
     update(): void;
 
+    hasTextureCoordinates(): boolean;
+
+    hasNormals(): boolean;
+
+    hasTangents(): boolean;
+
 }

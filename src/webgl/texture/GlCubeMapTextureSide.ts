@@ -5,6 +5,7 @@ import { vec2 } from 'gl-matrix';
 import { IFboAttachment } from '../fbo/IFboAttachment';
 import { TextureWrap } from '../enum/TextureWrap';
 import { Gl } from '../Gl';
+import { Format, FormatResolver } from '../enum/Format';
 
 export class GlCubeMapTextureSide implements IFboAttachment {
 
@@ -24,10 +25,11 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.side;
     }
 
-    public store(data: HTMLImageElement, flipYAxis = false, offset = vec2.create()): void {
+    public store(data: HTMLImageElement, format: Format, flipYAxis = false, offset = vec2.create()): void {
+        const glFormat = FormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis)
-        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), 0, offset[0], offset[1], Gl.gl.RGBA, Gl.gl.UNSIGNED_BYTE, data);
+        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), 0, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
     public getSize(): vec2 {

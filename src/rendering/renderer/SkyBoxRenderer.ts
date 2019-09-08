@@ -28,7 +28,7 @@ export class SkyBoxRenderer extends Renderer {
         }
 
         const skybox = Engine.getParameters().get(Engine.MAIN_SKYBOX) as CubeMapTexture;
-        if (!skybox || !skybox.allResourcesLoaded()) {
+        if (!skybox || !skybox.isUsable()) {
             return;
         }
         this.prepare();

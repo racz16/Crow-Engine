@@ -1,6 +1,5 @@
 import { Shader } from '../Shader';
-import { mat3, vec3 } from 'gl-matrix';
-import { Material } from '../../../material/Material';
+import { mat3 } from 'gl-matrix';
 import { IRenderable } from '../../IRenderable';
 import { BlinnPhongDiffuseHelper } from './BlinnPhongDiffuseHelper';
 import { BlinnPhongSpecularHelper } from './BlinnPhongSpecularHelper';
@@ -11,7 +10,6 @@ import { BlinnPhongRefractionHelper } from './BlinnPhongRefractionHelper';
 import { BlinnPhongEnvironmentHelper } from './BlinnPhongEnvironmentHelper';
 import { IRenderableComponent } from '../../../component/renderable/IRenderableComponent';
 import { RenderingPipeline } from '../../../rendering/RenderingPipeline';
-import { Utility } from '../../../utility/Utility';
 
 export class BlinnPhongShader extends Shader {
 
@@ -39,7 +37,7 @@ export class BlinnPhongShader extends Shader {
         const sp = this.getShaderProgram();
         sp.loadMatrix3('inverseTransposedModelMatrix3x3', inverseModel3x3, true);
         sp.loadMatrix4('modelMatrix', model, false);
-        sp.loadBoolean('sRgb', false);
+        //sp.loadBoolean('sRgb', false);
 
         const material = rc.getMaterial();
         for (const helper of this.slotHelpers) {
@@ -49,7 +47,7 @@ export class BlinnPhongShader extends Shader {
         }
     }
 
-    public connect(): void {
+    public connectTextureUnits(): void {
         //this.getShaderProgram().connectTextureUnit('shadowMap', 0);
         this.getShaderProgram().connectTextureUnit('material.reflection', 4);
         this.getShaderProgram().connectTextureUnit('material.refraction', 5);

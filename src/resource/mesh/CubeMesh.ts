@@ -7,15 +7,53 @@ import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
 import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 
 export class CubeMesh implements IMesh {
 
     private static instance: CubeMesh;
     private vao: Vao;
-    private positions = [-1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, -1, 1, 1, -1, 1, 1, 1, 1, 1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1];
+    private positions = [
+        -1, 1, -1,
+        -1, -1, -1,
+        1, -1, -1,
+        1, -1, -1,
+        1, 1, -1,
+        -1, 1, -1,
+        -1, -1, 1,
+        -1, -1, -1,
+        -1, 1, -1,
+        -1, 1, -1,
+        -1, 1, 1,
+        -1, -1, 1,
+        1, -1, -1,
+        1, -1, 1,
+        1, 1, 1,
+        1, 1, 1,
+        1, 1, -1,
+        1, -1, -1,
+        -1, -1, 1,
+        -1, 1, 1,
+        1, 1, 1,
+        1, 1, 1,
+        1, -1, 1,
+        -1, -1, 1,
+        -1, 1, -1,
+        1, 1, -1,
+        1, 1, 1,
+        1, 1, 1,
+        -1, 1, 1,
+        -1, 1, -1,
+        -1, -1, -1,
+        -1, -1, 1,
+        1, -1, -1,
+        1, -1, -1,
+        -1, -1, 1,
+        1, -1, 1
+    ];
 
     private constructor() {
-        this.loadData();
+        this.create();
         Engine.getResourceManager().add(this);
     }
 
@@ -26,12 +64,14 @@ export class CubeMesh implements IMesh {
         return CubeMesh.instance;
     }
 
-    private loadData(): void {
-        this.vao = new Vao();
-        const pos = new Vbo();
-        pos.allocateAndStore(new Float32Array(this.positions), BufferObjectUsage.STATIC_DRAW);
-        this.vao.getVertexAttribArray(0).setVbo(pos, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(0).setEnabled(true);
+    public create(): void {
+        if (!this.isUsable()) {
+            this.vao = new Vao();
+            const pos = new Vbo();
+            pos.allocateAndStore(new Float32Array(this.positions), BufferObjectUsage.STATIC_DRAW);
+            this.vao.getVertexAttribArray(RenderingPipeline.POSITIONS_VBO_INDEX).setVbo(pos, new VertexAttribPointer(3));
+            this.vao.getVertexAttribArray(RenderingPipeline.POSITIONS_VBO_INDEX).setEnabled(true);
+        }
     }
 
     public getVertexCount(): number {
@@ -55,26 +95,37 @@ export class CubeMesh implements IMesh {
     }
 
     public draw(): void {
-        if (!Utility.isUsable(this.vao)) {
-            this.loadData();
-        }
         this.vao.bind();
         Gl.gl.drawArrays(Gl.gl.TRIANGLES, 0, this.getVertexCount());
     }
 
     public getDataSize() {
-        return Utility.isUsable(this.vao) ? this.positions.length * 4 : 0;
+        return this.isUsable() ? this.positions.length * 4 : 0;
     }
 
     public release(): void {
-        this.vao.release();
-        this.vao = null;
+        if (this.isUsable()) {
+            this.vao.release();
+            this.vao = null;
+        }
     }
 
     public isUsable(): boolean {
-        return true;
+        return Utility.isUsable(this.vao);
     }
 
     public update(): void { }
+
+    public hasTextureCoordinates(): boolean {
+        return false;
+    }
+
+    public hasNormals(): boolean {
+        return false;
+    }
+
+    public hasTangents(): boolean {
+        return false;
+    }
 
 }

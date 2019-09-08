@@ -20,7 +20,7 @@ import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
 import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
 import { RotationBuilder } from './utility/RotationBuilder';
 import { Axis } from './utility/Axis';
-import { RealSphericalBillboard } from './component/renderable/billboard/RealSphericalBillboard';
+import { TextureType } from './resource/texture/enum/TextureType';
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -91,11 +91,11 @@ export class TestSceneBuilder {
     public loadResources(): void {
         this.dragon = new StaticMesh(this.dragonPath);
         this.box = new StaticMesh(this.boxPath);
-        this.diffuse = new Texture2D(this.diffusePath);
-        this.specular = new Texture2D(this.specularPath);
-        this.normal9 = new Texture2D(this.normal9Path);
-        this.normal6 = new Texture2D(this.normal6Path);
-        this.elyHills = new CubeMapTexture(this.elyHillsPaths);
+        this.diffuse = new Texture2D(this.diffusePath, false, TextureType.IMAGE);
+        this.specular = new Texture2D(this.specularPath, false, TextureType.DATA);
+        this.normal9 = new Texture2D(this.normal9Path, false, TextureType.DATA);
+        this.normal6 = new Texture2D(this.normal6Path, true, TextureType.DATA);
+        this.elyHills = new CubeMapTexture(this.elyHillsPaths, false, TextureType.IMAGE);
     }
 
     public setUpScene(): void {

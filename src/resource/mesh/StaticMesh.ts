@@ -18,6 +18,9 @@ export class StaticMesh implements IMesh {
     private aabbMax = vec3.create();
     private vao: Vao;
     private furthestVertexDistance: number;
+    private textureCoordinates = false;
+    private normals = false;
+    private tangents = false;
 
     public constructor(path: string) {
         this.load(path);
@@ -68,17 +71,18 @@ export class StaticMesh implements IMesh {
     private loadMesh(mesh: Mesh): void {
         this.vao = new Vao();
 
-        this.createVbo(mesh.vertices, 0, 3);
-        this.createVbo(mesh.textures, 1, 2);
-        this.createVbo(mesh.vertexNormals, 2, 3);
-        this.createVbo(mesh.tangents, 3, 3);
+        this.addVbo(mesh.vertices, 0, 3);
+        this.addVbo(mesh.textures, 1, 2);
+        this.addVbo(mesh.vertexNormals, 2, 3);
+        this.addVbo(mesh.tangents, 3, 3);
 
         const ebo = new Ebo();
         ebo.allocateAndStore(new Uint32Array(mesh.indices), BufferObjectUsage.STATIC_DRAW);
         this.vao.setEbo(ebo);
     }
 
-    private createVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
+    private addVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
+        //TODO implementálni, hogy volt-e normal, tangent stb.
         if (data) {
             const vbo = new Vbo();
             vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
@@ -131,5 +135,17 @@ export class StaticMesh implements IMesh {
     }
 
     public update(): void { }
+
+    public hasTextureCoordinates(): boolean {
+        return this.textureCoordinates;
+    }
+
+    public hasNormals(): boolean {
+        return this.normals;
+    }
+
+    public hasTangents(): boolean {
+        return this.tangents;
+    }
 
 }

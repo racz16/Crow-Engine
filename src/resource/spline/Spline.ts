@@ -283,4 +283,16 @@ export class Spline implements ISpline {
 
     public update(): void { }
 
+    public hasTextureCoordinates(): boolean {
+        return false;
+    }
+
+    public hasNormals(): boolean {
+        return false;
+    }
+
+    public hasTangents(): boolean {
+        return false;
+    }
+
 }

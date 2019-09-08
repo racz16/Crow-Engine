@@ -41,10 +41,10 @@ export class ScreenRenderer extends Renderer {
 
     private beforeDrawQuad(): void {
         /**/const image = RenderingPipeline.getParameters().get(RenderingPipeline.WORK);
-        image.bindToTextureUnit(0);
+        image.getNativeTexture().bindToTextureUnit(0);
         //const image = TestSceneBuilder.diffuse;
         if (image && image.isUsable()) {
-            image.bindToTextureUnit(0);
+            image.getNativeTexture().bindToTextureUnit(0);
         }
     }
 

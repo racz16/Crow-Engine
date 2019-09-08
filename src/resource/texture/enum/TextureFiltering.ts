@@ -1,5 +1,4 @@
-import { Gl } from '../../webgl/Gl';
-import { TextureFilter } from '../../webgl/enum/TextureFilter';
+import { TextureFilter } from '../../../webgl/enum/TextureFilter';
 
 export enum TextureFiltering {
     None,
@@ -43,7 +42,5 @@ export class TextureFilteringResolver {
             default: throw new Error('Invalid enum TextureFiltering');
         }
     }
-
-
 
 }
