@@ -7,6 +7,6 @@ in vec2 io_textureCoordinates;
 
 uniform sampler2D image;
 
-void main(){             
+void main(){
     color = texture(image, io_textureCoordinates);
 } 

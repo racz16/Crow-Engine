@@ -6,6 +6,8 @@ import { TexturedQuadShader } from '../resource/Shader/TexturedQuadShader';
 import { Gl } from '../webgl/Gl';
 import { vec2 } from 'gl-matrix';
 import { Utility } from '../utility/Utility';
+import { Log } from '../utility/log/Log';
+import { LogLevel } from '../utility/log/LogLevel';
 
 export class ScreenRenderer extends Renderer {
 
@@ -19,18 +21,20 @@ export class ScreenRenderer extends Renderer {
     }
 
     protected renderUnsafe(): void {
+        if (!Utility.isUsable(this.shader)) {
+            Log.logString(LogLevel.WARNING, 'The Textured quad shader is not usable');
+            return;
+        }
         this.beforeShader();
         this.shader.start();
         this.beforeDrawQuad();
-        //Gl.setEnableDepthTest(false);
+        Gl.setEnableDepthTest(false);
         this.quad.draw();
-        //Gl.setEnableDepthTest(true);
+        Gl.setEnableDepthTest(true);
     }
 
     private beforeShader(): void {
-        if (!Utility.isUsable(this.shader)) {
-            this.shader = new TexturedQuadShader();
-        }
+
         if (!Utility.isUsable(this.quad)) {
             this.quad = QuadMesh.getInstance();
         }
@@ -40,9 +44,8 @@ export class ScreenRenderer extends Renderer {
     }
 
     private beforeDrawQuad(): void {
-        /**/const image = RenderingPipeline.getParameters().get(RenderingPipeline.WORK);
-        image.getNativeTexture().bindToTextureUnit(0);
-        //const image = TestSceneBuilder.diffuse;
+        /**/
+        const image = RenderingPipeline.getParameters().get(RenderingPipeline.WORK);
         if (image && image.isUsable()) {
             image.getNativeTexture().bindToTextureUnit(0);
         }

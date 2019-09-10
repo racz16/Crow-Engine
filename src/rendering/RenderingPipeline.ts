@@ -11,10 +11,13 @@ import { SkyBoxRenderer } from './renderer/SkyBoxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
 import { ScreenRenderer } from './ScreenRenderer';
 import { Log } from '../utility/log/Log';
-import { BindingPoint } from './BindingPoint';
 import { LogLevel } from '../utility/log/LogLevel';
 import { CameraStruct } from '../component/camera/CameraStruct';
 import { Engine } from '../core/Engine';
+import { Utility } from '../utility/Utility';
+import { InternalFormat } from '../webgl/enum/InternalFormat';
+import { Rbo } from '../webgl/fbo/Rbo';
+import { TextureFilter } from '../webgl/enum/TextureFilter';
 
 export class RenderingPipeline {
 
@@ -39,6 +42,7 @@ export class RenderingPipeline {
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
         this.skyboxRenderer = new SkyBoxRenderer();
+        this.screenRenderer = new ScreenRenderer();
         Log.logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
     }
 
@@ -63,7 +67,7 @@ export class RenderingPipeline {
     }
 
     public static bindFbo(): void {
-        //this.fbo.bind();
+        this.fbo.bind();
     }
 
     public static getRenderingSize(): vec2 {
@@ -85,7 +89,7 @@ export class RenderingPipeline {
             return;
         }
         this.refreshIfCanvasResized();
-        /*if (!Utility.isUsable(this.fbo) ||
+        if (!Utility.isUsable(this.fbo) ||
             this.getRenderingSize()[0] != this.getFboSize()[0] ||
             this.getRenderingSize()[1] != this.getFboSize()[1]) {
             if (this.fbo) {
@@ -94,14 +98,16 @@ export class RenderingPipeline {
             this.fbo = new Fbo();
             const colorTexture1 = new GlTexture2D();
             colorTexture1.allocate(InternalFormat.RGBA16F, this.getRenderingSize(), false);
+            colorTexture1.setMinificationFilter(TextureFilter.NEAREST);
+            colorTexture1.setMagnificationFilter(TextureFilter.NEAREST);
             this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(colorTexture1);
             const depthRbo = new Rbo();
             depthRbo.allocate(this.getRenderingSize(), InternalFormat.DEPTH32F, 1);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH, -1).attachRbo(depthRbo);
-            if (!this.fbo.isDrawComplete()) {
+            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachRbo(depthRbo);
+            if (!this.fbo.isDrawComplete() || !this.fbo.isReadComplete()) {
                 throw new Error();
             }
-        }*/
+        }
         /*if (!Utility.isUsable(this.screenRenderer)) {
             this.screenRenderer = new ScreenRenderer();
         }
@@ -115,15 +121,17 @@ export class RenderingPipeline {
         this.beforeRender();
         Gl.setEnableDepthTest(true);
         //prepare
-        //this.bindFbo();
+        this.bindFbo();
+        Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D).getNativeTexture().bindToTextureUnit(0);
+        Gl.clear(true, true, false);
         this.blinnPhongRenderer.render();
         this.skyboxRenderer.render();
-        //this.getParameters().set(this.WORK, new Parameter(this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment()));
+        this.getParameters().set(this.WORK, this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment());
         //post
-        //Fbo.bindDefaultFrameBuffer();
-        //Gl.clear(true, true, false);
-        //this.screenRenderer.render();
-        //this.getParameters().set(this.WORK, null);
+        Fbo.bindDefaultFrameBuffer();
+        Gl.clear(true, true, false);
+        this.screenRenderer.render();
+        this.getParameters().set(this.WORK, null);
         Log.endGroup();
     }
 
