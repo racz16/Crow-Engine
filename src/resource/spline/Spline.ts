@@ -32,22 +32,21 @@ export class Spline implements ISpline {
     protected refresh(): void {
         if (!this.valid) {
             if (this.getRequiredControlPoints() <= this.getNumberOfControlPoints()) {
-                if (!Utility.isUsable(this.vao)) {
-                    this.createVao();
-                }
+                this.createVao();
+                this.refreshSpline();
             } else {
                 this.release();
-                return;
             }
-            this.refreshSpline();
         }
     }
 
     private createVao(): void {
-        this.vao = new Vao();
-        const vbo = new Vbo();
-        this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new VertexAttribPointer(3));
-        this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
+        if (!Utility.isUsable(this.vao)) {
+            this.vao = new Vao();
+            const vbo = new Vbo();
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new VertexAttribPointer(3));
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
+        }
     }
 
     private refreshSpline(): void {
@@ -58,28 +57,37 @@ export class Spline implements ISpline {
         this.valid = true;
     }
 
-    protected computeSplineData(): Array<number> {
+    private computeSplineData(): Array<number> {
         this.aabbMax = vec3.create();
         this.aabbMin = vec3.create();
         this.radius = 0;
+        return this.computeSplineDataUnsafe();
+    }
+
+    protected computeSplineDataUnsafe(): Array<number> {
         const data = new Array<number>(this.getNumberOfControlPoints() * 3);
-        let index = 0;
         for (let i = 0; i < this.getNumberOfControlPoints(); i++) {
-            const pos = this.getControlPoint(i);
-            this.refreshAabbAndRadius(pos);
-            data[index++] = pos[0];
-            data[index++] = pos[1];
-            data[index++] = pos[2];
+            const position = this.getControlPoint(i);
+            this.refreshRadius(position);
+            this.refreshAabb(position);
+            this.addPositionToData(position, data);
         }
         return data;
     }
 
-    protected refreshAabbAndRadius(position: vec3): void {
-        //radius
+    protected addPositionToData(position: vec3, data: Array<number>): void {
+        for (let j = 0; j < 3; j++) {
+            data.push(position[j]);
+        }
+    }
+
+    protected refreshRadius(position: vec3): void {
         if (this.radius < vec3.length(position)) {
             this.radius = vec3.length(position);
         }
-        //aabb
+    }
+
+    protected refreshAabb(position: vec3): void {
         for (let i = 0; i < 3; i++) {
             if (position[i] < this.aabbMin[i]) {
                 this.aabbMin[i] = position[i];
@@ -91,34 +99,40 @@ export class Spline implements ISpline {
     }
 
     public getForwardVector(t: number): vec3 {
+        t = this.normalizeT(t);
         if (this.getNumberOfControlPoints() < 2) {
             return null;
         } else {
-            if (t >= 0.9999) {
-                const p1 = this.getApproximatedPosition(t - 0.0001);
-                const p2 = this.getApproximatedPosition(t);
-                return vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), p2, p1));
-            } else {
-                const p1 = this.getApproximatedPosition(t);
-                const p2 = this.getApproximatedPosition(t + 0.0001);
-                return vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), p2, p1));
-            }
+            return this.getForwardVectorUnsafe(t);
+        }
+    }
+
+    private getForwardVectorUnsafe(t: number): vec3 {
+        if (t >= 0.9999) {
+            const p1 = this.getApproximatedPosition(t - 0.0001);
+            const p2 = this.getApproximatedPosition(t);
+            return vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), p2, p1));
+        } else {
+            const p1 = this.getApproximatedPosition(t);
+            const p2 = this.getApproximatedPosition(t + 0.0001);
+            return vec3.normalize(vec3.create(), vec3.subtract(vec3.create(), p2, p1));
         }
     }
 
     public getApproximatedPosition(t: number): vec3 {
-        t = t < 0 ? t % -1 : t % 1;
+        t = this.normalizeT(t);
         if (this.getNumberOfControlPoints() < 1) {
             return null;
-        } else if (this.getVertexCount() === 1) {
+        } else if (this.getNumberOfControlPoints() === 1) {
             return this.getControlPoint(0);
         } else {
             this.refreshLength();
-            if (t === 0) {
-                return this.getValue(0, 0);
-            }
-            return this.getApproximatedPositionInRealSpline(t);
+            return t === 0 ? this.getValue(0, 0) : this.getApproximatedPositionInRealSpline(t);
         }
+    }
+
+    private normalizeT(t: number): number {
+        return t < 0 ? 1 - (t % -1) : t % 1;
     }
 
     private getApproximatedPositionInRealSpline(t: number): vec3 {
@@ -136,32 +150,34 @@ export class Spline implements ISpline {
     protected getValue(startIndex: number, t: number): vec3 {
         if (this.getNumberOfControlPoints() < 1) {
             return null;
-        } else if (this.getVertexCount() === 1) {
+        } else if (this.getNumberOfControlPoints() === 1) {
             return this.getControlPoint(0);
         } else {
-            const first = vec3.scale(vec3.create(), vec3.clone(this.getControlPoint(startIndex)), 1 - t);
-            const second = vec3.clone(this.getControlPoint(startIndex === this.getVertexCount() - 1 ? 0 : startIndex + 1));
+            const first = vec3.scale(vec3.create(), this.getControlPoint(startIndex), 1 - t);
+            const second = this.getControlPoint(startIndex === this.getNumberOfControlPoints() - 1 ? 0 : startIndex + 1);
             return vec3.add(vec3.create(), first, vec3.scale(vec3.create(), second, t));
         }
     }
 
-    protected refreshLength(): void {
+    private refreshLength(): void {
         if (!this.lengthValid) {
             this.distances = [];
-            let sum = 0;
-            for (let i = 0; i < this.controlPoints.length - 1; i++) {
-                const dist = vec3.distance(this.getControlPoint(i), this.getControlPoint(i + 1));
-                sum += dist;
-                this.distances.push(dist);
-            }
-            if (this.isLoop()) {
-                const dist = vec3.distance(this.getControlPoint(this.controlPoints.length - 1), this.getControlPoint(0));
-                sum += dist;
-                this.distances.push(dist);
-            }
-
-            this.length = sum;
+            this.length = 0;
+            this.refreshLengthUnsafe();
             this.lengthValid = true;
+        }
+    }
+
+    protected refreshLengthUnsafe(): void {
+        for (let i = 0; i < this.controlPoints.length - 1; i++) {
+            const dist = vec3.distance(this.getControlPoint(i), this.getControlPoint(i + 1));
+            this.length += dist;
+            this.distances.push(dist);
+        }
+        if (this.isLoop()) {
+            const dist = vec3.distance(this.getControlPoint(this.controlPoints.length - 1), this.getControlPoint(0));
+            this.length += dist;
+            this.distances.push(dist);
         }
     }
 

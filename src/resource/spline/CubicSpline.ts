@@ -6,23 +6,20 @@ export abstract class CubicSpline extends Spline {
     protected basisMatrix = mat4.create();
     private step = 0.1;
 
-    protected computeSplineData(): Array<number> {
-        this.aabbMax = vec3.create();
-        this.aabbMin = vec3.create();
-        this.radius = 0;
+    protected computeSplineDataUnsafe(): Array<number> {
         const data = new Array<number>();
         for (let i = 0; i < this.getNumberOfControlPoints() - 1; i++) {
-            this.addSplineSegmentToData(data, i);
+            this.addCurveToData(data, i);
         }
         if (!this.isLoop()) {
             this.addPointToData(data, this.getNumberOfControlPoints() - 1, 0);
         } else {
-            this.addSplineSegmentToData(data, this.getNumberOfControlPoints() - 1);
+            this.addCurveToData(data, this.getNumberOfControlPoints() - 1);
         }
         return data;
     }
 
-    private addSplineSegmentToData(data: Array<number>, index: number): void {
+    private addCurveToData(data: Array<number>, index: number): void {
         const steps = 1 / this.getStep();
         for (let i = 0; i < steps; i++) {
             this.addPointToData(data, index, i * this.getStep());
@@ -30,11 +27,10 @@ export abstract class CubicSpline extends Spline {
     }
 
     private addPointToData(data: Array<number>, index: number, t: number): void {
-        const pos = this.getValue(index, t);
-        data.push(pos[0]);
-        data.push(pos[1]);
-        data.push(pos[2]);
-        this.refreshAabbAndRadius(pos);
+        const position = this.getValue(index, t);
+        this.addPositionToData(position, data);
+        this.refreshRadius(position);
+        this.refreshAabb(position);
     }
 
     public getStep(): number {
