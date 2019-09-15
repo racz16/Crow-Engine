@@ -1,15 +1,19 @@
 import { Shader } from './Shader';
-import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
+import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
+import { IRenderable } from '../IRenderable';
+import { Material } from '../../material/Material';
 
 export class SkyBoxShader extends Shader {
 
-    public setUniforms() {
+    public setUniforms(renderableComponent: IRenderableComponent<IRenderable>) {
         this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
-
-        const skybox = Engine.getParameters().get(Engine.MAIN_SKYBOX);
-        skybox.getNativeTexture().bindToTextureUnit(0);
-        this.getShaderProgram().loadBoolean('isThereCubeMap', true);
+        const slot = renderableComponent.getMaterial().getSlot(Material.DIFFUSE);
+        const hasCubeMapTexture = slot && slot.getCubeMapTexture() && slot.getCubeMapTexture().isUsable();
+        if (hasCubeMapTexture) {
+            slot.getCubeMapTexture().getNativeTexture().bindToTextureUnit(0);
+        }
+        this.getShaderProgram().loadBoolean('isThereCubeMap', hasCubeMapTexture);
     }
 
     protected connectTextureUnits(): void {

@@ -1,4 +1,7 @@
 import { Log } from '../utility/log/Log';
+import { LogLevel } from '../utility/log/LogLevel';
+import { Shader } from '../resource/shader/Shader';
+import { Utility } from '../utility/Utility';
 
 export abstract class Renderer {
 
@@ -17,19 +20,35 @@ export abstract class Renderer {
     public render(): void {
         try {
             Log.startGroup(this.name)
+            if (!this.isUsable()) {
+                Log.logString(LogLevel.WARNING, `The ${this.name} is not usable`);
+                return;
+            }
             this.renderUnsafe();
         } finally {
             Log.endGroup();
         }
     }
 
+    public getName(): string {
+        return this.name;
+    }
+
     protected abstract renderUnsafe(): void;
 
-    public abstract release(): void;
+    public release(): void {
+        if (this.isUsable()) {
+            this.getShader().release();
+        }
+    }
 
-    public abstract isUsable(): boolean;
+    public isUsable(): boolean {
+        return Utility.isUsable(this.getShader());
+    }
 
-    public abstract removeFromRenderingPipeline(): void;
+    protected addedToThePipeline(): void { }
+
+    protected removedFromThePipeline(): void { }
 
     public isActive(): boolean {
         return this.active;
@@ -54,5 +73,7 @@ export abstract class Renderer {
     protected setNumberOfRenderedFaces(count: number): void {
         this.numberOfRenderedFaces = count;
     }
+
+    protected abstract getShader(): Shader;
 
 }

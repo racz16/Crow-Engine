@@ -8,6 +8,7 @@ export class GlConstants {
     private static _RENDERER: string;
     private static _UNMASKED_VENDOR: string;
     private static _UNMASKED_RENDERER: string;
+    private static _COLOR_BUFFER_FLOAT_ENABLED: boolean;
     //shader
     private static _DEBUG_SHADERS_EXTENSION: WEBGL_debug_shaders;
     //buffer
@@ -54,6 +55,7 @@ export class GlConstants {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         this._UNMASKED_VENDOR = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null;
         this._UNMASKED_RENDERER = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null;
+        this._COLOR_BUFFER_FLOAT_ENABLED = !!gl.getExtension('EXT_color_buffer_float');
     }
 
     private static initializeShader(gl: WebGL2RenderingContext): void {
@@ -104,6 +106,10 @@ export class GlConstants {
 
     public static get UNMASKED_RENDERER(): string {
         return this._UNMASKED_RENDERER;
+    }
+
+    public static get COLOR_BUFFER_FLOAT_ENABLED(): boolean {
+        return this._COLOR_BUFFER_FLOAT_ENABLED;
     }
 
     //shader

@@ -81,6 +81,14 @@ export class FboAttachmentContainer {
         Gl.gl.framebufferRenderbuffer(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.RENDERBUFFER, rbo.getId())
     }
 
+    public detachAttachment(): void {
+        this.rbo = null;
+        this.texture = null;
+        this.cubeMapSideTexture = null;
+        this.fbo.bind();
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.TEXTURE_2D, 0, 0);
+    }
+
     //contains----------------------------------------------------------------------------------------------------------
     public isThereAttachment(): boolean {
         return this.isThereTextureAttachment() || this.isThereRboAttachment() || this.isThereCubeMapSideTextureAttachment();

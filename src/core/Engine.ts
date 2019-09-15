@@ -17,7 +17,6 @@ import { GlCubeMapTexture } from '../webgl/texture/GlCubeMapTexture';
 export class Engine {
 
     public static readonly MAIN_CAMERA = new ParameterKey<ICameraComponent>('MAIN_CAMERA');
-    public static readonly MAIN_SKYBOX = new ParameterKey<ICubeMapTexture>('MAIN_SKYBOX');
     public static readonly MAIN_AUDIO_LISTENER = new ParameterKey<AudioListenerComponent>('MAIN_AUDIO_LISTENER');
     public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>('GAMEOBJECT_CONTAINER');
     public static readonly TIME_MANAGER = new ParameterKey<TimeManager>('TIME_MANAGER');

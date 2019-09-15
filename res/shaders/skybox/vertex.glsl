@@ -7,7 +7,7 @@ layout (std140) uniform Camera {                    //binding point: 1
     mat4 viewMatrix;                                //0
     mat4 projectionMatrix;                          //64
     vec3 viewPosition;                              //128
-};                                                  //140
+};                                                  //144
 
 void main(){
     mat4 view = mat4(mat3(viewMatrix));

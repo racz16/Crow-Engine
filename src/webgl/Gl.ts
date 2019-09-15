@@ -28,6 +28,9 @@ export class Gl {
 
     private static initializeUnsafe(): void {
         GlConstants.initialize();
+        if (!GlConstants.COLOR_BUFFER_FLOAT_ENABLED) {
+            throw new Error();
+        }
         this.setGlDefaultStates();
         this.createDefaultTexture2D();
         this.createDefaultCubeMapTexture();

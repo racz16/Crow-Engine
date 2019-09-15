@@ -7,9 +7,9 @@ import { GlTexture2D } from '../webgl/texture/GlTexture2D';
 import { Fbo } from '../webgl/fbo/Fbo';
 import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
 import { vec2, mat4 } from 'gl-matrix';
-import { SkyBoxRenderer } from './renderer/SkyBoxRenderer';
+import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
-import { ScreenRenderer } from './ScreenRenderer';
+import { ScreenRenderer } from './renderer/ScreenRenderer';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { CameraStruct } from '../component/camera/CameraStruct';
@@ -18,22 +18,31 @@ import { Utility } from '../utility/Utility';
 import { InternalFormat } from '../webgl/enum/InternalFormat';
 import { Rbo } from '../webgl/fbo/Rbo';
 import { TextureFilter } from '../webgl/enum/TextureFilter';
+import { RendererContainer } from './RendererContainer';
+import { GeometryRenderer } from './GeometryRenderer';
+import { PostProcessRenderer } from './PostProcessRenderer';
 
 export class RenderingPipeline {
 
     public static readonly SHADOWMAP = new ParameterKey<ITexture2D>('SHADOWMAP');
     public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>('SHADOW_PROJECTION_VIEW_MATRIX');
     public static readonly GAMMA = new ParameterKey<number>('GAMMA');
+    public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
 
+    private static parameters = new ParameterContainer();
+
+
+    private static fbo: Fbo;
     private static renderingScale = 1;
     private static renderables = new RenderableContainer();
-    private static parameters = new ParameterContainer();
-    private static blinnPhongRenderer: BlinnPhongRenderer;
-    private static fbo: Fbo;
-    private static screenRenderer: ScreenRenderer;
-    private static skyboxRenderer: SkyBoxRenderer;
 
-    public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
+    private static geometryRenderers = new RendererContainer<GeometryRenderer>();
+    private static postProcessRenderers = new RendererContainer<PostProcessRenderer>();
+
+    private static blinnPhongRenderer: BlinnPhongRenderer;
+    private static skyboxRenderer: SkyboxRenderer;
+    private static screenRenderer: ScreenRenderer;
+
 
     private constructor() { }
 
@@ -41,7 +50,7 @@ export class RenderingPipeline {
         //TODO: parameterts
         this.refresh();
         this.blinnPhongRenderer = new BlinnPhongRenderer();
-        this.skyboxRenderer = new SkyBoxRenderer();
+        this.skyboxRenderer = new SkyboxRenderer();
         this.screenRenderer = new ScreenRenderer();
         Log.logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
     }
@@ -83,11 +92,6 @@ export class RenderingPipeline {
     }
 
     private static refresh(): void {
-        const ext = Gl.gl.getExtension('EXT_color_buffer_float');
-        if (!ext) {
-            alert('need EXT_color_buffer_float');
-            return;
-        }
         this.refreshIfCanvasResized();
         if (!Utility.isUsable(this.fbo) ||
             this.getRenderingSize()[0] != this.getFboSize()[0] ||
@@ -120,7 +124,7 @@ export class RenderingPipeline {
         Log.startGroup('rendering');
         this.beforeRender();
         Gl.setEnableDepthTest(true);
-        //prepare
+        //prepare  
         this.bindFbo();
         Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D).getNativeTexture().bindToTextureUnit(0);
         Gl.clear(true, true, false);

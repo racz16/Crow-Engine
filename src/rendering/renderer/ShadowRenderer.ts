@@ -175,7 +175,12 @@ export class ShadowRenderer extends Renderer {
         }
     }
 
-    public removeFromRenderingPipeline(): void {
+    public getShader(): ShadowShader{
+        return this.shader;
+    }
+
+    protected removedFromThePipeline(): void {
+        //TODO: ezt majd azért eléggé át kéne nézni
         const shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP);
         if (shadowMap) {
             if (shadowMap.isUsable()) {

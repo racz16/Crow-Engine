@@ -33,7 +33,7 @@ export class CameraStruct implements IInvalidatable {
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
-            this.ubo.allocate(140, BufferObjectUsage.STATIC_DRAW);
+            this.ubo.allocate(144, BufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Camera Matrices ubo created');
         }
     }

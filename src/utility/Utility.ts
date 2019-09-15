@@ -80,6 +80,10 @@ export class Utility {
         array.splice(index, 1);
     }
 
+    public static addElement<T>(array: Array<T>, index: number, element: T): void {
+        array.splice(index, 0, element);
+    }
+
     public static isUsable(resource: IResource): boolean {
         return resource && resource.isUsable();
     }

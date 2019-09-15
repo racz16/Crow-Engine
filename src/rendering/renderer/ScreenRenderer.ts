@@ -1,13 +1,13 @@
-import { Renderer } from './Renderer';
-import { QuadMesh } from '../resource/mesh/QuadMesh';
-import { RenderingPipeline } from './RenderingPipeline';
-import { Fbo } from '../webgl/fbo/Fbo';
-import { TexturedQuadShader } from '../resource/Shader/TexturedQuadShader';
-import { Gl } from '../webgl/Gl';
+import { Renderer } from '../Renderer';
+import { QuadMesh } from '../../resource/mesh/QuadMesh';
+import { RenderingPipeline } from '../RenderingPipeline';
+import { Fbo } from '../../webgl/fbo/Fbo';
+import { TexturedQuadShader } from '../../resource/Shader/TexturedQuadShader';
+import { Gl } from '../../webgl/Gl';
 import { vec2 } from 'gl-matrix';
-import { Utility } from '../utility/Utility';
-import { Log } from '../utility/log/Log';
-import { LogLevel } from '../utility/log/LogLevel';
+import { Utility } from '../../utility/Utility';
+import { Log } from '../../utility/log/Log';
+import { LogLevel } from '../../utility/log/LogLevel';
 
 export class ScreenRenderer extends Renderer {
 
@@ -57,8 +57,8 @@ export class ScreenRenderer extends Renderer {
         }
     }
 
-    public removeFromRenderingPipeline(): void {
-
+    public getShader(): TexturedQuadShader {
+        return this.shader;
     }
 
     public isUsable(): boolean {

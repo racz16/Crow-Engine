@@ -2,6 +2,8 @@ import { ShaderStage } from '../../webgl/enum/ShaderStage';
 import { GlShader } from '../../webgl/shader/GlShader';
 import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
+import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
+import { IRenderable } from '../IRenderable';
 
 export abstract class Shader {
 
@@ -11,6 +13,10 @@ export abstract class Shader {
     public constructor() {
         this.shaderProgram = new GlShaderProgram();
         this.loadShadersAndCreateProgram();
+    }
+
+    public getNativeShaderProgram(): GlShaderProgram {
+        return this.shaderProgram;
     }
 
     protected abstract getVertexShaderPath(): string;
@@ -71,6 +77,8 @@ export abstract class Shader {
     }
 
     protected connectTextureUnits(): void { }
+
+    public setUniforms(renderableComponent: IRenderableComponent<IRenderable>): void { }
 
     public isUsable(): boolean {
         return Utility.isUsable(this.shaderProgram) && this.loaded;

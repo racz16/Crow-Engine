@@ -21,6 +21,8 @@ import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundi
 import { RotationBuilder } from './utility/RotationBuilder';
 import { Axis } from './utility/Axis';
 import { TextureType } from './resource/texture/enum/TextureType';
+import { CubeMesh } from './resource/mesh/CubeMesh';
+import { SkyboxRenderer } from './rendering/renderer/SkyboxRenderer';
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -100,7 +102,13 @@ export class TestSceneBuilder {
 
     public setUpScene(): void {
         //skybox
-        Engine.getParameters().set(Engine.MAIN_SKYBOX, this.elyHills);
+        const sky = new GameObject();
+        const skyMaterial = new Material(SkyboxRenderer);
+        const slot = new MaterialSlot();
+        slot.setCubeMapTexture(this.elyHills);
+        skyMaterial.setSlot(Material.DIFFUSE, slot);
+        const skyRenderable = new MeshComponent(CubeMesh.getInstance(), skyMaterial);
+        sky.getComponents().add(skyRenderable);
 
         //camera
         const go = new GameObject();
