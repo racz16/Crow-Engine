@@ -29,57 +29,55 @@ export class RenderingPipeline {
     public static readonly GAMMA = new ParameterKey<number>('GAMMA');
     public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
 
-    private static parameters = new ParameterContainer();
+    private parameters = new ParameterContainer();
 
+    private fbo: Fbo;
+    private renderingScale = 1;
+    private renderables = new RenderableContainer();
+    private geometryRenderers = new RendererContainer<GeometryRenderer>();
+    private postProcessRenderers = new RendererContainer<PostProcessRenderer>();
+    private screenRenderer: ScreenRenderer;
 
-    private static fbo: Fbo;
-    private static renderingScale = 1;
-    private static renderables = new RenderableContainer();
-
-    private static geometryRenderers = new RendererContainer<GeometryRenderer>();
-    private static postProcessRenderers = new RendererContainer<PostProcessRenderer>();
-
-    private static blinnPhongRenderer: BlinnPhongRenderer;
-    private static skyboxRenderer: SkyboxRenderer;
-    private static screenRenderer: ScreenRenderer;
-
-
-    private constructor() { }
-
-    public static initialize(): void {
-        //TODO: parameterts
-        this.refresh();
-        this.blinnPhongRenderer = new BlinnPhongRenderer();
-        this.skyboxRenderer = new SkyboxRenderer();
+    public constructor() {
+        this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
+        this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
         this.screenRenderer = new ScreenRenderer();
         Log.logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
     }
 
-    public static getRenderableContainer(): RenderableContainer {
-        return RenderingPipeline.renderables;
+    public getGeometryRendererContainer(): RendererContainer<GeometryRenderer> {
+        return this.geometryRenderers;
     }
 
-    public static getParameters(): ParameterContainer {
-        return RenderingPipeline.parameters;
+    public getPostProcessRendererContainer(): RendererContainer<PostProcessRenderer> {
+        return this.postProcessRenderers;
     }
 
-    public static getRenderingScale(): number {
+    public getRenderableContainer(): RenderableContainer {
+        return this.renderables;
+    }
+
+    public getParameters(): ParameterContainer {
+        return this.parameters;
+    }
+
+    public getRenderingScale(): number {
         return this.renderingScale;
     }
 
-    public static setRenderingScale(renderingScale: number): void {
+    public setRenderingScale(renderingScale: number): void {
         if (renderingScale <= 0) {
             throw new Error();
         }
-        RenderingPipeline.renderingScale = renderingScale;
+        this.renderingScale = renderingScale;
         this.refresh();
     }
 
-    public static bindFbo(): void {
+    public bindFbo(): void {
         this.fbo.bind();
     }
 
-    public static getRenderingSize(): vec2 {
+    public getRenderingSize(): vec2 {
         const renderingSize = vec2.create();
         const canvas = Gl.getCanvas();
         renderingSize[0] = canvas.clientWidth * this.renderingScale;
@@ -87,61 +85,82 @@ export class RenderingPipeline {
         return renderingSize;
     }
 
-    private static getFboSize(): vec2 {
+    private getFboSize(): vec2 {
         return this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getAttachment().getSize();
     }
 
-    private static refresh(): void {
+    private refresh(): void {
         this.refreshIfCanvasResized();
-        if (!Utility.isUsable(this.fbo) ||
-            this.getRenderingSize()[0] != this.getFboSize()[0] ||
-            this.getRenderingSize()[1] != this.getFboSize()[1]) {
-            if (this.fbo) {
-                this.fbo.release();
-            }
-            this.fbo = new Fbo();
-            const colorTexture1 = new GlTexture2D();
-            colorTexture1.allocate(InternalFormat.RGBA16F, this.getRenderingSize(), false);
-            colorTexture1.setMinificationFilter(TextureFilter.NEAREST);
-            colorTexture1.setMagnificationFilter(TextureFilter.NEAREST);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(colorTexture1);
-            const depthRbo = new Rbo();
-            depthRbo.allocate(this.getRenderingSize(), InternalFormat.DEPTH32F, 1);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachRbo(depthRbo);
+        if (!this.isFboValid()) {
+            this.createFbo();
+            this.addColorAttachmentToTheFbo();
+            this.addDepthAttachmentToTheFbo();
             if (!this.fbo.isDrawComplete() || !this.fbo.isReadComplete()) {
                 throw new Error();
             }
         }
-        /*if (!Utility.isUsable(this.screenRenderer)) {
-            this.screenRenderer = new ScreenRenderer();
-        }
-        if (!Utility.isUsable(this.skyboxRenderer)) {
-            this.skyboxRenderer = new SkyBoxRenderer();
-        }*/
     }
 
-    public static render(): void {
+    private createFbo(): void {
+        if (this.fbo) {
+            this.fbo.release();
+        }
+        this.fbo = new Fbo();
+    }
+
+    private addColorAttachmentToTheFbo(): void {
+        const colorTexture1 = new GlTexture2D();
+        colorTexture1.allocate(InternalFormat.RGBA16F, this.getRenderingSize(), false);
+        colorTexture1.setMinificationFilter(TextureFilter.NEAREST);
+        colorTexture1.setMagnificationFilter(TextureFilter.NEAREST);
+        this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(colorTexture1);
+    }
+
+    private addDepthAttachmentToTheFbo(): void {
+        const depthRbo = new Rbo();
+        depthRbo.allocate(this.getRenderingSize(), InternalFormat.DEPTH32F, 1);
+        this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachRbo(depthRbo);
+    }
+
+    private isFboValid(): boolean {
+        return Utility.isUsable(this.fbo) &&
+            this.getRenderingSize()[0] === this.getFboSize()[0] &&
+            this.getRenderingSize()[1] === this.getFboSize()[1]
+    }
+
+    public render(): void {
         Log.startGroup('rendering');
-        this.beforeRender();
-        Gl.setEnableDepthTest(true);
-        //prepare  
-        this.bindFbo();
-        Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D).getNativeTexture().bindToTextureUnit(0);
-        Gl.clear(true, true, false);
-        this.blinnPhongRenderer.render();
-        this.skyboxRenderer.render();
-        this.getParameters().set(this.WORK, this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment());
-        //post
-        Fbo.bindDefaultFrameBuffer();
-        Gl.clear(true, true, false);
-        this.screenRenderer.render();
-        this.getParameters().set(this.WORK, null);
+
+        this.beforePipeline();
+
+        this.renderGeometry();
+        this.renderPostProcess();
+        this.renderToScreen();
+
         Log.endGroup();
     }
 
-    private static beforeRender(): void {
+    protected renderGeometry(): void {
+        for (const renderer of this.geometryRenderers.getIterator()) {
+            renderer.render();
+        }
+        this.getParameters().set(RenderingPipeline.WORK, this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment());
+    }
+
+    protected renderPostProcess(): void {
+        //TODO
+    }
+
+    protected renderToScreen(): void {
+        Fbo.bindDefaultFrameBuffer();
+        Gl.clear(true, true, false);
+        this.screenRenderer.render();
+        this.getParameters().set(RenderingPipeline.WORK, null);
+    }
+
+    private beforePipeline(): void {
         this.refresh();
-        //this.bindFbo();
+        this.bindFbo();
         Gl.clear(true, true, false);
 
         const mainCamera = Engine.getMainCamera();
@@ -152,7 +171,7 @@ export class RenderingPipeline {
         CameraStruct.getInstance().useUbo();
     }
 
-    private static refreshIfCanvasResized(): void {
+    private refreshIfCanvasResized(): void {
         const canvas = Gl.getCanvas();
         if (canvas.clientWidth !== canvas.width || canvas.clientHeight !== canvas.height) {
             canvas.width = canvas.clientWidth;
@@ -163,4 +182,5 @@ export class RenderingPipeline {
             }
         }
     }
+
 }

@@ -15,10 +15,6 @@ export abstract class GeometryRenderer extends Renderer {
     protected camera: ICameraComponent;
 
     protected renderUnsafe(): void {
-        if (!Utility.isUsable(this.getShader())) {
-            Log.logString(LogLevel.WARNING, `The ${this.getName()} is not usable`);
-            return;
-        }
         this.beforeRendering();
         const mapOfRenderableComponents = this.getRenderables();
         for (const renderable of mapOfRenderableComponents.keys()) {
@@ -38,8 +34,8 @@ export abstract class GeometryRenderer extends Renderer {
 
     protected beforeRendering(): void {
         this.getShader().start();
-        RenderingPipeline.bindFbo();
-        Gl.setViewport(RenderingPipeline.getRenderingSize(), vec2.create());
+        Engine.getRenderingPipeline().bindFbo();
+        Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
         this.setNumberOfRenderedElements(0);
         this.setNumberOfRenderedFaces(0);
         this.camera = Engine.getMainCamera();
@@ -88,7 +84,7 @@ export abstract class GeometryRenderer extends Renderer {
     }
 
     private getRenderables(): Map<IRenderable, Array<IRenderableComponent<IRenderable>>> {
-        const renderables = RenderingPipeline.getRenderableContainer().getIterator();
+        const renderables = Engine.getRenderingPipeline().getRenderableContainer().getIterator();
         const filteredRenderables = this.filter(renderables);
         return this.order(filteredRenderables);
     }

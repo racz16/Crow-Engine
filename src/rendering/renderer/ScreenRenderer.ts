@@ -6,8 +6,7 @@ import { TexturedQuadShader } from '../../resource/Shader/TexturedQuadShader';
 import { Gl } from '../../webgl/Gl';
 import { vec2 } from 'gl-matrix';
 import { Utility } from '../../utility/Utility';
-import { Log } from '../../utility/log/Log';
-import { LogLevel } from '../../utility/log/LogLevel';
+import { Engine } from '../../core/Engine';
 
 export class ScreenRenderer extends Renderer {
 
@@ -21,10 +20,6 @@ export class ScreenRenderer extends Renderer {
     }
 
     protected renderUnsafe(): void {
-        if (!Utility.isUsable(this.shader)) {
-            Log.logString(LogLevel.WARNING, 'The Textured quad shader is not usable');
-            return;
-        }
         this.beforeShader();
         this.shader.start();
         this.beforeDrawQuad();
@@ -34,7 +29,6 @@ export class ScreenRenderer extends Renderer {
     }
 
     private beforeShader(): void {
-
         if (!Utility.isUsable(this.quad)) {
             this.quad = QuadMesh.getInstance();
         }
@@ -44,25 +38,14 @@ export class ScreenRenderer extends Renderer {
     }
 
     private beforeDrawQuad(): void {
-        /**/
-        const image = RenderingPipeline.getParameters().get(RenderingPipeline.WORK);
+        const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
         if (image && image.isUsable()) {
-            image.getNativeTexture().bindToTextureUnit(0);
-        }
-    }
-
-    public release(): void {
-        if (!this.shader.isUsable()) {
-            this.shader.release();
+            image.getNativeTexture().bindToTextureUnit(31);
         }
     }
 
     public getShader(): TexturedQuadShader {
         return this.shader;
-    }
-
-    public isUsable(): boolean {
-        return true;
     }
 
 }

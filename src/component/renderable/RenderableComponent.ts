@@ -9,6 +9,7 @@ import { vec2, mat4, vec3, quat } from 'gl-matrix';
 import { BlinnPhongRenderer } from '../../rendering/renderer/BlinnPhongRenderer';
 import { BoundingShape } from './boundingshape/BoundingShape';
 import { Billboard } from './billboard/Billboard';
+import { Engine } from '../../core/Engine';
 
 export abstract class RenderableComponent<T extends IRenderable> extends Component implements IRenderableComponent<T>{
 
@@ -239,12 +240,12 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
 
     protected handleAttach(attached: GameObject): void {
         attached.getTransform().getInvalidatables().addInvalidatable(this);
-        RenderingPipeline.getRenderableContainer().add(this);
+        Engine.getRenderingPipeline().getRenderableContainer().add(this);
     }
 
     protected handleDetach(detached: GameObject): void {
         detached.getTransform().getInvalidatables().removeInvalidatable(this);
-        RenderingPipeline.getRenderableContainer().remove(this);
+        Engine.getRenderingPipeline().getRenderableContainer().remove(this);
     }
 
 }

@@ -9,6 +9,7 @@ import { CullFace } from '../../webgl/enum/CullFace';
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
 import { InternalFormat } from '../../webgl/enum/InternalFormat';
 import { Utility } from '../../utility/Utility';
+import { Engine } from '../../core/Engine';
 
 export class ShadowRenderer extends Renderer {
 
@@ -97,7 +98,7 @@ export class ShadowRenderer extends Renderer {
         this.beforeShader();
         this.shader.start();
 
-        const renderables = RenderingPipeline.getRenderableContainer();
+        const renderables = Engine.getRenderingPipeline().getRenderableContainer();
         for (const renderableComponent of renderables.getIterator()) {
             if (renderableComponent.isActive() && renderableComponent
                 .isCastShadow()) {
@@ -108,7 +109,7 @@ export class ShadowRenderer extends Renderer {
             }
         }
         this.afterShader();
-        RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getTextureAttachment());
+        Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getTextureAttachment());
     }
 
     private beforeShader(): void {
@@ -175,18 +176,18 @@ export class ShadowRenderer extends Renderer {
         }
     }
 
-    public getShader(): ShadowShader{
+    public getShader(): ShadowShader {
         return this.shader;
     }
 
     protected removedFromThePipeline(): void {
         //TODO: ezt majd azért eléggé át kéne nézni
-        const shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP);
+        const shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
         if (shadowMap) {
             if (shadowMap.isUsable()) {
                 shadowMap.release();
             }
-            RenderingPipeline.getParameters().set(RenderingPipeline.SHADOWMAP, null);
+            Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, null);
         }
     }
 

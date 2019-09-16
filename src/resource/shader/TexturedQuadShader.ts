@@ -10,7 +10,7 @@ export class TexturedQuadShader extends Shader {
     }
 
     public connectTextureUnits(): void {
-        this.getShaderProgram().connectTextureUnit('image', 0);
+        this.getShaderProgram().connectTextureUnit('image', 31);
     }
 
 }

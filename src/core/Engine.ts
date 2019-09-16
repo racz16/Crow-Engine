@@ -6,7 +6,6 @@ import { Audio } from '../resource/Audio';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { ParameterKey } from '../utility/parameter/ParameterKey';
-import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
 import { AudioListenerComponent } from '../component/audio/AudioListenerComponent';
 import { GameObjectContainer } from './GameObjectContainer';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
@@ -19,8 +18,11 @@ export class Engine {
     public static readonly MAIN_CAMERA = new ParameterKey<ICameraComponent>('MAIN_CAMERA');
     public static readonly MAIN_AUDIO_LISTENER = new ParameterKey<AudioListenerComponent>('MAIN_AUDIO_LISTENER');
     public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>('GAMEOBJECT_CONTAINER');
+
     public static readonly TIME_MANAGER = new ParameterKey<TimeManager>('TIME_MANAGER');
     public static readonly RESOURCE_MANAGER = new ParameterKey<ResourceManager>('RESOURCE_MANAGER');
+    public static readonly RENDERING_PIPELINE = new ParameterKey<RenderingPipeline>('RENDERING_PIPELINE');
+
     public static readonly DEFAULT_TEXTURE_2D = new ParameterKey<GlTexture2D>('DEFAULT_TEXTURE_2D');
     public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<GlCubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
 
@@ -44,18 +46,14 @@ export class Engine {
     private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
         Log.startGroup('initialization');
         Log.initialize(logLevel);
-        this.initializeSystems();
-        Gl.initialize(canvas);
-        Audio.initialize();
-        RenderingPipeline.initialize();
-        Engine.initialized = true;
-        Log.endGroup();
-    }
-
-    private static initializeSystems(): void {
+        this.setResourceManager(new ResourceManager());
         this.setGameObjectContainer(new GameObjectContainer());
         this.setTimeManager(new TimeManager());
-        this.setResourceManager(new ResourceManager());
+        Gl.initialize(canvas);
+        Audio.initialize();
+        this.setRenderingPipeline(new RenderingPipeline());
+        Engine.initialized = true;
+        Log.endGroup();
     }
 
     //
@@ -120,6 +118,17 @@ export class Engine {
         this.PARAMETERS.set(this.RESOURCE_MANAGER, resourceManager);
     }
 
+    public static getRenderingPipeline(): RenderingPipeline {
+        return this.PARAMETERS.get(this.RENDERING_PIPELINE);
+    }
+
+    public static setRenderingPipeline(renderingPipeline: RenderingPipeline): void {
+        if (!renderingPipeline) {
+            Log.logString(LogLevel.WARNING, 'Rendering Pipeline set to null');
+        }
+        this.PARAMETERS.set(this.RENDERING_PIPELINE, renderingPipeline);
+    }
+
     //
     //engine lifecycle
     //
@@ -164,7 +173,7 @@ export class Engine {
         Log.startGroup(`frame ${this.getTimeManager().getFrameCount()}`);
         (this.getTimeManager() as any).update();
         (this.getGameObjectContainer() as any).updateComponents();
-        RenderingPipeline.render();
+        this.getRenderingPipeline().render();
         Log.endGroup();
         Log.endFrame();
         window.requestAnimationFrame(Engine.createNextFrame);
