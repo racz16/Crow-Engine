@@ -1,5 +1,4 @@
 import { Log } from '../utility/log/Log';
-import { LogLevel } from '../utility/log/LogLevel';
 import { Shader } from '../resource/shader/Shader';
 import { Utility } from '../utility/Utility';
 
@@ -7,8 +6,8 @@ export abstract class Renderer {
 
     private name: string;
     private active = true;
-    private numberOfRenderedElements = 0;
-    private numberOfRenderedFaces = 0;
+    private renderedElementCount = 0;
+    private renderedFaceCount = 0;
 
     public constructor(name: string) {
         if (name == null) {
@@ -18,23 +17,26 @@ export abstract class Renderer {
     }
 
     public render(): void {
-        try {
-            Log.startGroup(this.name)
-            if (!this.isUsable()) {
-                Log.logString(LogLevel.WARNING, `The ${this.name} is not usable`);
-                return;
-            }
-            this.renderUnsafe();
-        } finally {
-            Log.endGroup();
-        }
+        Log.startGroup(this.name)
+        this.beforeRendering();
+        this.renderUnsafe();
+        this.afterRendering();
+        Log.endGroup();
     }
 
     public getName(): string {
         return this.name;
     }
 
+    protected beforeRendering(): void {
+        this.getShader().start();
+        this.resetRenderedElementCount();
+        this.resetRenderedFaceCount();
+    }
+
     protected abstract renderUnsafe(): void;
+
+    protected afterRendering(): void { }
 
     public release(): void {
         if (this.isUsable()) {
@@ -58,20 +60,28 @@ export abstract class Renderer {
         this.active = active;
     }
 
-    public getNumberOfRenderedElements(): number {
-        return this.numberOfRenderedElements;
+    public getRenderedElementCount(): number {
+        return this.renderedElementCount;
     }
 
-    protected setNumberOfRenderedElements(count: number): void {
-        this.numberOfRenderedElements = count;
+    protected resetRenderedElementCount(): void {
+        this.renderedElementCount = 0;
     }
 
-    public getNumberOfRenderedFaces(): number {
-        return this.numberOfRenderedFaces;
+    protected incrementRenderedElementCountBy(elementCount: number): void {
+        this.renderedElementCount += elementCount;
     }
 
-    protected setNumberOfRenderedFaces(count: number): void {
-        this.numberOfRenderedFaces = count;
+    public getRenderedFaceCount(): number {
+        return this.renderedFaceCount;
+    }
+
+    protected resetRenderedFaceCount(): void {
+        this.renderedFaceCount = 0;
+    }
+
+    protected incrementRenderedFaceCountBy(faceCount: number): void {
+        this.renderedFaceCount += faceCount;
     }
 
     protected abstract getShader(): Shader;

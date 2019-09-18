@@ -1,7 +1,7 @@
 import { GlBuffer } from './GlBuffer';
 import { GlConstants } from '../GlConstants';
 import { Gl } from '../Gl';
-import { BindingPoint } from '../../rendering/BindingPoint';
+import { BindingPoint } from '../BindingPoint';
 
 export class Ubo extends GlBuffer {
 

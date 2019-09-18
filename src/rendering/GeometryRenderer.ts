@@ -1,10 +1,6 @@
 import { Renderer } from './Renderer';
 import { IRenderable } from '../resource/IRenderable';
-import { RenderingPipeline } from './RenderingPipeline';
 import { IRenderableComponent } from '../component/renderable/IRenderableComponent';
-import { Utility } from '../utility/Utility';
-import { Log } from '../utility/log/Log';
-import { LogLevel } from '../utility/log/LogLevel';
 import { Gl } from '../webgl/Gl';
 import { vec2, vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
@@ -15,42 +11,43 @@ export abstract class GeometryRenderer extends Renderer {
     protected camera: ICameraComponent;
 
     protected renderUnsafe(): void {
-        this.beforeRendering();
-        const mapOfRenderableComponents = this.getRenderables();
-        for (const renderable of mapOfRenderableComponents.keys()) {
-            const renderableComponents = mapOfRenderableComponents.get(renderable);
-            this.beforeDrawRenderables(renderable, renderableComponents);
-            for (const renderableComponent of renderableComponents.values()) {
-                if (this.drawPredicate(renderableComponent)) {
-                    this.beforeDraw(renderableComponent);
-                    this.draw(renderableComponent);
-                    this.afterDraw(renderableComponent);
-                }
-            }
-            this.afterDrawRenderables(renderable, renderableComponents);
+        const renderableComponents = this.getRenderables();
+        for (const renderable of renderableComponents.keys()) {
+            this.renderRenderable(renderableComponents.get(renderable).values(), renderable);
         }
-        this.afterRendering();
+    }
+
+    protected renderRenderable(renderableComponents: IterableIterator<IRenderableComponent<IRenderable>>, renderable: IRenderable): void {
+        this.beforeDrawRenderables(renderable, renderableComponents);
+        for (const renderableComponent of renderableComponents) {
+            this.renderRenderableComponent(renderableComponent);
+        }
+        this.afterDrawRenderables(renderable, renderableComponents);
+    }
+
+    protected renderRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+        if (this.drawPredicate(renderableComponent)) {
+            this.beforeDraw(renderableComponent);
+            this.draw(renderableComponent);
+            this.afterDraw(renderableComponent);
+        }
     }
 
     protected beforeRendering(): void {
-        this.getShader().start();
+        super.beforeRendering();
         Engine.getRenderingPipeline().bindFbo();
         Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
-        this.setNumberOfRenderedElements(0);
-        this.setNumberOfRenderedFaces(0);
         this.camera = Engine.getMainCamera();
     }
 
-    protected afterRendering(): void { }
+    protected beforeDrawRenderables(renderable: IRenderable, renderableComponents: IterableIterator<IRenderableComponent<IRenderable>>): void { }
 
-    protected beforeDrawRenderables(renderable: IRenderable, renderableComponents: Array<IRenderableComponent<IRenderable>>): void { }
-
-    protected afterDrawRenderables(renderable: IRenderable, renderableComponents: Array<IRenderableComponent<IRenderable>>): void { }
+    protected afterDrawRenderables(renderable: IRenderable, renderableComponents: IterableIterator<IRenderableComponent<IRenderable>>): void { }
 
     protected beforeDraw(renderableComponent: IRenderableComponent<IRenderable>): void {
         Gl.setEnableCullFace(!renderableComponent.isTwoSided());
-        this.setNumberOfRenderedElements(this.getNumberOfRenderedElements() + 1);
-        this.setNumberOfRenderedFaces(this.getNumberOfRenderedFaces() + renderableComponent.getFaceCount());
+        this.incrementRenderedElementCountBy(1);
+        this.incrementRenderedFaceCountBy(renderableComponent.getFaceCount());
         this.getShader().setUniforms(renderableComponent);
     }
 
@@ -64,7 +61,7 @@ export abstract class GeometryRenderer extends Renderer {
         return renderableComponent.getRenderable().isUsable() &&
             renderableComponent.isActive() &&
             this.isVisible(renderableComponent, this.camera) &&
-            this.isInsideFrustum(renderableComponent);
+            renderableComponent.getBoundingShape().isInsideMainCameraFrustum();
     }
 
     protected isVisible(renderableComponent: IRenderableComponent<IRenderable>, camera: ICameraComponent): boolean {
@@ -77,10 +74,6 @@ export abstract class GeometryRenderer extends Renderer {
         const renderableDistanceFromCamera = vec3.distance(cameraPosition, renderablePosition);
         const positionInPercent = (renderableDistanceFromCamera - camera.getNearPlaneDistance()) / (camera.getFarPlaneDistance() - camera.getNearPlaneDistance()) * 100;
         return positionInPercent >= visibility[0] && positionInPercent < visibility[1];
-    }
-
-    protected isInsideFrustum(renderableComponent: IRenderableComponent<IRenderable>): boolean {
-        return renderableComponent.getBoundingShape().isInsideMainCameraFrustum();
     }
 
     private getRenderables(): Map<IRenderable, Array<IRenderableComponent<IRenderable>>> {

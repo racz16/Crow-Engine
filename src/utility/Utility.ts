@@ -1,6 +1,9 @@
 import { mat4, vec3, vec4, quat } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
+import { Fbo } from '../webgl/fbo/Fbo';
+import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
+import { FboAttachmentContainer } from '../webgl/fbo/FboAttachmentContainer';
 
 export class Utility {
 
@@ -86,6 +89,29 @@ export class Utility {
 
     public static isUsable(resource: IResource): boolean {
         return resource && resource.isUsable();
+    }
+
+    public static releaseFboAndAttachments(fbo: Fbo): void {
+        if (this.isUsable(fbo)) {
+            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH));
+            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.STENCIL));
+            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH_STENCIL));
+            for (let i = 0; i < Fbo.getMaxColorAttachments(); i++) {
+                this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, i));
+            }
+            fbo.release();
+        }
+    }
+
+    private static releaseFboAttachment(attachmentContainer: FboAttachmentContainer): void {
+        this.releaseIfUsable(attachmentContainer.getTextureAttachment());
+        this.releaseIfUsable(attachmentContainer.getRboAttachment());
+    }
+
+    public static releaseIfUsable(resource: IResource): void {
+        if (this.isUsable(resource)) {
+            resource.release();
+        }
     }
 
     public static isColor(data: vec3): boolean {

@@ -2,7 +2,7 @@ import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
 import { vec2, vec3, vec4, mat4, mat3 } from 'gl-matrix';
 import { GlShader } from './GlShader';
-import { BindingPoint } from '../../rendering/BindingPoint';
+import { BindingPoint } from '../BindingPoint';
 import { ShaderStage } from '../enum/ShaderStage';
 
 export class GlShaderProgram extends GlObject {

@@ -106,7 +106,7 @@ export class TestSceneBuilder {
         const skyMaterial = new Material(SkyboxRenderer);
         const slot = new MaterialSlot();
         slot.setCubeMapTexture(this.elyHills);
-        skyMaterial.setSlot(Material.DIFFUSE, slot);
+        skyMaterial.setSlot(Material.SKYBOX, slot);
         const skyRenderable = new MeshComponent(CubeMesh.getInstance(), skyMaterial);
         sky.getComponents().add(skyRenderable);
 

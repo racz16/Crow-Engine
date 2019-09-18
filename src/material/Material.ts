@@ -5,12 +5,13 @@ import { Renderer } from '../rendering/Renderer';
 
 export class Material<T extends Renderer> {
 
-    public static readonly REFRACTION_INDEX = new ParameterKey<number>('REFRACTION_INDEX');
+    public static readonly SKYBOX = new ParameterKey<MaterialSlot>('SKYBOX');
     public static readonly DIFFUSE = new ParameterKey<MaterialSlot>('DIFFUSE');
     public static readonly SPECULAR = new ParameterKey<MaterialSlot>('SPECULAR');
     public static readonly NORMAL = new ParameterKey<MaterialSlot>('NORMAL');
     public static readonly REFLECTION = new ParameterKey<MaterialSlot>('REFLECTION');
     public static readonly REFRACTION = new ParameterKey<MaterialSlot>('REFRACTION');
+    public static readonly REFRACTION_INDEX = new ParameterKey<number>('REFRACTION_INDEX');
     public static readonly ENVIRONMENT_INTENSITY = new ParameterKey<MaterialSlot>('ENVIRONMENT_INTENSITY');
 
     private readonly slots = new ParameterContainer();

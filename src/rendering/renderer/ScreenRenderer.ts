@@ -20,28 +20,33 @@ export class ScreenRenderer extends Renderer {
     }
 
     protected renderUnsafe(): void {
-        this.beforeShader();
-        this.shader.start();
-        this.beforeDrawQuad();
-        Gl.setEnableDepthTest(false);
-        this.quad.draw();
-        Gl.setEnableDepthTest(true);
+        this.beforeRendering();
+        this.beforeDraw();
+        this.draw();
     }
 
-    private beforeShader(): void {
+    protected beforeRendering(): void {
         if (!Utility.isUsable(this.quad)) {
             this.quad = QuadMesh.getInstance();
         }
+        this.shader.start();
         Fbo.bindDefaultFrameBuffer();
+        Gl.clear(true, true, false);
         const canvas = Gl.getCanvas();
         Gl.setViewport(vec2.fromValues(canvas.clientWidth, canvas.clientHeight), vec2.create());
     }
 
-    private beforeDrawQuad(): void {
+    protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
         if (image && image.isUsable()) {
             image.getNativeTexture().bindToTextureUnit(31);
         }
+    }
+
+    protected draw(): void {
+        Gl.setEnableDepthTest(false);
+        this.quad.draw();
+        Gl.setEnableDepthTest(true);
     }
 
     public getShader(): TexturedQuadShader {

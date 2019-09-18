@@ -8,7 +8,7 @@ export class SkyBoxShader extends Shader {
 
     public setUniforms(renderableComponent: IRenderableComponent<IRenderable>) {
         this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
-        const slot = renderableComponent.getMaterial().getSlot(Material.DIFFUSE);
+        const slot = renderableComponent.getMaterial().getSlot(Material.SKYBOX);
         const hasCubeMapTexture = slot && slot.getCubeMapTexture() && slot.getCubeMapTexture().isUsable();
         if (hasCubeMapTexture) {
             slot.getCubeMapTexture().getNativeTexture().bindToTextureUnit(0);

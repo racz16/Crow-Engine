@@ -21,6 +21,7 @@ import { TextureFilter } from '../webgl/enum/TextureFilter';
 import { RendererContainer } from './RendererContainer';
 import { GeometryRenderer } from './GeometryRenderer';
 import { PostProcessRenderer } from './PostProcessRenderer';
+import { Renderer } from './Renderer';
 
 export class RenderingPipeline {
 
@@ -89,21 +90,41 @@ export class RenderingPipeline {
         return this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getAttachment().getSize();
     }
 
+    public getRenderedFaceCount(): number {
+        let count = 0;
+        for (const renderer of this.geometryRenderers.getIterator()) {
+            count += renderer.getRenderedFaceCount();
+        }
+        return count;
+    }
+
+    public getRenderedElementCount(): number {
+        let count = 0;
+        for (const renderer of this.geometryRenderers.getIterator()) {
+            count += renderer.getRenderedElementCount();
+        }
+        return count;
+    }
+
     private refresh(): void {
-        this.refreshIfCanvasResized();
+        this.refreshCameraAndCanvasIfResized();
         if (!this.isFboValid()) {
             this.createFbo();
             this.addColorAttachmentToTheFbo();
             this.addDepthAttachmentToTheFbo();
-            if (!this.fbo.isDrawComplete() || !this.fbo.isReadComplete()) {
-                throw new Error();
-            }
+            this.throwErrorIfFboIsNotComplete();
+        }
+    }
+
+    protected throwErrorIfFboIsNotComplete(): void {
+        if (!this.fbo.isDrawComplete() || !this.fbo.isReadComplete()) {
+            throw new Error();
         }
     }
 
     private createFbo(): void {
-        if (this.fbo) {
-            this.fbo.release();
+        if (Utility.isUsable(this.fbo)) {
+            Utility.releaseFboAndAttachments(this.fbo);
         }
         this.fbo = new Fbo();
     }
@@ -130,19 +151,18 @@ export class RenderingPipeline {
 
     public render(): void {
         Log.startGroup('rendering');
-
         this.beforePipeline();
-
         this.renderGeometry();
         this.renderPostProcess();
         this.renderToScreen();
-
+        this.afterPipeline();
         Log.endGroup();
     }
 
     protected renderGeometry(): void {
         for (const renderer of this.geometryRenderers.getIterator()) {
-            renderer.render();
+            this.logWarningIfRendererIsNotUsable(renderer);
+            this.renderIfRendererIsUsableAndActive(renderer);
         }
         this.getParameters().set(RenderingPipeline.WORK, this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment());
     }
@@ -152,17 +172,30 @@ export class RenderingPipeline {
     }
 
     protected renderToScreen(): void {
-        Fbo.bindDefaultFrameBuffer();
-        Gl.clear(true, true, false);
-        this.screenRenderer.render();
-        this.getParameters().set(RenderingPipeline.WORK, null);
+        this.logWarningIfRendererIsNotUsable(this.screenRenderer);
+        this.renderIfRendererIsUsableAndActive(this.screenRenderer);
     }
 
-    private beforePipeline(): void {
+    protected renderIfRendererIsUsableAndActive(renderer: Renderer): void {
+        if (renderer.isUsable() && renderer.isActive()) {
+            renderer.render();
+        }
+    }
+
+    protected logWarningIfRendererIsNotUsable(renderer: Renderer): void {
+        if (!renderer.isUsable()) {
+            Log.logString(LogLevel.WARNING, `The ${renderer.getName()} is not usable`);
+        }
+    }
+
+    protected beforePipeline(): void {
         this.refresh();
         this.bindFbo();
         Gl.clear(true, true, false);
+        this.useCameraUbo();
+    }
 
+    private useCameraUbo(): void {
         const mainCamera = Engine.getMainCamera();
         if (!mainCamera || !mainCamera.isActive()) {
             throw new Error();
@@ -171,7 +204,11 @@ export class RenderingPipeline {
         CameraStruct.getInstance().useUbo();
     }
 
-    private refreshIfCanvasResized(): void {
+    protected afterPipeline(): void {
+        this.getParameters().set(RenderingPipeline.WORK, null);
+    }
+
+    private refreshCameraAndCanvasIfResized(): void {
         const canvas = Gl.getCanvas();
         if (canvas.clientWidth !== canvas.width || canvas.clientHeight !== canvas.height) {
             canvas.width = canvas.clientWidth;

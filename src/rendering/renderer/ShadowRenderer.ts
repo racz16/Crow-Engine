@@ -85,8 +85,8 @@ export class ShadowRenderer extends Renderer {
                 this.generateFbo();
             }
         } else {
-            this.setNumberOfRenderedElements(0);
-            this.setNumberOfRenderedFaces(0);
+            this.resetRenderedFaceCount();
+            this.resetRenderedElementCount();
             this.releaseFbo();
         }
 
@@ -104,8 +104,8 @@ export class ShadowRenderer extends Renderer {
                 .isCastShadow()) {
                 //beforeDrawMeshInstance(projectionViewMatrix, renderableComponent.getModelMatrix());
                 renderableComponent.draw();
-                this.setNumberOfRenderedElements(this.getNumberOfRenderedElements() + 1);
-                this.setNumberOfRenderedFaces(this.getNumberOfRenderedFaces() + renderableComponent.getFaceCount());
+                //this.setRenderedElementCount(this.getRenderedElementCount() + 1);
+                //this.setRenderedFaceCount(this.getRenderedFaceCount() + renderableComponent.getFaceCount());
             }
         }
         this.afterShader();
@@ -120,8 +120,8 @@ export class ShadowRenderer extends Renderer {
         Gl.setCullFace(CullFace.FRONT);
         this.fbo.bind();
         //OpenGl.clear(false, true, false);
-        this.setNumberOfRenderedElements(0);
-        this.setNumberOfRenderedFaces(0);
+        this.resetRenderedFaceCount();
+            this.resetRenderedElementCount();
     }
 
     private afterShader(): void {

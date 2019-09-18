@@ -1,4 +1,4 @@
-import { BindingPoint } from '../rendering/BindingPoint';
+import { BindingPoint } from '../webgl/BindingPoint';
 
 export class Conventions {
 
