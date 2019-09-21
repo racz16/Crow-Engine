@@ -1,6 +1,9 @@
 import { Log } from '../utility/log/Log';
 import { Shader } from '../resource/shader/Shader';
 import { Utility } from '../utility/Utility';
+import { Engine } from '../core/Engine';
+import { Gl } from '../webgl/Gl';
+import { vec2 } from 'gl-matrix';
 
 export abstract class Renderer {
 
@@ -32,6 +35,8 @@ export abstract class Renderer {
         this.getShader().start();
         this.resetRenderedElementCount();
         this.resetRenderedFaceCount();
+        Engine.getRenderingPipeline().bindFbo();
+        Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
     }
 
     protected abstract renderUnsafe(): void;

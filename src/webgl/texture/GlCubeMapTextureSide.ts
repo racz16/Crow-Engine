@@ -72,8 +72,8 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.cubeMapTexture.getWrapW();
     }
 
-    public issRgb(): boolean {
-        return this.cubeMapTexture.issRgb();
+    public isSRgb(): boolean {
+        return this.cubeMapTexture.isSRgb();
     }
 
     public isUsable(): boolean {

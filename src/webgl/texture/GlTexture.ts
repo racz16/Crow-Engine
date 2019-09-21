@@ -180,7 +180,7 @@ export abstract class GlTexture extends GlObject implements IResource {
         return GlConstants.MAX_TEXTURE_SIZE_SAFE;
     }
 
-    public issRgb(): boolean {
+    public isSRgb(): boolean {
         return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat === InternalFormat.SRGB8;
     }
 

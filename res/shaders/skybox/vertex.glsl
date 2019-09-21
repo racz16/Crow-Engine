@@ -1,5 +1,6 @@
 #version 300 es
-layout (location = 0) in vec3 position;
+
+layout (location = 0) in vec3 i_position;
 
 out vec3 io_textureCoordinates;
 
@@ -11,7 +12,7 @@ layout (std140) uniform Camera {                    //binding point: 1
 
 void main(){
     mat4 view = mat4(mat3(viewMatrix));
-    io_textureCoordinates = position;
-    gl_Position = projectionMatrix * view * vec4(position, 1.0);
+    io_textureCoordinates = i_position;
+    gl_Position = projectionMatrix * view * vec4(i_position, 1.0f);
     gl_Position = gl_Position.xyww;
 }   

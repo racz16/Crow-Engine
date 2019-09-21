@@ -1,9 +1,9 @@
 import { ParameterKey } from '../utility/parameter/ParameterKey';
 import { MaterialSlot } from './MaterialSlot';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
-import { Renderer } from '../rendering/Renderer';
+import { GeometryRenderer } from '../rendering/GeometryRenderer';
 
-export class Material<T extends Renderer> {
+export class Material<T extends GeometryRenderer> {
 
     public static readonly SKYBOX = new ParameterKey<MaterialSlot>('SKYBOX');
     public static readonly DIFFUSE = new ParameterKey<MaterialSlot>('DIFFUSE');

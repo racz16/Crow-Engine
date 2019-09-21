@@ -105,13 +105,16 @@ export class Fbo extends GlObject {
     public setDrawBuffers(...indices: Array<number>): void {
         const attachments = new Array<number>();
         for (const fac of this.color) {
-            const drawAttachment = indices.includes(fac.getIndex());
-            (fac as any).setDrawBuffer(drawAttachment);
-            if (drawAttachment) {
-                attachments.push(Gl.gl.COLOR_ATTACHMENT0 + fac.getIndex());
-            }
+            this.setAttachmentDrawStatus(indices, attachments, fac);
         }
         this.setDrawBuffersUnsafe(attachments);
+    }
+
+    private setAttachmentDrawStatus(indices: Array<number>, attachments: Array<number>, fac: FboAttachmentContainer): void {
+        const drawAttachment = indices.includes(fac.getIndex());
+        (fac as any).setDrawBuffer(drawAttachment);
+        const glValue = drawAttachment ? Gl.gl.COLOR_ATTACHMENT0 + fac.getIndex() : Gl.gl.NONE;
+        attachments.push(glValue);
     }
 
     private setDrawBuffersUnsafe(attachments: Array<number>): void {

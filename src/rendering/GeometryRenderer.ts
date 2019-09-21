@@ -2,7 +2,7 @@ import { Renderer } from './Renderer';
 import { IRenderable } from '../resource/IRenderable';
 import { IRenderableComponent } from '../component/renderable/IRenderableComponent';
 import { Gl } from '../webgl/Gl';
-import { vec2, vec3 } from 'gl-matrix';
+import { vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
 import { Engine } from '../core/Engine';
 
@@ -35,8 +35,6 @@ export abstract class GeometryRenderer extends Renderer {
 
     protected beforeRendering(): void {
         super.beforeRendering();
-        Engine.getRenderingPipeline().bindFbo();
-        Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
         this.camera = Engine.getMainCamera();
     }
 

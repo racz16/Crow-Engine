@@ -26,9 +26,6 @@ export class ScreenRenderer extends Renderer {
     }
 
     protected beforeRendering(): void {
-        if (!Utility.isUsable(this.quad)) {
-            this.quad = QuadMesh.getInstance();
-        }
         this.shader.start();
         Fbo.bindDefaultFrameBuffer();
         Gl.clear(true, true, false);
@@ -38,9 +35,7 @@ export class ScreenRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        if (image && image.isUsable()) {
-            image.getNativeTexture().bindToTextureUnit(31);
-        }
+        image.getNativeTexture().bindToTextureUnit(0);
     }
 
     protected draw(): void {

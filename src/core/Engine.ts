@@ -46,14 +46,22 @@ export class Engine {
     private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
         Log.startGroup('initialization');
         Log.initialize(logLevel);
+        this.addSystemsBeforeInitialize();
+        Gl.initialize(canvas);
+        Audio.initialize();
+        this.addSystemsAfterInitialize();
+        Engine.initialized = true;
+        Log.endGroup();
+    }
+
+    private static addSystemsBeforeInitialize(): void {
         this.setResourceManager(new ResourceManager());
         this.setGameObjectContainer(new GameObjectContainer());
         this.setTimeManager(new TimeManager());
-        Gl.initialize(canvas);
-        Audio.initialize();
+    }
+
+    private static addSystemsAfterInitialize(): void {
         this.setRenderingPipeline(new RenderingPipeline());
-        Engine.initialized = true;
-        Log.endGroup();
     }
 
     //

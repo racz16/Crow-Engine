@@ -86,7 +86,7 @@ export class FboAttachmentContainer {
         this.texture = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.TEXTURE_2D, 0, 0);
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.TEXTURE_2D, null, 0);
     }
 
     //contains----------------------------------------------------------------------------------------------------------

@@ -103,7 +103,7 @@ export class Rbo extends GlObject implements IFboAttachment {
         return GlConstants.MAX_SAMPLES_SAFE;
     }
 
-    public issRgb(): boolean {
+    public isSRgb(): boolean {
         return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat === InternalFormat.SRGB8;
     }
 

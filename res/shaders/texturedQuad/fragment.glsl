@@ -1,12 +1,13 @@
 #version 300 es
 
-precision mediump float;
+precision highp float;
 
-out vec4 color;
 in vec2 io_textureCoordinates;
 
 uniform sampler2D image;
 
+out vec4 o_color;
+
 void main(){
-    color = texture(image, io_textureCoordinates);
+    o_color = texture(image, io_textureCoordinates);
 } 
