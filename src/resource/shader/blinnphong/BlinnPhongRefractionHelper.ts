@@ -23,11 +23,10 @@ export class BlinnPhongRefractionHelper extends BlinnPhongHelper {
     }
 
     private loadRefractionIndex(): void {
-        const sp = this.getSp();
         const index = this.material.getParameters().get(Material.REFRACTION_INDEX) == null ?
             BlinnPhongRefractionHelper.defaultRefractionIndex :
             this.material.getParameters().get(Material.REFRACTION_INDEX) as number;
-        sp.loadFloat(this.getRefractionIndexName(), index);
+        this.shaderProgram.loadFloat(this.getRefractionIndexName(), index);
     }
 
     protected getTextureUnit(): number {

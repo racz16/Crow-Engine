@@ -179,7 +179,7 @@ export class TestSceneBuilder {
         go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
 
         const ma = new Material(BlinnPhongRenderer);
-        ma.getParameters().set(MaterialSlot.USE_POM, 1);
+        ma.getParameters().set(MaterialSlot.USE_POM, true);
         ma.getParameters().set(MaterialSlot.POM_SCALE, 0.2);
         ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 5);
         ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, 10);

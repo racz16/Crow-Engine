@@ -5,6 +5,7 @@ import { Gl } from '../webgl/Gl';
 import { vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
 import { Engine } from '../core/Engine';
+import { Conventions } from '../resource/Conventions';
 
 export abstract class GeometryRenderer extends Renderer {
 
@@ -35,6 +36,7 @@ export abstract class GeometryRenderer extends Renderer {
 
     protected beforeRendering(): void {
         super.beforeRendering();
+        this.getShader().getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
         this.camera = Engine.getMainCamera();
     }
 

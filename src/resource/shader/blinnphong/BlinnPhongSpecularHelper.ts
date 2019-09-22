@@ -25,20 +25,21 @@ export class BlinnPhongSpecularHelper extends BlinnPhongHelper {
     }
 
     private loadGlossiness(): void {
-        //debugger;
-        const slot = this.getSlot();
-        const sp = this.getSp();
-        const isThereGlossiness = slot.getParameters().get(MaterialSlot.USE_GLOSSINESS);
-        if (isThereGlossiness == null || isThereGlossiness != 1) {
-            const color = slot.getColor();
-            sp.loadBoolean(this.getIsThereGlossinessName(), false);
-            if (color) {
-                sp.loadVector4(this.getColorName(), color);
-            } else {
-                sp.loadVector4(this.getColorName(), BlinnPhongSpecularHelper.defaultValue);
-            }
+        const isThereGlossiness = this.slot.getParameters().get(MaterialSlot.USE_GLOSSINESS);
+        if (isThereGlossiness) {
+            this.shaderProgram.loadBoolean(this.getIsThereGlossinessName(), true);
         } else {
-            sp.loadBoolean(this.getIsThereGlossinessName(), true);
+            this.loadGlossinessColor();
+        }
+    }
+
+    private loadGlossinessColor(): void {
+        const color = this.slot.getColor();
+        this.shaderProgram.loadBoolean(this.getIsThereGlossinessName(), false);
+        if (color) {
+            this.shaderProgram.loadVector4(this.getColorName(), color);
+        } else {
+            this.shaderProgram.loadVector4(this.getColorName(), BlinnPhongSpecularHelper.defaultValue);
         }
     }
 

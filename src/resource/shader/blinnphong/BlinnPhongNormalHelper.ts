@@ -17,29 +17,36 @@ export class BlinnPhongNormalHelper extends BlinnPhongHelper {
         this.material = material;
         this.setValues(material.getSlot(Material.NORMAL), sp);
         if (this.isTexture2DUsable()) {
-            sp.loadBoolean(this.getUseNormalMapName(), true);
-            this.loadTexture2D();
-            this.loadPom();
+            this.loadNormalMap();
         } else {
             sp.loadBoolean(this.getIsThereMapName(), false);
             sp.loadBoolean(this.getUseNormalMapName(), false);
         }
     }
 
+    private loadNormalMap(): void {
+        this.shaderProgram.loadBoolean(this.getUseNormalMapName(), true);
+        this.loadTexture2D();
+        this.loadPom();
+    }
+
     private loadPom(): void {
-        const sp = this.getSp();
         const usePom = this.material.getParameters().get(MaterialSlot.USE_POM);
-        if (usePom != null && usePom === 1) {
-            sp.loadBoolean(this.getIsTherePomName(), true);
-            let value = this.material.getParameters().get(MaterialSlot.POM_SCALE) as number;
-            sp.loadFloat(this.getPomScaleName(), value == null ? BlinnPhongNormalHelper.defPOMScale : value);
-            value = this.material.getParameters().get(MaterialSlot.POM_MIN_LAYERS) as number;
-            sp.loadFloat(this.getPomMinLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMinLayers : value);
-            value = this.material.getParameters().get(MaterialSlot.POM_MAX_LAYERS) as number;
-            sp.loadFloat(this.getPomMaxLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMaxLayers : value);
+        if (usePom) {
+            this.loadPomUnsafe();
         } else {
-            sp.loadBoolean(this.getIsTherePomName(), false);
+            this.shaderProgram.loadBoolean(this.getIsTherePomName(), false);
         }
+    }
+
+    private loadPomUnsafe(): void {
+        this.shaderProgram.loadBoolean(this.getIsTherePomName(), true);
+        let value = this.material.getParameters().get(MaterialSlot.POM_SCALE) as number;
+        this.shaderProgram.loadFloat(this.getPomScaleName(), value == null ? BlinnPhongNormalHelper.defPOMScale : value);
+        value = this.material.getParameters().get(MaterialSlot.POM_MIN_LAYERS) as number;
+        this.shaderProgram.loadFloat(this.getPomMinLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMinLayers : value);
+        value = this.material.getParameters().get(MaterialSlot.POM_MAX_LAYERS) as number;
+        this.shaderProgram.loadFloat(this.getPomMaxLayersName(), value == null ? BlinnPhongNormalHelper.defPOMMaxLayers : value);
     }
 
     protected getTextureUnit(): number {

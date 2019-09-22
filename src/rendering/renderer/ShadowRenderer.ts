@@ -109,7 +109,7 @@ export class ShadowRenderer extends Renderer {
             }
         }
         this.afterShader();
-        Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getTextureAttachment());
+        //Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getTextureAttachment());
     }
 
     private beforeShader(): void {
@@ -182,13 +182,13 @@ export class ShadowRenderer extends Renderer {
 
     protected removedFromThePipeline(): void {
         //TODO: ezt majd azért eléggé át kéne nézni
-        const shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
+        /*const shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
         if (shadowMap) {
             if (shadowMap.isUsable()) {
                 shadowMap.release();
             }
             Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, null);
-        }
+        }*/
     }
 
 }

@@ -64,16 +64,15 @@ in vec3 io_normal;
 in vec2 io_textureCoordinates;
 in vec3 io_viewPosition;
 in mat3 io_TBN;
-in mat4 io_shadowProjectionViewMatrix;
-in vec4 io_fragmentPositionLightSpace;
+//in mat4 io_shadowProjectionViewMatrix;
+//in vec4 io_fragmentPositionLightSpace;
 
 uniform Material material;
-uniform bool sRgb;
-uniform sampler2D shadowMap;
-uniform bool receiveShadow;
+//uniform sampler2D shadowMap;
+//uniform bool receiveShadow;
 
 layout(std140) uniform Lights { //binding point: 2
-    Light[16] positionalLights; //1792
+    Light[16] lights;           //1792
 };
 
 out vec4 o_color;
@@ -85,35 +84,35 @@ vec3 calculateAmbientColor(vec3 materialDiffuseColor, vec3 lightAmbientColor);
 float calculateAttenuation(vec3 fragmentPosition, vec3 lightPosition, vec3 lightAttenuation);
 float calculateCutOff(vec3 lightToFragmentDirection, vec3 lightDirection, vec2 lightCutOff);
 //data collection
-vec3 getDiffuseColor(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector);
+vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector);
 vec3 parallaxCorrectReflectionVector(vec3 reflectionVector);
 vec4 getSpecularColor(vec2 textureCoordinates);
 vec3 getNormalVector(vec2 textureCoordinates);
 vec2 getTextureCoordinates();
 vec3 getIntensity(vec2 textureCoordinates);
 //misc
-vec2 parallaxMapping(in vec3 textureCoordinates, in vec2 tangentViewDirection);
-float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector);
+vec2 parallaxMapping(vec3 textureCoordinates, vec2 tangentViewDirection);
+//float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector);
 
 void main(){
     vec3 viewDirection = normalize(io_viewPosition - io_fragmentPosition);
     vec3 fragmentPosition = io_fragmentPosition;
     vec2 textureCoordinates = getTextureCoordinates();
     vec3 normalVector = getNormalVector(textureCoordinates);
-    vec3 diffuseColor = getDiffuseColor(textureCoordinates, viewDirection, normalVector);
+    vec4 diffuse = getDiffuse(textureCoordinates, viewDirection, normalVector);
+    vec3 diffuseColor = diffuse.rgb;
+    float alpha = diffuse.a;
     vec4 specularColor = getSpecularColor(textureCoordinates);
-    //directional light
+
     vec3 result = vec3(0);
-    //vec3 result = calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, directionalLight);
     //shadows
     //result *= calculateShadow(receiveShadow, io_fragmentPositionLightSpace, normalVector);
-    //point and spotlights
     for(int i=0; i<16; i++){
-        if(positionalLights[i].lightActive){
-            result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, positionalLights[i]);
+        if(lights[i].lightActive){
+            result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, lights[i]);
         }
     }
-    o_color = vec4(result, 1.0f);
+    o_color = vec4(result, alpha);
 }
 
 vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, Light light){
@@ -129,14 +128,14 @@ vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 
 }
 
 vec3 calculateDiffuseColor(vec3 materialDiffuseColor, vec3 lightDiffuseColor, vec3 normalVector, vec3 lightDirection){
-    float diffuseStrength = max(dot(normalVector, -lightDirection), 0.0);
+    float diffuseStrength = max(dot(normalVector, -lightDirection), 0.0f);
     vec3 diffuse = lightDiffuseColor * diffuseStrength * materialDiffuseColor;
     return diffuse;
 }
 
 vec3 calculateSpecularColor(vec4 materialSpecularColor, vec3 lightSpecularColor, vec3 normalVector, vec3 lightToFragmentDirection, vec3 viewDirection){
     vec3 halfwayDirection = normalize(-lightToFragmentDirection + viewDirection);  
-    float specularStrength = pow(max(dot(normalVector, halfwayDirection), 0.0), materialSpecularColor.a);
+    float specularStrength = pow(max(dot(normalVector, halfwayDirection), 0.0f), materialSpecularColor.a);
     return lightSpecularColor * specularStrength * materialSpecularColor.rgb;
 }
 
@@ -155,7 +154,7 @@ float calculateCutOff(vec3 lightToFragmentDirection, vec3 lightDirection, vec2 l
     return clamp((theta - lightCutOff.y) / epsilon, 0.0f, 1.0f);
 }
 
-float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector, vec3 lightDirection){
+/*float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector, vec3 lightDirection){
     if(!receiveShadow){
         return 1.0f;
     }else if(dot(normalVector, -lightDirection) < 0.0f){
@@ -175,12 +174,12 @@ float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 
     }
     shadow /= 9.0f;
     return shadow;
-}
+}*/
 
-vec2 parallaxMapping(in vec3 tangentViewDirection, in vec2 textureCoordinates){
+vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
-    float layerHeight = 1.0 / numLayers;
-    float curLayerHeight = 0.0;
+    float layerHeight = 1.0f / numLayers;
+    float curLayerHeight = 0.0f;
     vec2 dtex = material.POMScale * tangentViewDirection.xy / numLayers;
     vec2 currentTextureCoords = textureCoordinates;
     float heightFromTexture = texture(material.normal, currentTextureCoords).a;
@@ -194,20 +193,19 @@ vec2 parallaxMapping(in vec3 tangentViewDirection, in vec2 textureCoordinates){
     float nextH	= heightFromTexture - curLayerHeight;
     float prevH	= texture(material.normal, prevTCoords).a - curLayerHeight + layerHeight;
     float weight = nextH / (nextH - prevH);
-    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0-weight);
-    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0 || finalTexCoords.x < 0.0 || finalTexCoords.y < 0.0){
+    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0f - weight);
+    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0f || finalTexCoords.x < 0.0f || finalTexCoords.y < 0.0f){
         discard;
     }
     return finalTexCoords;
 }
 
-vec3 getDiffuseColor(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
-    vec3 diffuse;
+vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
+    vec4 diffuse;
     if(material.isThereDiffuseMap){
-        vec4 tex = texture(material.diffuse, textureCoordinates * material.diffuseTile + material.diffuseOffset);
-        diffuse = tex.rgb;
+        diffuse = texture(material.diffuse, textureCoordinates * material.diffuseTile + material.diffuseOffset);
     }else{
-        diffuse = pow(material.diffuseColor, vec3(2.2f));
+        diffuse = vec4(pow(material.diffuseColor, vec3(2.2f)), 1.0f);
     }
 
     vec3 reflectionColor;
@@ -224,8 +222,7 @@ vec3 getDiffuseColor(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVec
         refractionColor = texture(material.refraction, refractionVector).rgb;
     }
     vec3 intensity = getIntensity(textureCoordinates);
-    return diffuse * intensity.r + reflectionColor * intensity.g + refractionColor * intensity.b;
-    //TODO: alpha channel?
+    return vec4(diffuse.rgb * intensity.r + reflectionColor * intensity.g + refractionColor * intensity.b, diffuse.a);
 }
 
 vec3 parallaxCorrectReflectionVector(vec3 reflectionVector){
@@ -241,14 +238,14 @@ vec3 getIntensity(vec2 textureCoordinates){
         intensity = material.environmentIntensityColor;
     }
     if(!material.isThereReflectionMap){
-        intensity.g = 0.0;
+        intensity.g = 0.0f;
     }
     if(!material.isThereRefractionMap){
-        intensity.b = 0.0;
+        intensity.b = 0.0f;
     }
     sum = intensity.r + intensity.g + intensity.b;
-    if(sum == 0.0){
-        return vec3(1, 0, 0);
+    if(sum == 0.0f){
+        return vec3(1.0f, 0.0f, 0.0f);
     }else{
         intensity /= sum;
         return intensity;
@@ -272,7 +269,7 @@ vec4 getSpecularColor(vec2 textureCoordinates){
 vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
         vec3 normal = texture(material.normal, textureCoordinates * material.normalTile + material.normalOffset).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
+        normal = normalize(normal * 2.0f - 1.0f);
         normal = normalize(io_TBN * normal);
         return normal;
     }else{
@@ -284,9 +281,9 @@ vec2 getTextureCoordinates(){
     if(material.isThereNormalMap && material.isTherePOM){
         vec3 tangentViewPosition = io_viewPosition * io_TBN;
         vec3 tangentFragmentPosition = io_fragmentPosition * io_TBN;
-        return parallaxMapping(normalize(tangentViewPosition - tangentFragmentPosition), io_textureCoordinates * material.normalTile + material.normalOffset);
+        vec3 tangentViewDirection = normalize(tangentViewPosition - tangentFragmentPosition);
+        return parallaxMapping(tangentViewDirection, io_textureCoordinates * material.normalTile + material.normalOffset);
     }else{
-        //TODO: nem kéne ide is tile meg offset?
         return io_textureCoordinates;
     }
 }

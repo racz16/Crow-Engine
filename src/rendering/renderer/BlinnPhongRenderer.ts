@@ -1,6 +1,7 @@
 import { BlinnPhongShader } from '../../resource/shader/blinnphong/BlinnPhongShader';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 import { GeometryRenderer } from '../GeometryRenderer';
+import { Conventions } from '../../resource/Conventions';
 
 export class BlinnPhongRenderer extends GeometryRenderer {
 
@@ -15,6 +16,7 @@ export class BlinnPhongRenderer extends GeometryRenderer {
         super.beforeRendering();
         BlinnPhongLightsStruct.getInstance().refreshUbo();
         BlinnPhongLightsStruct.getInstance().useUbo();
+        this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
     }
 
     private beforeDrawShader(): void {

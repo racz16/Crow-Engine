@@ -22,11 +22,6 @@ export class BlinnPhongEnvironmentHelper extends BlinnPhongHelper {
         }
     }
 
-    /*private isThereReflectionOrRefractionMap(): boolean {
-        return this.isTexture2DUsable(this.material.getSlot(Material.REFLECTION)) ||
-            this.isTexture2DUsable(this.material.getSlot(Material.REFLECTION));
-    }*/
-
     protected getTextureUnit(): number {
         return Conventions.ENVIRONMENT_INTENSITY_TEXTURE_UNIT;
     }

@@ -1,37 +1,29 @@
 import { vec3, vec4 } from 'gl-matrix';
-
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { Material } from '../../../material/Material';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 import { Engine } from '../../../core/Engine';
+import { Utility } from '../../../utility/Utility';
 
 export abstract class BlinnPhongHelper {
 
-    private slot: MaterialSlot;
-    private sp: GlShaderProgram;
+    protected slot: MaterialSlot;
+    protected shaderProgram: GlShaderProgram;
 
     public abstract loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void;
 
-    protected setValues(slot: MaterialSlot, sp: GlShaderProgram): void {
+    protected setValues(slot: MaterialSlot, shaderProgram: GlShaderProgram): void {
         this.slot = slot;
-        this.sp = sp;
-    }
-
-    protected getSlot(): MaterialSlot {
-        return this.slot;
-    }
-
-    protected getSp(): GlShaderProgram {
-        return this.sp;
+        this.shaderProgram = shaderProgram;
     }
 
     protected isTexture2DUsable(): boolean {
-        return this.slot && this.slot.isActive() && this.slot.getTexture2D() && this.slot.getTexture2D().isUsable();
+        return this.slot && this.slot.isActive() && Utility.isUsable(this.slot.getTexture2D());
     }
 
     protected isCubeMapTextureUsable(): boolean {
-        return this.slot && this.slot.isActive() && this.slot.getCubeMapTexture() && this.slot.getCubeMapTexture().isUsable();
+        return this.slot && this.slot.isActive() && Utility.isUsable(this.slot.getCubeMapTexture());
     }
 
     protected isColorUsable(): boolean {
@@ -40,53 +32,53 @@ export abstract class BlinnPhongHelper {
 
     protected loadTexture2D(): void {
         const texture = this.slot.getTexture2D();
-        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
         texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
-        this.sp.loadBoolean(this.getIsThereMapName(), true);
-        this.sp.loadVector2(this.getTileName(), this.slot.getTextureTile());
-        this.sp.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
+        this.shaderProgram.loadVector2(this.getTileName(), this.slot.getTextureTile());
+        this.shaderProgram.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
     }
 
     protected loadCubeMapTexture(): void {
         const texture = this.slot.getCubeMapTexture();
-        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
         texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
-        this.sp.loadBoolean(this.getIsThereMapName(), true);
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
     }
 
     protected loadColor3(): void {
         const color = this.slot.getColor();
-        this.sp.loadVector3(this.getColorName(), vec3.fromValues(color[0], color[1], color[2]));
-        this.sp.loadBoolean(this.getIsThereMapName(), false);
+        this.shaderProgram.loadVector3(this.getColorName(), vec3.fromValues(color[0], color[1], color[2]));
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected loadColor4(): void {
         const color = this.slot.getColor();
-        this.sp.loadVector4(this.getColorName(), color);
-        this.sp.loadBoolean(this.getIsThereMapName(), false);
+        this.shaderProgram.loadVector4(this.getColorName(), color);
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected loadDefaultTexture2D(): void {
         const texture = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D);
-        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
         texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
     }
 
     protected loadDefaultCubeMapTexture(): void {
         const texture = Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE);
-        this.sp.connectTextureUnit(this.getMapName(), this.getTextureUnit());
+        this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
         texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
     }
 
     protected loadDefaultColor3(defaultColor: vec3): void {
-        this.sp.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
-        this.sp.loadBoolean(this.getIsThereMapName(), false);
+        this.shaderProgram.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
 
     }
 
     protected loadDefaultColor4(defaultColor: vec4): void {
-        this.sp.loadVector4(this.getColorName(), defaultColor);
-        this.sp.loadBoolean(this.getIsThereMapName(), false);
+        this.shaderProgram.loadVector4(this.getColorName(), defaultColor);
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected abstract getTextureUnit(): number;

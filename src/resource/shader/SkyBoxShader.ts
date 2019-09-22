@@ -1,5 +1,4 @@
 import { Shader } from './Shader';
-import { Conventions } from '../Conventions';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../IRenderable';
 import { Material } from '../../material/Material';
@@ -8,7 +7,6 @@ import { MaterialSlot } from '../../material/MaterialSlot';
 export class SkyBoxShader extends Shader {
 
     public setUniforms(renderableComponent: IRenderableComponent<IRenderable>) {
-        this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
         const slot = renderableComponent.getMaterial().getSlot(Material.SKYBOX);
         const usable = this.isCubeMapUsable(renderableComponent, slot);
         if (usable) {
@@ -20,6 +18,7 @@ export class SkyBoxShader extends Shader {
     private isCubeMapUsable(renderableComponent: IRenderableComponent<IRenderable>, slot: MaterialSlot): boolean {
         return renderableComponent.getMaterial() &&
             slot &&
+            slot.isActive() &&
             slot.getCubeMapTexture() &&
             slot.getCubeMapTexture().isUsable();
     }

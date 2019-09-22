@@ -3,17 +3,31 @@ import { Material } from '../../../material/Material';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { BlinnPhongRenderer } from '../../../rendering/renderer/BlinnPhongRenderer';
 import { Conventions } from '../../Conventions';
+import { MaterialSlot } from '../../../material/MaterialSlot';
 
 export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
 
     public loadSlot(material: Material<BlinnPhongRenderer>, sp: GlShaderProgram): void {
         this.setValues(material.getSlot(Material.REFLECTION), sp);
-        sp.loadBoolean(this.getIsThereParallaxCorrectionName(), false);
         if (this.isCubeMapTextureUsable()) {
             this.loadCubeMapTexture();
+            this.loadParallaxCorrectionData();
         } else {
             this.loadDefaultCubeMapTexture();
             sp.loadBoolean(this.getIsThereMapName(), false);
+            this.shaderProgram.loadBoolean(this.getIsThereParallaxCorrectionName(), false);
+        }
+    }
+
+    private loadParallaxCorrectionData(): void {
+        const gpr = this.slot.getParameters().get(MaterialSlot.PARALLAX_CORRECTION_GEOMETRY_PROXY_RADIUS);
+        const epp = this.slot.getParameters().get(MaterialSlot.PARALLAX_CORRECTION_ENVIRONMENT_PROBE_POSITION);
+        if (gpr && epp) {
+            this.shaderProgram.loadBoolean(this.getIsThereParallaxCorrectionName(), true);
+            this.shaderProgram.loadFloat(this.getGeometryProxyRadiusName(), gpr);
+            this.shaderProgram.loadVector3(this.getEnvironmentProbePositionName(), epp);
+        } else {
+            this.shaderProgram.loadBoolean(this.getIsThereParallaxCorrectionName(), false);
         }
     }
 
@@ -43,6 +57,14 @@ export class BlinnPhongReflectionHelper extends BlinnPhongHelper {
 
     protected getIsThereParallaxCorrectionName(): string {
         return 'material.isThereParallaxCorrection';
+    }
+
+    protected getGeometryProxyRadiusName(): string {
+        return 'material.geometryProxyRadius';
+    }
+
+    protected getEnvironmentProbePositionName(): string {
+        return 'material.environmentProbePosition';
     }
 
 }

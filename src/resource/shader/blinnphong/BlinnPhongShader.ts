@@ -9,7 +9,6 @@ import { BlinnPhongReflectionHelper } from './BlinnPhongReflectionHelper';
 import { BlinnPhongRefractionHelper } from './BlinnPhongRefractionHelper';
 import { BlinnPhongEnvironmentHelper } from './BlinnPhongEnvironmentHelper';
 import { IRenderableComponent } from '../../../component/renderable/IRenderableComponent';
-import { Conventions } from '../../Conventions';
 
 export class BlinnPhongShader extends Shader {
 
@@ -27,30 +26,23 @@ export class BlinnPhongShader extends Shader {
         ];
     }
 
-    public setUniforms(rc: IRenderableComponent<IRenderable>): void {
-        //FIXME: na ezt tutira nem itt kéne
-        this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
-        this.getShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
-
-        const model = rc.getModelMatrix();
-        const inverseModel3x3 = mat3.fromMat4(mat3.create(), rc.getInverseModelMatrix());
-        const sp = this.getShaderProgram();
-        sp.loadMatrix3('inverseTransposedModelMatrix3x3', inverseModel3x3, true);
-        sp.loadMatrix4('modelMatrix', model, false);
-        //sp.loadBoolean('sRgb', false);
-
-        const material = rc.getMaterial();
+    public setUniforms(renderableComponent: IRenderableComponent<IRenderable>): void {
+        this.setMatrixUniforms(renderableComponent);
+        const material = renderableComponent.getMaterial();
         for (const helper of this.slotHelpers) {
-            //TODO: ellenőrizni, hogy a slot aktív-e slot.isActive()
-            //mellesleg ezt a többi shaderben is kéne
-            helper.loadSlot(material, sp);
+            helper.loadSlot(material, this.getShaderProgram());
         }
+    }
+
+    private setMatrixUniforms(renderableComponent: IRenderableComponent<IRenderable>): void {
+        const model = renderableComponent.getModelMatrix();
+        const inverseModel3x3 = mat3.fromMat4(mat3.create(), renderableComponent.getInverseModelMatrix());
+        this.getShaderProgram().loadMatrix3('inverseTransposedModelMatrix3x3', inverseModel3x3, true);
+        this.getShaderProgram().loadMatrix4('modelMatrix', model, false);
     }
 
     public connectTextureUnits(): void {
         //this.getShaderProgram().connectTextureUnit('shadowMap', 0);
-        this.getShaderProgram().connectTextureUnit('material.reflection', Conventions.REFLECTION_TEXTURE_UNIT);
-        this.getShaderProgram().connectTextureUnit('material.refraction', Conventions.REFRACTION_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {

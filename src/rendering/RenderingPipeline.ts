@@ -42,8 +42,8 @@ export class RenderingPipeline {
     private screenRenderer: ScreenRenderer;
 
     public constructor() {
-        this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
         this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
+        this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
         this.postProcessRenderers.addToTheEnd(new GammaCorrectionRenderer());
         this.screenRenderer = new ScreenRenderer();
