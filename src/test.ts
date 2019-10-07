@@ -23,6 +23,11 @@ import { Axis } from './utility/Axis';
 import { TextureType } from './resource/texture/enum/TextureType';
 import { CubeMesh } from './resource/mesh/CubeMesh';
 import { SkyboxRenderer } from './rendering/renderer/SkyboxRenderer';
+import { PbrRenderer } from './rendering/renderer/PbrRenderer';
+import { PbrDirectionalLightComponent } from './component/light/pbr/PbrDirectionalLightComponent';
+import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
+import { PbrSpotLightComponent } from './component/light/pbr/PbrSpotLightComponent';
+import { PbrPointLightComponent } from './component/light/pbr/PbrPointLightComponent';
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -30,6 +35,7 @@ window.onload = () => {
     tsb.loadResources();
     tsb.setUpScene();
     tsb.createUi();
+    tsb.createFlightHelmet();
     tsb.createDiffuseBox();
     tsb.createNormalBox();
     tsb.createNormalPomBox();
@@ -128,20 +134,140 @@ export class TestSceneBuilder {
 
         //directional light
         const dlgo = new GameObject();
-        const dlc = new BlinnPhongDirectionalLightComponent();
-        dlgo.getComponents().add(dlc);
+        const bpdlc = new BlinnPhongDirectionalLightComponent();
+        dlgo.getComponents().add(bpdlc);
+        const pbrdlc = new PbrDirectionalLightComponent();
+        pbrdlc.setColor(vec3.fromValues(1, 1, 1));
+        dlgo.getComponents().add(pbrdlc);
 
         const rotation = RotationBuilder
             .createRotation(Axis.X, -45)
             .thenRotate(Axis.Y, 45)
             .getQuaternion();
         dlgo.getTransform().setRelativeRotation(rotation);
+
+        /*const slgo = new GameObject();
+        slgo.getTransform().setRelativePosition(vec3.fromValues(-10, 0, 5));
+        const slc = new PbrSpotLightComponent();
+        slc.setCutoff(3);
+        slc.setOuterCutoff(3);
+        slc.setColor(vec3.fromValues(1, 0, 0));
+        slgo.getComponents().add(slc);
+
+        const plc = new PbrPointLightComponent();
+        plc.setColor(vec3.fromValues(0, 1, 0));
+        plc.setIntensity(100);
+        slgo.getComponents().add(plc);*/
     }
 
     public createUi(): void {
         const go = new GameObject();
         const ic = new InfoComponent();
         go.getComponents().add(ic);
+    }
+
+    public createFlightHelmet(): void {
+        const flightHelmet = new GameObject();
+        flightHelmet.getTransform().setRelativePosition(vec3.fromValues(-10, 0, 0));
+        flightHelmet.getTransform().setRelativeScale(vec3.fromValues(3, 3, 3));
+
+        const leatherMesh = new StaticMesh('res/meshes/flight-helmet/leather.obj');
+        const leatherMaterial = new Material(PbrRenderer);
+
+        const leatherBaseColor = new MaterialSlot();
+        leatherBaseColor.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_baseColor1.png', false, TextureType.IMAGE, TextureFiltering.Anisotropic_16));
+        leatherMaterial.setSlot(Material.BASE_COLOR, leatherBaseColor);
+
+        const leatherNormal = new MaterialSlot();
+        leatherNormal.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_normal1.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        leatherMaterial.setSlot(Material.NORMAL, leatherNormal);
+
+        const leatherORM = new MaterialSlot();
+        leatherORM.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_occlusionRoughnessMetallic1.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        leatherMaterial.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, leatherORM);
+
+        const leather = new MeshComponent(leatherMesh, leatherMaterial);
+        flightHelmet.getComponents().add(leather);
+
+        //
+
+        const glassPlasticMesh = new StaticMesh('res/meshes/flight-helmet/glassPlastic.obj');
+        const glassPlasticMaterial = new Material(PbrRenderer);
+
+        const glassPlasticBaseColor = new MaterialSlot();
+        glassPlasticBaseColor.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_baseColor.png', false, TextureType.IMAGE, TextureFiltering.Anisotropic_16));
+        glassPlasticMaterial.setSlot(Material.BASE_COLOR, glassPlasticBaseColor);
+
+        const glassPlasticNormal = new MaterialSlot();
+        glassPlasticNormal.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_normal.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        glassPlasticMaterial.setSlot(Material.NORMAL, glassPlasticNormal);
+
+        const glassPlasticORM = new MaterialSlot();
+        glassPlasticORM.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_occlusionRoughnessMetallic.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        glassPlasticMaterial.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, glassPlasticORM);
+
+        const glassPlastic = new MeshComponent(glassPlasticMesh, glassPlasticMaterial);
+        flightHelmet.getComponents().add(glassPlastic);
+
+        //
+
+        const metalMesh = new StaticMesh('res/meshes/flight-helmet/metal.obj');
+        const metalMaterial = new Material(PbrRenderer);
+
+        const metalBaseColor = new MaterialSlot();
+        metalBaseColor.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_baseColor3.png', false, TextureType.IMAGE, TextureFiltering.Anisotropic_16));
+        metalMaterial.setSlot(Material.BASE_COLOR, metalBaseColor);
+
+        const metalNormal = new MaterialSlot();
+        metalNormal.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_normal3.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        metalMaterial.setSlot(Material.NORMAL, metalNormal);
+
+        const metalORM = new MaterialSlot();
+        metalORM.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_occlusionRoughnessMetallic3.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        metalMaterial.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, metalORM);
+
+        const metal = new MeshComponent(metalMesh, metalMaterial);
+        flightHelmet.getComponents().add(metal);
+
+        //
+
+        const lensesMesh = new StaticMesh('res/meshes/flight-helmet/lenses.obj');
+        const lensesMaterial = new Material(PbrRenderer);
+
+        const lensesBaseColor = new MaterialSlot();
+        lensesBaseColor.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_baseColor2.png', true, TextureType.IMAGE, TextureFiltering.Anisotropic_16));
+        lensesMaterial.setSlot(Material.BASE_COLOR, lensesBaseColor);
+
+        const lensesNormal = new MaterialSlot();
+        lensesNormal.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_normal2.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        lensesMaterial.setSlot(Material.NORMAL, lensesNormal);
+
+        const lensesORM = new MaterialSlot();
+        lensesORM.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_occlusionRoughnessMetallic2.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        lensesMaterial.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, lensesORM);
+
+        const lenses = new MeshComponent(lensesMesh, lensesMaterial);
+        flightHelmet.getComponents().add(lenses);
+
+        //
+
+        const rubberWoodMesh = new StaticMesh('res/meshes/flight-helmet/rubberWood.obj');
+        const headMaterial = new Material(PbrRenderer);
+
+        const rubberWoodBaseColor = new MaterialSlot();
+        rubberWoodBaseColor.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_baseColor4.png', true, TextureType.IMAGE, TextureFiltering.Anisotropic_16));
+        headMaterial.setSlot(Material.BASE_COLOR, rubberWoodBaseColor);
+
+        const rubberWoodNormal = new MaterialSlot();
+        rubberWoodNormal.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_normal4.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        headMaterial.setSlot(Material.NORMAL, rubberWoodNormal);
+
+        const rubberWoodORM = new MaterialSlot();
+        rubberWoodORM.setTexture2D(new Texture2D('res/textures/flight-helmet/FlightHelmet_occlusionRoughnessMetallic4.png', false, TextureType.DATA, TextureFiltering.Anisotropic_16));
+        headMaterial.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, rubberWoodORM);
+
+        const rubberWood = new MeshComponent(rubberWoodMesh, headMaterial);
+        flightHelmet.getComponents().add(rubberWood);
     }
 
     public createDiffuseBox(): void {
@@ -170,7 +296,6 @@ export class TestSceneBuilder {
         ma.setSlot(Material.NORMAL, ns);
 
         const mc = new MeshComponent(this.box, ma);
-        //mc.setBillboard(new RealSphericalBillboard());
         go.getComponents().add(mc);
     }
 
@@ -179,14 +304,11 @@ export class TestSceneBuilder {
         go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
 
         const ma = new Material(BlinnPhongRenderer);
-        ma.getParameters().set(MaterialSlot.USE_POM, true);
-        ma.getParameters().set(MaterialSlot.POM_SCALE, 0.2);
-        ma.getParameters().set(MaterialSlot.POM_MIN_LAYERS, 5);
-        ma.getParameters().set(MaterialSlot.POM_MAX_LAYERS, 10);
 
         const ns = new MaterialSlot();
         ns.setTexture2D(this.normal6);
         ma.setSlot(Material.NORMAL, ns);
+        ns.getParameters().set(MaterialSlot.USE_POM, true);
 
         const rc = new MeshComponent(this.box, ma);
         rc.setVisibilityInterval(vec2.fromValues(0, 5));

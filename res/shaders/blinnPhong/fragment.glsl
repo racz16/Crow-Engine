@@ -4,23 +4,23 @@ precision highp float;
 
 struct Material {
     bool isThereDiffuseMap;
-    sampler2D diffuse;
-    vec2 diffuseTile;
-    vec2 diffuseOffset;
+    sampler2D diffuseMap;
+    vec2 diffuseMapTile;
+    vec2 diffuseMapOffset;
     vec3 diffuseColor;
 
     bool isThereSpecularMap;
-    sampler2D specular;
-    vec2 specularTile;
-    vec2 specularOffset;
+    sampler2D specularMap;
+    vec2 specularMapTile;
+    vec2 specularMapOffset;
     vec4 specularColor;
 
     bool isThereGlossiness;
 
     bool isThereNormalMap;
-    sampler2D normal;
-    vec2 normalTile;
-    vec2 normalOffset;
+    sampler2D normalMap;
+    vec2 normalMapTile;
+    vec2 normalMapOffset;
 
     bool isTherePOM;
     float POMScale;
@@ -28,19 +28,25 @@ struct Material {
     float POMMaxLayers;
 
     bool isThereReflectionMap;
-    samplerCube reflection;
+    samplerCube reflectionMap;
     bool isThereRefractionMap;
-    samplerCube refraction;
+    samplerCube refractionMap;
     float refractionIndex;
     bool isThereEnvironmentIntensityMap;
-    sampler2D environmentIntensity;
-    vec2 environmentIntensityTile;
-    vec2 environmentIntensityOffset;
+    sampler2D environmentIntensityMap;
+    vec2 environmentIntensityMapTile;
+    vec2 environmentIntensityMapOffset;
     vec3 environmentIntensityColor;
 
     bool isThereParallaxCorrection;
     float geometryProxyRadius;
     vec3 environmentProbePosition;
+
+    bool isThereEmissiveMap;
+    sampler2D emissiveMap;
+    vec2 emissiveMapTile;
+    vec2 emissiveMapOffset;
+    vec3 emissiveColor;
 };
 
 struct Light {              //base alignment        alignment offset
@@ -88,6 +94,7 @@ vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector);
 vec3 parallaxCorrectReflectionVector(vec3 reflectionVector);
 vec4 getSpecularColor(vec2 textureCoordinates);
 vec3 getNormalVector(vec2 textureCoordinates);
+vec3 getEmissiveColor(vec2 textureCoordinates);
 vec2 getTextureCoordinates();
 vec3 getIntensity(vec2 textureCoordinates);
 //misc
@@ -99,6 +106,7 @@ void main(){
     vec3 fragmentPosition = io_fragmentPosition;
     vec2 textureCoordinates = getTextureCoordinates();
     vec3 normalVector = getNormalVector(textureCoordinates);
+    vec3 emissiveColor = getEmissiveColor(textureCoordinates);
     vec4 diffuse = getDiffuse(textureCoordinates, viewDirection, normalVector);
     vec3 diffuseColor = diffuse.rgb;
     float alpha = diffuse.a;
@@ -112,6 +120,7 @@ void main(){
             result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, lights[i]);
         }
     }
+    result += emissiveColor;
     o_color = vec4(result, alpha);
 }
 
@@ -182,16 +191,16 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float curLayerHeight = 0.0f;
     vec2 dtex = material.POMScale * tangentViewDirection.xy / numLayers;
     vec2 currentTextureCoords = textureCoordinates;
-    float heightFromTexture = texture(material.normal, currentTextureCoords).a;
+    float heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
     while(heightFromTexture > curLayerHeight){
         curLayerHeight += layerHeight; 
         currentTextureCoords -= dtex;
-        heightFromTexture = texture(material.normal, currentTextureCoords).a;
+        heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
     }
 
     vec2 prevTCoords = currentTextureCoords + dtex;
     float nextH	= heightFromTexture - curLayerHeight;
-    float prevH	= texture(material.normal, prevTCoords).a - curLayerHeight + layerHeight;
+    float prevH	= texture(material.normalMap, prevTCoords).a - curLayerHeight + layerHeight;
     float weight = nextH / (nextH - prevH);
     vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0f - weight);
     if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0f || finalTexCoords.x < 0.0f || finalTexCoords.y < 0.0f){
@@ -203,7 +212,7 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
 vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
     vec4 diffuse;
     if(material.isThereDiffuseMap){
-        diffuse = texture(material.diffuse, textureCoordinates * material.diffuseTile + material.diffuseOffset);
+        diffuse = texture(material.diffuseMap, textureCoordinates * material.diffuseMapTile + material.diffuseMapOffset);
     }else{
         diffuse = vec4(pow(material.diffuseColor, vec3(2.2f)), 1.0f);
     }
@@ -214,12 +223,12 @@ vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
         if(material.isThereParallaxCorrection){
             reflectionVector = parallaxCorrectReflectionVector(reflectionVector);
         }
-        reflectionColor = texture(material.reflection, reflectionVector).rgb;
+        reflectionColor = texture(material.reflectionMap, reflectionVector).rgb;
     }
     vec3 refractionColor;
     if(material.isThereRefractionMap){
         vec3 refractionVector = refract(-viewDirection, normalVector, material.refractionIndex);
-        refractionColor = texture(material.refraction, refractionVector).rgb;
+        refractionColor = texture(material.refractionMap, refractionVector).rgb;
     }
     vec3 intensity = getIntensity(textureCoordinates);
     return vec4(diffuse.rgb * intensity.r + reflectionColor * intensity.g + refractionColor * intensity.b, diffuse.a);
@@ -233,7 +242,7 @@ vec3 getIntensity(vec2 textureCoordinates){
     vec3 intensity;
     float sum;
     if(material.isThereEnvironmentIntensityMap){
-        intensity = texture(material.environmentIntensity, textureCoordinates * material.environmentIntensityTile + material.environmentIntensityOffset).rgb;
+        intensity = texture(material.environmentIntensityMap, textureCoordinates * material.environmentIntensityMapTile + material.environmentIntensityMapOffset).rgb;
     }else{
         intensity = material.environmentIntensityColor;
     }
@@ -255,7 +264,7 @@ vec3 getIntensity(vec2 textureCoordinates){
 vec4 getSpecularColor(vec2 textureCoordinates){
     vec4 ret;
     if(material.isThereSpecularMap){
-        ret = texture(material.specular, textureCoordinates * material.specularTile + material.specularOffset);
+        ret = texture(material.specularMap, textureCoordinates * material.specularMapTile + material.specularMapOffset);
         if(!material.isThereGlossiness){
             ret.a = material.specularColor.a;
         }
@@ -268,7 +277,7 @@ vec4 getSpecularColor(vec2 textureCoordinates){
 
 vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
-        vec3 normal = texture(material.normal, textureCoordinates * material.normalTile + material.normalOffset).rgb;
+        vec3 normal = texture(material.normalMap, textureCoordinates * material.normalMapTile + material.normalMapOffset).rgb;
         normal = normalize(normal * 2.0f - 1.0f);
         normal = normalize(io_TBN * normal);
         return normal;
@@ -277,12 +286,20 @@ vec3 getNormalVector(vec2 textureCoordinates){
     }
 }
 
+vec3 getEmissiveColor(vec2 textureCoordinates){
+    if(material.isThereEmissiveMap){
+        return texture(material.emissiveMap, textureCoordinates * material.emissiveMapOffset + material.emissiveMapOffset).rgb;
+    }else{
+        return pow(material.emissiveColor, vec3(2.2f));
+    }
+}
+
 vec2 getTextureCoordinates(){
     if(material.isThereNormalMap && material.isTherePOM){
         vec3 tangentViewPosition = io_viewPosition * io_TBN;
         vec3 tangentFragmentPosition = io_fragmentPosition * io_TBN;
         vec3 tangentViewDirection = normalize(tangentViewPosition - tangentFragmentPosition);
-        return parallaxMapping(tangentViewDirection, io_textureCoordinates * material.normalTile + material.normalOffset);
+        return parallaxMapping(tangentViewDirection, io_textureCoordinates * material.normalMapTile + material.normalMapOffset);
     }else{
         return io_textureCoordinates;
     }

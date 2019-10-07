@@ -21,7 +21,7 @@ layout (std140) uniform Camera {                    //binding point: 1
 
 uniform mat4 modelMatrix;
 uniform mat3 inverseTransposedModelMatrix3x3;
-uniform float useNormalMap;
+uniform bool useNormalMap;
 //uniform mat4 shadowProjectionViewMatrix;
 
 void main(){
@@ -32,7 +32,7 @@ void main(){
     //io_fragmentPositionLightSpace = shadowProjectionViewMatrix * vec4(io_fragmentPosition, 1.0f);
     //io_shadowProjectionViewMatrix = shadowProjectionViewMatrix;
     io_viewPosition = viewPosition;
-    if(useNormalMap == 1.0f){
+    if(useNormalMap){
         vec3 tangentColumn = normalize(mat3(modelMatrix) * i_tangent);
         vec3 normalColumn = normalize(mat3(modelMatrix) * i_normal);
         tangentColumn = normalize(tangentColumn - dot(tangentColumn, normalColumn) * normalColumn);

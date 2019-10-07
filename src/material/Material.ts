@@ -11,8 +11,10 @@ export class Material<T extends GeometryRenderer> {
     public static readonly NORMAL = new ParameterKey<MaterialSlot>('NORMAL');
     public static readonly REFLECTION = new ParameterKey<MaterialSlot>('REFLECTION');
     public static readonly REFRACTION = new ParameterKey<MaterialSlot>('REFRACTION');
-    public static readonly REFRACTION_INDEX = new ParameterKey<number>('REFRACTION_INDEX');
     public static readonly ENVIRONMENT_INTENSITY = new ParameterKey<MaterialSlot>('ENVIRONMENT_INTENSITY');
+    public static readonly BASE_COLOR = new ParameterKey<MaterialSlot>('BASE_COLOR');
+    public static readonly OCCLUSION_ROUGHNESS_METALNESS = new ParameterKey<MaterialSlot>('OCCLUSION_ROUGHNESS_METALNESS');
+    public static readonly EMISSIVE = new ParameterKey<MaterialSlot>('EMISSIVE');
 
     private readonly slots = new ParameterContainer();
     private readonly parameters = new ParameterContainer();

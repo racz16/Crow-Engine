@@ -24,6 +24,7 @@ import { PostProcessRenderer } from './PostProcessRenderer';
 import { Renderer } from './Renderer';
 import { GammaCorrectionRenderer } from './renderer/GammaCorrectionRenderer';
 import { ReinhardToneMappingRenderer } from './renderer/ReinhardToneMappingRenderer';
+import { PbrRenderer } from './renderer/PbrRenderer';
 
 export class RenderingPipeline {
 
@@ -44,6 +45,7 @@ export class RenderingPipeline {
     public constructor() {
         this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
         this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
+        this.geometryRenderers.addToTheEnd(new PbrRenderer());
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
         this.postProcessRenderers.addToTheEnd(new GammaCorrectionRenderer());
         this.screenRenderer = new ScreenRenderer();

@@ -1,4 +1,4 @@
-import { BlinnPhongShader } from '../../resource/shader/blinnphong/BlinnPhongShader';
+import { BlinnPhongShader } from '../../resource/shader/BlinnPhongShader';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 import { GeometryRenderer } from '../GeometryRenderer';
 import { Conventions } from '../../resource/Conventions';
