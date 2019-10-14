@@ -75,6 +75,12 @@ in mat3 io_TBN;
 
 uniform Material material;
 
+uniform bool areThereIblMaps;
+uniform samplerCube diffuseIblMap;
+uniform samplerCube specularIblMap;
+uniform float specularIblLodCount;
+uniform sampler2D brdfLutMap;
+
 layout(std140) uniform Lights {             //binding point: 2
     Light[LIGHT_COUNT] lights;              //1024
 };
@@ -89,6 +95,9 @@ float calculateGeometrySmith(DotInfo dotInfo, float roughness);
 vec3 calculateFresnelSchlick(DotInfo dotInfo, vec3 F0);
 float calculatePointAttenuation(float range, float distance);
 float calculateSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeCos, float innerConeCos);
+
+vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N);
+vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV);
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates);
 
@@ -113,6 +122,10 @@ void main(){
             result += calculateLight(lights[i], materialInfo, fragmentPosition, V, N);
         }
     }
+
+    if(areThereIblMaps){
+        result += calculateIbl(materialInfo, V, N);
+    }
     
     result = mix(result, result * vec3(materialInfo.occlusion), material.occlusionStrength);
     result += materialInfo.emissiveColor;
@@ -131,21 +144,19 @@ vec3 calculateLight(Light light, MaterialInfo materialInfo, vec3 fragmentPositio
 
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V){
     DotInfo dotInfo = createDotInfo(L, N, V);
-    if (dotInfo.NdotL > 0.0 || dotInfo.NdotV > 0.0){
-        vec3 F = calculateFresnelSchlick(dotInfo, materialInfo.F0);
-        float D = calculateDistributionGGX(dotInfo, materialInfo.roughness);
-        float G = calculateGeometrySmith(dotInfo, materialInfo.roughness);
 
-        vec3 nominator = D * G * F;
-        float denominator = 4.0f * dotInfo.NdotV * dotInfo.NdotL;
-        vec3 specular = nominator / max(denominator, 0.001f);
+    vec3 F = calculateFresnelSchlick(dotInfo, materialInfo.F0);
+    float D = calculateDistributionGGX(dotInfo, materialInfo.roughness);
+    float G = calculateGeometrySmith(dotInfo, materialInfo.roughness);
 
-        vec3 diffuseFactor = (vec3(1.0f) - F) * (1.0f - materialInfo.metalness);
-        vec3 diffuse = diffuseFactor * materialInfo.baseColor / PI;
+    vec3 nominator = D * G * F;
+    float denominator = 4.0f * dotInfo.NdotV * dotInfo.NdotL;
+    vec3 specular = nominator / max(denominator, 0.001f);
 
-        return (diffuse + specular) * dotInfo.NdotL;
-    }
-    return vec3(0, 0, 0);
+    vec3 diffuseFactor = (vec3(1.0f) - F) * (1.0f - materialInfo.metalness);
+    vec3 diffuse = diffuseFactor * materialInfo.baseColor / PI;
+
+    return (diffuse + specular) * dotInfo.NdotL;
 }
 
 float calculateDistributionGGX(DotInfo dotInfo, float roughness){
@@ -196,6 +207,26 @@ float calculateSpotAttenuation(vec3 lightDirection, vec3 L, float cutoffAngleCos
     }
     return 0.0f;
 }
+
+vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
+    float NdotV = max(dot(N, V), 0.0f);
+    vec3 R = reflect(-V, N);
+
+    vec3 F = calculateFresnelSchlickRoughness(materialInfo, NdotV);
+    vec3 diffuseFactor = (1.0f - F) * (1.0f - materialInfo.metalness); 
+    vec3 irradiance = texture(diffuseIblMap, N).rgb;
+    vec3 diffuse = diffuseFactor * irradiance * materialInfo.baseColor;
+
+    vec3 prefilteredColor = textureLod(specularIblMap, R,  materialInfo.roughness * specularIblLodCount).rgb;   
+    vec2 envBRDF = texture(brdfLutMap, vec2(NdotV), materialInfo.roughness).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+    return diffuse + specular; 
+}
+
+vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV){
+    return materialInfo.F0 + (max(vec3(1.0f - materialInfo.roughness), materialInfo.F0) - materialInfo.F0) * pow(1.0f - NdotV, 5.0f);
+} 
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
@@ -261,7 +292,7 @@ void getOcclusionRoughnessMetalness(vec2 textureCoordinates, out float occlusion
 
 vec3 getEmissiveColor(vec2 textureCoordinates){
     if(material.isThereEmissiveMap){
-        return texture(material.emissiveMap, textureCoordinates * material.emissiveMapOffset + material.emissiveMapOffset).rgb;
+        return texture(material.emissiveMap, textureCoordinates * material.emissiveMapTile + material.emissiveMapOffset).rgb;
     }else{
         return pow(material.emissiveColor, vec3(2.2f));
     }

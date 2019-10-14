@@ -10,9 +10,14 @@ export abstract class ShaderSlotHelper {
 
     protected slot: MaterialSlot;
     protected shaderProgram: GlShaderProgram;
+    protected textureUnit: number;
 
-    public loadSlot(material: Material<any>, sp: GlShaderProgram): void {
-        this.setValues(material.getSlot(this.getMaterialSlotKey()), sp);
+    public constructor(sp: GlShaderProgram, textureUnit: number) {
+        this.setValues(sp, textureUnit);
+    }
+
+    public loadSlot(material: Material<any>): void {
+        this.setSlot(material.getSlot(this.getMaterialSlotKey()));
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();
         } else if (this.isColorUsable()) {
@@ -24,9 +29,13 @@ export abstract class ShaderSlotHelper {
         }
     }
 
-    protected setValues(slot: MaterialSlot, shaderProgram: GlShaderProgram): void {
-        this.slot = slot;
+    protected setValues(shaderProgram: GlShaderProgram, textureUnit: number): void {
         this.shaderProgram = shaderProgram;
+        this.textureUnit = textureUnit;
+    }
+
+    protected setSlot(slot: MaterialSlot): void {
+        this.slot = slot;
     }
 
     protected isTexture2DUsable(): boolean {
@@ -116,9 +125,11 @@ export abstract class ShaderSlotHelper {
         return this.slot && this.slot.isActive() && this.slot.getParameters().get(parameterKey) != null;
     }
 
-    protected abstract getMaterialSlotKey(): ParameterKey<MaterialSlot>;
+    protected getTextureUnit(): number {
+        return this.textureUnit;
+    }
 
-    protected abstract getTextureUnit(): number;
+    protected abstract getMaterialSlotKey(): ParameterKey<MaterialSlot>;
 
     protected abstract getMapName(): string;
 

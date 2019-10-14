@@ -9,6 +9,8 @@ export class GlConstants {
     private static _UNMASKED_VENDOR: string;
     private static _UNMASKED_RENDERER: string;
     private static _COLOR_BUFFER_FLOAT_ENABLED: boolean;
+    private static _TEXTURE_FLOAT_ENABLED: boolean;
+    private static _TEXTURE_FLOAT_LINEAR_ENABLED: boolean;
     //shader
     private static _DEBUG_SHADERS_EXTENSION: WEBGL_debug_shaders;
     //buffer
@@ -41,7 +43,7 @@ export class GlConstants {
     public static initialize(): void {
         const gl = Gl.gl;
         this.initializeGeneral(gl);
-        this.initializeShader(gl);
+        this.initializeShadersAndTextures(gl);
         this.initializeBuffer(gl);
         this.initializeTextureRbo(gl);
         this.initializeFbo(gl);
@@ -55,11 +57,13 @@ export class GlConstants {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         this._UNMASKED_VENDOR = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null;
         this._UNMASKED_RENDERER = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null;
-        this._COLOR_BUFFER_FLOAT_ENABLED = !!gl.getExtension('EXT_color_buffer_float');
     }
 
-    private static initializeShader(gl: WebGL2RenderingContext): void {
+    private static initializeShadersAndTextures(gl: WebGL2RenderingContext): void {
         this._DEBUG_SHADERS_EXTENSION = gl.getExtension('WEBGL_debug_shaders');
+        this._COLOR_BUFFER_FLOAT_ENABLED = !!gl.getExtension('EXT_color_buffer_float');
+        this._TEXTURE_FLOAT_ENABLED = !!gl.getExtension('OES_texture_float');
+        this._TEXTURE_FLOAT_LINEAR_ENABLED = !!gl.getExtension('OES_texture_float_linear');
     }
 
     private static initializeBuffer(gl: WebGL2RenderingContext): void {
@@ -108,8 +112,17 @@ export class GlConstants {
         return this._UNMASKED_RENDERER;
     }
 
+    //texture
     public static get COLOR_BUFFER_FLOAT_ENABLED(): boolean {
         return this._COLOR_BUFFER_FLOAT_ENABLED;
+    }
+
+    public static get TEXTURE_FLOAT_ENABLED(): boolean {
+        return this._TEXTURE_FLOAT_ENABLED;
+    }
+
+    public static get TEXTURE_FLOAT_LINEAR(): boolean {
+        return this._TEXTURE_FLOAT_LINEAR_ENABLED;
     }
 
     //shader

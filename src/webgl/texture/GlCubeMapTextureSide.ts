@@ -25,11 +25,18 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.side;
     }
 
-    public store(data: HTMLImageElement, format: Format, flipYAxis = false, offset = vec2.create()): void {
+    public store(data: HTMLImageElement, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
         const glFormat = FormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
-        Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis)
-        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), 0, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
+        Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
+        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
+    }
+
+    public storeHdr(data: ArrayBufferView, size: vec2, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+        const glFormat = FormatResolver.enumToGl(format);
+        this.cubeMapTexture.bind();
+        Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
+        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], size[0], size[1], glFormat, Gl.gl.FLOAT, data);
     }
 
     public getSize(): vec2 {

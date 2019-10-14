@@ -4,7 +4,10 @@
   "description": "TypeScript based 3D game engine.",
   "main": "index.js",
   "dependencies": {
+    "@types/gl-matrix": "^2.4.5",
+    "@types/webgl2": "0.0.5",
     "gl-matrix": "^3.1.0",
+    "parse-hdr": "^1.0.0",
     "webgl-obj-loader": "^2.0.3"
   },
   "devDependencies": {},

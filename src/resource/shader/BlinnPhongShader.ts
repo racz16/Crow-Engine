@@ -13,18 +13,26 @@ import { EmissiveSlotHelper } from './slotHelper/EmissiveSlotHelper';
 
 export class BlinnPhongShader extends Shader {
 
+    private readonly DIFFUSE_TEXTURE_UNIT = 1;
+    private readonly SPECULAR_TEXTURE_UNIT = 2;
+    private readonly NORMAL_POM_TEXTURE_UNIT = 3;
+    private readonly REFLECTION_TEXTURE_UNIT = 4;
+    private readonly REFRACTION_TEXTURE_UNIT = 5;
+    private readonly ENVIRONMENT_INTENSITY_TEXTURE_UNIT = 6;
+    private readonly EMISSIVE_TEXTURE_UNIT = 7;
+
     private slotHelpers: Array<ShaderSlotHelper>;
 
     public constructor() {
         super();
         this.slotHelpers = [
-            new DiffuseSlotHelper(),
-            new SpecularSlotHelper(),
-            new NormalSlotHelper(),
-            new ReflectionSlotHelper(),
-            new RefractionSlotHelper(),
-            new EnvironmentSlotHelper(),
-            new EmissiveSlotHelper()
+            new DiffuseSlotHelper(this.getShaderProgram(), this.DIFFUSE_TEXTURE_UNIT),
+            new SpecularSlotHelper(this.getShaderProgram(), this.SPECULAR_TEXTURE_UNIT),
+            new NormalSlotHelper(this.getShaderProgram(), this.NORMAL_POM_TEXTURE_UNIT),
+            new ReflectionSlotHelper(this.getShaderProgram(), this.REFLECTION_TEXTURE_UNIT),
+            new RefractionSlotHelper(this.getShaderProgram(), this.REFRACTION_TEXTURE_UNIT),
+            new EnvironmentSlotHelper(this.getShaderProgram(), this.ENVIRONMENT_INTENSITY_TEXTURE_UNIT),
+            new EmissiveSlotHelper(this.getShaderProgram(), this.EMISSIVE_TEXTURE_UNIT)
         ];
     }
 
@@ -32,7 +40,7 @@ export class BlinnPhongShader extends Shader {
         this.setMatrixUniforms(renderableComponent);
         const material = renderableComponent.getMaterial();
         for (const helper of this.slotHelpers) {
-            helper.loadSlot(material, this.getShaderProgram());
+            helper.loadSlot(material);
         }
     }
 

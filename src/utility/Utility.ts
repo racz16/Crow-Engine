@@ -4,6 +4,7 @@ import { Gl } from '../webgl/Gl';
 import { Fbo } from '../webgl/fbo/Fbo';
 import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
 import { FboAttachmentContainer } from '../webgl/fbo/FboAttachmentContainer';
+import parseHdr, { HdrImageResult } from 'parse-hdr';
 
 export class Utility {
 
@@ -150,6 +151,17 @@ export class Utility {
         return vec3.length(vector) === 0;
     }
 
+    public static getCubemapSideNames(path: string, name: string, sideNames: Array<string>, mipmapCount: number, extension: string): Array<string> {
+        const paths = new Array<string>();
+        for (let i = 0; i < sideNames.length; i++) {
+            const side = sideNames[i];
+            for (let mipmapLevel = 0; mipmapLevel < mipmapCount; mipmapLevel++) {
+                paths.push(`${path}/${name}_${side}_${mipmapLevel}.${extension}`);
+            }
+        }
+        return paths;
+    }
+
     public static async loadImage(path: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
             const image = new Image();
@@ -158,6 +170,12 @@ export class Utility {
             image.onerror = reject;
             image.src = path;
         });
+    }
+
+    public static async loadHdrImage(path: string): Promise<HdrImageResult> {
+        const response = await fetch(path);
+        const arrayBuffer = await response.arrayBuffer();
+        return parseHdr(arrayBuffer);
     }
 
 }

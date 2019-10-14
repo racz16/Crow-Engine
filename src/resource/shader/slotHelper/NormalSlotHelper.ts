@@ -1,20 +1,18 @@
 import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { Material } from '../../../material/Material';
-import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { MaterialSlot } from '../../../material/MaterialSlot';
-import { Conventions } from '../../Conventions';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 
 export class NormalSlotHelper extends ShaderSlotHelper {
 
-    public loadSlot(material: Material<any>, sp: GlShaderProgram): void {
-        this.setValues(material.getSlot(this.getMaterialSlotKey()), sp);
+    public loadSlot(material: Material<any>): void {
+        this.setSlot(material.getSlot(this.getMaterialSlotKey()));
         if (this.isTexture2DUsable()) {
             this.loadNormalMap();
         } else {
             this.loadDefaultTexture2D();
-            sp.loadBoolean(this.getIsThereMapName(), false);
-            sp.loadBoolean(this.getUseNormalMapName(), false);
+            this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
+            this.shaderProgram.loadBoolean(this.getUseNormalMapName(), false);
         }
     }
 
@@ -35,10 +33,6 @@ export class NormalSlotHelper extends ShaderSlotHelper {
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
         return Material.NORMAL;
-    }
-
-    protected getTextureUnit(): number {
-        return Conventions.NORMAL_POM_TEXTURE_UNIT;
     }
 
     protected getMapName(): string {

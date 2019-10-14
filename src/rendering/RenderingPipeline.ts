@@ -25,11 +25,14 @@ import { Renderer } from './Renderer';
 import { GammaCorrectionRenderer } from './renderer/GammaCorrectionRenderer';
 import { ReinhardToneMappingRenderer } from './renderer/ReinhardToneMappingRenderer';
 import { PbrRenderer } from './renderer/PbrRenderer';
+import { CubeMapTexture } from '../resource/texture/CubeMapTexture';
 
 export class RenderingPipeline {
 
     //public static readonly SHADOWMAP = new ParameterKey<ITexture2D>('SHADOWMAP');
     //public static readonly SHADOW_PROJECTION_VIEW_MATRIX = new ParameterKey<mat4>('SHADOW_PROJECTION_VIEW_MATRIX');
+    public static readonly PBR_DIFFUSE_IBL_MAP = new ParameterKey<CubeMapTexture>('PBR_DIFFUSE_IBL_MAP');
+    public static readonly PBR_SPECULAR_IBL_MAP = new ParameterKey<CubeMapTexture>('PBR_SPECULAR_IBL_MAP');
     public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
 
     private parameters = new ParameterContainer();
