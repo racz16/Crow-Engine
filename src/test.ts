@@ -110,12 +110,10 @@ export class TestSceneBuilder {
         const paths = Utility.getCubemapSideNames('res/textures/pisa/specular', 'specular', sides, 10, 'hdr');
 
         const renderingPipeline = Engine.getRenderingPipeline();
-        const diffuseIblMap = new CubeMapTexture();
+        const diffuseIblMap = new CubeMapTexture(pisa);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_DIFFUSE_IBL_MAP, diffuseIblMap);
-        const specularIblMap = new CubeMapTexture();
+        const specularIblMap = new CubeMapTexture(paths, true, TextureType.IMAGE, TextureFiltering.Trilinear);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_SPECULAR_IBL_MAP, specularIblMap);
-        await diffuseIblMap.createHdrTexture(pisa, true, TextureFiltering.None);
-        await specularIblMap.createHdrTextureWithMipmaps(/*'specular', 11,*/paths, true, TextureFiltering.Trilinear);
         specularIblMap.getNativeTexture().setWrapU(TextureWrap.CLAMP_TO_EDGE);
         specularIblMap.getNativeTexture().setWrapV(TextureWrap.CLAMP_TO_EDGE);
         specularIblMap.getNativeTexture().setWrapW(TextureWrap.CLAMP_TO_EDGE);

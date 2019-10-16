@@ -10,20 +10,37 @@ import { Format } from '../../webgl/enum/Format';
 export class Texture2D implements ITexture2D {
 
     private texture: GlTexture2D;
-    private textureFiltering: TextureFiltering;
     private loaded = false;
 
-    public constructor(path?: string, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
+    public constructor(path: string, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
         this.createTexture(path, hasAlphaChannel, type, textureFiltering);
+        const isHdr = path.toLowerCase().endsWith('.hdr');
+        if (isHdr) {
+            this.createHdrTexture(path, hasAlphaChannel, textureFiltering);
+        } else {
+            this.createTexture(path, hasAlphaChannel, type, textureFiltering);
+        }
     }
 
-    private async createTexture(path: string, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering: TextureFiltering): Promise<void> {
+    private async createTexture(path: string, hasAlphaChannel: boolean, type: TextureType, textureFiltering: TextureFiltering): Promise<void> {
         this.texture = new GlTexture2D();
         const image = await Utility.loadImage(path);
         const internalFormat = this.computeInternalFormat(hasAlphaChannel, type);
         const format = internalFormat === InternalFormat.RGB8 ? Format.RGB : Format.RGBA;
         this.texture.allocate(internalFormat, vec2.fromValues(image.width, image.height), true);
         this.texture.store(image, format);
+        this.setTextureFiltering(textureFiltering);
+        this.texture.generateMipmaps();
+        this.loaded = true;
+    }
+
+    private async createHdrTexture(path: string, hasAlphaChannel: boolean, textureFiltering: TextureFiltering): Promise<void> {
+        this.texture = new GlTexture2D();
+        const image = await Utility.loadHdrImage(path);
+        const internalFormat = hasAlphaChannel ? InternalFormat.RGBA32F : InternalFormat.RGB32F;
+        const format = internalFormat === InternalFormat.RGB32F ? Format.RGB : Format.RGBA;
+        this.texture.allocate(internalFormat, vec2.fromValues(image.shape[0], image.shape[1]), true);
+        this.texture.storeHdr(image.data, vec2.fromValues(image.shape[0], image.shape[1]), format);
         this.setTextureFiltering(textureFiltering);
         this.texture.generateMipmaps();
         this.loaded = true;
@@ -39,12 +56,7 @@ export class Texture2D implements ITexture2D {
         }
     }
 
-    public getTextureFiltering(): TextureFiltering {
-        return this.textureFiltering;
-    }
-
     public setTextureFiltering(textureFiltering: TextureFiltering): void {
-        this.textureFiltering = textureFiltering;
         this.texture.setMinificationFilter(TextureFilteringResolver.enumToGlMinification(textureFiltering));
         this.texture.setMagnificationFilter(TextureFilteringResolver.enumToGlMagnification(textureFiltering));
         this.texture.setAnisotropicLevel(TextureFilteringResolver.enumToGlAnisotropicValue(textureFiltering));
