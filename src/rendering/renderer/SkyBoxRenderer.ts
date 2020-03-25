@@ -3,6 +3,7 @@ import { Gl } from '../../webgl/Gl';
 import { GeometryRenderer } from '../GeometryRenderer';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
+import { Utility } from '../../utility/Utility';
 
 export class SkyboxRenderer extends GeometryRenderer {
 
@@ -14,7 +15,7 @@ export class SkyboxRenderer extends GeometryRenderer {
     }
 
     protected drawPredicate(renderableComponent: IRenderableComponent<IRenderable>): boolean {
-        return renderableComponent.getRenderable().isUsable() && renderableComponent.isActive();
+        return Utility.isUsable(renderableComponent.getRenderable()) && renderableComponent.isActive();
     }
 
     protected beforeRendering(): void {

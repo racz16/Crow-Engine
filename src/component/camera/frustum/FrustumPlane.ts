@@ -5,8 +5,8 @@ export class FrustumPlane {
     private readonly point = vec3.create();
 
     public constructor(normalVector: vec3, point: vec3) {
-        this.normalVector.set(normalVector);
-        this.point.set(point);
+        vec3.copy(this.normalVector, normalVector);
+        vec3.copy(this.point, point);
     }
 
     public getNormalVector(): vec3 {

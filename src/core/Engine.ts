@@ -10,21 +10,27 @@ import { AudioListenerComponent } from '../component/audio/AudioListenerComponen
 import { GameObjectContainer } from './GameObjectContainer';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
-import { GlTexture2D } from '../webgl/texture/GlTexture2D';
-import { GlCubeMapTexture } from '../webgl/texture/GlCubeMapTexture';
+import { ITexture2D } from '../resource/texture/ITexture2D';
+import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
+import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
+import { ITimeManager } from './ITimeManager';
+import { IGameObjectContainer } from './IGameObjectContainer';
+import { IResourceManager } from '../resource/IResourceManager';
+import { IRenderingPipeline } from '../rendering/IRenderingPipeline';
 
 export class Engine {
 
     public static readonly MAIN_CAMERA = new ParameterKey<ICameraComponent>('MAIN_CAMERA');
     public static readonly MAIN_AUDIO_LISTENER = new ParameterKey<AudioListenerComponent>('MAIN_AUDIO_LISTENER');
-    public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<GameObjectContainer>('GAMEOBJECT_CONTAINER');
 
-    public static readonly TIME_MANAGER = new ParameterKey<TimeManager>('TIME_MANAGER');
-    public static readonly RESOURCE_MANAGER = new ParameterKey<ResourceManager>('RESOURCE_MANAGER');
-    public static readonly RENDERING_PIPELINE = new ParameterKey<RenderingPipeline>('RENDERING_PIPELINE');
+    public static readonly GAMEOBJECT_CONTAINER = new ParameterKey<IGameObjectContainer>('GAMEOBJECT_CONTAINER');
+    public static readonly TIME_MANAGER = new ParameterKey<ITimeManager>('TIME_MANAGER');
+    public static readonly RESOURCE_MANAGER = new ParameterKey<IResourceManager>('RESOURCE_MANAGER');
+    public static readonly RENDERING_PIPELINE = new ParameterKey<IRenderingPipeline>('RENDERING_PIPELINE');
 
-    public static readonly DEFAULT_TEXTURE_2D = new ParameterKey<GlTexture2D>('DEFAULT_TEXTURE_2D');
-    public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<GlCubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
+    public static readonly DEFAULT_TEXTURE_2D = new ParameterKey<ITexture2D>('DEFAULT_TEXTURE_2D');
+    public static readonly DEFAULT_TEXTURE_2D_ARRAY = new ParameterKey<ITexture2DArray>('DEFAULT_TEXTURE_2D_ARRAY');
+    public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<ICubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
 
     private static readonly PARAMETERS = new ParameterContainer();
 
@@ -39,7 +45,7 @@ export class Engine {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
             Log.logObject(LogLevel.ERROR, error);
-            this.getResourceManager().releaseResources();
+            this.getResourceManager().release();
         }
     }
 
@@ -61,7 +67,9 @@ export class Engine {
     }
 
     private static addSystemsAfterInitialize(): void {
-        this.setRenderingPipeline(new RenderingPipeline());
+        const renderingPipeline = new RenderingPipeline();
+        this.setRenderingPipeline(renderingPipeline);
+        renderingPipeline.initialize();
     }
 
     //
@@ -93,44 +101,44 @@ export class Engine {
         this.PARAMETERS.set(this.MAIN_AUDIO_LISTENER, audioListenerComponent);
     }
 
-    public static getGameObjectContainer(): GameObjectContainer {
+    public static getGameObjectContainer(): IGameObjectContainer {
         return this.PARAMETERS.get(this.GAMEOBJECT_CONTAINER);
     }
 
-    public static setGameObjectContainer(gameObjectContainer: GameObjectContainer): void {
+    public static setGameObjectContainer(gameObjectContainer: IGameObjectContainer): void {
         if (!gameObjectContainer) {
             Log.logString(LogLevel.WARNING, 'GameObject container set to null');
         }
         this.PARAMETERS.set(this.GAMEOBJECT_CONTAINER, gameObjectContainer);
     }
 
-    public static getTimeManager(): TimeManager {
+    public static getTimeManager(): ITimeManager {
         return this.PARAMETERS.get(this.TIME_MANAGER);
     }
 
-    public static setTimeManager(timeManager: TimeManager): void {
+    public static setTimeManager(timeManager: ITimeManager): void {
         if (!timeManager) {
             Log.logString(LogLevel.WARNING, 'Time Manager set to null');
         }
         this.PARAMETERS.set(this.TIME_MANAGER, timeManager);
     }
 
-    public static getResourceManager(): ResourceManager {
+    public static getResourceManager(): IResourceManager {
         return this.PARAMETERS.get(this.RESOURCE_MANAGER);
     }
 
-    public static setResourceManager(resourceManager: ResourceManager): void {
+    public static setResourceManager(resourceManager: IResourceManager): void {
         if (!resourceManager) {
             Log.logString(LogLevel.WARNING, 'Resource Manager set to null');
         }
         this.PARAMETERS.set(this.RESOURCE_MANAGER, resourceManager);
     }
 
-    public static getRenderingPipeline(): RenderingPipeline {
+    public static getRenderingPipeline(): IRenderingPipeline {
         return this.PARAMETERS.get(this.RENDERING_PIPELINE);
     }
 
-    public static setRenderingPipeline(renderingPipeline: RenderingPipeline): void {
+    public static setRenderingPipeline(renderingPipeline: IRenderingPipeline): void {
         if (!renderingPipeline) {
             Log.logString(LogLevel.WARNING, 'Rendering Pipeline set to null');
         }
@@ -159,13 +167,6 @@ export class Engine {
         }
     }
 
-    public static release(): void {
-        if (Engine.started) {
-            throw Error();
-        }
-        this.getResourceManager().releaseResources();
-    }
-
     private static createNextFrame(): void {
         try {
             if (Engine.started) {
@@ -173,14 +174,14 @@ export class Engine {
             }
         } catch (error) {
             Log.logObject(LogLevel.ERROR, error);
-            this.getResourceManager().releaseResources();
+            this.getResourceManager().release();
         }
     }
 
     private static createNextFrameUnsafe(): void {
         Log.startGroup(`frame ${this.getTimeManager().getFrameCount()}`);
-        (this.getTimeManager() as any).update();
-        (this.getGameObjectContainer() as any).updateComponents();
+        this.PARAMETERS.get(this.TIME_MANAGER).endFrame();
+        this.getGameObjectContainer().update();
         this.getRenderingPipeline().render();
         Log.endGroup();
         Log.endFrame();
@@ -196,4 +197,3 @@ export class Engine {
     }
 
 }
-

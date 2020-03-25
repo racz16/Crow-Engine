@@ -10,9 +10,14 @@ import { RefractionSlotHelper } from './slotHelper/RefractionSlotHelper';
 import { EnvironmentSlotHelper } from './slotHelper/EnvironmentSlotHelper';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { EmissiveSlotHelper } from './slotHelper/EmissiveSlotHelper';
+import { Engine } from '../../core/Engine';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { Utility } from '../../utility/Utility';
+import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 
 export class BlinnPhongShader extends Shader {
 
+    private readonly SHADOW_TEXTURE_UNIT = 8;
     private readonly DIFFUSE_TEXTURE_UNIT = 1;
     private readonly SPECULAR_TEXTURE_UNIT = 2;
     private readonly NORMAL_POM_TEXTURE_UNIT = 3;
@@ -42,6 +47,8 @@ export class BlinnPhongShader extends Shader {
         for (const helper of this.slotHelpers) {
             helper.loadSlot(material);
         }
+        this.getShaderProgram().loadInt('shadowLightIndex', BlinnPhongLightsStruct.getInstance().getShadowLightIndex());
+        this.getShaderProgram().loadBoolean('receiveShadow', renderableComponent.isReceiveShadows());
     }
 
     private setMatrixUniforms(renderableComponent: IRenderableComponent<IRenderable>): void {
@@ -52,14 +59,20 @@ export class BlinnPhongShader extends Shader {
     }
 
     public connectTextureUnits(): void {
-        //this.getShaderProgram().connectTextureUnit('shadowMap', 0);
+        let shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
+        const isThereShadowMap = Utility.isUsable(shadowMap);
+        if (!isThereShadowMap) {
+            shadowMap = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D_ARRAY);
+        }
+        shadowMap.getNativeTexture().bindToTextureUnit(this.SHADOW_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('shadowMap', this.SHADOW_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {
-        return 'res/shaders/blinnPhong/vertex.glsl';
+        return 'res/shaders/blinnPhong/blinnPhong.vs';
     }
     protected getFragmentShaderPath(): string {
-        return 'res/shaders/blinnPhong/fragment.glsl';
+        return 'res/shaders/blinnPhong/blinnPhong.fs';
     }
 
 }

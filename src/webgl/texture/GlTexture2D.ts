@@ -4,6 +4,8 @@ import { IFboAttachment } from '../fbo/IFboAttachment';
 import { Gl } from '../Gl';
 import { ITexture2D } from '../../resource/texture/ITexture2D';
 import { Format, FormatResolver } from '../enum/Format';
+import { InternalFormat } from '../enum/InternalFormat';
+import { GlConstants } from '../GlConstants';
 
 export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment {
 
@@ -13,6 +15,10 @@ export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment
 
     public getNativeTexture(): GlTexture2D {
         return this;
+    }
+
+    public allocate(internalFormat: InternalFormat, size: vec2, mipmaps: boolean): void {
+        this.allocate2D(internalFormat, size, 1, mipmaps);
     }
 
     //
@@ -32,12 +38,12 @@ export class GlTexture2D extends GlTexture implements ITexture2D, IFboAttachment
         Gl.gl.texSubImage2D(this.getTarget(), mipmapLevel, offset[0], offset[1], size[0], size[1], glFormat, Gl.gl.FLOAT, data);
     }
 
-    public isMultisampled(): boolean {
-        return false;
+    public static getMaxSize(): number {
+        return GlConstants.MAX_TEXTURE_SIZE;
     }
 
-    public getSampleCount(): number {
-        return 1;
+    public static getMaxSizeSafe(): number {
+        return GlConstants.MAX_TEXTURE_SIZE_SAFE;
     }
 
 }

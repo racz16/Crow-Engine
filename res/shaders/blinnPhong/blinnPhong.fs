@@ -1,6 +1,7 @@
 #version 300 es
 
 precision highp float;
+precision highp sampler2DArray;
 
 struct Material {
     bool isThereDiffuseMap;
@@ -61,6 +62,7 @@ struct Light {              //base alignment        alignment offset
     bool lightActive;       //4                     108
 };                          //                      112
 
+const int SPLIT_COUNT = 3;
 const int DIRECTIONAL_LIGHT = 0;
 const int POINT_LIGHT = 1;
 const int SPOT_LIGHT = 2;
@@ -70,12 +72,13 @@ in vec3 io_normal;
 in vec2 io_textureCoordinates;
 in vec3 io_viewPosition;
 in mat3 io_TBN;
-//in mat4 io_shadowProjectionViewMatrix;
-//in vec4 io_fragmentPositionLightSpace;
+in vec4[SPLIT_COUNT] io_fragmentPositionLightSpace;
 
 uniform Material material;
-//uniform sampler2D shadowMap;
-//uniform bool receiveShadow;
+uniform sampler2DArray shadowMap;
+uniform int shadowLightIndex;
+uniform bool receiveShadow;
+uniform float[SPLIT_COUNT + 1] splits;
 
 layout(std140) uniform Lights { //binding point: 2
     Light[16] lights;           //1792
@@ -83,7 +86,7 @@ layout(std140) uniform Lights { //binding point: 2
 
 out vec4 o_color;
 
-vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, Light light);
+vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, float shadow, int lightIndex);
 vec3 calculateDiffuseColor(vec3 materialDiffuseColor, vec3 lightDiffuseColor, vec3 normalVector, vec3 lightDirection);
 vec3 calculateSpecularColor(vec4 materialSpecularColor, vec3 lightSpecularColor, vec3 normalVector, vec3 lightDirection, vec3 viewDirection);
 vec3 calculateAmbientColor(vec3 materialDiffuseColor, vec3 lightAmbientColor);
@@ -99,7 +102,8 @@ vec2 getTextureCoordinates();
 vec3 getIntensity(vec2 textureCoordinates);
 //misc
 vec2 parallaxMapping(vec3 textureCoordinates, vec2 tangentViewDirection);
-//float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector);
+float calculateShadow(vec3 N, vec3 L);
+float calculateShadowInCascade(vec3 normalVector, vec3 lightDirection, int cascade);
 
 void main(){
     vec3 viewDirection = normalize(io_viewPosition - io_fragmentPosition);
@@ -111,29 +115,30 @@ void main(){
     vec3 diffuseColor = diffuse.rgb;
     float alpha = diffuse.a;
     vec4 specularColor = getSpecularColor(textureCoordinates);
+    float shadow = calculateShadow(normalVector, lights[shadowLightIndex].direction);
 
     vec3 result = vec3(0);
-    //shadows
-    //result *= calculateShadow(receiveShadow, io_fragmentPositionLightSpace, normalVector);
     for(int i=0; i<16; i++){
         if(lights[i].lightActive){
-            result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, lights[i]);
+            result += calculateLight(diffuseColor, specularColor, viewDirection, normalVector, fragmentPosition, shadow, i);
         }
     }
     result += emissiveColor;
     o_color = vec4(result, alpha);
 }
 
-vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, Light light){
+vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 viewDirection, vec3 normalVector, vec3 fragmentPosition, float shadow, int lightIndex){
+    Light light = lights[lightIndex];
     vec3 lightDirection = light.type == POINT_LIGHT ? normalize(fragmentPosition - light.position) : light.direction;
     vec3 lightToFragmentDirection = light.type == DIRECTIONAL_LIGHT ? light.direction : normalize(fragmentPosition - light.position);
 
+    shadow = mix(1.0, shadow, lightIndex == shadowLightIndex);
     vec3 diffuse = calculateDiffuseColor(materialDiffuseColor, light.diffuse, normalVector, lightDirection);
     vec3 specular = calculateSpecularColor(materialSpecularColor, light.specular, normalVector, lightToFragmentDirection, viewDirection);
     vec3 ambient = calculateAmbientColor(materialDiffuseColor, light.ambient);
     float attenuation = light.type == DIRECTIONAL_LIGHT ? 1.0f : calculateAttenuation(fragmentPosition, light.position, light.attenuation);
     float cutOff = light.type == SPOT_LIGHT ? calculateCutOff(lightToFragmentDirection, lightDirection, light.cutOff) : 1.0f;
-    return (ambient + diffuse + specular) * attenuation * cutOff;
+    return (ambient + diffuse * shadow + specular * shadow) * attenuation * cutOff;
 }
 
 vec3 calculateDiffuseColor(vec3 materialDiffuseColor, vec3 lightDiffuseColor, vec3 normalVector, vec3 lightDirection){
@@ -163,27 +168,58 @@ float calculateCutOff(vec3 lightToFragmentDirection, vec3 lightDirection, vec2 l
     return clamp((theta - lightCutOff.y) / epsilon, 0.0f, 1.0f);
 }
 
-/*float calculateShadow(bool receiveShadow, vec4 fragmentPositionLightSpace, vec3 normalVector, vec3 lightDirection){
+float calculateShadowOld(vec3 N, vec3 L) {
     if(!receiveShadow){
         return 1.0f;
-    }else if(dot(normalVector, -lightDirection) < 0.0f){
-        return 0.3f;
     }
-    vec2 texelSize = vec2(1 / textureSize(shadowMap, 0));
-    vec3 projectionCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
+    vec2 texelSize = vec2(1.0f / vec2(textureSize(shadowMap, 0)));
+    vec3 projectionCoordinates = io_fragmentPositionLightSpace[0].xyz / io_fragmentPositionLightSpace[0].w;
     projectionCoordinates = projectionCoordinates * 0.5f + 0.5f;
     float currentDepth = projectionCoordinates.z;
-    float bias = max(0.00005f * (1.0f - dot(normalVector, lightDirection)    ), 0.000005f)  * texelSize.x * 3500.0f;
+
+    float maxOffset = 0.0002f;
+    float minOffset = 0.000001;
+    float offsetMod = 1.0f - clamp(dot(N, L), 0.0f, 1.0f);
+    float bias = minOffset + maxOffset * offsetMod;
+
+    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0f : 1.0f;
     float shadow = 0.0f;
     for(int x = -1; x <= 1; ++x){
         for(int y = -1; y <= 1; ++y){
-            float pcfDepth = texture(shadowMap, projectionCoordinates.xy + vec2(x, y) * texelSize).r; 
+            float pcfDepth = texture(shadowMap, vec3(projectionCoordinates.xy + vec2(x, y) * texelSize, 0)).r; 
             shadow += currentDepth - bias > pcfDepth  ? 0.3f : 1.0f;        
         }    
     }
     shadow /= 9.0f;
     return shadow;
-}*/
+}
+
+float calculateShadow(vec3 N, vec3 L) {
+    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    float shadow;
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 2), depth <= splits[3] && depth >= splits[2]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 1), depth <= splits[2] && depth >= splits[1]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 0), depth <= splits[1] && depth >= splits[0]);
+    return shadow;
+}
+
+float calculateShadowInCascade(vec3 N, vec3 L, int cascade){
+    if(!receiveShadow){
+        return 1.0f;
+    }
+    vec3 projectionCoordinates = io_fragmentPositionLightSpace[cascade].xyz / io_fragmentPositionLightSpace[cascade].w;
+    projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+    float currentDepth = projectionCoordinates.z;
+    vec2 moments = texture(shadowMap, vec3(projectionCoordinates.xy, cascade)).xy;
+    if (currentDepth <= moments.x) {
+		return 1.0;
+    }
+	float variance = moments.y - (moments.x * moments.x);
+	variance = max(variance, 0.00002);
+	float d = currentDepth - moments.x;
+	float pMax = variance / (variance + d * d);
+    return smoothstep(0.1f, 1.0f, pMax);
+}
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
@@ -197,12 +233,12 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
         currentTextureCoords -= dtex;
         heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
     }
-
     vec2 prevTCoords = currentTextureCoords + dtex;
     float nextH	= heightFromTexture - curLayerHeight;
     float prevH	= texture(material.normalMap, prevTCoords).a - curLayerHeight + layerHeight;
     float weight = nextH / (nextH - prevH);
     vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0f - weight);
+    
     if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0f || finalTexCoords.x < 0.0f || finalTexCoords.y < 0.0f){
         discard;
     }
@@ -216,7 +252,6 @@ vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
     }else{
         diffuse = vec4(pow(material.diffuseColor, vec3(2.2f)), 1.0f);
     }
-
     vec3 reflectionColor;
     if(material.isThereReflectionMap){
         vec3 reflectionVector = reflect(-viewDirection, normalVector);

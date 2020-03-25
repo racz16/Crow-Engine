@@ -5,7 +5,7 @@ export class BezierSpline extends CubicSpline {
 
     public constructor() {
         super();
-        this.computeBasisMatrix();
+        this.refreshBasisMatrix();
     }
 
     protected getValue(startIndex: number, t: number): vec3 {
@@ -61,19 +61,19 @@ export class BezierSpline extends CubicSpline {
     private normalizeFirstControlPoint(distance: number): void {
         const direction = vec3.create();
         if (this.isLoop()) {
-            direction.set(vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 1), this.getControlPoint(1)));
+            vec3.copy(direction, vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 1), this.getControlPoint(1)));
         } else {
-            direction.set(vec3.sub(vec3.create(), this.getControlPoint(0), this.getControlPoint(1)));
+            vec3.copy(direction, vec3.sub(vec3.create(), this.getControlPoint(0), this.getControlPoint(1)));
         }
-        direction.set(vec3.normalize(vec3.create(), direction));
+        vec3.normalize(direction, direction);
         this.controlPoints[0].setLeft(vec3.add(vec3.create(), this.getControlPoint(0), vec3.scale(vec3.create(), direction, distance)));
     }
 
     private normalizeMiddleControlPoints(distance: number): void {
         const direction = vec3.create();
         for (let i = 1; i < this.controlPoints.length - 1; i++) {
-            direction.set(vec3.sub(vec3.create(), this.getControlPoint(i - 1), this.getControlPoint(i + 1)));
-            direction.set(vec3.normalize(vec3.create(), direction));
+            vec3.copy(direction, vec3.sub(vec3.create(), this.getControlPoint(i - 1), this.getControlPoint(i + 1)));
+            vec3.normalize(direction, direction);
             this.controlPoints[i].setLeft(vec3.add(vec3.create(), this.getControlPoint(i), vec3.scale(vec3.create(), direction, distance)));
         }
     }
@@ -81,16 +81,16 @@ export class BezierSpline extends CubicSpline {
     private normalizeLastControlPoint(distance: number): void {
         const direction = vec3.create();
         if (this.isLoop()) {
-            direction.set(vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 2), this.getControlPoint(0)));
+            vec3.copy(direction, vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 2), this.getControlPoint(0)));
         } else {
-            direction.set(vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 2), this.getControlPoint(this.controlPoints.length - 1)));
+            vec3.copy(direction, vec3.sub(vec3.create(), this.getControlPoint(this.controlPoints.length - 2), this.getControlPoint(this.controlPoints.length - 1)));
         }
-        direction.set(vec3.normalize(vec3.create(), direction));
+        vec3.normalize(direction, direction);
         this.controlPoints[this.controlPoints.length - 1].setLeft(vec3.add(vec3.create(), this.getControlPoint(this.controlPoints.length - 1), vec3.scale(vec3.create(), direction, distance)));
 
     }
 
-    protected computeBasisMatrix(): void {
+    protected refreshBasisMatrix(): void {
         this.basisMatrix = mat4.fromValues(
             -1, 3, -3, 1,
             3, -6, 3, 0,

@@ -1,10 +1,17 @@
 import { IRenderable } from '../resource/IRenderable';
 import { Utility } from '../utility/Utility';
 import { IRenderableComponent } from '../component/renderable/IRenderableComponent';
+import { IRenderableContainer } from './IRenderableContainer';
 
-export class RenderableContainer {
+export class RenderableContainer implements IRenderableContainer {
 
     private renderables = new Array<IRenderableComponent<IRenderable>>();
+
+    public add(renderable: IRenderableComponent<IRenderable>): void {
+        if (!this.renderables.includes(renderable) && renderable.getGameObject()) {
+            this.renderables.push(renderable);
+        }
+    }
 
     public getCount(): number {
         return this.renderables.length;
@@ -12,12 +19,6 @@ export class RenderableContainer {
 
     public getIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
         return this.renderables.values();
-    }
-
-    public add(renderable: IRenderableComponent<IRenderable>): void {
-        if (!this.renderables.includes(renderable) && renderable.getGameObject()) {
-            this.renderables.push(renderable);
-        }
     }
 
     public remove(renderable: IRenderableComponent<IRenderable>): void {

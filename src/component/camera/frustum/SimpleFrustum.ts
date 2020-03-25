@@ -89,16 +89,10 @@ export class SimpleFrustum extends Frustum {
     private refreshCornerPoints(): void {
         for (let i = 0; i < 8; i++) {
             const cp = FrustumCornerPointResolver.get(i);
-            this.cornerPoints.set(cp, this.computeWorldSpaceCornerPoint(cp));
+            const ndcPosition = FrustumCornerPointResolver.getNdcPosition(cp);
+            const worldSpacePosition = Utility.computeoWorldSpacePosition(ndcPosition, this.IP, this.IV);
+            this.cornerPoints.set(cp, vec3.fromValues(worldSpacePosition[0], worldSpacePosition[1], worldSpacePosition[2]));
         }
-    }
-
-    private computeWorldSpaceCornerPoint(cp: FrustumCornerPoint): vec3 {
-        const ndcPosition = FrustumCornerPointResolver.getNDCPosition(cp);
-        const viewSpacePosition = vec4.transformMat4(vec4.create(), ndcPosition, this.IP);
-        vec4.scale(viewSpacePosition, viewSpacePosition, 1 / viewSpacePosition[3]);
-        const worldSpacePosition = vec4.transformMat4(vec4.create(), viewSpacePosition, this.IV);
-        return vec3.fromValues(worldSpacePosition[0], worldSpacePosition[1], worldSpacePosition[2]);
     }
 
     private refreshCenterPoint(): void {

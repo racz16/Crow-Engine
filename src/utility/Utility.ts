@@ -72,6 +72,13 @@ export class Utility {
         return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;
     }
 
+    public static computeoWorldSpacePosition(ndcPosition: vec4, inverseProjection: mat4, inverseView: mat4): vec4 {
+        const viewSpacePosition = vec4.transformMat4(vec4.create(), ndcPosition, inverseProjection);
+        vec4.scale(viewSpacePosition, viewSpacePosition, 1 / viewSpacePosition[3]);
+        const worldSpacePosition = vec4.transformMat4(vec4.create(), viewSpacePosition, inverseView);
+        return worldSpacePosition;
+    }
+
     public static toRadians(angle: number): number {
         return angle / 180 * Math.PI;
     }
@@ -88,7 +95,7 @@ export class Utility {
         array.splice(index, 0, element);
     }
 
-    public static isUsable(resource: IResource): boolean {
+    public static isUsable(resource: { isUsable(): boolean }): boolean {
         return resource && resource.isUsable();
     }
 

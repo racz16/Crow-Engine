@@ -1,6 +1,6 @@
 import { GlObject } from '../GlObject';
 import { IFboAttachment } from './IFboAttachment';
-import { vec2 } from 'gl-matrix';
+import { vec2, vec3 } from 'gl-matrix';
 import { InternalFormat, InternalFormatResolver } from '../enum/InternalFormat';
 import { Gl } from '../Gl';
 import { GlConstants } from '../GlConstants';
@@ -72,7 +72,7 @@ export class Rbo extends GlObject implements IFboAttachment {
     }
 
     private setSize(size: vec2): void {
-        this.size.set(size);
+        vec2.copy(this.size, size);
     }
 
     public static getMaxSize(): number {

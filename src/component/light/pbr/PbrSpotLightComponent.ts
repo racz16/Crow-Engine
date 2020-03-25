@@ -44,9 +44,9 @@ export class PbrSpotLightComponent extends PbrLightComponent {
     }
 
     protected refresh(ubo: Ubo, index: number) {
-        ubo.store(this.getColor(), this.computeOffset(PbrLightComponent.COLOR_OFFSET, index));
-        ubo.store(this.getGameObject().getTransform().getForwardVector(), this.computeOffset(PbrLightComponent.DIRECTION_OFFSET, index));
-        ubo.store(this.getGameObject().getTransform().getAbsolutePosition(), this.computeOffset(PbrLightComponent.POSITION_OFFSET, index));
+        ubo.store(new Float32Array(this.getColor()), this.computeOffset(PbrLightComponent.COLOR_OFFSET, index));
+        ubo.store(new Float32Array(this.getGameObject().getTransform().getForwardVector()), this.computeOffset(PbrLightComponent.DIRECTION_OFFSET, index));
+        ubo.store(new Float32Array(this.getGameObject().getTransform().getAbsolutePosition()), this.computeOffset(PbrLightComponent.POSITION_OFFSET, index));
         ubo.store(new Float32Array([Math.cos(Utility.toRadians(this.getCutoff())), Math.cos(Utility.toRadians(this.getOuterCutoff()))]), this.computeOffset(PbrLightComponent.CUTOFF_OFFSET, index));
         ubo.store(new Float32Array([this.getIntensity()]), this.computeOffset(PbrLightComponent.INTENSITY_OFFSET, index));
         ubo.store(new Float32Array([this.getRange()]), this.computeOffset(PbrLightComponent.RANGE_OFFSET, index));

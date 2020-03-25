@@ -1,5 +1,5 @@
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
-import { InternalFormat, InternalFormatResolver } from '../../webgl/enum/InternalFormat';
+import { InternalFormat } from '../../webgl/enum/InternalFormat';
 import { vec2 } from 'gl-matrix';
 import { ITexture2D } from './ITexture2D';
 import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
@@ -13,7 +13,7 @@ export class Texture2D implements ITexture2D {
     private loaded = false;
 
     public constructor(path: string, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
-        this.createTexture(path, hasAlphaChannel, type, textureFiltering);
+        this.texture = new GlTexture2D();
         const isHdr = path.toLowerCase().endsWith('.hdr');
         if (isHdr) {
             this.createHdrTexture(path, hasAlphaChannel, textureFiltering);
@@ -23,7 +23,6 @@ export class Texture2D implements ITexture2D {
     }
 
     private async createTexture(path: string, hasAlphaChannel: boolean, type: TextureType, textureFiltering: TextureFiltering): Promise<void> {
-        this.texture = new GlTexture2D();
         const image = await Utility.loadImage(path);
         const internalFormat = this.computeInternalFormat(hasAlphaChannel, type);
         const format = internalFormat === InternalFormat.RGB8 ? Format.RGB : Format.RGBA;
@@ -35,7 +34,6 @@ export class Texture2D implements ITexture2D {
     }
 
     private async createHdrTexture(path: string, hasAlphaChannel: boolean, textureFiltering: TextureFiltering): Promise<void> {
-        this.texture = new GlTexture2D();
         const image = await Utility.loadHdrImage(path);
         const internalFormat = hasAlphaChannel ? InternalFormat.RGBA32F : InternalFormat.RGB32F;
         const format = internalFormat === InternalFormat.RGB32F ? Format.RGB : Format.RGBA;

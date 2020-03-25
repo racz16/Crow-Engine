@@ -55,7 +55,7 @@ export class CubeMapTexture implements ICubeMapTexture {
     private async loadImages(paths: Array<string>): Promise<Array<HTMLImageElement>> {
         return await Promise.all(
             paths.map(async path => {
-                return await Utility.loadImage(path);
+                return Utility.loadImage(path);
             })
         );
     }
@@ -63,7 +63,7 @@ export class CubeMapTexture implements ICubeMapTexture {
     private async loadHdrImages(paths: Array<string>): Promise<Array<HdrImageResult>> {
         return await Promise.all(
             paths.map(async path => {
-                return await Utility.loadHdrImage(path);
+                return Utility.loadHdrImage(path);
             })
         );
     }

@@ -4,6 +4,9 @@ import { CubeMapSide, CubeMapSideResolver } from '../enum/CubeMapSide';
 import { Gl } from '../Gl';
 import { GlCubeMapTextureSide } from './GlCubeMapTextureSide';
 import { ICubeMapTexture } from '../../resource/texture/ICubeMapTexture';
+import { InternalFormat } from '../enum/InternalFormat';
+import { vec2 } from 'gl-matrix';
+import { GlConstants } from '../GlConstants';
 
 export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
 
@@ -29,6 +32,10 @@ export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
         return Gl.gl.TEXTURE_CUBE_MAP;
     }
 
+    public allocate(internalFormat: InternalFormat, size: vec2, mipmaps: boolean): void {
+        this.allocate2D(internalFormat, size, GlCubeMapTexture.SIDE_COUNT, mipmaps);
+    }
+
     //
     //wrap--------------------------------------------------------------------------------------------------------------
     //
@@ -42,16 +49,20 @@ export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
         Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_WRAP_R, TextureWrapResolver.enumToGl(wrap));
     }
 
-    public getDataSize(): number {
-        return super.getDataSize() * GlCubeMapTexture.SIDE_COUNT;
-    }
-
     public getSide(side: CubeMapSide): GlCubeMapTextureSide {
         return this.sides.get(side);
     }
 
     public getSidesIterator(): IterableIterator<GlCubeMapTextureSide> {
         return this.sides.values();
+    }
+
+    public static getMaxSize(): number {
+        return GlConstants.MAX_CUBE_MAP_TEXTURE_SIZE;
+    }
+
+    public static getMaxSizeSafe(): number {
+        return GlConstants.MAX_CUBE_MAP_TEXTURE_SIZE_SAFE;
     }
 
 }

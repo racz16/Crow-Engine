@@ -20,6 +20,7 @@ export class BlinnPhongLightsStruct {
     private ubo: Ubo;
     private lights = new Array<BlinnPhongLightComponent>();
     private addedLightCount = 0;
+    private shadowLightIndex = -1;
 
     private constructor() { }
 
@@ -104,6 +105,18 @@ export class BlinnPhongLightsStruct {
         if (!this.lights.includes(light)) {
             this.lights.push(light);
         }
+    }
+
+    public setShadowLightSource(light: BlinnPhongDirectionalLightComponent): void {
+        this.shadowLightIndex = this.lights.indexOf(light);
+    }
+
+    public getShadowLightSource(): BlinnPhongDirectionalLightComponent{
+        return this.shadowLightIndex !== -1 ? this.lights[this.shadowLightIndex] as BlinnPhongDirectionalLightComponent : null;
+    }
+
+    public getShadowLightIndex(): number {
+        return this.shadowLightIndex;
     }
 
     public getLightCount(): number {

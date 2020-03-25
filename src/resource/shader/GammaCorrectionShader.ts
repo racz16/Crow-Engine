@@ -7,11 +7,11 @@ export class GammaCorrectionShader extends Shader {
     }
 
     protected getVertexShaderPath(): string {
-        return 'res/shaders/gammaCorrection/vertex.glsl';
+        return 'res/shaders/gammaCorrection/gammaCorrection.vs';
     }
 
     protected getFragmentShaderPath(): string {
-        return 'res/shaders/gammaCorrection/fragment.glsl';
+        return 'res/shaders/gammaCorrection/gammaCorrection.fs';
     }
 
 }

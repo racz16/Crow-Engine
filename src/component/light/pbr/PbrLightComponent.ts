@@ -41,7 +41,7 @@ export abstract class PbrLightComponent extends Component {
         if (!Utility.isColor(color)) {
             throw new Error();
         }
-        this.color.set(color);
+        vec3.copy(this.color, color);
         this.invalidate();
     }
 

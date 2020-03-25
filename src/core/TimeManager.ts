@@ -1,4 +1,6 @@
-export class TimeManager {
+import { ITimeManager } from "./ITimeManager";
+
+export class TimeManager implements ITimeManager {
 
     private readonly ONE_SECOND = 1000;
     private readonly START_MOMENT = performance.now();
@@ -9,7 +11,7 @@ export class TimeManager {
     private lastFrameMoment = this.START_MOMENT;
     private frameCount = 0;
 
-    private update(): void {
+    public endFrame(): void {
         this.refreshDeltaTimeFactor();
         this.refreshFps();
     }

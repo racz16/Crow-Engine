@@ -22,6 +22,7 @@ export class StaticMesh implements IMesh {
     private textureCoordinates = false;
     private normals = false;
     private tangents = false;
+    private dataSize = 0;
 
     public constructor(path: string) {
         this.loadMesh(path);
@@ -34,24 +35,24 @@ export class StaticMesh implements IMesh {
         const mesh = new Mesh(text, { calcTangentsAndBitangents: true });
         this.vertexCount = mesh.indices.length;
         this.faceCount = this.vertexCount / 3;
-        this.computeFrustumCullingData(mesh);
+        this.refreshFrustumCullingData(mesh);
         this.createVao(mesh);
     }
 
     //
     //loading-saving------------------------------------------------------------
     //
-    private computeFrustumCullingData(mesh: Mesh): void {
+    private refreshFrustumCullingData(mesh: Mesh): void {
         this.radius = 0;
         this.aabbMax = vec3.create();
         this.aabbMin = vec3.create();
-        this.computeFrustumCullingDataUnsafe(mesh);
+        this.refreshFrustumCullingDataUnsafe(mesh);
     }
 
-    private computeFrustumCullingDataUnsafe(mesh: Mesh): void {
+    private refreshFrustumCullingDataUnsafe(mesh: Mesh): void {
         const vertexPosition = vec3.create();
         for (let i = 0; i < mesh.vertices.length; i += 3) {
-            vertexPosition.set(vec3.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]));
+            vec3.copy(vertexPosition, vec3.fromValues(mesh.vertices[i], mesh.vertices[i + 1], mesh.vertices[i + 2]));
             this.refreshRadius(vertexPosition);
             this.refreshAabb(vertexPosition);
         }
@@ -81,6 +82,7 @@ export class StaticMesh implements IMesh {
         this.addVbo(mesh.textures, Conventions.TEXTURE_COORDINATES_VBO_INDEX, 2);
         this.addVbo(mesh.vertexNormals, Conventions.NORMALS_VBO_INDEX, 3);
         this.addVbo(mesh.tangents, Conventions.TANGENTS_VBO_INDEX, 3);
+        this.dataSize = (mesh.indices.length + mesh.vertices.length + mesh.textures.length + mesh.vertexNormals.length + mesh.tangents.length) * 4;
     }
 
     private addEbo(indices: Array<number>): void {
@@ -130,7 +132,7 @@ export class StaticMesh implements IMesh {
     //misc----------------------------------------------------------------------
     //
     public getDataSize(): number {
-        return this.isUsable() ? this.vao.getDataSize() : 0;
+        return this.isUsable() ? this.dataSize : 0;
     }
 
     public getVertexCount(): number {

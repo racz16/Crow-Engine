@@ -20,6 +20,7 @@ export class PbrLightsStruct {
     private ubo: Ubo;
     private lights = new Array<PbrLightComponent>();
     private addedLightCount = 0;
+    private shadowLightIndex = -1;
 
     private constructor() { }
 
@@ -104,6 +105,18 @@ export class PbrLightsStruct {
         if (!this.lights.includes(light)) {
             this.lights.push(light);
         }
+    }
+
+    public setShadowLightSource(light: PbrDirectionalLightComponent): void {
+        this.shadowLightIndex = this.lights.indexOf(light);
+    }
+
+    public getShadowLightSource(): PbrDirectionalLightComponent {
+        return this.shadowLightIndex !== -1 ? this.lights[this.shadowLightIndex] as PbrDirectionalLightComponent : null;
+    }
+
+    public getShadowLightIndex(): number {
+        return this.shadowLightIndex;
     }
 
     public getLightCount(): number {

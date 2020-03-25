@@ -2,8 +2,7 @@ import { ShaderStage } from '../../webgl/enum/ShaderStage';
 import { GlShader } from '../../webgl/shader/GlShader';
 import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
-import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
-import { IRenderable } from '../IRenderable';
+import { Engine } from '../../core/Engine';
 
 export abstract class Shader {
 
@@ -34,7 +33,8 @@ export abstract class Shader {
     protected createShaderProgram(vertexSource: string, fragmentSource: string): void {
         const vertexShader = this.createAndttachShader(ShaderStage.VERTEX_SHADER, vertexSource);
         const fragmentShader = this.createAndttachShader(ShaderStage.FRAGMENT_SHADER, fragmentSource);
-        this.linkAndValidate();
+        this.shaderProgram.link();
+        this.validateIfDebug();
         this.detachAndReleaseShader(vertexShader);
         this.detachAndReleaseShader(fragmentShader);
         this.loaded = true;
@@ -56,14 +56,15 @@ export abstract class Shader {
         shader.release();
     }
 
-    private linkAndValidate(): void {
-        this.shaderProgram.link();
-        if (!this.shaderProgram.isLinkValid()) {
-            throw new Error(this.shaderProgram.getValidationOrLinkInfo());
-        }
-        this.shaderProgram.validate();
-        if (!this.shaderProgram.isProgramValid()) {
-            throw new Error(this.shaderProgram.getValidationOrLinkInfo());
+    private validateIfDebug(): void {
+        if (Engine.DEBUG) {
+            if (!this.shaderProgram.isLinkValid()) {
+                throw new Error(this.shaderProgram.getValidationOrLinkInfo());
+            }
+            this.shaderProgram.validate();
+            if (!this.shaderProgram.isProgramValid()) {
+                throw new Error(this.shaderProgram.getValidationOrLinkInfo());
+            }
         }
     }
 
@@ -78,7 +79,7 @@ export abstract class Shader {
 
     protected connectTextureUnits(): void { }
 
-    public setUniforms(renderableComponent: IRenderableComponent<IRenderable>): void { }
+    public setUniforms(data?: any): void { }
 
     public isUsable(): boolean {
         return Utility.isUsable(this.shaderProgram) && this.loaded;

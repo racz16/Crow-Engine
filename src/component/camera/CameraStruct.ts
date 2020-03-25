@@ -14,6 +14,7 @@ export class CameraStruct implements IInvalidatable {
     private valid = false;
 
     private static instance: CameraStruct;
+    private static CAMERA_UBO_SIZE = 2 * Ubo.MAT4_SIZE + Ubo.VEC4_SIZE;
 
     private constructor() {
         Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
@@ -33,7 +34,7 @@ export class CameraStruct implements IInvalidatable {
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
             this.ubo = new Ubo();
-            this.ubo.allocate(144, BufferObjectUsage.STATIC_DRAW);
+            this.ubo.allocate(CameraStruct.CAMERA_UBO_SIZE, BufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Camera Matrices ubo created');
         }
     }

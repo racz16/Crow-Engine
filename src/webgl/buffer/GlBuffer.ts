@@ -48,7 +48,7 @@ export abstract class GlBuffer extends GlObject {
     }
 
     public allocateAndStore(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array, usage: BufferObjectUsage): void {
+        Float64Array | ArrayBuffer, usage: BufferObjectUsage): void {
         this.bind();
         this.allocationGeneral(data.byteLength, usage);
         const glUsage = BufferObjectUsageResolver.enumToGl(usage);
@@ -65,9 +65,9 @@ export abstract class GlBuffer extends GlObject {
     //data store--------------------------------------------------------
     //
     public store(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array, offset = 0): void {
+        Float64Array | ArrayBuffer, offset = 0): void {
         this.bind();
-        Gl.gl.bufferSubData(this.getTarget(), offset, data, 0);
+        Gl.gl.bufferSubData(this.getTarget(), offset, data);
     }
 
     //
@@ -89,4 +89,5 @@ export abstract class GlBuffer extends GlObject {
         this.setDataSize(0);
         this.allocated = false;
     }
+
 }

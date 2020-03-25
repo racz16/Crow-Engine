@@ -1,6 +1,7 @@
 #version 300 es
 
 precision highp float;
+precision highp sampler2DArray;
 
 struct Material {
     bool isThereBaseColorMap;
@@ -61,6 +62,7 @@ struct Light {              //base alignment        alignment offset
     bool lightActive;       //4                     68
 };                          //12 padding            80
 
+const int SPLIT_COUNT = 3;
 const int DIRECTIONAL_LIGHT = 0;
 const int POINT_LIGHT = 1;
 const int SPOT_LIGHT = 2;
@@ -72,9 +74,13 @@ in vec3 io_normal;
 in vec2 io_textureCoordinates;
 in vec3 io_viewPosition;
 in mat3 io_TBN;
+in vec4[SPLIT_COUNT] io_fragmentPositionLightSpace;
 
 uniform Material material;
-
+uniform sampler2DArray shadowMap;
+uniform int shadowLightIndex;
+uniform bool receiveShadow;
+uniform float[SPLIT_COUNT + 1] splits;
 uniform bool areThereIblMaps;
 uniform samplerCube diffuseIblMap;
 uniform samplerCube specularIblMap;
@@ -87,7 +93,7 @@ layout(std140) uniform Lights {             //binding point: 2
 
 out vec4 o_color;
 
-vec3 calculateLight(Light light, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N);
+vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow);
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V);
 float calculateDistributionGGX(DotInfo dotInfo, float roughness);
 float calculateGeometrySchlickGGX(DotInfo dotInfo, float roughness);
@@ -100,6 +106,8 @@ vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N);
 vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV);
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates);
+float calculateShadow(vec3 N, vec3 L);
+float calculateShadowInCascade(vec3 normalVector, vec3 lightDirection, int cascade);
 
 vec3 getNormalVector(vec2 textureCoordinates);
 void getBaseColorAndAlpha(vec2 textureCoordinates, out vec3 baseColor, out float alpha);
@@ -116,10 +124,12 @@ void main(){
     vec3 N = getNormalVector(textureCoordinates);
     MaterialInfo materialInfo = createMaterialInfo(textureCoordinates);
 
+    float shadow = calculateShadow(N, lights[shadowLightIndex].direction);
+
     vec3 result = vec3(0.0f);
     for(int i=0; i<LIGHT_COUNT; i++){
         if(lights[i].lightActive){
-            result += calculateLight(lights[i], materialInfo, fragmentPosition, V, N);
+            result += calculateLight(i, materialInfo, fragmentPosition, V, N, shadow);
         }
     }
 
@@ -130,16 +140,19 @@ void main(){
     result = mix(result, result * vec3(materialInfo.occlusion), material.occlusionStrength);
     result += materialInfo.emissiveColor;
     o_color = vec4(result, materialInfo.alpha);
+    //o_color = vec4(result.xyz * vec3(0) + vec3(1) * vec3(shadow), 1);
 }
 
-vec3 calculateLight(Light light, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N){
+vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow){
+    Light light = lights[lightIndex];
+    shadow = mix(1.0, shadow, lightIndex == shadowLightIndex);
     vec3 fragmentToLightVector = light.type == DIRECTIONAL_LIGHT ? -light.direction : light.position - fragmentPosition;
     vec3 L = normalize(fragmentToLightVector);
     float lightDistance = length(fragmentToLightVector);
     float pointAttenuation = light.type == DIRECTIONAL_LIGHT ? 1.0f : calculatePointAttenuation(light.range, lightDistance);
     float spotAttenuation = light.type != SPOT_LIGHT ? 1.0f : calculateSpotAttenuation(light.direction, L, light.cutOff.x, light.cutOff.y);
     vec3 shade = calculateShading(materialInfo, L, N, V);
-    return pointAttenuation * spotAttenuation * light.intensity * light.color * shade;
+    return pointAttenuation * spotAttenuation * light.intensity * light.color * shade * shadow;
 }
 
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V){
@@ -226,7 +239,60 @@ vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
 
 vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV){
     return materialInfo.F0 + (max(vec3(1.0f - materialInfo.roughness), materialInfo.F0) - materialInfo.F0) * pow(1.0f - NdotV, 5.0f);
-} 
+}
+
+float calculateShadowOld(vec3 N, vec3 L) {
+    if(!receiveShadow){
+        return 1.0f;
+    }
+    vec2 texelSize = vec2(1.0f / vec2(textureSize(shadowMap, 0)));
+    vec3 projectionCoordinates = io_fragmentPositionLightSpace[0].xyz / io_fragmentPositionLightSpace[0].w;
+    projectionCoordinates = projectionCoordinates * 0.5f + 0.5f;
+    float currentDepth = projectionCoordinates.z;
+
+    float maxOffset = 0.0002f;
+    float minOffset = 0.000001;
+    float offsetMod = 1.0f - clamp(dot(N, L), 0.0f, 1.0f);
+    float bias = minOffset + maxOffset * offsetMod;
+
+    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0f : 1.0f;
+    float shadow = 0.0f;
+    for(int x = -1; x <= 1; ++x){
+        for(int y = -1; y <= 1; ++y){
+            float pcfDepth = texture(shadowMap, vec3(projectionCoordinates.xy + vec2(x, y) * texelSize, 0)).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 0.3f : 1.0f;        
+        }    
+    }
+    shadow /= 9.0f;
+    return shadow;
+}
+
+float calculateShadow(vec3 N, vec3 L) {
+    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    float shadow;
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 2), depth <= splits[3] && depth >= splits[2]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 1), depth <= splits[2] && depth >= splits[1]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 0), depth <= splits[1] && depth >= splits[0]);
+    return shadow;
+}
+
+float calculateShadowInCascade(vec3 N, vec3 L, int cascade){
+    if(!receiveShadow){
+        return 1.0f;
+    }
+    vec3 projectionCoordinates = io_fragmentPositionLightSpace[cascade].xyz / io_fragmentPositionLightSpace[cascade].w;
+    projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
+    float currentDepth = projectionCoordinates.z;
+    vec2 moments = texture(shadowMap, vec3(projectionCoordinates.xy, cascade)).xy;
+    if (currentDepth <= moments.x) {
+		return 1.0;
+    }
+	float variance = moments.y - (moments.x * moments.x);
+	variance = max(variance, 0.00002);
+	float d = currentDepth - moments.x;
+	float pMax = variance / (variance + d * d);
+    return smoothstep(0.1f, 1.0f, pMax);
+}
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));

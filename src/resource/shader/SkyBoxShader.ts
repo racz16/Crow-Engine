@@ -3,6 +3,8 @@ import { IRenderableComponent } from '../../component/renderable/IRenderableComp
 import { IRenderable } from '../IRenderable';
 import { Material } from '../../material/Material';
 import { MaterialSlot } from '../../material/MaterialSlot';
+import { Engine } from '../../core/Engine';
+import { Utility } from '../../utility/Utility';
 
 export class SkyBoxShader extends Shader {
 
@@ -11,7 +13,10 @@ export class SkyBoxShader extends Shader {
         const usable = this.isCubeMapUsable(renderableComponent, slot);
         if (usable) {
             slot.getCubeMapTexture().getNativeTexture().bindToTextureUnit(0);
+        } else {
+            Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE).getNativeTexture().bindToTextureUnit(0);
         }
+
         this.getShaderProgram().loadBoolean('isThereCubeMap', usable);
     }
 
@@ -20,7 +25,7 @@ export class SkyBoxShader extends Shader {
             slot &&
             slot.isActive() &&
             slot.getCubeMapTexture() &&
-            slot.getCubeMapTexture().isUsable();
+            Utility.isUsable(slot.getCubeMapTexture());
     }
 
     protected connectTextureUnits(): void {
@@ -28,10 +33,10 @@ export class SkyBoxShader extends Shader {
     }
 
     protected getVertexShaderPath(): string {
-        return 'res/shaders/skybox/vertex.glsl';
+        return 'res/shaders/skybox/skybox.vs';
     }
     protected getFragmentShaderPath(): string {
-        return 'res/shaders/skybox/fragment.glsl';
+        return 'res/shaders/skybox/skybox.fs';
     }
 
 }

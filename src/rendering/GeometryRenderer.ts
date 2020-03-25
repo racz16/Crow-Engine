@@ -6,6 +6,7 @@ import { vec3 } from 'gl-matrix';
 import { ICameraComponent } from '../component/camera/ICameraComponent';
 import { Engine } from '../core/Engine';
 import { Conventions } from '../resource/Conventions';
+import { Utility } from '../utility/Utility';
 
 export abstract class GeometryRenderer extends Renderer {
 
@@ -58,7 +59,7 @@ export abstract class GeometryRenderer extends Renderer {
     }
 
     protected drawPredicate(renderableComponent: IRenderableComponent<IRenderable>): boolean {
-        return renderableComponent.getRenderable().isUsable() &&
+        return Utility.isUsable(renderableComponent.getRenderable()) &&
             renderableComponent.isActive() &&
             this.isVisible(renderableComponent, this.camera) &&
             renderableComponent.getBoundingShape().isInsideMainCameraFrustum();

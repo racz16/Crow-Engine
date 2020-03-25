@@ -14,9 +14,13 @@ import { Utility } from '../../utility/Utility';
 import { TextureWrap } from '../../webgl/enum/TextureWrap';
 import { TextureFilter } from '../../webgl/enum/TextureFilter';
 import { PbrIblHelper } from './PbrIblHelper';
+import { Engine } from '../../core/Engine';
+import { RenderingPipeline } from '../../rendering/RenderingPipeline';
+import { PbrLightsStruct } from '../../component/light/pbr/PbrLightsStruct';
 
 export class PbrShader extends Shader {
 
+    private readonly SHADOW_TEXTURE_UNIT = 8;
     private readonly BASE_COLOR_TEXTURE_UNIT = 1;
     private readonly NORMAL_POM_TEXTURE_UNIT = 2;
     private readonly OCCLUSION_ROUGHNESS_METALNESS_TEXTURE_UNIT = 3;
@@ -29,7 +33,6 @@ export class PbrShader extends Shader {
     public constructor() {
         super();
         this.createBrdfLut();
-        console.log(this.getShaderProgram());
         this.slotHelpers = [
             new BaseColorSlotHelper(this.getShaderProgram(), this.BASE_COLOR_TEXTURE_UNIT),
             new NormalSlotHelper(this.getShaderProgram(), this.NORMAL_POM_TEXTURE_UNIT),
@@ -44,8 +47,8 @@ export class PbrShader extends Shader {
         this.brdfLut.allocate(InternalFormat.RG8, vec2.fromValues(512, 512), false);
         this.brdfLut.setWrapU(TextureWrap.CLAMP_TO_EDGE);
         this.brdfLut.setWrapV(TextureWrap.CLAMP_TO_EDGE);
-        this.brdfLut.setMinificationFilter(TextureFilter.LINEAR);
-        this.brdfLut.setMagnificationFilter(TextureFilter.LINEAR);
+        this.brdfLut.setMinificationFilter(TextureFilter.NEAREST);
+        this.brdfLut.setMagnificationFilter(TextureFilter.NEAREST);
         const data = await Utility.loadImage('res/textures/brdfLUT.png');
         this.brdfLut.store(data, Format.RG, false);
     }
@@ -57,6 +60,8 @@ export class PbrShader extends Shader {
             helper.loadSlot(material);
         }
         this.pbrIblHelper.loadIblMaps();
+        this.getShaderProgram().loadInt('shadowLightIndex', PbrLightsStruct.getInstance().getShadowLightIndex());
+        this.getShaderProgram().loadBoolean('receiveShadow', renderableComponent.isReceiveShadows());
     }
 
     private setMatrixUniforms(renderableComponent: IRenderableComponent<IRenderable>): void {
@@ -66,16 +71,22 @@ export class PbrShader extends Shader {
         this.getShaderProgram().loadMatrix4('modelMatrix', model, false);
     }
 
-    protected connectTextureUnits(): void {
-
+    public connectTextureUnits(): void {
+        let shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
+        const isThereShadowMap = Utility.isUsable(shadowMap);
+        if (!isThereShadowMap) {
+            shadowMap = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D_ARRAY);
+        }
+        shadowMap.getNativeTexture().bindToTextureUnit(this.SHADOW_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('shadowMap', this.SHADOW_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {
-        return 'res/shaders/pbr/vertex.glsl';
+        return 'res/shaders/pbr/pbr.vs';
     }
 
     protected getFragmentShaderPath(): string {
-        return 'res/shaders/pbr/fragment.glsl';
+        return 'res/shaders/pbr/pbr.fs';
     }
 
 }

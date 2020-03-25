@@ -48,10 +48,21 @@ export class GlShaderProgram extends GlObject {
     private connectUniforms(): void {
         this.uniforms.clear();
         for (let i = 0; i < Gl.gl.getProgramParameter(this.getId(), Gl.gl.ACTIVE_UNIFORMS); i++) {
-            const name = Gl.gl.getActiveUniform(this.getId(), i).name;
-            const location = Gl.gl.getUniformLocation(this.getId(), name) as number;
-            this.uniforms.set(name, location);
+            const info = Gl.gl.getActiveUniform(this.getId(), i);
+            if (info.size > 1) {
+                for (let i = 0; i < info.size; i++) {
+                    const name = info.name.substring(0, info.name.length - 3) + `[${i}]`;
+                    this.connectUniform(name);
+                }
+            } else {
+                this.connectUniform(info.name);
+            }
         }
+    }
+
+    private connectUniform(name: string): void {
+        const location = Gl.gl.getUniformLocation(this.getId(), name) as number;
+        this.uniforms.set(name, location);
     }
 
     private connectUniformBlocks(): void {
@@ -66,9 +77,9 @@ export class GlShaderProgram extends GlObject {
     private connectAttributes(): void {
         this.attributes.clear();
         for (let i = 0; i < Gl.gl.getProgramParameter(this.getId(), Gl.gl.ACTIVE_ATTRIBUTES); i++) {
-            const name = Gl.gl.getActiveAttrib(this.getId(), i).name;
-            const location = Gl.gl.getAttribLocation(this.getId(), name) as number;
-            this.attributes.set(name, location);
+            const info = Gl.gl.getActiveAttrib(this.getId(), i);
+            const location = Gl.gl.getAttribLocation(this.getId(), info.name) as number;
+            this.attributes.set(info.name, location);
         }
     }
 

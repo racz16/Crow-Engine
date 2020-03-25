@@ -2,6 +2,9 @@ import { BlinnPhongShader } from '../../resource/shader/BlinnPhongShader';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 import { GeometryRenderer } from '../GeometryRenderer';
 import { Conventions } from '../../resource/Conventions';
+import { Engine } from '../../core/Engine';
+import { RenderingPipeline } from '../RenderingPipeline';
+import { mat4 } from 'gl-matrix';
 
 export class BlinnPhongRenderer extends GeometryRenderer {
 
@@ -17,14 +20,21 @@ export class BlinnPhongRenderer extends GeometryRenderer {
         BlinnPhongLightsStruct.getInstance().refreshUbo();
         BlinnPhongLightsStruct.getInstance().useUbo();
         this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
-    }
-
-    private beforeDrawShader(): void {
-        //shadow map
-        /*Parameter < Texture2D > shadowMap = RenderingPipeline.getParameters().get(RenderingPipeline.SHADOWMAP);
-        if (shadowMap) {
-            shadowMap.getValue().bindToTextureUnit(0);
-        }*/
+        let mats = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRICES);
+        if (!mats || !mats.length) {
+            mats = new Array<mat4>(mat4.create());
+        }
+        for (let i = 0; i < mats.length; i++) {
+            this.shader.getNativeShaderProgram().loadMatrix4(`shadowProjectionViewMatrices[${i}]`, mats[i]);
+        }
+        let splits = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_SPLITS);
+        if (!splits || !splits.length) {
+            splits = new Array<number>();
+            splits.push(1);
+        }
+        for (let i = 0; i < splits.length; i++) {
+            this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);
+        }
     }
 
     public getShader(): BlinnPhongShader {

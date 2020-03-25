@@ -1,7 +1,6 @@
 import { IRenderable } from '../../resource/IRenderable';
 import { Component } from '../Component';
 import { GameObject } from '../../core/GameObject';
-import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { Material } from '../../material/Material';
 import { SphereBoundingShape } from './boundingshape/SphereBoundingShape';
 import { IRenderableComponent } from './IRenderableComponent';
@@ -234,7 +233,6 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     }
 
     protected updateComponent(): void {
-        super.updateComponent();
         this.renderable.update();
     }
 

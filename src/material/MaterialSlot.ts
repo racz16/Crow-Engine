@@ -3,6 +3,7 @@ import { ParameterKey } from '../utility/parameter/ParameterKey';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ITexture2D } from '../resource/texture/ITexture2D';
 import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
+import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
 
 export class MaterialSlot {
 
@@ -18,10 +19,12 @@ export class MaterialSlot {
 
     private readonly textureTile = vec2.fromValues(1, 1);
     private readonly textureOffset = vec2.create();
+    private textureLayer = 0;
     private readonly parameters = new ParameterContainer();
     private active = true;
     private color: vec4;
     private texture2D: ITexture2D;
+    private texture2DArray: ITexture2DArray;
     private cubeMapTexture: ICubeMapTexture;
 
     public isActive(): boolean {
@@ -48,6 +51,14 @@ export class MaterialSlot {
         this.texture2D = texture;
     }
 
+    public getTexture2DArray(): ITexture2DArray {
+        return this.texture2DArray;
+    }
+
+    public setTexture2DArray(texture: ITexture2DArray): void {
+        this.texture2DArray = texture;
+    }
+
     public getCubeMapTexture(): ICubeMapTexture {
         return this.cubeMapTexture;
     }
@@ -61,7 +72,7 @@ export class MaterialSlot {
     }
 
     public setTextureTile(textureTile: vec2): void {
-        this.textureTile.set(textureTile);
+        vec2.copy(this.textureTile, textureTile);
     }
 
     public getTextureOffset(): vec2 {
@@ -69,7 +80,15 @@ export class MaterialSlot {
     }
 
     public setTextureOffset(textureOffset: vec2): void {
-        this.textureOffset.set(textureOffset);
+        vec2.copy(this.textureOffset, textureOffset);
+    }
+
+    public getTextureLayer(): number {
+        return this.textureLayer;
+    }
+
+    public setTextureLayer(layer: number): void {
+        this.textureLayer = layer;
     }
 
     public getParameters(): ParameterContainer {

@@ -3,6 +3,7 @@ import { ChildContainer } from './ChildContainer';
 import { vec3, quat } from 'gl-matrix';
 import { Transform } from './Transform';
 import { Engine } from './Engine';
+
 export class GameObject {
 
     private components: ComponentContainer;
@@ -19,9 +20,9 @@ export class GameObject {
         Engine.getGameObjectContainer().add(this);
     }
 
-    protected update(): void {
-        (this.transform as any).update();
-        (this.components as any).update();
+    public update(): void {
+        this.transform.update();
+        this.components.update();
     }
 
     public getRoot(): GameObject {
@@ -106,4 +107,5 @@ export class GameObject {
     public getChildren(): ChildContainer {
         return this.children;
     }
+
 }

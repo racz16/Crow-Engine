@@ -17,6 +17,7 @@ export abstract class PostProcessRenderer extends Renderer {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
         image.getNativeTexture().bindToTextureUnit(0);
         Gl.setEnableDepthTest(false);
+        this.getShader().setUniforms();
         this.quad.draw();
         this.incrementRenderedElementCountBy(1);
         this.incrementRenderedFaceCountBy(this.quad.getFaceCount());

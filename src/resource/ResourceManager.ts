@@ -1,10 +1,9 @@
 import { IResource } from './IResource';
+import { IResourceManager } from './IResourceManager';
 
-export class ResourceManager {
+export class ResourceManager implements IResourceManager {
 
     private resources = new Array<IResource>();
-
-    public constructor() { }
 
     public add(resource: IResource): void {
         if (!this.contains(resource)) {
@@ -16,21 +15,19 @@ export class ResourceManager {
         return this.resources.includes(resource);
     }
 
-    public getAllResourcesIterator(): IterableIterator<IResource> {
+    public getIterator(): IterableIterator<IResource> {
         return this.resources.values();
     }
 
-    public getResourcesIterator<T>(type: new (..._) => T): IterableIterator<T> {
-        const ret = new Array<T>();
-        for (const resource of this.resources) {
-            if (resource instanceof type) {
-                ret.push(resource);
-            }
-        }
-        return ret.values();
+    public getTypedIterator<T extends IResource>(type: new (..._) => T): IterableIterator<T> {
+        return this.resources.filter(resource => resource instanceof type).values() as IterableIterator<T>;
     }
 
-    public releaseResources(): void {
+    public getCount(): number {
+        return this.resources.length;
+    }
+
+    public release(): void {
         for (const resource of this.resources) {
             resource.release();
         }

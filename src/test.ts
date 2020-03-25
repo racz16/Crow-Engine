@@ -29,6 +29,19 @@ import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
 import { TextureWrap } from './webgl/enum/TextureWrap';
 import { RenderingPipeline } from './rendering/RenderingPipeline';
 import { Utility } from './utility/Utility';
+import { QuadMesh } from './resource/mesh/QuadMesh';
+import { Vao } from './webgl/Vao';
+import { Vbo } from './webgl/buffer/Vbo';
+import { BufferObjectUsage } from './webgl/enum/BufferObjectUsage';
+import { VertexAttribPointer } from './webgl/VertexAttribPointer';
+import { VertexAttribPointerType } from './webgl/enum/VertexAttribPointerType';
+import { Conventions } from './resource/Conventions';
+import { Ebo } from './webgl/buffer/Ebo';
+import { IMesh } from './resource/mesh/IMesh';
+import { Gl } from './webgl/Gl';
+import { ParameterKey } from './utility/parameter/ParameterKey';
+import { BlinnPhongLightsStruct } from './component/light/blinnphong/BlinnPhongLightsStruct';
+import { PbrLightsStruct } from './component/light/pbr/PbrLightsStruct';
 
 window.onload = () => {
     const tsb = new TestSceneBuilder();
@@ -36,6 +49,7 @@ window.onload = () => {
     tsb.loadResources();
     tsb.setUpScene();
     tsb.createUi();
+    tsb.createGround();
     tsb.createDamagedHelmet();
     tsb.createGoldSphere();
     tsb.createFlightHelmet();
@@ -45,8 +59,68 @@ window.onload = () => {
     tsb.createReflectionBox();
     tsb.createDragon();
     tsb.createBezierSpline();
-    tsb.createAudioSource();
+    //tsb.createAudioSource();
     Engine.start();
+}
+
+export class GltfMesh implements IMesh {
+
+    private vao: Vao;
+
+    public constructor(vao: Vao) {
+        this.vao = vao;
+    }
+
+    public getFaceCount(): number {
+        return 12;
+    }
+
+    public getVertexCount(): number {
+        return 36;
+    }
+
+    public getObjectSpaceRadius(): number {
+        return Math.sqrt(3);
+    }
+
+    public getObjectSpaceAabbMin(): vec3 {
+        return vec3.fromValues(-1, -1, -1);
+    }
+
+    public getObjectSpaceAabbMax(): vec3 {
+        return vec3.fromValues(1, 1, 1);
+    }
+
+    public draw(): void {
+        this.vao.bind();
+        Gl.gl.drawElements(Gl.gl.TRIANGLES, this.getVertexCount(), Gl.gl.UNSIGNED_SHORT, 0);
+    }
+
+    public update(): void { }
+
+    public hasTextureCoordinates(): boolean {
+        return true;
+    }
+
+    public hasNormals(): boolean {
+        return true;
+    }
+
+    public hasTangents(): boolean {
+        return true;
+    }
+
+    public release(): void {
+        if (this.isUsable()) {
+            this.vao.release();
+            this.vao = null;
+        }
+    }
+
+    public isUsable(): boolean {
+        return Utility.isUsable(this.vao);
+    }
+
 }
 
 export class TestSceneBuilder {
@@ -68,8 +142,11 @@ export class TestSceneBuilder {
 
         //camera
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(0, 0, 10));
+        go.getTransform().setRelativePosition(vec3.fromValues(0, 2, 10));
         const cc = new CameraComponent();
+        cc.setNearPlaneDistance(0.01);
+        cc.setFarPlaneDistance(50);
+
         go.getComponents().add(cc);
         Engine.setMainCamera(cc);
 
@@ -86,15 +163,57 @@ export class TestSceneBuilder {
         const dlgo = new GameObject();
         const bpdlc = new BlinnPhongDirectionalLightComponent();
         dlgo.getComponents().add(bpdlc);
+        BlinnPhongLightsStruct.getInstance().setShadowLightSource(bpdlc);
         const pbrdlc = new PbrDirectionalLightComponent();
         pbrdlc.setColor(vec3.fromValues(1, 1, 1));
         dlgo.getComponents().add(pbrdlc);
+        PbrLightsStruct.getInstance().setShadowLightSource(pbrdlc);
 
         const rotation = RotationBuilder
             .createRotation(Axis.X, -45)
             .thenRotate(Axis.Y, 45)
+            //.thenRotate(Axis.Z, -45)
             .getQuaternion();
         dlgo.getTransform().setRelativeRotation(rotation);
+
+        this.loadGltf();
+    }
+
+    private async loadGltf(): Promise<void> {
+        const response = await fetch('res/meshes/gltf-test/test.bin');
+        const arrayBuffer = await response.arrayBuffer();
+
+        const vao = new Vao();
+
+        const posVbo = new Vbo();
+        posVbo.allocateAndStore(new Uint8Array(arrayBuffer, 0, 288), BufferObjectUsage.STATIC_DRAW);
+        vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(posVbo, new VertexAttribPointer(3));
+        vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
+
+        const norVbo = new Vbo();
+        norVbo.allocateAndStore(new Uint8Array(arrayBuffer, 288, 288), BufferObjectUsage.STATIC_DRAW);
+        vao.getVertexAttribArray(Conventions.NORMALS_VBO_INDEX).setVbo(norVbo, new VertexAttribPointer(3));
+        vao.getVertexAttribArray(Conventions.NORMALS_VBO_INDEX).setEnabled(true);
+
+        const tanVbo = new Vbo();
+        tanVbo.allocateAndStore(new Uint8Array(arrayBuffer, 576, 384), BufferObjectUsage.STATIC_DRAW);
+        vao.getVertexAttribArray(Conventions.TANGENTS_VBO_INDEX).setVbo(tanVbo, new VertexAttribPointer(3, VertexAttribPointerType.FLOAT, false, 0, 16));
+        vao.getVertexAttribArray(Conventions.TANGENTS_VBO_INDEX).setEnabled(true);
+
+        const uvVbo = new Vbo();
+        uvVbo.allocateAndStore(new Uint8Array(arrayBuffer, 960, 192), BufferObjectUsage.STATIC_DRAW);
+        vao.getVertexAttribArray(Conventions.TEXTURE_COORDINATES_VBO_INDEX).setVbo(uvVbo, new VertexAttribPointer(2));
+        vao.getVertexAttribArray(Conventions.TEXTURE_COORDINATES_VBO_INDEX).setEnabled(true);
+
+        const indEbo = new Ebo();
+        indEbo.allocateAndStore(new Uint8Array(arrayBuffer, 1152, 72), BufferObjectUsage.STATIC_DRAW);
+        vao.setEbo(indEbo);
+
+        const gltf = new GltfMesh(vao);
+        const go = new GameObject();
+        go.getTransform().setRelativePosition(vec3.fromValues(0, 1, 5));
+        const mesh = new MeshComponent(gltf);
+        go.getComponents().add(mesh);
     }
 
     private async createSkybox(): Promise<void> {
@@ -124,6 +243,7 @@ export class TestSceneBuilder {
         slot.setCubeMapTexture(diffuseIblMap);
         skyMaterial.setSlot(Material.SKYBOX, slot);
         const skyRenderable = new MeshComponent(CubeMesh.getInstance(), skyMaterial);
+        skyRenderable.setCastShadow(false);
         sky.getComponents().add(skyRenderable);
     }
 
@@ -133,9 +253,20 @@ export class TestSceneBuilder {
         go.getComponents().add(ic);
     }
 
+    public createGround(): void {
+        const go = new GameObject();
+        const material = new Material(PbrRenderer);
+        const orm = new MaterialSlot();
+        orm.setColor(vec4.fromValues(1, 1, 0, -1));
+        material.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, orm);
+        const meshComponent = new MeshComponent(new StaticMesh('res/meshes/plane.obj'), material);
+        go.getComponents().add(meshComponent);
+        go.getTransform().setRelativeScale(vec3.fromValues(200, 1, 100));
+    }
+
     public createDamagedHelmet(): void {
         const helmet = new GameObject();
-        helmet.getTransform().setRelativePosition(vec3.fromValues(-15, 0, 0))
+        helmet.getTransform().setRelativePosition(vec3.fromValues(-15, 1, 0))
         const material = new Material(PbrRenderer);
 
         const bcs = new MaterialSlot();
@@ -169,12 +300,12 @@ export class TestSceneBuilder {
         sm.setSlot(Material.OCCLUSION_ROUGHNESS_METALNESS, sormms);
         const smc = new MeshComponent(new StaticMesh('res/meshes/sphere.obj'), sm);
         sphere.getComponents().add(smc);
-        sphere.getTransform().setRelativePosition(vec3.fromValues(-5, 0, 0));
+        sphere.getTransform().setRelativePosition(vec3.fromValues(-5, 1, 0));
     }
 
     public createFlightHelmet(): void {
         const flightHelmet = new GameObject();
-        flightHelmet.getTransform().setRelativePosition(vec3.fromValues(-10, 0, 0));
+        flightHelmet.getTransform().setRelativePosition(vec3.fromValues(-10, 1.32, 0));
         flightHelmet.getTransform().setRelativeScale(vec3.fromValues(3, 3, 3));
 
         const leatherMesh = new StaticMesh('res/meshes/flight-helmet/leather.obj');
@@ -290,11 +421,12 @@ export class TestSceneBuilder {
 
         const mc = new MeshComponent(this.box, ma);
         go.getComponents().add(mc);
+        go.getTransform().setRelativePosition(vec3.fromValues(0, 0.5, 0));
     }
 
     public createNormalBox(): void {
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(2.5, 0, 0));
+        go.getTransform().setRelativePosition(vec3.fromValues(2.5, 0.5, 0));
         const ma = new Material(BlinnPhongRenderer);
 
         const ns = new MaterialSlot();
@@ -307,7 +439,7 @@ export class TestSceneBuilder {
 
     public createNormalPomBox(): void {
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(5, 0, 0));
+        go.getTransform().setRelativePosition(vec3.fromValues(3, 0.5, 1));
 
         const ma = new Material(BlinnPhongRenderer);
 
@@ -330,7 +462,7 @@ export class TestSceneBuilder {
 
     public createReflectionBox(): void {
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(7.5, 0, 0));
+        go.getTransform().setRelativePosition(vec3.fromValues(7.5, 0.5, 0));
         const ma = new Material(BlinnPhongRenderer);
 
         const rs = new MaterialSlot();
@@ -347,7 +479,7 @@ export class TestSceneBuilder {
 
     public createDragon(): void {
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(10, -0.5, 0));
+        go.getTransform().setRelativePosition(vec3.fromValues(10, 0, 0));
         go.getTransform().setRelativeScale(vec3.fromValues(0.1, 0.1, 0.1));
 
         const dragonMesh = new StaticMesh('res/meshes/dragon.obj');
@@ -360,7 +492,7 @@ export class TestSceneBuilder {
 
     public createBezierSpline(): void {
         const go = new GameObject();
-        go.getTransform().setRelativePosition(vec3.fromValues(12.5, 0, 0));
+        go.getTransform().setRelativePosition(vec3.fromValues(12.5, 1, 0));
         go.getTransform().setRelativeScale(vec3.fromValues(0.075, 0.075, 0.075));
 
         const bs = new BezierSpline();
@@ -372,7 +504,11 @@ export class TestSceneBuilder {
         }
         bs.normalizeHelperPoints(5);
         bs.setLoop(true);
-        const sc = new SplineComponent(bs, new Material(BlinnPhongRenderer));
+        const material = new Material(BlinnPhongRenderer);
+        const diffuseSlot = new MaterialSlot();
+        diffuseSlot.setColor(vec4.fromValues(0, 0, 0, 1));
+        material.setSlot(Material.DIFFUSE, diffuseSlot);
+        const sc = new SplineComponent(bs, material);
         go.getComponents().add(sc);
     }
 

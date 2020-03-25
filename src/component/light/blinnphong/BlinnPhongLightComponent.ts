@@ -39,7 +39,7 @@ export abstract class BlinnPhongLightComponent extends Component {
         if (!Utility.isColor(diffuse)) {
             throw new Error();
         }
-        this.diffuseColor.set(diffuse);
+        vec3.copy(this.diffuseColor, diffuse);
         this.invalidate();
     }
 
@@ -51,7 +51,7 @@ export abstract class BlinnPhongLightComponent extends Component {
         if (!Utility.isColor(specular)) {
             throw new Error();
         }
-        this.specularColor.set(specular);
+        vec3.copy(this.specularColor, specular);
         this.invalidate();
     }
 
@@ -63,7 +63,7 @@ export abstract class BlinnPhongLightComponent extends Component {
         if (!Utility.isColor(ambient)) {
             throw new Error();
         }
-        this.ambientColor.set(ambient);
+        vec3.copy(this.ambientColor, ambient);
         this.invalidate();
     }
 

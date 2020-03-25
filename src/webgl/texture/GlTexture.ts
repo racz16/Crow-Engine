@@ -10,6 +10,7 @@ import { IResource } from '../../resource/IResource';
 export abstract class GlTexture extends GlObject implements IResource {
 
     private size = vec2.create();
+    private layers = 1;
     private allocated: boolean;
     private internalFormat: InternalFormat;
     private mipmapLevelCount = 1;
@@ -37,24 +38,33 @@ export abstract class GlTexture extends GlObject implements IResource {
     //
     //allocate----------------------------------------------------------------------------------------------------------
     //
-    public allocate(internalFormat: InternalFormat, size: vec2, mipmaps: boolean): void {
-        this.allocationGeneral(internalFormat, size, mipmaps);
+    protected allocate2D(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+        this.allocationGeneral(internalFormat, size, layers, mipmaps);
         const glInternalFormat = InternalFormatResolver.enumToGl(this.internalFormat).code;
         this.bind();
         Gl.gl.texStorage2D(this.getTarget(), this.mipmapLevelCount, glInternalFormat, this.size[0], this.size[1]);
         this.allocated = true;
     }
 
-    protected allocationGeneral(internalFormat: InternalFormat, size: vec2, mipmaps: boolean): void {
+    protected allocate3D(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+        this.allocationGeneral(internalFormat, size, layers, mipmaps);
+        const glInternalFormat = InternalFormatResolver.enumToGl(this.internalFormat).code;
+        this.bind();
+        Gl.gl.texStorage3D(this.getTarget(), this.mipmapLevelCount, glInternalFormat, this.size[0], this.size[1], layers);
+        this.allocated = true;
+    }
+
+    protected allocationGeneral(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
         this.setInternalFormat(internalFormat);
         this.setSize(size);
+        this.setLayers(layers);
         this.setMipmapCount(mipmaps);
         this.setDataSize(this.computeDataSize());
     }
 
     protected computeDataSize(): number {
         const pixelSizeInBits = InternalFormatResolver.enumToGl(this.internalFormat).bitDepth;
-        const numberOfPixels = this.size[0] * this.size[1];
+        const numberOfPixels = this.size[0] * this.size[1] * this.layers;
         const mipmapMultiplier = this.isMipmapped() ? 1 / 3 : 1;
         const dataSizeInBits = pixelSizeInBits * numberOfPixels * mipmapMultiplier;
         const dataSizeInBytes = dataSizeInBits / 8;
@@ -169,15 +179,15 @@ export abstract class GlTexture extends GlObject implements IResource {
     }
 
     protected setSize(size: vec2): void {
-        this.size.set(size);
+        vec2.copy(this.size, size);
     }
 
-    public static getMaxSize(): number {
-        return GlConstants.MAX_TEXTURE_SIZE;
+    public getLayers(): number {
+        return this.layers;
     }
 
-    public static getMaxSizeSafe(): number {
-        return GlConstants.MAX_TEXTURE_SIZE_SAFE;
+    protected setLayers(layers: number): void {
+        this.layers = layers;
     }
 
     public isSRgb(): boolean {
@@ -195,6 +205,14 @@ export abstract class GlTexture extends GlObject implements IResource {
 
     public static getMaxTextureUnitsSafe(): number {
         return GlConstants.MAX_COMBINED_TEXTURE_IMAGE_UNITS_SAFE;
+    }
+
+    public isMultisampled(): boolean {
+        return false;
+    }
+
+    public getSampleCount(): number {
+        return 1;
     }
 
     public release(): void {

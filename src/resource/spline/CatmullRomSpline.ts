@@ -14,7 +14,7 @@ export class CatmullRomSpline extends CubicSpline {
             return super.getValue(startIndex, t);
         } else {
             const vec = vec4.transformMat4(vec4.create(), vec4.fromValues(t * t * t, t * t, t, 1), this.basisMatrix);
-            const cps = this.computeClosestControlPoints(startIndex);
+            const cps = this.refreshClosestControlPoints(startIndex);
             const v1 = vec4.fromValues(cps[0][0], cps[1][0], cps[2][0], cps[3][0]);
             const v2 = vec4.fromValues(cps[0][1], cps[1][1], cps[2][1], cps[3][1]);
             const v3 = vec4.fromValues(cps[0][2], cps[1][2], cps[2][2], cps[3][2]);
@@ -22,7 +22,7 @@ export class CatmullRomSpline extends CubicSpline {
         }
     }
 
-    private computeClosestControlPoints(startIndex: number): void {
+    private refreshClosestControlPoints(startIndex: number): void {
         const closestControlPoints = new Array<vec3>(4);
         for (let i = -1; i < 3; i++) {
             if (this.isLoop()) {
@@ -55,7 +55,7 @@ export class CatmullRomSpline extends CubicSpline {
         }
     }
 
-    protected computeBasisMatrix(): void {
+    protected refreshBasisMatrix(): void {
         this.basisMatrix = mat4.fromValues(
             -this.tension, 2 - this.tension, this.tension - 2, this.tension,
             2 * this.tension, this.tension - 3, 3 - 2 * this.tension, -this.tension,
@@ -70,7 +70,7 @@ export class CatmullRomSpline extends CubicSpline {
 
     public setTension(newTension: number): void {
         this.tension = newTension;
-        this.computeBasisMatrix();
+        this.refreshBasisMatrix();
     }
 
     public getRequiredControlPoints(): number {

@@ -6,6 +6,7 @@ import { IFboAttachment } from '../fbo/IFboAttachment';
 import { TextureWrap } from '../enum/TextureWrap';
 import { Gl } from '../Gl';
 import { Format, FormatResolver } from '../enum/Format';
+import { Utility } from '../../utility/Utility';
 
 export class GlCubeMapTextureSide implements IFboAttachment {
 
@@ -52,11 +53,11 @@ export class GlCubeMapTextureSide implements IFboAttachment {
     }
 
     public isMultisampled(): boolean {
-        return false;
+        return this.cubeMapTexture.isMultisampled();
     }
 
     public getSampleCount(): number {
-        return 1;
+        return this.cubeMapTexture.getSampleCount();
     }
 
     public isMipmapped(): boolean {
@@ -84,7 +85,7 @@ export class GlCubeMapTextureSide implements IFboAttachment {
     }
 
     public isUsable(): boolean {
-        return this.cubeMapTexture.isUsable();
+        return Utility.isUsable(this.cubeMapTexture);
     }
 
 }

@@ -1,13 +1,16 @@
 import { BlendFunc, BlendFuncResolver } from './enum/BlendFunc';
 import { CullFace, CullFaceResolver } from './enum/CullFace';
 import { GlConstants } from './GlConstants';
-import { vec2 } from 'gl-matrix';
+import { vec2, vec4 } from 'gl-matrix';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { GlTexture2D } from './texture/GlTexture2D';
 import { InternalFormat } from './enum/InternalFormat';
 import { Engine } from '../core/Engine';
 import { GlCubeMapTexture } from './texture/GlCubeMapTexture';
+import { TextureFilter } from './enum/TextureFilter';
+import { GlTexture2DArray } from './texture/GlTexture2DArray';
+import { Performance, PerformanceResolver } from './enum/Performance';
 
 export class Gl {
 
@@ -33,6 +36,7 @@ export class Gl {
         }
         this.setGlDefaultStates();
         this.createDefaultTexture2D();
+        this.createDefaultTexture2DArray();
         this.createDefaultCubeMapTexture();
     }
 
@@ -46,13 +50,25 @@ export class Gl {
 
     private static createDefaultTexture2D(): void {
         const texture = new GlTexture2D();
-        texture.allocate(InternalFormat.R8, vec2.fromValues(1, 1), false);
+        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.setMinificationFilter(TextureFilter.NEAREST);
+        texture.setMagnificationFilter(TextureFilter.NEAREST);
         Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D, texture);
+    }
+
+    private static createDefaultTexture2DArray(): void {
+        const texture = new GlTexture2DArray();
+        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), 1, false);
+        texture.setMinificationFilter(TextureFilter.NEAREST);
+        texture.setMagnificationFilter(TextureFilter.NEAREST);
+        Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D_ARRAY, texture);
     }
 
     private static createDefaultCubeMapTexture(): void {
         const texture = new GlCubeMapTexture();
-        texture.allocate(InternalFormat.R8, vec2.fromValues(1, 1), false);
+        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.setMinificationFilter(TextureFilter.NEAREST);
+        texture.setMagnificationFilter(TextureFilter.NEAREST);
         Engine.getParameters().set(Engine.DEFAULT_CUBE_MAP_TEXTURE, texture);
     }
 
@@ -140,11 +156,24 @@ export class Gl {
         Gl.gl.viewport(offset[0], offset[1], size[0], size[1]);
     }
 
+    public static getClearColor(): vec4 {
+        const clearColor: Float32Array = Gl.gl.getParameter(Gl.gl.COLOR_CLEAR_VALUE);
+        return vec4.fromValues(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+    }
+
+    public static setClearColor(color: vec4): void {
+        Gl.gl.clearColor(color[0], color[1], color[2], color[3]);
+    }
+
     public static clear(color: boolean, depth: boolean, stencil: boolean): void {
         const colorBit = color ? Gl.gl.COLOR_BUFFER_BIT : 0;
         const depthBit = depth ? Gl.gl.DEPTH_BUFFER_BIT : 0;
         const stencilBit = stencil ? Gl.gl.STENCIL_BUFFER_BIT : 0;
         Gl.gl.clear(colorBit | depthBit | stencilBit);
+    }
+
+    public static setMipmapPerformance(performance: Performance): void {
+        Gl.gl.hint(Gl.gl.GENERATE_MIPMAP_HINT, PerformanceResolver.enumToGl(performance))
     }
 
 }

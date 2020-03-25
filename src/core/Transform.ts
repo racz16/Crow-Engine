@@ -28,7 +28,7 @@ export class Transform implements IInvalidatable {
     }
 
     public setRelativePosition(position: vec3): void {
-        this.relativePosition.set(position);
+        vec3.copy(this.relativePosition, position);
         this.invalidate();
     }
 
@@ -204,8 +204,7 @@ export class Transform implements IInvalidatable {
     //
     //GameObject related--------------------------------------------------------
     //
-    protected update(): void {
-    }
+    public update(): void { }
 
     protected attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;

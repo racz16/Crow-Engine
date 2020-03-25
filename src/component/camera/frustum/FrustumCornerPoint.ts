@@ -13,7 +13,7 @@ export enum FrustumCornerPoint {
 
 export class FrustumCornerPointResolver {
 
-    public static getNDCPosition(cornerPoint: FrustumCornerPoint): vec4 {
+    public static getNdcPosition(cornerPoint: FrustumCornerPoint): vec4 {
         switch (cornerPoint) {
             case FrustumCornerPoint.FAR_TOP_LEFT: return vec4.fromValues(-1, 1, 1, 1);
             case FrustumCornerPoint.FAR_TOP_RIGHT: return vec4.fromValues(1, 1, 1, 1);

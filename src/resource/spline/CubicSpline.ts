@@ -45,7 +45,7 @@ export abstract class CubicSpline extends Spline {
         this.valid = false;
     }
 
-    protected abstract computeBasisMatrix(): void;
+    protected abstract refreshBasisMatrix(): void;
 
     public getBasisMatrix(): mat4 {
         return mat4.clone(this.basisMatrix);

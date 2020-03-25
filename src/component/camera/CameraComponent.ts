@@ -6,7 +6,7 @@ import { Frustum } from './frustum/Frustum';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { Engine } from '../../core/Engine';
-import { ICameraComponent as ICameraComponent } from './ICameraComponent';
+import { ICameraComponent } from './ICameraComponent';
 import { Component } from '../Component';
 
 export class CameraComponent extends Component implements ICameraComponent {

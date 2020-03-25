@@ -38,8 +38,8 @@ export class AabbBoundingShape extends BoundingShape {
 
     protected refreshUnsafe(): void {
         const wsBoundingBoxCornerPoints = this.computeWorldSpaceBoundingBoxCornerPoints();
-        this.aabbMin.set(vec3.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
-        this.aabbMax.set(vec3.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY));
+        vec3.copy(this.aabbMin, vec3.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+        vec3.copy(this.aabbMax, vec3.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY));
         for (const cornerPoint of wsBoundingBoxCornerPoints) {
             this.refreshAabbCornerPoint(cornerPoint);
         }

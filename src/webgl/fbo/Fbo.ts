@@ -83,23 +83,21 @@ export class Fbo extends GlObject {
 
     //draw buffers------------------------------------------------------------------------------------------------------
     public getDrawBufferIndicesIterator(): IterableIterator<number> {
-        const result = new Array<number>();
-        for (const fac of this.color) {
-            if (fac.isDrawBuffer()) {
-                result.push(fac.getIndex());
-            }
-        }
-        return result.values();
+        return this.getDrawBuffers().map(fac => fac.getIndex()).values();
     }
 
     public getDrawBuffersIterator(): IterableIterator<FboAttachmentContainer> {
+        return this.getDrawBuffers().values();
+    }
+
+    private getDrawBuffers(): Array<FboAttachmentContainer> {
         const result = new Array<FboAttachmentContainer>();
         for (const fac of this.color) {
             if (fac.isDrawBuffer()) {
                 result.push(fac);
             }
         }
-        return result.values();
+        return result
     }
 
     public setDrawBuffers(...indices: Array<number>): void {

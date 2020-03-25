@@ -14,7 +14,7 @@ export class ComponentContainer {
         this.gameObject = gameObject;
     }
 
-    protected update(): void {
+    public update(): void {
         for (const component of this.components) {
             if (component.isActive()) {
                 (component as any).updateComponent();

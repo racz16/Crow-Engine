@@ -20,6 +20,12 @@ export class QuadMesh implements IMesh {
         -1, -1, 0,      //bottom left
         1, -1, 0,       //bottom right
     ];
+    private normals = [
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+    ]
     private indices = [0, 2, 3, 1, 0, 3];
     private uv = [0, 1, 1, 1, 0, 0, 1, 0];
 
@@ -40,6 +46,7 @@ export class QuadMesh implements IMesh {
             this.vao = new Vao();
             this.addEbo();
             this.addVbo(this.positions, Conventions.POSITIONS_VBO_INDEX, 3);
+            this.addVbo(this.normals, Conventions.NORMALS_VBO_INDEX, 3);
             this.addVbo(this.uv, Conventions.TEXTURE_COORDINATES_VBO_INDEX, 2);
         }
     }
@@ -83,7 +90,7 @@ export class QuadMesh implements IMesh {
     }
 
     public getDataSize(): number {
-        return this.isUsable() ? 104 : 0;
+        return this.isUsable() ? (this.positions.length + this.normals.length + this.uv.length + this.indices.length) * 4 : 0;
     }
 
     public release(): void {
@@ -104,7 +111,7 @@ export class QuadMesh implements IMesh {
     }
 
     public hasNormals(): boolean {
-        return false;
+        return true;
     }
 
     public hasTangents(): boolean {

@@ -7,11 +7,11 @@ export class ReinhardToneMappingShader extends Shader {
     }
 
     protected getVertexShaderPath(): string {
-        return 'res/shaders/reinhardToneMapping/vertex.glsl';
+        return 'res/shaders/reinhardToneMapping/reinhardToneMapping.vs';
     }
 
     protected getFragmentShaderPath(): string {
-        return 'res/shaders/reinhardToneMapping/fragment.glsl';
+        return 'res/shaders/reinhardToneMapping/reinhardToneMapping.fs';
     }
 
 }

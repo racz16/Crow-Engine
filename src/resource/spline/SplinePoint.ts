@@ -15,7 +15,7 @@ export class SplinePoint {
     }
 
     public setPoint(point: vec3): void {
-        this.point.set(point);
+        vec3.copy(this.point, point);
     }
 
     public getLeft(): vec3 {
@@ -23,7 +23,7 @@ export class SplinePoint {
     }
 
     public setLeft(left: vec3): void {
-        this.left.set(left);
+        vec3.copy(this.left, left);
         const direction = vec3.subtract(vec3.create(), this.point, left);
         this.right = vec3.add(vec3.create(), this.point, direction);
     }
@@ -33,7 +33,7 @@ export class SplinePoint {
     }
 
     public setRight(right: vec3): void {
-        this.right.set(right);
+        vec3.copy(this.right, right);
         const direction = vec3.subtract(vec3.create(), this.point, right);
         this.left = vec3.add(vec3.create(), this.point, direction);
     }
