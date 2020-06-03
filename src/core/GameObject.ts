@@ -50,24 +50,8 @@ export class GameObject {
     }
 
     private setParentUnsafe(parent: GameObject): void {
-        const transformData = this.getTransformData();
         this.removeParent();
         this.addParent(parent);
-        this.setTransformData(transformData);
-    }
-
-    private getTransformData(): [vec3, quat, vec3] {
-        return [
-            this.transform.getAbsolutePosition(),
-            this.transform.getAbsoluteRotation(),
-            this.transform.getAbsoluteScale()
-        ];
-    }
-
-    private setTransformData([position, rotation, scale]: [vec3, quat, vec3]): void {
-        this.transform.setAbsolutePosition(position);
-        this.transform.setAbsoluteRotation(rotation);
-        this.transform.setAbsoluteScale(scale);
     }
 
     private removeParent(): void {

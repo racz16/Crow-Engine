@@ -41,7 +41,7 @@ export class DebugRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DEBUG);
-        image.getNativeTexture().bindToTextureUnit(0);
+        image.bindToTextureUnit(0);
     }
 
     protected draw(): void {

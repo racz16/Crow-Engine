@@ -15,7 +15,7 @@ export abstract class PostProcessRenderer extends Renderer {
 
     protected renderUnsafe(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.getNativeTexture().bindToTextureUnit(0);
+        image.bindToTextureUnit(0);
         Gl.setEnableDepthTest(false);
         this.getShader().setUniforms();
         this.quad.draw();

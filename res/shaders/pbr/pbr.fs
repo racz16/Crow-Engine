@@ -9,29 +9,40 @@ struct Material {
     vec2 baseColorMapTile;
     vec2 baseColorMapOffset;
     vec3 baseColor;
+    int baseColorTextureCoordinate;
 
-    bool isThereOcclusionRoughnessMetalnessMap;
-    sampler2D occlusionRoughnessMetalnessMap;
-    vec2 occlusionRoughnessMetalnessMapTile;
-    vec2 occlusionRoughnessMetalnessMapOffset;
-    vec3 occlusionRoughnessMetalness;
-    float occlusionStrength;
+    bool isThereRoughnessMetalnessMap;
+    sampler2D roughnessMetalnessMap;
+    vec2 roughnessMetalnessMapTile;
+    vec2 roughnessMetalnessMapOffset;
+    vec3 roughnessMetalness;
+    int roughnessMetalnessTextureCoordinate;
 
     bool isThereNormalMap;
     sampler2D normalMap;
     vec2 normalMapTile;
     vec2 normalMapOffset;
+    int normalMapTextureCoordinate;
+    float normalScale;
 
     bool isTherePOM;
     float POMScale;
     float POMMinLayers;
     float POMMaxLayers;
 
+    bool isThereOcclusionMap;
+    sampler2D occlusionMap;
+    vec2 occlusionMapTile;
+    vec2 occlusionMapOffset;
+    float occlusionStrength;
+    int occlusionTextureCoordinate;
+
     bool isThereEmissiveMap;
     sampler2D emissiveMap;
     vec2 emissiveMapTile;
     vec2 emissiveMapOffset;
     vec3 emissiveColor;
+    int emissiveTextureCoordinate;
 };
 
 struct DotInfo{
@@ -67,11 +78,18 @@ const int DIRECTIONAL_LIGHT = 0;
 const int POINT_LIGHT = 1;
 const int SPOT_LIGHT = 2;
 const int LIGHT_COUNT = 16;
+const int ALPHA_MODE_OPAQUE = 0;
+const int ALPHA_MODE_MASK = 1;
+const int ALPHA_MODE_BLEND = 2;
 const float PI = 3.14159265359;
 
 in vec3 io_fragmentPosition;
 in vec3 io_normal;
-in vec2 io_textureCoordinates;
+flat in int io_isThereNormal;
+flat in int io_isThereTangent;
+in vec2 io_textureCoordinates_0;
+in vec2 io_textureCoordinates_1;
+in vec3 io_vertex_color;
 in vec3 io_viewPosition;
 in mat3 io_TBN;
 in vec4[SPLIT_COUNT] io_fragmentPositionLightSpace;
@@ -86,6 +104,9 @@ uniform samplerCube diffuseIblMap;
 uniform samplerCube specularIblMap;
 uniform float specularIblLodCount;
 uniform sampler2D brdfLutMap;
+uniform bool isThereVertexColor;
+uniform int alphaMode;
+uniform float alphaCutoff;
 
 layout(std140) uniform Lights {             //binding point: 2
     Light[LIGHT_COUNT] lights;              //1024
@@ -111,19 +132,21 @@ float calculateShadowInCascade(vec3 normalVector, vec3 lightDirection, int casca
 
 vec3 getNormalVector(vec2 textureCoordinates);
 void getBaseColorAndAlpha(vec2 textureCoordinates, out vec3 baseColor, out float alpha);
-void getOcclusionRoughnessMetalness(vec2 textureCoordinates, out float occlusion, out float roughness, out float metalness);
+void getRoughnessMetalness(vec2 textureCoordinates, out float roughness, out float metalness);
+float getOcclusion(vec2 textureCoordinates);
 vec3 getEmissiveColor(vec2 textureCoordinates);
-vec2 getTextureCoordinates();
+void getTextureCoordinates(out vec2 textureCoordinates_0, out vec2 textureCoordinates_1);
+vec2 transformTextureCoordinates(vec2 textureCoordinates);
 DotInfo createDotInfo(vec3 L, vec3 N, vec3 V);
-MaterialInfo createMaterialInfo(vec2 textureCoordinates);
+MaterialInfo createMaterialInfo(vec2 textureCoordinates_0, vec2 textureCoordinates_1);
 
 void main(){
-    vec2 textureCoordinates = getTextureCoordinates();
+    vec2 textureCoordinates_0, textureCoordinates_1;
+    getTextureCoordinates(textureCoordinates_0, textureCoordinates_1);
     vec3 fragmentPosition = io_fragmentPosition;
     vec3 V = normalize(io_viewPosition - io_fragmentPosition);
-    vec3 N = getNormalVector(textureCoordinates);
-    MaterialInfo materialInfo = createMaterialInfo(textureCoordinates);
-
+    vec3 N = getNormalVector(mix(textureCoordinates_0, textureCoordinates_1, bvec2(material.normalMapTextureCoordinate != 0)));
+    MaterialInfo materialInfo = createMaterialInfo(textureCoordinates_0, textureCoordinates_1);
     float shadow = calculateShadow(N, lights[shadowLightIndex].direction);
 
     vec3 result = vec3(0.0f);
@@ -140,6 +163,15 @@ void main(){
     result = mix(result, result * vec3(materialInfo.occlusion), material.occlusionStrength);
     result += materialInfo.emissiveColor;
     o_color = vec4(result, materialInfo.alpha);
+
+    /*shadow cascade debug
+    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(1, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1);
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 1, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1);
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 0.2, 1), vec3(depth <= splits[1] && depth >= splits[0])), 1);
+    */
+    
+    //o_color = vec4(vec3(materialInfo.alpha).rgb, 1);
     //o_color = vec4(result.xyz * vec3(0) + vec3(1) * vec3(shadow), 1);
 }
 
@@ -324,9 +356,32 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
 
 vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
+        mat3 tbn;
+        if(!bool(io_isThereTangent)) {
+            vec3 pos_dx = dFdx(io_fragmentPosition);
+            vec3 pos_dy = dFdy(io_fragmentPosition);
+            vec3 tex_dx = dFdx(vec3(textureCoordinates, 0.0f));
+            vec3 tex_dy = dFdy(vec3(textureCoordinates, 0.0f));
+            vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
+
+            vec3 ng;
+            if(bool(io_isThereNormal)) {
+                ng = normalize(io_normal);
+            }else{
+                ng = cross(pos_dx, pos_dy);
+            }
+
+            t = normalize(t - ng * dot(ng, t));
+            vec3 b = normalize(cross(ng, t));
+            tbn = mat3(t, b, ng);
+        }else{
+            tbn = io_TBN;
+        }
+
         vec3 normal = texture(material.normalMap, textureCoordinates * material.normalMapTile + material.normalMapOffset).rgb;
-        normal = normalize(normal * 2.0f - 1.0f);
-        normal = normalize(io_TBN * normal);
+        normal = normal * 2.0f - 1.0f;
+        normal *= vec3(material.normalScale, material.normalScale, 1.0f);
+        normal = normalize(tbn * normal);
         return normal;
     }else{
         return normalize(io_normal);
@@ -334,44 +389,66 @@ vec3 getNormalVector(vec2 textureCoordinates){
 }
 
 void getBaseColorAndAlpha(vec2 textureCoordinates, out vec3 baseColor, out float alpha){
+    vec4 result = vec4(material.baseColor, 1.0f);
     if(material.isThereBaseColorMap){
-        vec4 result = texture(material.baseColorMap, textureCoordinates * material.baseColorMapTile + material.baseColorMapOffset);
-        baseColor = result.rgb;
+        result *= texture(material.baseColorMap, textureCoordinates * material.baseColorMapTile + material.baseColorMapOffset);
+    }
+    if(isThereVertexColor) {
+        result *= vec4(io_vertex_color, 1.0);
+    }
+    baseColor = pow(result.rgb, vec3(2.2f));
+    if(alphaMode == ALPHA_MODE_OPAQUE) {
+        alpha = 1.0;
+    }else if(alphaMode == ALPHA_MODE_MASK) {
+        if(result.a < alphaCutoff) {
+            discard;
+        }
+    }else {
         alpha = result.a;
-    }else{
-        baseColor = pow(material.baseColor, vec3(2.2f));
-        alpha = 1.0f;
     }
 }
 
-void getOcclusionRoughnessMetalness(vec2 textureCoordinates, out float occlusion, out float roughness, out float metalness){
-    vec3 result;
-    if(material.isThereOcclusionRoughnessMetalnessMap){
-        result = texture(material.occlusionRoughnessMetalnessMap, textureCoordinates * material.occlusionRoughnessMetalnessMapTile + material.occlusionRoughnessMetalnessMapOffset).rgb;
-    }else{
-        result = material.occlusionRoughnessMetalness;
+void getRoughnessMetalness(vec2 textureCoordinates, out float roughness, out float metalness){
+    vec3 result = vec3(material.roughnessMetalness);
+    if(material.isThereRoughnessMetalnessMap){
+        result *= texture(material.roughnessMetalnessMap, textureCoordinates * material.roughnessMetalnessMapTile + material.roughnessMetalnessMapOffset).rgb;
     }
-    occlusion = result.r;
     roughness = result.g;
     metalness = result.b;
 }
 
-vec3 getEmissiveColor(vec2 textureCoordinates){
-    if(material.isThereEmissiveMap){
-        return texture(material.emissiveMap, textureCoordinates * material.emissiveMapTile + material.emissiveMapOffset).rgb;
+float getOcclusion(vec2 textureCoordinates){
+    if(material.isThereOcclusionMap){
+        return texture(material.occlusionMap, textureCoordinates * material.occlusionMapTile + material.occlusionMapOffset).r;
     }else{
-        return pow(material.emissiveColor, vec3(2.2f));
+        return 1.0f;
     }
 }
 
-vec2 getTextureCoordinates(){
+vec3 getEmissiveColor(vec2 textureCoordinates){
+    vec3 color = material.emissiveColor;
+    if(material.isThereEmissiveMap){
+        color *= texture(material.emissiveMap, textureCoordinates * material.emissiveMapTile + material.emissiveMapOffset).rgb;
+    }
+    return pow(color, vec3(2.2f));
+}
+
+void getTextureCoordinates(out vec2 textureCoordinates_0, out vec2 textureCoordinates_1) {
+    textureCoordinates_0 = transformTextureCoordinates(io_textureCoordinates_0);
+    if(material.baseColorTextureCoordinate + material.roughnessMetalnessTextureCoordinate + material.occlusionTextureCoordinate + 
+        material.emissiveTextureCoordinate  + material.normalMapTextureCoordinate> 0) {
+        textureCoordinates_1 = transformTextureCoordinates(io_textureCoordinates_1);
+    }
+}
+
+vec2 transformTextureCoordinates(vec2 textureCoordinates) {
     if(material.isThereNormalMap && material.isTherePOM){
         vec3 tangentViewPosition = io_viewPosition * io_TBN;
         vec3 tangentFragmentPosition = io_fragmentPosition * io_TBN;
         vec3 tangentViewDirection = normalize(tangentViewPosition - tangentFragmentPosition);
-        return parallaxMapping(tangentViewDirection, io_textureCoordinates * material.normalMapTile + material.normalMapOffset);
+        return parallaxMapping(tangentViewDirection, textureCoordinates * material.normalMapTile + material.normalMapOffset);
     }else{
-        return io_textureCoordinates;
+        return textureCoordinates;
     }
 }
 
@@ -384,12 +461,13 @@ DotInfo createDotInfo(vec3 L, vec3 N, vec3 V){
     return DotInfo(NdotL, NdotV, NdotH, VdotH);
 }
 
-MaterialInfo createMaterialInfo(vec2 textureCoordinates){
-    vec3 emissiveColor = getEmissiveColor(textureCoordinates);
+MaterialInfo createMaterialInfo(vec2 textureCoordinates_0, vec2 textureCoordinates_1){
+    vec3 emissiveColor = getEmissiveColor(mix(textureCoordinates_0, textureCoordinates_1, bvec2(material.emissiveTextureCoordinate != 0)));
     vec3 baseColor;
     float alpha, occlusion, roughness, metalness;
-    getBaseColorAndAlpha(textureCoordinates, baseColor, alpha);
-    getOcclusionRoughnessMetalness(textureCoordinates, occlusion, roughness, metalness);
+    getBaseColorAndAlpha(mix(textureCoordinates_0, textureCoordinates_1, bvec2(material.baseColorTextureCoordinate != 0)), baseColor, alpha);
+    getRoughnessMetalness(mix(textureCoordinates_0, textureCoordinates_1, bvec2(material.roughnessMetalnessTextureCoordinate != 0)), roughness, metalness);
+    occlusion = getOcclusion(mix(textureCoordinates_0, textureCoordinates_1, bvec2(material.occlusionTextureCoordinate != 0)));
     vec3 F0 = mix(vec3(0.04), baseColor, metalness);
     return MaterialInfo(baseColor, emissiveColor, F0, alpha, occlusion, roughness, metalness);
 }

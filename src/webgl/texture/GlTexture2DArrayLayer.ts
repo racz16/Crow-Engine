@@ -79,6 +79,14 @@ export class GlTexture2DArrayLayer implements IFboAttachment {
         return this.texture2DArray.isSRgb();
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
+    public getDataSize(): number {
+        return this.texture2DArray.getDataSize() / this.texture2DArray.getLayers();
+    }
+
     public isUsable(): boolean {
         return Utility.isUsable(this.texture2DArray);
     }

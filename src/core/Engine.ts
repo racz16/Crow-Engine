@@ -28,7 +28,8 @@ export class Engine {
     public static readonly RESOURCE_MANAGER = new ParameterKey<IResourceManager>('RESOURCE_MANAGER');
     public static readonly RENDERING_PIPELINE = new ParameterKey<IRenderingPipeline>('RENDERING_PIPELINE');
 
-    public static readonly DEFAULT_TEXTURE_2D = new ParameterKey<ITexture2D>('DEFAULT_TEXTURE_2D');
+    public static readonly BLACK_TEXTURE_2D = new ParameterKey<ITexture2D>('BLACK_TEXTURE_2D');
+    public static readonly WHITE_TEXTURE_2D = new ParameterKey<ITexture2D>('WHITE_TEXTURE_2D');
     public static readonly DEFAULT_TEXTURE_2D_ARRAY = new ParameterKey<ITexture2DArray>('DEFAULT_TEXTURE_2D_ARRAY');
     public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<ICubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
 

@@ -21,4 +21,6 @@ export interface IRenderable extends IResource {
 
     hasTangents(): boolean;
 
+    hasVertexColors(): boolean;
+
 }

@@ -21,7 +21,6 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     private castShadow = true;
     private receiveShadow = true;
     private reflectable = false;
-    private twoSided = false;
 
     public constructor(renderable: T, material: Material<any> = new Material(BlinnPhongRenderer), boundingShape: BoundingShape = new SphereBoundingShape()) {
         super();
@@ -111,14 +110,6 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     public setReceiveShadows(receiveShadows: boolean): void {
         this.receiveShadow = receiveShadows;
         this.invalidate();
-    }
-
-    public isTwoSided(): boolean {
-        return this.twoSided;
-    }
-
-    public setTwoSided(twoSided: boolean): void {
-        this.twoSided = twoSided;
     }
 
     public isMaterialActive(): boolean {

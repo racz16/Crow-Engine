@@ -1,6 +1,7 @@
 import { mat4 } from 'gl-matrix';
 import { Frustum } from './frustum/Frustum';
 import { IComponent } from '../IComponent';
+import { CameraType } from './CameraType';
 
 export interface ICameraComponent extends IComponent {
 
@@ -9,6 +10,12 @@ export interface ICameraComponent extends IComponent {
     getProjectionMatrix(): mat4;
 
     getFrustum(): Frustum;
+
+    getType(): CameraType;
+
+    getHorizontalScale(): number;
+
+    getVerticalalScale(): number;
 
     getFov(): number;
 

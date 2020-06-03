@@ -10,8 +10,10 @@ export class Conventions {
 
     //VBO indices
     public static readonly POSITIONS_VBO_INDEX = 0;
-    public static readonly TEXTURE_COORDINATES_VBO_INDEX = 1;
-    public static readonly NORMALS_VBO_INDEX = 2;
-    public static readonly TANGENTS_VBO_INDEX = 3;
+    public static readonly TEXTURE_COORDINATES_0_VBO_INDEX = 1;
+    public static readonly TEXTURE_COORDINATES_1_VBO_INDEX = 2;
+    public static readonly NORMALS_VBO_INDEX = 3;
+    public static readonly TANGENTS_VBO_INDEX = 4;
+    public static readonly VERTEX_COLORS_VBO_INDEX = 5;
 
 }

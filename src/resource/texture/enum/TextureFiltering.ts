@@ -1,4 +1,5 @@
-import { TextureFilter } from '../../../webgl/enum/TextureFilter';
+import { MagnificationFilter } from "../../../webgl/enum/MagnificationFIlter";
+import { MinificationFilter } from "../../../webgl/enum/MinificationFilter";
 
 export enum TextureFiltering {
     None,
@@ -12,21 +13,21 @@ export enum TextureFiltering {
 
 export class TextureFilteringResolver {
 
-    public static enumToGlMagnification(textureFilter: TextureFiltering): TextureFilter {
+    public static enumToGlMagnification(textureFilter: TextureFiltering): MagnificationFilter {
         if (textureFilter === TextureFiltering.None) {
-            return TextureFilter.NEAREST;
+            return MagnificationFilter.NEAREST;
         } else {
-            return TextureFilter.LINEAR;
+            return MagnificationFilter.LINEAR;
         }
     }
 
-    public static enumToGlMinification(textureFilter: TextureFiltering): TextureFilter {
+    public static enumToGlMinification(textureFilter: TextureFiltering): MinificationFilter {
         if (textureFilter === TextureFiltering.None) {
-            return TextureFilter.NEAREST_MIPMAP_NEAREST
+            return MinificationFilter.NEAREST_MIPMAP_NEAREST
         } else if (textureFilter === TextureFiltering.Bilinear) {
-            return TextureFilter.LINEAR_MIPMAP_NEAREST
+            return MinificationFilter.LINEAR_MIPMAP_NEAREST
         } else {
-            return TextureFilter.LINEAR_MIPMAP_LINEAR
+            return MinificationFilter.LINEAR_MIPMAP_LINEAR
         }
     }
 

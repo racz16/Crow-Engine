@@ -84,6 +84,14 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.cubeMapTexture.isSRgb();
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
+    public getDataSize(): number {
+        return this.cubeMapTexture.getDataSize() / 6;
+    }
+
     public isUsable(): boolean {
         return Utility.isUsable(this.cubeMapTexture);
     }

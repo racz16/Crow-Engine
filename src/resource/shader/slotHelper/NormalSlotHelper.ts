@@ -11,20 +11,21 @@ export class NormalSlotHelper extends ShaderSlotHelper {
             this.loadNormalMap();
         } else {
             this.loadDefaultTexture2D();
-            this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
             this.shaderProgram.loadBoolean(this.getUseNormalMapName(), false);
         }
     }
 
     private loadNormalMap(): void {
         this.shaderProgram.loadBoolean(this.getUseNormalMapName(), true);
+        this.shaderProgram.loadFloat('material.normalScale', 1);
         this.loadTexture2D();
         this.loadPomParameters();
     }
 
     private loadPomParameters(): void {
+        this.loadFloatParameter('material.normalScale', MaterialSlot.NORMAL_SCALE, 1);
         this.loadBooleanParameter('material.isTherePOM', MaterialSlot.USE_POM, false);
-        if (this.slot && this.slot.isActive() && this.slot.getParameters().get(MaterialSlot.USE_POM) != null) {
+        if (this.isThereParameter(MaterialSlot.USE_POM)) {
             this.loadFloatParameter('material.POMScale', MaterialSlot.POM_SCALE, 0.15);
             this.loadFloatParameter('material.POMMinLayers', MaterialSlot.POM_MIN_LAYERS, 15);
             this.loadFloatParameter('material.POMMaxLayers', MaterialSlot.POM_MAX_LAYERS, 30);
@@ -57,6 +58,10 @@ export class NormalSlotHelper extends ShaderSlotHelper {
 
     protected getUseNormalMapName(): string {
         return 'useNormalMap';
+    }
+
+    protected getTextureCoordinateName(): string {
+        return 'material.normalMapTextureCoordinate';
     }
 
 }

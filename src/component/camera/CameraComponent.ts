@@ -8,24 +8,52 @@ import { LogLevel } from '../../utility/log/LogLevel';
 import { Engine } from '../../core/Engine';
 import { ICameraComponent } from './ICameraComponent';
 import { Component } from '../Component';
+import { CameraType } from './CameraType';
 
 export class CameraComponent extends Component implements ICameraComponent {
 
+    private type: CameraType;
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
     private frustum: Frustum;
-    private nearPlaneDistance: number;
-    private farPlaneDistance: number;
-    private fov: number;
-    private aspectRatio: number;
+    private nearPlaneDistance = 0.01;
+    private farPlaneDistance = 100;
+    private fov = 55;
+    private horizontalScale = 10;
+    private verticalScale = 10;
+    private aspectRatio = 1;
 
-    public constructor(fov = 55, aspectRatio = 1, nearPlane = 0.1, farPlane = 200) {
+    public constructor(type = CameraType.PERSPECTIVE) {
         super();
+        this.setType(type);
         this.setFrustum(new SimpleFrustum());
-        this.setFov(fov);
-        this.setAspectRatio(aspectRatio);
-        this.setNearPlaneDistance(nearPlane);
-        this.setFarPlaneDistance(farPlane);
+    }
+
+    public getType(): CameraType {
+        return this.type;
+    }
+
+    private setType(type: CameraType): void {
+        this.type = type;
+        this.invalidate();
+    }
+
+    public getHorizontalScale(): number {
+        return this.horizontalScale;
+    }
+
+    public setHorizontalScale(scale: number): void {
+        this.horizontalScale = scale;
+        this.invalidate();
+    }
+
+    public getVerticalalScale(): number {
+        return this.verticalScale;
+    }
+
+    public setVerticalScale(scale: number): void {
+        this.verticalScale = scale;
+        this.invalidate();
     }
 
     public getFov(): number {
@@ -80,6 +108,7 @@ export class CameraComponent extends Component implements ICameraComponent {
         if (!this.isValid()) {
             if (this.isTheMainCamera()) {
                 this.setAspectRatio(Utility.getCanvasAspectRatio());
+                this.setVerticalScale(this.horizontalScale / this.aspectRatio);
             }
             this.refreshProjectionMatrix();
             this.refreshViewMatrix();
@@ -88,7 +117,20 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     private refreshProjectionMatrix(): void {
-        this.projectionMatrix = Utility.computePerspectiveProjectionMatrix(this.fov, this.aspectRatio, this.nearPlaneDistance, this.farPlaneDistance);
+        if (this.type === CameraType.PERSPECTIVE) {
+            this.projectionMatrix = Utility.computePerspectiveProjectionMatrix(
+                this.fov, this.aspectRatio,
+                this.nearPlaneDistance,
+                this.farPlaneDistance);
+        } else {
+            this.projectionMatrix = Utility.computeOrthographicProjectionMatrix(
+                -this.horizontalScale,
+                this.horizontalScale,
+                -this.verticalScale,
+                this.verticalScale,
+                this.nearPlaneDistance,
+                this.farPlaneDistance);
+        }
     }
 
     private refreshViewMatrix(): void {

@@ -10,7 +10,6 @@ import { RenderingPipeline } from '../RenderingPipeline';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { ICameraComponent } from '../../component/camera/ICameraComponent';
-import { TextureFilter } from '../../webgl/enum/TextureFilter';
 import { Rbo } from '../../webgl/fbo/Rbo';
 import { VarianceShadowShader } from '../../resource/shader/VarianceShadowShader';
 import { GaussianBlurShader } from '../../resource/shader/GaussianBlurShader';
@@ -20,6 +19,9 @@ import { GlTexture2DArray } from '../../webgl/texture/GlTexture2DArray';
 import { TextureWrap } from '../../webgl/enum/TextureWrap';
 import { FrustumCornerPointResolver } from '../../component/camera/frustum/FrustumCornerPoint';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
+import { CameraType } from '../../component/camera/CameraType';
+import { MinificationFilter } from '../../webgl/enum/MinificationFilter';
+import { MagnificationFilter } from '../../webgl/enum/MagnificationFIlter';
 
 export class VarianceShadowRenderer extends Renderer {
 
@@ -48,7 +50,7 @@ export class VarianceShadowRenderer extends Renderer {
 
     private refreshDistances(): void {
         if (!this.initialized) {
-            const lambda = 0.5;
+            const lambda = 0.15;
             const n = this.camera.getNearPlaneDistance();
             const f = this.camera.getFarPlaneDistance();
 
@@ -67,8 +69,8 @@ export class VarianceShadowRenderer extends Renderer {
 
             const tex1 = new GlTexture2DArray();
             tex1.allocate(InternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
-            tex1.setMinificationFilter(TextureFilter.LINEAR);
-            tex1.setMagnificationFilter(TextureFilter.LINEAR);
+            tex1.setMinificationFilter(MinificationFilter.LINEAR);
+            tex1.setMagnificationFilter(MagnificationFilter.LINEAR);
             tex1.setWrapU(TextureWrap.REPEAT);
             tex1.setWrapV(TextureWrap.REPEAT);
             this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(tex1.getLayer(0));
@@ -77,8 +79,8 @@ export class VarianceShadowRenderer extends Renderer {
 
             const tex2 = new GlTexture2DArray();
             tex2.allocate(InternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
-            tex2.setMinificationFilter(TextureFilter.LINEAR);
-            tex2.setMagnificationFilter(TextureFilter.LINEAR);
+            tex2.setMinificationFilter(MinificationFilter.LINEAR);
+            tex2.setMagnificationFilter(MagnificationFilter.LINEAR);
             tex2.setWrapU(TextureWrap.REPEAT);
             tex2.setWrapV(TextureWrap.REPEAT);
             this.fboTextures.push(tex2);
@@ -99,7 +101,22 @@ export class VarianceShadowRenderer extends Renderer {
         const inverseRotation = quat.invert(quat.create(), light.getGameObject().getTransform().getAbsoluteRotation());
         const view = mat4.fromRotationTranslation(mat4.create(), inverseRotation, vec3.create());
         for (let i = 0; i < this.splitCount; i++) {
-            const P = Utility.computePerspectiveProjectionMatrix(this.camera.getFov(), this.camera.getAspectRatio(), this.wsSplitDistances[i], this.wsSplitDistances[i + 1] + 5);;
+            let P: mat4;
+            if (this.camera.getType() === CameraType.PERSPECTIVE) {
+                P = Utility.computePerspectiveProjectionMatrix(
+                    this.camera.getFov(),
+                    this.camera.getAspectRatio(),
+                    this.wsSplitDistances[i],
+                    this.wsSplitDistances[i + 1]);
+            } else {
+                P = Utility.computeOrthographicProjectionMatrix(
+                    -this.camera.getHorizontalScale(),
+                    this.camera.getHorizontalScale(),
+                    -this.camera.getVerticalalScale(),
+                    this.camera.getVerticalalScale(),
+                    this.wsSplitDistances[i],
+                    this.wsSplitDistances[i + 1])
+            }
             const IP = mat4.invert(mat4.create(), P);
             const cornerPoints = new Array<vec4>();
             for (let i = 0; i < 8; i++) {
@@ -217,11 +234,11 @@ export class VarianceShadowRenderer extends Renderer {
             //const blurOffset = (this.blur * 25) / ((this.wsSplitDistances[i + 1] - this.wsSplitDistances[i]) * this.resolution);
             const blurOffset = this.blur / this.resolution;
             this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[1].getLayer(i));
-            this.fboTextures[0].getNativeTexture().bindToTextureUnit(0);
+            this.fboTextures[0].bindToTextureUnit(0);
             this.renderGaussianPass(true, i, blurOffset);
 
             this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
-            this.fboTextures[1].getNativeTexture().bindToTextureUnit(0);
+            this.fboTextures[1].bindToTextureUnit(0);
             this.renderGaussianPass(false, i, blurOffset);
         }
 

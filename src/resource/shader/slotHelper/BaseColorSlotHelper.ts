@@ -29,4 +29,8 @@ export class BaseColorSlotHelper extends ShaderSlotHelper {
         return 'material.baseColor';
     }
 
+    protected getTextureCoordinateName(): string {
+        return 'material.baseColorTextureCoordinate';
+    }
+
 }

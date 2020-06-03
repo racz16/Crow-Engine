@@ -168,14 +168,27 @@ export class Fbo extends GlObject {
         Gl.gl.bindFramebuffer(this.getDrawTarget(), this.getId());
     }
 
-    //blit--------------------------------------------------------------------------------------------------------------
+    //blit
     public blitTo(destination: Fbo, fromOffset: vec2, fromSize: vec2, toOffset: vec2, toSize: vec2, slots: FboAttachmentSlot): void {
         this.bindToRead();
         destination.bindToDraw();
         Gl.gl.blitFramebuffer(fromOffset[0], fromOffset[1], fromSize[0], fromSize[1], toOffset[0], toOffset[1], toSize[0], toSize[1], AttachmentSlotResolver.enumFlagToGl(slots), Gl.gl.NEAREST);
     }
 
-    //misc--------------------------------------------------------------------------------------------------------------
+    //
+    //misc
+    //
+    public getAllDataSize(): number {
+        let size = 0;
+        size += this.depth.getAttachment()?.getDataSize();
+        size += this.stencil.getAttachment()?.getDataSize();
+        size += this.depthStencil.getAttachment()?.getDataSize();
+        for (const fac of this.color) {
+            size += fac.getAttachment()?.getDataSize() ?? 0;
+        }
+        return size;
+    }
+
     public readRgbaPixels(offset: vec2, size: vec2): Uint8Array {
         return this.readPixelsUnsafe(offset, size, 4);
     }

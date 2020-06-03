@@ -6,7 +6,7 @@ import { ITexture2D } from '../resource/texture/ITexture2D';
 import { GlTexture2D } from '../webgl/texture/GlTexture2D';
 import { Fbo } from '../webgl/fbo/Fbo';
 import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
-import { vec2, mat4, } from 'gl-matrix';
+import { vec2, mat4, quat, vec3, } from 'gl-matrix';
 import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
 import { ScreenRenderer } from './renderer/ScreenRenderer';
@@ -17,7 +17,6 @@ import { Engine } from '../core/Engine';
 import { Utility } from '../utility/Utility';
 import { InternalFormat } from '../webgl/enum/InternalFormat';
 import { Rbo } from '../webgl/fbo/Rbo';
-import { TextureFilter } from '../webgl/enum/TextureFilter';
 import { RendererContainer } from './RendererContainer';
 import { GeometryRenderer } from './GeometryRenderer';
 import { PostProcessRenderer } from './PostProcessRenderer';
@@ -32,6 +31,8 @@ import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
 import { DebugRenderer } from './renderer/DebugRenderer';
 import { IRenderingPipeline } from './IRenderingPipeline';
 import { IRenderableContainer } from '../core/IRenderableContainer';
+import { MinificationFilter } from '../webgl/enum/MinificationFilter';
+import { MagnificationFilter } from '../webgl/enum/MagnificationFIlter';
 
 export class RenderingPipeline implements IRenderingPipeline {
 
@@ -154,8 +155,8 @@ export class RenderingPipeline implements IRenderingPipeline {
     private createFboTexture(): GlTexture2D {
         const colorTexture = new GlTexture2D();
         colorTexture.allocate(InternalFormat.RGBA16F, this.getRenderingSize(), false);
-        colorTexture.setMinificationFilter(TextureFilter.LINEAR);
-        colorTexture.setMagnificationFilter(TextureFilter.LINEAR);
+        colorTexture.setMinificationFilter(MinificationFilter.LINEAR);
+        colorTexture.setMagnificationFilter(MagnificationFilter.LINEAR);
         colorTexture.setWrapU(TextureWrap.CLAMP_TO_EDGE);
         colorTexture.setWrapV(TextureWrap.CLAMP_TO_EDGE);
         return colorTexture;
@@ -186,7 +187,6 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.renderToScreen();
         this.afterPipeline();
         Log.endGroup();
-        //
     }
 
     protected beforePipeline(): void {
@@ -220,15 +220,15 @@ export class RenderingPipeline implements IRenderingPipeline {
 
         /*this.getParameters().set(RenderingPipeline.DEBUG, this.getParameters().get(RenderingPipeline.SHADOWMAP));
         const ar = 1 / (this.getRenderingSize()[0] / this.getRenderingSize()[1]);
-        let trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(-0.5 + ar * 0.5, -0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
+        let trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(ar * 0 + 0.25 + ar * 0.5, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
         this.debugRenderer.setData(trans, 0);
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);
 
-        trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(ar * 0.5, -0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
+        trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(ar * -0.5 + ar * 0.5, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
         this.debugRenderer.setData(trans, 1);
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);
 
-        trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(0.5 + ar * 0.5, -0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
+        trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(ar * -1 - 0.25 + ar * 0.5, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
         this.debugRenderer.setData(trans, 2);
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);*/
     }
@@ -290,9 +290,7 @@ export class RenderingPipeline implements IRenderingPipeline {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
             const camera = Engine.getMainCamera();
-            if (camera) {
-                camera.invalidate();
-            }
+            camera?.invalidate();
         }
     }
 

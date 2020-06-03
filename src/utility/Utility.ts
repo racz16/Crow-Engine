@@ -68,6 +68,13 @@ export class Utility {
         return mat4.perspective(mat4.create(), this.toRadians(fov), aspectRatio, nearPlane, farPlane);
     }
 
+    public static computeOrthographicProjectionMatrix(left: number, right: number, bottom: number, top: number, nearPlane: number, farPlane: number): mat4 {
+        if (nearPlane <= 0 || farPlane <= nearPlane) {
+            throw new Error();
+        }
+        return mat4.ortho(mat4.create(), left, right, bottom, top, nearPlane, farPlane);
+    }
+
     public static getCanvasAspectRatio(): number {
         return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;
     }

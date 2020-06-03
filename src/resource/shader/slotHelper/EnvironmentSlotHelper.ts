@@ -34,4 +34,8 @@ export class EnvironmentSlotHelper extends ShaderSlotHelper {
         return 'material.environmentIntensityColor';
     }
 
+    protected getTextureCoordinateName(): string {
+        return null;
+    }
+
 }

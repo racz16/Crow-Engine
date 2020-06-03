@@ -34,4 +34,8 @@ export class EmissiveSlotHelper extends ShaderSlotHelper {
         return 'material.emissiveColor';
     }
 
+    protected getTextureCoordinateName(): string {
+        return 'material.emissiveTextureCoordinate';
+    }
+
 }

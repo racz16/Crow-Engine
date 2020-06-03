@@ -8,9 +8,12 @@ import { GlTexture2D } from './texture/GlTexture2D';
 import { InternalFormat } from './enum/InternalFormat';
 import { Engine } from '../core/Engine';
 import { GlCubeMapTexture } from './texture/GlCubeMapTexture';
-import { TextureFilter } from './enum/TextureFilter';
 import { GlTexture2DArray } from './texture/GlTexture2DArray';
 import { Performance, PerformanceResolver } from './enum/Performance';
+import { MinificationFilter } from './enum/MinificationFilter';
+import { MagnificationFilter } from './enum/MagnificationFIlter';
+import { Format } from './enum/Format';
+import { TextureDataType } from './enum/TextureDataType';
 
 export class Gl {
 
@@ -35,12 +38,14 @@ export class Gl {
             throw new Error();
         }
         this.setGlDefaultStates();
-        this.createDefaultTexture2D();
+        this.createBlackTexture2D();
+        this.createWhiteTexture2D();
         this.createDefaultTexture2DArray();
         this.createDefaultCubeMapTexture();
     }
 
     private static setGlDefaultStates(): void {
+        Gl.gl.pixelStorei(Gl.gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, Gl.gl.NONE);
         Gl.setEnableCullFace(true);
         Gl.setCullFace(CullFace.BACK);
         Gl.setEnableBlend(true);
@@ -48,27 +53,36 @@ export class Gl {
         Gl.setEnableDepthTest(true);
     }
 
-    private static createDefaultTexture2D(): void {
+    private static createBlackTexture2D(): void {
         const texture = new GlTexture2D();
         texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
-        texture.setMinificationFilter(TextureFilter.NEAREST);
-        texture.setMagnificationFilter(TextureFilter.NEAREST);
-        Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D, texture);
+        texture.setMinificationFilter(MinificationFilter.NEAREST);
+        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
+        Engine.getParameters().set(Engine.BLACK_TEXTURE_2D, texture);
+    }
+
+    private static createWhiteTexture2D(): void {
+        const texture = new GlTexture2D();
+        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.storeFromBinary(new Uint8Array([255, 255, 255, 255]), vec2.fromValues(1, 1), Format.RGBA, TextureDataType.UNSIGNED_BYTE)
+        texture.setMinificationFilter(MinificationFilter.NEAREST);
+        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
+        Engine.getParameters().set(Engine.WHITE_TEXTURE_2D, texture);
     }
 
     private static createDefaultTexture2DArray(): void {
         const texture = new GlTexture2DArray();
         texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), 1, false);
-        texture.setMinificationFilter(TextureFilter.NEAREST);
-        texture.setMagnificationFilter(TextureFilter.NEAREST);
+        texture.setMinificationFilter(MinificationFilter.NEAREST);
+        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
         Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D_ARRAY, texture);
     }
 
     private static createDefaultCubeMapTexture(): void {
         const texture = new GlCubeMapTexture();
         texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
-        texture.setMinificationFilter(TextureFilter.NEAREST);
-        texture.setMagnificationFilter(TextureFilter.NEAREST);
+        texture.setMinificationFilter(MinificationFilter.NEAREST);
+        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
         Engine.getParameters().set(Engine.DEFAULT_CUBE_MAP_TEXTURE, texture);
     }
 

@@ -11,27 +11,30 @@ export abstract class ShaderSlotHelper {
     protected slot: MaterialSlot;
     protected shaderProgram: GlShaderProgram;
     protected textureUnit: number;
+    protected multipleTextureCoordinates: boolean;
 
-    public constructor(sp: GlShaderProgram, textureUnit: number) {
-        this.setValues(sp, textureUnit);
+    public constructor(sp: GlShaderProgram, textureUnit: number, multipleTextureCoordinates: boolean) {
+        this.shaderProgram = sp;
+        this.textureUnit = textureUnit;
+        this.multipleTextureCoordinates = multipleTextureCoordinates;
     }
 
     public loadSlot(material: Material<any>): void {
         this.setSlot(material.getSlot(this.getMaterialSlotKey()));
+        //texture
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();
-        } else if (this.isColorUsable()) {
-            this.loadDefaultTexture2D();
-            this.loadColor3();
         } else {
             this.loadDefaultTexture2D();
+        }
+        //color
+        if (this.isColorUsable()) {
+            this.loadColor3();
+        } else if (this.isTexture2DUsable()) {
+            this.loadDefaultColor3(vec3.fromValues(1, 1, 1));
+        } else {
             this.loadDefaultColor3(this.getDefaultColor());
         }
-    }
-
-    protected setValues(shaderProgram: GlShaderProgram, textureUnit: number): void {
-        this.shaderProgram = shaderProgram;
-        this.textureUnit = textureUnit;
     }
 
     protected setSlot(slot: MaterialSlot): void {
@@ -53,52 +56,55 @@ export abstract class ShaderSlotHelper {
     protected loadTexture2D(): void {
         const texture = this.slot.getTexture2D();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
         this.shaderProgram.loadVector2(this.getTileName(), this.slot.getTextureTile());
         this.shaderProgram.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
+        if (this.multipleTextureCoordinates) {
+            this.shaderProgram.loadInt(this.getTextureCoordinateName(), this.slot.getTextureCoordinate());
+        }
     }
 
     protected loadCubeMapTexture(): void {
         const texture = this.slot.getCubeMapTexture();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
     }
 
     protected loadColor3(): void {
         const color = this.slot.getColor();
         this.shaderProgram.loadVector3(this.getColorName(), vec3.fromValues(color[0], color[1], color[2]));
-        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected loadColor4(): void {
         const color = this.slot.getColor();
         this.shaderProgram.loadVector4(this.getColorName(), color);
-        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected loadDefaultTexture2D(): void {
-        const texture = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D);
+        const texture = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
+        if (this.multipleTextureCoordinates) {
+            this.shaderProgram.loadInt(this.getTextureCoordinateName(), 0);
+        }
     }
 
     protected loadDefaultCubeMapTexture(): void {
         const texture = Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        texture.bindToTextureUnit(this.getTextureUnit());
+        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected loadDefaultColor3(defaultColor: vec3): void {
         this.shaderProgram.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
-        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
-
     }
 
     protected loadDefaultColor4(defaultColor: vec4): void {
         this.shaderProgram.loadVector4(this.getColorName(), defaultColor);
-        this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
     protected getDefaultColor(): vec3 {
@@ -140,5 +146,7 @@ export abstract class ShaderSlotHelper {
     protected abstract getOffsetName(): string;
 
     protected abstract getColorName(): string;
+
+    protected abstract getTextureCoordinateName(): string;
 
 }

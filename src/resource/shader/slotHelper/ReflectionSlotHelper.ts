@@ -12,7 +12,6 @@ export class ReflectionSlotHelper extends ShaderSlotHelper {
             this.loadParallaxCorrectionData();
         } else {
             this.loadDefaultCubeMapTexture();
-            this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
             this.shaderProgram.loadBoolean(this.getIsThereParallaxCorrectionName(), false);
         }
     }
@@ -63,6 +62,10 @@ export class ReflectionSlotHelper extends ShaderSlotHelper {
 
     protected getEnvironmentProbePositionName(): string {
         return 'material.environmentProbePosition';
+    }
+
+    protected getTextureCoordinateName(): string {
+        return null;
     }
 
 }

@@ -43,7 +43,7 @@ export class ScreenRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.getNativeTexture().bindToTextureUnit(10);
+        image.bindToTextureUnit(10);
     }
 
     protected draw(): void {

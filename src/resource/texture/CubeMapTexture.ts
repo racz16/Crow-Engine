@@ -8,40 +8,43 @@ import { Utility } from '../../utility/Utility';
 import { TextureType } from './enum/TextureType';
 import { Format } from '../../webgl/enum/Format';
 import { HdrImageResult } from 'parse-hdr';
+import { GlSampler } from '../../webgl/GlSampler';
 
 export class CubeMapTexture implements ICubeMapTexture {
 
     private texture: GlCubeMapTexture;
+    private sampler: GlSampler;
+    private textureFiltering: TextureFiltering
     private loaded = false;
 
     public constructor(paths: Array<string>, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
+        this.sampler = new GlSampler();
+        this.setTextureFiltering(textureFiltering);
         this.texture = new GlCubeMapTexture();
         const isHdr = paths[0].toLowerCase().endsWith('.hdr');
         if (isHdr) {
-            this.createHdrTexture(paths, hasAlphaChannel, textureFiltering);
+            this.createHdrTexture(paths, hasAlphaChannel);
         } else {
-            this.createTexture(paths, hasAlphaChannel, type, textureFiltering);
+            this.createTexture(paths, hasAlphaChannel, type);
         }
     }
 
-    private async createTexture(paths: Array<string>, hasAlphaChannel: boolean, type: TextureType, textureFiltering: TextureFiltering): Promise<void> {
+    private async createTexture(paths: Array<string>, hasAlphaChannel: boolean, type: TextureType): Promise<void> {
         const images = await this.loadImages(paths);
         const internalFormat = this.computeInternalFormat(hasAlphaChannel, type);
         const format = internalFormat === InternalFormat.RGB8 ? Format.RGB : Format.RGBA;
         this.texture.allocate(internalFormat, vec2.fromValues(images[0].width, images[0].height), true);
         this.addTextureSides(images, format);
-        this.setTextureFiltering(textureFiltering);
         this.generateMipmapsIfNeeded(images.length);
         this.loaded = true;
     }
 
-    private async createHdrTexture(paths: Array<string>, hasAlphaChannel: boolean, textureFiltering: TextureFiltering): Promise<void> {
+    private async createHdrTexture(paths: Array<string>, hasAlphaChannel: boolean): Promise<void> {
         const images = await this.loadHdrImages(paths);
         const internalFormat = hasAlphaChannel ? InternalFormat.RGBA32F : InternalFormat.RGB32F;
         const format = internalFormat === InternalFormat.RGB32F ? Format.RGB : Format.RGBA;
         this.texture.allocate(internalFormat, vec2.fromValues(images[0].shape[0], images[0].shape[1]), true);
         this.addHdrTextureSides(images, format);
-        this.setTextureFiltering(textureFiltering);
         this.generateMipmapsIfNeeded(images.length);
         this.loaded = true;
     }
@@ -102,10 +105,19 @@ export class CubeMapTexture implements ICubeMapTexture {
         }
     }
 
+    public bindToTextureUnit(textureUnit: number): void {
+        this.texture.bindToTextureUnitWithSampler(textureUnit, this.sampler);
+    }
+
+    public getTextureFiltering(): TextureFiltering {
+        return this.textureFiltering;
+    }
+
     public setTextureFiltering(textureFiltering: TextureFiltering): void {
-        this.texture.setMinificationFilter(TextureFilteringResolver.enumToGlMinification(textureFiltering));
-        this.texture.setMagnificationFilter(TextureFilteringResolver.enumToGlMagnification(textureFiltering));
-        this.texture.setAnisotropicLevel(TextureFilteringResolver.enumToGlAnisotropicValue(textureFiltering));
+        this.textureFiltering = textureFiltering;
+        this.sampler.setMinificationFilter(TextureFilteringResolver.enumToGlMinification(textureFiltering));
+        this.sampler.setMagnificationFilter(TextureFilteringResolver.enumToGlMagnification(textureFiltering));
+        this.sampler.setAnisotropicLevel(TextureFilteringResolver.enumToGlAnisotropicValue(textureFiltering));
     }
 
     public getNativeTexture(): GlCubeMapTexture {
@@ -120,15 +132,21 @@ export class CubeMapTexture implements ICubeMapTexture {
         return this.texture.getDataSize();
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
     public release(): void {
         if (this.isUsable()) {
             this.texture.release();
             this.texture = null;
+            this.sampler.release();
+            this.sampler = null;
         }
     }
 
     public isUsable(): boolean {
-        return Utility.isUsable(this.texture) && this.loaded;
+        return Utility.isUsable(this.sampler) && Utility.isUsable(this.texture) && this.loaded;
     }
 
 }

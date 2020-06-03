@@ -21,8 +21,6 @@ export interface IRenderableComponent<T extends IRenderable> extends IComponent 
 
     isReceiveShadows(): boolean;
 
-    isTwoSided(): boolean;
-
     isMaterialActive(): boolean;
 
     getVisibilityInterval(): vec2;

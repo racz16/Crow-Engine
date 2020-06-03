@@ -12,7 +12,6 @@ export class RefractionSlotHelper extends ShaderSlotHelper {
             this.loadFloatParameter('material.refractionIndex', MaterialSlot.REFRACTION_INDEX, 1 / 1.33);
         } else {
             this.loadDefaultCubeMapTexture();
-            this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
         }
     }
 
@@ -37,6 +36,10 @@ export class RefractionSlotHelper extends ShaderSlotHelper {
     }
 
     protected getColorName(): string {
+        return null;
+    }
+
+    protected getTextureCoordinateName(): string {
         return null;
     }
 

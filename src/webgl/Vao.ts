@@ -26,11 +26,23 @@ export class Vao extends GlObject {
         Gl.gl.bindVertexArray(this.getId());
     }
 
+    public getAllDataSize(): number {
+        let size = this.ebo?.getDataSize() ?? 0;
+        for (const vaa of this.vertexAttribArrays) {
+            size += vaa.getVbo()?.getDataSize() ?? 0;
+        }
+        return size;
+    }
+
     //
     //VAA-----------------------------------------------------------------------
     //
     public getVertexAttribArray(index: number): VertexAttribArray {
         return this.vertexAttribArrays[index];
+    }
+
+    public getVertexAttribArraysIterator(): IterableIterator<VertexAttribArray> {
+        return this.vertexAttribArrays.values();
     }
 
     public static getMaxVertexAttribs(): number {
@@ -60,6 +72,16 @@ export class Vao extends GlObject {
     public release(): void {
         Gl.gl.deleteVertexArray(this.getId());
         this.setId(GlObject.INVALID_ID);
+    }
+
+    public releaseAll(): void {
+        this.ebo.release();
+        this.ebo = null;
+        for (const vaa of this.vertexAttribArrays) {
+            vaa.getVbo().release();
+        }
+        this.vertexAttribArrays = null;
+        this.release();
     }
 
 }

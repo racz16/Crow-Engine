@@ -285,9 +285,13 @@ export class Spline implements ISpline {
         return Utility.isUsable(this.vao) ? this.vao.getDataSize() : 0;
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
     public release(): void {
         if (Utility.isUsable(this.vao)) {
-            this.vao.release();
+            this.vao.releaseAll();
             this.vao = null;
             this.valid = false;
             this.lengthValid = false;
@@ -309,6 +313,10 @@ export class Spline implements ISpline {
     }
 
     public hasTangents(): boolean {
+        return false;
+    }
+
+    public hasVertexColors(): boolean {
         return false;
     }
 

@@ -103,9 +103,13 @@ export class CubeMesh implements IMesh {
         return this.isUsable() ? this.positions.length * 4 : 0;
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
     public release(): void {
         if (this.isUsable()) {
-            this.vao.release();
+            this.vao.releaseAll();
             this.vao = null;
         }
     }
@@ -125,6 +129,10 @@ export class CubeMesh implements IMesh {
     }
 
     public hasTangents(): boolean {
+        return false;
+    }
+
+    public hasVertexColors(): boolean {
         return false;
     }
 

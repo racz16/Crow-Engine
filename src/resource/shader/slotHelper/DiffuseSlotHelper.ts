@@ -29,4 +29,8 @@ export class DiffuseSlotHelper extends ShaderSlotHelper {
         return 'material.diffuseColor';
     }
 
+    protected getTextureCoordinateName(): string {
+        return null;
+    }
+
 }

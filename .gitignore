@@ -1,2 +1,6 @@
 node_modules/
 out/
+res/meshes/gltf-samples
+res/meshes/sketchfab
+bs-config.json
+*.glb

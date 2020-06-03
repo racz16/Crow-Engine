@@ -5,6 +5,11 @@ import { Conventions } from '../../resource/Conventions';
 import { Engine } from '../../core/Engine';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { mat4 } from 'gl-matrix';
+import { AlphaMode } from '../../material/AlphaMode';
+import { Gl } from '../../webgl/Gl';
+import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
+import { IRenderable } from '../../resource/IRenderable';
+import { Material } from '../../material/Material';
 
 export class PbrRenderer extends GeometryRenderer {
 
@@ -34,6 +39,15 @@ export class PbrRenderer extends GeometryRenderer {
         }
         for (let i = 0; i < splits.length; i++) {
             this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);
+        }
+    }
+
+    protected setAlphaMode(renderableComponent: IRenderableComponent<IRenderable>, alphaMode: AlphaMode): void {
+        this.getShader().getNativeShaderProgram().loadInt('alphaMode', alphaMode);
+        Gl.setEnableBlend(alphaMode === AlphaMode.BLEND);
+        if (alphaMode === AlphaMode.MASK) {
+            const alphaCutoff = renderableComponent.getMaterial().getParameters().get(Material.ALPHA_CUTOFF) ?? 0.5;
+            this.getShader().getNativeShaderProgram().loadFloat('alphaCutoff', alphaCutoff);
         }
     }
 

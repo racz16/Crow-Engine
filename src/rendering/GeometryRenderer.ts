@@ -7,6 +7,8 @@ import { ICameraComponent } from '../component/camera/ICameraComponent';
 import { Engine } from '../core/Engine';
 import { Conventions } from '../resource/Conventions';
 import { Utility } from '../utility/Utility';
+import { Material } from '../material/Material';
+import { AlphaMode } from '../material/AlphaMode';
 
 export abstract class GeometryRenderer extends Renderer {
 
@@ -46,10 +48,20 @@ export abstract class GeometryRenderer extends Renderer {
     protected afterDrawRenderables(renderable: IRenderable, renderableComponents: IterableIterator<IRenderableComponent<IRenderable>>): void { }
 
     protected beforeDraw(renderableComponent: IRenderableComponent<IRenderable>): void {
-        Gl.setEnableCullFace(!renderableComponent.isTwoSided());
+        Gl.setEnableCullFace(!renderableComponent.getMaterial().getParameters().get(Material.DOUBLE_SIDED));
+        const alphaMode = renderableComponent.getMaterial().getParameters().get(Material.ALPHA_MODE);
+        this.setAlphaMode(renderableComponent, alphaMode);
         this.incrementRenderedElementCountBy(1);
         this.incrementRenderedFaceCountBy(renderableComponent.getFaceCount());
         this.getShader().setUniforms(renderableComponent);
+    }
+
+    protected setAlphaMode(renderableComponent: IRenderableComponent<IRenderable>, alphaMode: AlphaMode): void {
+        if (alphaMode == null || alphaMode === AlphaMode.OPAQUE) {
+            Gl.setEnableBlend(false);
+        } else {
+            Gl.setEnableBlend(true);
+        }
     }
 
     protected afterDraw(renderableComponent: IRenderableComponent<IRenderable>): void { }

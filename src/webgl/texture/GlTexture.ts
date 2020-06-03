@@ -1,11 +1,13 @@
 import { GlObject } from '../GlObject';
 import { vec2 } from 'gl-matrix';
 import { InternalFormat, InternalFormatResolver } from '../enum/InternalFormat';
-import { TextureFilter, TextureFilterResolver } from '../enum/TextureFilter';
 import { TextureWrap, TextureWrapResolver } from '../enum/TextureWrap';
 import { GlConstants } from '../GlConstants';
 import { Gl } from '../Gl';
 import { IResource } from '../../resource/IResource';
+import { GlSampler } from '../GlSampler';
+import { MagnificationFilter, MagnificationFilterResolver } from '../enum/MagnificationFIlter';
+import { MinificationFilter, MinificationFilterResolver } from '../enum/MinificationFilter';
 
 export abstract class GlTexture extends GlObject implements IResource {
 
@@ -15,8 +17,8 @@ export abstract class GlTexture extends GlObject implements IResource {
     private internalFormat: InternalFormat;
     private mipmapLevelCount = 1;
     private anisotropicLevel = 1;
-    private magnificationFilter = TextureFilter.NEAREST;
-    private minificationFilter = TextureFilter.NEAREST_MIPMAP_NEAREST;
+    private magnificationFilter = MagnificationFilter.NEAREST;
+    private minificationFilter = MinificationFilter.NEAREST_MIPMAP_NEAREST;
     private wrapU = TextureWrap.REPEAT;
     private wrapV = TextureWrap.REPEAT;
 
@@ -115,24 +117,24 @@ export abstract class GlTexture extends GlObject implements IResource {
     //
     //filter------------------------------------------------------------------------------------------------------------
     //
-    public getMagnificationFilter(): TextureFilter {
+    public getMagnificationFilter(): MagnificationFilter {
         return this.magnificationFilter;
     }
 
-    public setMagnificationFilter(filter: TextureFilter): void {
+    public setMagnificationFilter(filter: MagnificationFilter): void {
         this.magnificationFilter = filter;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MAG_FILTER, TextureFilterResolver.enumToGl(filter));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MAG_FILTER, MagnificationFilterResolver.enumToGl(filter));
     }
 
-    public getMinificationFilter(): TextureFilter {
+    public getMinificationFilter(): MinificationFilter {
         return this.minificationFilter;
     }
 
-    public setMinificationFilter(filter: TextureFilter): void {
+    public setMinificationFilter(filter: MinificationFilter): void {
         this.minificationFilter = filter;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MIN_FILTER, TextureFilterResolver.enumToGl(filter));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MIN_FILTER, MinificationFilterResolver.enumToGl(filter));
     }
 
     //
@@ -196,6 +198,13 @@ export abstract class GlTexture extends GlObject implements IResource {
 
     public bindToTextureUnit(textureUnit: number): void {
         Gl.gl.activeTexture(Gl.gl.TEXTURE0 + textureUnit);
+        Gl.gl.bindSampler(textureUnit, null);
+        this.bind();
+    }
+
+    public bindToTextureUnitWithSampler(textureUnit: number, sampler: GlSampler): void {
+        Gl.gl.activeTexture(Gl.gl.TEXTURE0 + textureUnit);
+        sampler.bindToTextureUnit(textureUnit);
         this.bind();
     }
 

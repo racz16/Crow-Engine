@@ -47,7 +47,7 @@ export class QuadMesh implements IMesh {
             this.addEbo();
             this.addVbo(this.positions, Conventions.POSITIONS_VBO_INDEX, 3);
             this.addVbo(this.normals, Conventions.NORMALS_VBO_INDEX, 3);
-            this.addVbo(this.uv, Conventions.TEXTURE_COORDINATES_VBO_INDEX, 2);
+            this.addVbo(this.uv, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, 2);
         }
     }
 
@@ -93,9 +93,13 @@ export class QuadMesh implements IMesh {
         return this.isUsable() ? (this.positions.length + this.normals.length + this.uv.length + this.indices.length) * 4 : 0;
     }
 
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
+
     public release(): void {
         if (this.isUsable()) {
-            this.vao.release();
+            this.vao.releaseAll();
             this.vao = null;
         }
     }
@@ -115,6 +119,10 @@ export class QuadMesh implements IMesh {
     }
 
     public hasTangents(): boolean {
+        return false;
+    }
+
+    public hasVertexColors(): boolean {
         return false;
     }
 

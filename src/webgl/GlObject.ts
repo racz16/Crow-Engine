@@ -19,6 +19,10 @@ export abstract class GlObject implements IResource {
         this.id = id;
     }
 
+    public getAllDataSize(): number {
+        return this.dataSize;
+    }
+
     public getDataSize(): number {
         return this.dataSize;
     }

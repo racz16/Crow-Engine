@@ -15,4 +15,8 @@ export interface IFboAttachment {
 
     isUsable(): boolean;
 
+    getDataSize(): number;
+
+    getAllDataSize(): number;
+
 }

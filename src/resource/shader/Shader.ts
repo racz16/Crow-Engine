@@ -3,8 +3,9 @@ import { GlShader } from '../../webgl/shader/GlShader';
 import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
+import { IResource } from '../IResource';
 
-export abstract class Shader {
+export abstract class Shader implements IResource {
 
     private shaderProgram: GlShaderProgram;
     private loaded = false;
@@ -80,6 +81,14 @@ export abstract class Shader {
     protected connectTextureUnits(): void { }
 
     public setUniforms(data?: any): void { }
+
+    public getDataSize(): number {
+        return 0;
+    }
+
+    public getAllDataSize(): number {
+        return this.getDataSize();
+    }
 
     public isUsable(): boolean {
         return Utility.isUsable(this.shaderProgram) && this.loaded;

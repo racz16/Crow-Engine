@@ -4,6 +4,8 @@ import { vec2 } from 'gl-matrix';
 
 export interface ITexture2D extends IResource {
 
+    bindToTextureUnit(textureUnit: number): void;
+
     getNativeTexture(): GlTexture2D;
 
     getSize(): vec2;

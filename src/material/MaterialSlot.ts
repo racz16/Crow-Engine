@@ -8,6 +8,7 @@ import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
 export class MaterialSlot {
 
     public static readonly USE_GLOSSINESS = new ParameterKey<boolean>('PARAM_USE_GLOSSINESS');
+    public static readonly NORMAL_SCALE = new ParameterKey<number>('PARAM_NORMAL_SCALE');
     public static readonly USE_POM = new ParameterKey<boolean>('PARAM_USE_POM');
     public static readonly POM_SCALE = new ParameterKey<number>('PARAM_POM_SCALE');
     public static readonly POM_MIN_LAYERS = new ParameterKey<number>('PARAM_POM_MIN_LAYERS');
@@ -19,13 +20,14 @@ export class MaterialSlot {
 
     private readonly textureTile = vec2.fromValues(1, 1);
     private readonly textureOffset = vec2.create();
+    private textureCoordinate = 0;
     private textureLayer = 0;
-    private readonly parameters = new ParameterContainer();
     private active = true;
     private color: vec4;
     private texture2D: ITexture2D;
     private texture2DArray: ITexture2DArray;
     private cubeMapTexture: ICubeMapTexture;
+    private readonly parameters = new ParameterContainer();
 
     public isActive(): boolean {
         return this.active;
@@ -93,6 +95,17 @@ export class MaterialSlot {
 
     public getParameters(): ParameterContainer {
         return this.parameters;
+    }
+
+    public getTextureCoordinate(): number {
+        return this.textureCoordinate;
+    }
+
+    public setTextureCoordinate(textureCoordinate): void {
+        if (textureCoordinate < 0) {
+            throw new Error();
+        }
+        this.textureCoordinate = textureCoordinate;
     }
 
 }

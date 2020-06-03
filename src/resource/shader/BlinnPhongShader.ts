@@ -17,7 +17,7 @@ import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPh
 
 export class BlinnPhongShader extends Shader {
 
-    private readonly SHADOW_TEXTURE_UNIT = 8;
+    private readonly SHADOW_TEXTURE_UNIT = 9;
     private readonly DIFFUSE_TEXTURE_UNIT = 1;
     private readonly SPECULAR_TEXTURE_UNIT = 2;
     private readonly NORMAL_POM_TEXTURE_UNIT = 3;
@@ -31,13 +31,13 @@ export class BlinnPhongShader extends Shader {
     public constructor() {
         super();
         this.slotHelpers = [
-            new DiffuseSlotHelper(this.getShaderProgram(), this.DIFFUSE_TEXTURE_UNIT),
-            new SpecularSlotHelper(this.getShaderProgram(), this.SPECULAR_TEXTURE_UNIT),
-            new NormalSlotHelper(this.getShaderProgram(), this.NORMAL_POM_TEXTURE_UNIT),
-            new ReflectionSlotHelper(this.getShaderProgram(), this.REFLECTION_TEXTURE_UNIT),
-            new RefractionSlotHelper(this.getShaderProgram(), this.REFRACTION_TEXTURE_UNIT),
-            new EnvironmentSlotHelper(this.getShaderProgram(), this.ENVIRONMENT_INTENSITY_TEXTURE_UNIT),
-            new EmissiveSlotHelper(this.getShaderProgram(), this.EMISSIVE_TEXTURE_UNIT)
+            new DiffuseSlotHelper(this.getShaderProgram(), this.DIFFUSE_TEXTURE_UNIT, false),
+            new SpecularSlotHelper(this.getShaderProgram(), this.SPECULAR_TEXTURE_UNIT, false),
+            new NormalSlotHelper(this.getShaderProgram(), this.NORMAL_POM_TEXTURE_UNIT, false),
+            new ReflectionSlotHelper(this.getShaderProgram(), this.REFLECTION_TEXTURE_UNIT, false),
+            new RefractionSlotHelper(this.getShaderProgram(), this.REFRACTION_TEXTURE_UNIT, false),
+            new EnvironmentSlotHelper(this.getShaderProgram(), this.ENVIRONMENT_INTENSITY_TEXTURE_UNIT, false),
+            new EmissiveSlotHelper(this.getShaderProgram(), this.EMISSIVE_TEXTURE_UNIT, false)
         ];
     }
 
@@ -64,7 +64,7 @@ export class BlinnPhongShader extends Shader {
         if (!isThereShadowMap) {
             shadowMap = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D_ARRAY);
         }
-        shadowMap.getNativeTexture().bindToTextureUnit(this.SHADOW_TEXTURE_UNIT);
+        shadowMap.bindToTextureUnit(this.SHADOW_TEXTURE_UNIT);
         this.getShaderProgram().connectTextureUnit('shadowMap', this.SHADOW_TEXTURE_UNIT);
     }
 

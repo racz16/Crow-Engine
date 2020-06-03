@@ -10,25 +10,20 @@ export class SpecularSlotHelper extends ShaderSlotHelper {
 
     public loadSlot(material: Material<any>): void {
         this.setSlot(material.getSlot(this.getMaterialSlotKey()));
+        //texture
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();
-            this.loadGlossiness();
-        } else if (this.isColorUsable()) {
-            this.loadDefaultTexture2D();
-            this.loadColor4();
+            this.loadBooleanParameter('material.isThereGlossiness', MaterialSlot.USE_GLOSSINESS, false);
         } else {
             this.loadDefaultTexture2D();
-            this.loadDefaultColor4(SpecularSlotHelper.defaultValue);
         }
-    }
-
-    private loadGlossiness(): void {
-        this.loadBooleanParameter('material.isThereGlossiness', MaterialSlot.USE_GLOSSINESS, false);
-        const color = this.slot.getColor();
-        if (color) {
-            this.shaderProgram.loadVector4(this.getColorName(), color);
+        //color
+        if (this.isColorUsable()) {
+            this.loadColor4();
+        } else if (this.isTexture2DUsable()) {
+            this.loadDefaultColor4(vec4.fromValues(1, 1, 1, 1));
         } else {
-            this.shaderProgram.loadVector4(this.getColorName(), SpecularSlotHelper.defaultValue);
+            this.loadDefaultColor4(SpecularSlotHelper.defaultValue)
         }
     }
 
@@ -54,6 +49,10 @@ export class SpecularSlotHelper extends ShaderSlotHelper {
 
     protected getColorName(): string {
         return 'material.specularColor';
+    }
+
+    protected getTextureCoordinateName(): string {
+        return null;
     }
 
 }
