@@ -1,18 +1,19 @@
 import { GlObject } from "./GlObject";
 import { Gl } from "./Gl";
 import { GlConstants } from "./GlConstants";
-import { TextureWrap, TextureWrapResolver } from "./enum/TextureWrap";
-import { MagnificationFilter, MagnificationFilterResolver } from "./enum/MagnificationFIlter";
-import { MinificationFilter, MinificationFilterResolver } from "./enum/MinificationFilter";
+import { GlWrap, GlWrapResolver } from "./enum/GlWrap";
+import { GlMagnificationFilter as GlMagnificationFilter, GlMagnificationFilterResolver } from "./enum/GlMagnificationFIlter";
+import { GlMinificationFilter, GlMinificationFilterResolver } from "./enum/GlMinificationFilter";
+import { GlTextureUnit } from "./GlTextureUnit";
 
 export class GlSampler extends GlObject {
 
     private anisotropicLevel = 1;
-    private magnificationFilter = MagnificationFilter.NEAREST;
-    private minificationFilter = MinificationFilter.NEAREST_MIPMAP_NEAREST;
-    private wrapU = TextureWrap.REPEAT;
-    private wrapV = TextureWrap.REPEAT;
-    private wrapW = TextureWrap.REPEAT;
+    private magnificationFilter = GlMagnificationFilter.LINEAR;
+    private minificationFilter = GlMinificationFilter.NEAREST_MIPMAP_LINEAR;
+    private wrapU = GlWrap.REPEAT;
+    private wrapV = GlWrap.REPEAT;
+    private wrapW = GlWrap.REPEAT;
 
     public constructor() {
         super();
@@ -23,6 +24,15 @@ export class GlSampler extends GlObject {
         return Gl.gl.createSampler() as number;
     }
 
+    public bindToTextureUnit(textureUnit: GlTextureUnit): void {
+        Gl.gl.bindSampler(textureUnit.getIndex(), this.getId());
+    }
+
+    public static unbindFromTextureUnit(textureUnit: GlTextureUnit): void {
+        Gl.gl.bindSampler(textureUnit.getIndex(), null);
+    }
+
+    //filter
     public getAnisotropicLevel(): number {
         return this.anisotropicLevel;
     }
@@ -32,84 +42,56 @@ export class GlSampler extends GlObject {
         Gl.gl.samplerParameterf(this.getId(), GlConstants.ANISOTROPIC_FILTER_EXTENSION.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropicLevel);
     }
 
-    public static isAnisotropicFilterEnabled(): boolean {
-        return GlConstants.ANISOTROPIC_FILTER_ENABLED;
-    }
-
-    public static getMaxAnisotropicLevel(): number {
-        return GlConstants.MAX_ANISOTROPIC_FILTER_LEVEL;
-    }
-
-    //
-    //filter
-    //
-    public getMagnificationFilter(): MagnificationFilter {
+    public getMagnificationFilter(): GlMagnificationFilter {
         return this.magnificationFilter;
     }
 
-    public setMagnificationFilter(filter: MagnificationFilter): void {
+    public setMagnificationFilter(filter: GlMagnificationFilter): void {
         this.magnificationFilter = filter;
-        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_MAG_FILTER, MagnificationFilterResolver.enumToGl(filter));
+        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_MAG_FILTER, GlMagnificationFilterResolver.enumToGl(filter));
     }
 
-    public getMinificationFilter(): MinificationFilter {
+    public getMinificationFilter(): GlMinificationFilter {
         return this.minificationFilter;
     }
 
-    public setMinificationFilter(filter: MinificationFilter): void {
+    public setMinificationFilter(filter: GlMinificationFilter): void {
         this.minificationFilter = filter;
-        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_MIN_FILTER, MinificationFilterResolver.enumToGl(filter));
+        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_MIN_FILTER, GlMinificationFilterResolver.enumToGl(filter));
     }
 
-    //
     //wrap
-    //
-    public getWrapU(): TextureWrap {
+    public getWrapU(): GlWrap {
         return this.wrapU;
     }
 
-    public setWrapU(wrap: TextureWrap): void {
+    public setWrapU(wrap: GlWrap): void {
         this.wrapU = wrap;
-        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_S, TextureWrapResolver.enumToGl(wrap));
+        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_S, GlWrapResolver.enumToGl(wrap));
     }
 
-    public getWrapV(): TextureWrap {
+    public getWrapV(): GlWrap {
         return this.wrapV;
     }
 
-    public setWrapV(wrap: TextureWrap): void {
+    public setWrapV(wrap: GlWrap): void {
         this.wrapV = wrap;
-        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_T, TextureWrapResolver.enumToGl(wrap));
+        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_T, GlWrapResolver.enumToGl(wrap));
     }
 
-    public getWrapW(): TextureWrap {
+    public getWrapW(): GlWrap {
         return this.wrapW;
     }
 
-    public setWrapW(wrap: TextureWrap): void {
+    public setWrapW(wrap: GlWrap): void {
         this.wrapW = wrap;
-        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_R, TextureWrapResolver.enumToGl(wrap));
+        Gl.gl.samplerParameteri(this.getId(), Gl.gl.TEXTURE_WRAP_R, GlWrapResolver.enumToGl(wrap));
     }
 
-    //
     //misc
-    //
-    public static getMaxTextureUnits(): number {
-        return GlConstants.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-    }
-
-    public static getMaxTextureUnitsSafe(): number {
-        return GlConstants.MAX_COMBINED_TEXTURE_IMAGE_UNITS_SAFE;
-    }
-
-    public bindToTextureUnit(textureUnit: number): void {
-        Gl.gl.bindSampler(textureUnit, this.getId());
-    }
-
     public release(): void {
         Gl.gl.deleteSampler(this.getId());
         this.setId(GlObject.INVALID_ID);
     }
-
 
 }

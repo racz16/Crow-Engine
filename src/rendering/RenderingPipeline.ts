@@ -4,8 +4,8 @@ import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ParameterKey } from '../utility/parameter/ParameterKey';
 import { ITexture2D } from '../resource/texture/ITexture2D';
 import { GlTexture2D } from '../webgl/texture/GlTexture2D';
-import { Fbo } from '../webgl/fbo/Fbo';
-import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
+import { GlFbo } from '../webgl/fbo/GlFbo';
+import { GlFboAttachmentSlot } from '../webgl/enum/GlFboAttachmentSlot';
 import { vec2, mat4, quat, vec3, } from 'gl-matrix';
 import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
@@ -15,8 +15,8 @@ import { LogLevel } from '../utility/log/LogLevel';
 import { CameraStruct } from '../component/camera/CameraStruct';
 import { Engine } from '../core/Engine';
 import { Utility } from '../utility/Utility';
-import { InternalFormat } from '../webgl/enum/InternalFormat';
-import { Rbo } from '../webgl/fbo/Rbo';
+import { GlInternalFormat } from '../webgl/enum/GlInternalFormat';
+import { GlRbo } from '../webgl/fbo/GlRbo';
 import { RendererContainer } from './RendererContainer';
 import { GeometryRenderer } from './GeometryRenderer';
 import { PostProcessRenderer } from './PostProcessRenderer';
@@ -25,14 +25,15 @@ import { GammaCorrectionRenderer } from './renderer/GammaCorrectionRenderer';
 import { ReinhardToneMappingRenderer } from './renderer/ReinhardToneMappingRenderer';
 import { PbrRenderer } from './renderer/PbrRenderer';
 import { CubeMapTexture } from '../resource/texture/CubeMapTexture';
-import { TextureWrap } from '../webgl/enum/TextureWrap';
+import { GlWrap } from '../webgl/enum/GlWrap';
 import { VarianceShadowRenderer } from './renderer/VarianceShadowRenderer';
 import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
 import { DebugRenderer } from './renderer/DebugRenderer';
 import { IRenderingPipeline } from './IRenderingPipeline';
 import { IRenderableContainer } from '../core/IRenderableContainer';
-import { MinificationFilter } from '../webgl/enum/MinificationFilter';
-import { MagnificationFilter } from '../webgl/enum/MagnificationFIlter';
+import { GlMinificationFilter } from '../webgl/enum/GlMinificationFilter';
+import { GlMagnificationFilter } from '../webgl/enum/GlMagnificationFIlter';
+import { GlConstants } from '../webgl/GlConstants';
 
 export class RenderingPipeline implements IRenderingPipeline {
 
@@ -45,7 +46,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     public static readonly DEBUG = new ParameterKey<ITexture2DArray>('DEBUG');
 
     private parameters = new ParameterContainer();
-    private fbo: Fbo;
+    private fbo: GlFbo;
     private fboTextures = new Array<GlTexture2D>(2);
     private drawIndex = 0;
     private renderingScale = 1;
@@ -57,6 +58,9 @@ export class RenderingPipeline implements IRenderingPipeline {
     private screenRenderer: ScreenRenderer;
 
     public initialize(): void {
+        if (!GlConstants.COLOR_BUFFER_FLOAT_ENABLED) {
+            throw new Error();
+        }
         this.shadowRenderer = new VarianceShadowRenderer();
         this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
         this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
@@ -142,30 +146,30 @@ export class RenderingPipeline implements IRenderingPipeline {
             Utility.releaseIfUsable(this.fboTextures[0]);
             Utility.releaseIfUsable(this.fboTextures[1]);
         }
-        this.fbo = new Fbo();
+        this.fbo = new GlFbo();
     }
 
     private addAttachmentsToTheFbo(): void {
         this.fboTextures[0] = this.createFboTexture();
         this.fboTextures[1] = this.createFboTexture();
-        this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         this.addDepthAttachmentToTheFbo();
     }
 
     private createFboTexture(): GlTexture2D {
         const colorTexture = new GlTexture2D();
-        colorTexture.allocate(InternalFormat.RGBA16F, this.getRenderingSize(), false);
-        colorTexture.setMinificationFilter(MinificationFilter.LINEAR);
-        colorTexture.setMagnificationFilter(MagnificationFilter.LINEAR);
-        colorTexture.setWrapU(TextureWrap.CLAMP_TO_EDGE);
-        colorTexture.setWrapV(TextureWrap.CLAMP_TO_EDGE);
+        colorTexture.allocate(GlInternalFormat.RGBA16F, this.getRenderingSize(), false);
+        colorTexture.setMinificationFilter(GlMinificationFilter.LINEAR);
+        colorTexture.setMagnificationFilter(GlMagnificationFilter.LINEAR);
+        colorTexture.setWrapU(GlWrap.CLAMP_TO_EDGE);
+        colorTexture.setWrapV(GlWrap.CLAMP_TO_EDGE);
         return colorTexture;
     }
 
     private addDepthAttachmentToTheFbo(): void {
-        const depthRbo = new Rbo();
-        depthRbo.allocate(this.getRenderingSize(), InternalFormat.DEPTH32F, 1);
-        this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachRbo(depthRbo);
+        const depthRbo = new GlRbo();
+        depthRbo.allocate(this.getRenderingSize(), GlInternalFormat.DEPTH32F, 1);
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).attachRbo(depthRbo);
     }
 
     protected throwErrorIfFboIsNotComplete(): void {
@@ -183,7 +187,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.renderIfRendererIsUsableAndActive(this.shadowRenderer);
         this.renderGeometry();
         this.renderPostProcess();
-        this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).detachAttachment();
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
         this.renderToScreen();
         this.afterPipeline();
         Log.endGroup();
@@ -192,7 +196,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     protected beforePipeline(): void {
         this.refresh();
         this.bindFbo();
-        this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[0]);
         this.drawIndex = 0;
         Gl.clear(true, true, false);
@@ -212,7 +216,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     }
 
     protected renderToScreen(): void {
-        Fbo.bindDefaultFrameBuffer();
+        GlFbo.bindDefaultFrameBuffer();
         Gl.clear(true, true, false);
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[this.drawIndex]);
         this.screenRenderer.setTransformation(mat4.create());
@@ -251,7 +255,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     protected pingPong(): void {
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[this.drawIndex]);
         this.drawIndex = 1 - this.drawIndex;
-        this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[this.drawIndex]);
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[this.drawIndex]);
     }
 
     protected logWarningIfRendererIsNotUsable(renderer: Renderer): void {

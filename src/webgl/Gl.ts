@@ -1,19 +1,19 @@
-import { BlendFunc, BlendFuncResolver } from './enum/BlendFunc';
-import { CullFace, CullFaceResolver } from './enum/CullFace';
+import { GlBlendFunc, GlBlendFuncResolver } from './enum/GlBlendFunc';
+import { GlCullFace, GlCullFaceResolver } from './enum/GlCullFace';
 import { GlConstants } from './GlConstants';
 import { vec2, vec4 } from 'gl-matrix';
 import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { GlTexture2D } from './texture/GlTexture2D';
-import { InternalFormat } from './enum/InternalFormat';
+import { GlInternalFormat } from './enum/GlInternalFormat';
 import { Engine } from '../core/Engine';
 import { GlCubeMapTexture } from './texture/GlCubeMapTexture';
 import { GlTexture2DArray } from './texture/GlTexture2DArray';
-import { Performance, PerformanceResolver } from './enum/Performance';
-import { MinificationFilter } from './enum/MinificationFilter';
-import { MagnificationFilter } from './enum/MagnificationFIlter';
-import { Format } from './enum/Format';
-import { TextureDataType } from './enum/TextureDataType';
+import { GlPerformance, GlPerformanceResolver } from './enum/GlPerformance';
+import { GlMinificationFilter } from './enum/GlMinificationFilter';
+import { GlMagnificationFilter } from './enum/GlMagnificationFIlter';
+import { GlFormat } from './enum/GlFormat';
+import { GlTextureDataType } from './enum/GlTextureDataType';
 
 export class Gl {
 
@@ -40,50 +40,50 @@ export class Gl {
         this.setGlDefaultStates();
         this.createBlackTexture2D();
         this.createWhiteTexture2D();
-        this.createDefaultTexture2DArray();
-        this.createDefaultCubeMapTexture();
+        this.createBlackTexture2DArray();
+        this.createBlackCubeMapTexture();
     }
 
     private static setGlDefaultStates(): void {
         Gl.gl.pixelStorei(Gl.gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, Gl.gl.NONE);
         Gl.setEnableCullFace(true);
-        Gl.setCullFace(CullFace.BACK);
+        Gl.setCullFace(GlCullFace.BACK);
         Gl.setEnableBlend(true);
-        Gl.setBlendFunc(BlendFunc.SRC_ALPHA, BlendFunc.ONE_MINUS_SRC_ALPHA);
+        Gl.setBlendFunc(GlBlendFunc.SRC_ALPHA, GlBlendFunc.ONE_MINUS_SRC_ALPHA);
         Gl.setEnableDepthTest(true);
     }
 
     private static createBlackTexture2D(): void {
         const texture = new GlTexture2D();
-        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
-        texture.setMinificationFilter(MinificationFilter.NEAREST);
-        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
+        texture.allocate(GlInternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.setMinificationFilter(GlMinificationFilter.NEAREST);
+        texture.setMagnificationFilter(GlMagnificationFilter.NEAREST);
         Engine.getParameters().set(Engine.BLACK_TEXTURE_2D, texture);
     }
 
     private static createWhiteTexture2D(): void {
         const texture = new GlTexture2D();
-        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
-        texture.storeFromBinary(new Uint8Array([255, 255, 255, 255]), vec2.fromValues(1, 1), Format.RGBA, TextureDataType.UNSIGNED_BYTE)
-        texture.setMinificationFilter(MinificationFilter.NEAREST);
-        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
+        texture.allocate(GlInternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.storeFromBinary(new Uint8Array([255, 255, 255, 255]), vec2.fromValues(1, 1), GlFormat.RGBA, GlTextureDataType.UNSIGNED_BYTE)
+        texture.setMinificationFilter(GlMinificationFilter.NEAREST);
+        texture.setMagnificationFilter(GlMagnificationFilter.NEAREST);
         Engine.getParameters().set(Engine.WHITE_TEXTURE_2D, texture);
     }
 
-    private static createDefaultTexture2DArray(): void {
+    private static createBlackTexture2DArray(): void {
         const texture = new GlTexture2DArray();
-        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), 1, false);
-        texture.setMinificationFilter(MinificationFilter.NEAREST);
-        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
-        Engine.getParameters().set(Engine.DEFAULT_TEXTURE_2D_ARRAY, texture);
+        texture.allocate(GlInternalFormat.RGBA8, vec2.fromValues(1, 1), 1, false);
+        texture.setMinificationFilter(GlMinificationFilter.NEAREST);
+        texture.setMagnificationFilter(GlMagnificationFilter.NEAREST);
+        Engine.getParameters().set(Engine.BLACK_TEXTURE_2D_ARRAY, texture);
     }
 
-    private static createDefaultCubeMapTexture(): void {
+    private static createBlackCubeMapTexture(): void {
         const texture = new GlCubeMapTexture();
-        texture.allocate(InternalFormat.RGBA8, vec2.fromValues(1, 1), false);
-        texture.setMinificationFilter(MinificationFilter.NEAREST);
-        texture.setMagnificationFilter(MagnificationFilter.NEAREST);
-        Engine.getParameters().set(Engine.DEFAULT_CUBE_MAP_TEXTURE, texture);
+        texture.allocate(GlInternalFormat.RGBA8, vec2.fromValues(1, 1), false);
+        texture.setMinificationFilter(GlMinificationFilter.NEAREST);
+        texture.setMagnificationFilter(GlMagnificationFilter.NEAREST);
+        Engine.getParameters().set(Engine.BLACK_CUBE_MAP_TEXTURE, texture);
     }
 
     public static get gl(): WebGL2RenderingContext {
@@ -106,12 +106,12 @@ export class Gl {
         }
     }
 
-    public static getCullFace(): CullFace {
-        return CullFaceResolver.glToEnum(Gl.context.getParameter(Gl.context.CULL_FACE_MODE));
+    public static getCullFace(): GlCullFace {
+        return GlCullFaceResolver.glToEnum(Gl.context.getParameter(Gl.context.CULL_FACE_MODE));
     }
 
-    public static setCullFace(cullFace: CullFace): void {
-        const glCullFace = CullFaceResolver.enumToGl(cullFace);
+    public static setCullFace(cullFace: GlCullFace): void {
+        const glCullFace = GlCullFaceResolver.enumToGl(cullFace);
         Gl.context.cullFace(glCullFace);
     }
 
@@ -127,17 +127,17 @@ export class Gl {
         }
     }
 
-    public static getBlendSourceFactor(): BlendFunc {
-        return BlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_SRC_ALPHA));
+    public static getBlendSourceFactor(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_SRC_ALPHA));
     }
 
-    public static getBlendDestinationFactor(): BlendFunc {
-        return BlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_DST_ALPHA));
+    public static getBlendDestinationFactor(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_DST_ALPHA));
     }
 
-    public static setBlendFunc(sFactor: BlendFunc, dFactor: BlendFunc): void {
-        const glSFactor = BlendFuncResolver.enumToGl(sFactor);
-        const glDFactor = BlendFuncResolver.enumToGl(dFactor);
+    public static setBlendFunc(sFactor: GlBlendFunc, dFactor: GlBlendFunc): void {
+        const glSFactor = GlBlendFuncResolver.enumToGl(sFactor);
+        const glDFactor = GlBlendFuncResolver.enumToGl(dFactor);
         Gl.context.blendFunc(glSFactor, glDFactor);
     }
 
@@ -186,8 +186,12 @@ export class Gl {
         Gl.gl.clear(colorBit | depthBit | stencilBit);
     }
 
-    public static setMipmapPerformance(performance: Performance): void {
-        Gl.gl.hint(Gl.gl.GENERATE_MIPMAP_HINT, PerformanceResolver.enumToGl(performance))
+    public static setMipmapPerformance(performance: GlPerformance): void {
+        Gl.gl.hint(Gl.gl.GENERATE_MIPMAP_HINT, GlPerformanceResolver.enumToGl(performance))
+    }
+
+    public static setDerivativePerformance(performance: GlPerformance): void {
+        Gl.gl.hint(Gl.gl.FRAGMENT_SHADER_DERIVATIVE_HINT, GlPerformanceResolver.enumToGl(performance))
     }
 
 }

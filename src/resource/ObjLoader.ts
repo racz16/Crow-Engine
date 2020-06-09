@@ -1,13 +1,11 @@
-
-import { IMesh } from "./mesh/IMesh";
 import { Mesh } from "../../node_modules/webgl-obj-loader/src/index";
 import { vec3 } from "gl-matrix";
-import { Vao } from "../webgl/Vao";
+import { GlVao } from "../webgl/GlVao";
 import { Conventions } from "./Conventions";
-import { Ebo } from "../webgl/buffer/Ebo";
-import { BufferObjectUsage } from "../webgl/enum/BufferObjectUsage";
-import { Vbo } from "../webgl/buffer/Vbo";
-import { VertexAttribPointer } from "../webgl/VertexAttribPointer";
+import { GlEbo } from "../webgl/buffer/GlEbo";
+import { GlBufferObjectUsage } from "../webgl/enum/GlBufferObjectUsage";
+import { GlVbo } from "../webgl/buffer/GlVbo";
+import { GlVertexAttribPointer } from "../webgl/GlVertexAttribPointer";
 import { StaticMesh } from "./mesh/StaticMesh";
 import { RenderingMode } from "./RenderingMode";
 import { IndicesType } from "./IndicesType";
@@ -73,8 +71,8 @@ export class ObjLoader {
         }
     }
 
-    private createVao(mesh: Mesh): Vao {
-        const vao = new Vao();
+    private createVao(mesh: Mesh): GlVao {
+        const vao = new GlVao();
         this.addEbo(vao, mesh.indices);
         this.addVbo(vao, mesh.vertices, Conventions.POSITIONS_VBO_INDEX, 3);
         this.addVbo(vao, mesh.textures, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, 2);
@@ -83,17 +81,17 @@ export class ObjLoader {
         return vao;
     }
 
-    private addEbo(vao: Vao, indices: Array<number>): void {
-        const ebo = new Ebo();
+    private addEbo(vao: GlVao, indices: Array<number>): void {
+        const ebo = new GlEbo();
         vao.setEbo(ebo);
-        ebo.allocateAndStore(new Uint32Array(indices), BufferObjectUsage.STATIC_DRAW);
+        ebo.allocateAndStore(new Uint32Array(indices), GlBufferObjectUsage.STATIC_DRAW);
     }
 
-    private addVbo(vao: Vao, data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
+    private addVbo(vao: GlVao, data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
         if (data) {
-            const vbo = new Vbo();
-            vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
-            vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new VertexAttribPointer(vertexSize));
+            const vbo = new GlVbo();
+            vbo.allocateAndStore(new Float32Array(data), GlBufferObjectUsage.STATIC_DRAW);
+            vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new GlVertexAttribPointer(vertexSize));
             vao.getVertexAttribArray(vertexAttribArrayIndex).setEnabled(true);
         }
     }

@@ -1,5 +1,5 @@
 import { IMesh } from "./IMesh";
-import { Vao } from "../../webgl/Vao";
+import { GlVao } from "../../webgl/GlVao";
 import { Utility } from "../../utility/Utility";
 import { Conventions } from "../Conventions";
 import { vec3 } from "gl-matrix";
@@ -7,10 +7,11 @@ import { Gl } from "../../webgl/Gl";
 import { RenderingMode, RenderingModeResolver } from "../RenderingMode";
 import { IndicesType, IndicesTypeResolver } from "../IndicesType";
 import { Engine } from "../../core/Engine";
+import { TagContainer } from "../../core/TagContainer";
 
 export class StaticMesh implements IMesh {
 
-    private vao: Vao;
+    private vao: GlVao;
     private vertexCount: number;
     private faceCount: number;
     private renderingMode: RenderingMode;
@@ -19,7 +20,9 @@ export class StaticMesh implements IMesh {
     private aabbMax: vec3;
     private radius: number;
 
-    public constructor(vao: Vao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, aabbMin: vec3, aabbMax: vec3, radius: number) {
+    private tagContainer = new TagContainer();
+
+    public constructor(vao: GlVao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, aabbMin: vec3, aabbMax: vec3, radius: number) {
         this.vao = vao;
         this.vertexCount = vertexCount;
         this.faceCount = faceCount;

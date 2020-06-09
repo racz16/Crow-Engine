@@ -2,7 +2,7 @@ import { Component } from '../../Component';
 import { vec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
-import { Ubo } from '../../../webgl/buffer/Ubo';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { PbrLightsStruct } from './PbrLightsStruct';
 
 export abstract class PbrLightComponent extends Component {
@@ -64,6 +64,6 @@ export abstract class PbrLightComponent extends Component {
         detached.getTransform().getInvalidatables().removeInvalidatable(this);
     }
 
-    protected abstract refresh(ubo: Ubo, index: number): void;
+    protected abstract refresh(ubo: GlUbo, index: number): void;
 
 }

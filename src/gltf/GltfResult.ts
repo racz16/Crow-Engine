@@ -13,7 +13,7 @@ import { PbrRenderer } from "../rendering/renderer/PbrRenderer";
 import { GltfMesh } from "./interface/GltfMesh";
 import { Texture2D } from "../resource/texture/Texture2D";
 import { GltfTextureInfo } from "./interface/GltfTextureInfo";
-import { Vao } from "../webgl/Vao";
+import { GlVao } from "../webgl/GlVao";
 
 export class GltfResult {
     private readonly gameObjects = new Array<[GameObject, GltfNode]>();
@@ -23,7 +23,7 @@ export class GltfResult {
     private readonly meshes = new Array<[IMesh, GltfMesh, GltfPrimitive]>();
     private readonly materials = new Array<[Material<PbrRenderer>, GltfMaterial]>();
     private readonly textures = new Array<[Texture2D, GltfTextureInfo]>();
-    private readonly vaos = new Array<[Vao, GltfPrimitive]>();
+    private readonly vaos = new Array<[GlVao, GltfPrimitive]>();
 
     public addGameObject(gameObject: GameObject, gltfNode: GltfNode): void {
         this.gameObjects.push([gameObject, gltfNode]);
@@ -53,7 +53,7 @@ export class GltfResult {
         this.textures.push([texture, gltfTextureinfo]);
     }
 
-    public addVao(vao: Vao, gltfPrimitive: GltfPrimitive): void {
+    public addVao(vao: GlVao, gltfPrimitive: GltfPrimitive): void {
         this.vaos.push([vao, gltfPrimitive]);
     }
 
@@ -88,7 +88,7 @@ export class GltfResult {
         return this.textures.values();
     }
 
-    public getVaos(): IterableIterator<[Vao, GltfPrimitive]> {
+    public getVaos(): IterableIterator<[GlVao, GltfPrimitive]> {
         return this.vaos.values();
     }
 

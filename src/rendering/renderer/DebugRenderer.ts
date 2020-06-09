@@ -5,6 +5,7 @@ import { Gl } from '../../webgl/Gl';
 import { vec2, mat4 } from 'gl-matrix';
 import { Engine } from '../../core/Engine';
 import { DebugShader } from '../../resource/shader/DebugShader';
+import { Conventions } from '../../resource/Conventions';
 
 export class DebugRenderer extends Renderer {
 
@@ -41,7 +42,7 @@ export class DebugRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DEBUG);
-        image.bindToTextureUnit(0);
+        image.getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
     }
 
     protected draw(): void {

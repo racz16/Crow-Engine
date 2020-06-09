@@ -1,11 +1,11 @@
 import { vec2 } from 'gl-matrix';
-import { InternalFormat } from '../enum/InternalFormat';
+import { GlInternalFormat } from '../enum/GlInternalFormat';
 
-export interface IFboAttachment {
+export interface IGlFboAttachment {
 
     getSize(): vec2;
 
-    getInternalFormat(): InternalFormat;
+    getInternalFormat(): GlInternalFormat;
 
     isAllocated(): boolean;
 

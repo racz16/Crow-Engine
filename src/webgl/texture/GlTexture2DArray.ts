@@ -1,10 +1,9 @@
 import { Gl } from "../Gl";
 import { GlTexture } from "./GlTexture";
 import { vec2 } from "gl-matrix";
-import { InternalFormat } from "../enum/InternalFormat";
+import { GlInternalFormat } from "../enum/GlInternalFormat";
 import { GlTexture2DArrayLayer } from "./GlTexture2DArrayLayer";
 import { ITexture2DArray } from "../../resource/texture/ITexture2DArray";
-import { GlConstants } from "../GlConstants";
 
 export class GlTexture2DArray extends GlTexture implements ITexture2DArray {
 
@@ -18,7 +17,7 @@ export class GlTexture2DArray extends GlTexture implements ITexture2DArray {
         return this;
     }
 
-    public allocate(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    public allocate(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
         this.allocate3D(internalFormat, size, layers, mipmaps);
         for (let i = 0; i < layers; i++) {
             this.textureLayers.set(i, new GlTexture2DArrayLayer(this, i));
@@ -31,22 +30,6 @@ export class GlTexture2DArray extends GlTexture implements ITexture2DArray {
 
     public getLayersIterator(): IterableIterator<GlTexture2DArrayLayer> {
         return this.textureLayers.values();
-    }
-
-    public static getMaxSize(): number {
-        return GlConstants.MAX_TEXTURE_SIZE;
-    }
-
-    public static getMaxSizeSafe(): number {
-        return GlConstants.MAX_TEXTURE_SIZE_SAFE;
-    }
-
-    public static getMaxLayersCount(): number {
-        return GlConstants.MAX_ARRAY_TEXTURE_LAYERS;
-    }
-
-    public static getMaxLayersCountSafe(): number {
-        return GlConstants.MAX_ARRAY_TEXTURE_LAYERS_SAFE;
     }
 
 }

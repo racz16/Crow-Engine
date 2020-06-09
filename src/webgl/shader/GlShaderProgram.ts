@@ -2,8 +2,11 @@ import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
 import { vec2, vec3, vec4, mat4, mat3 } from 'gl-matrix';
 import { GlShader } from './GlShader';
-import { BindingPoint } from '../BindingPoint';
-import { ShaderStage } from '../enum/ShaderStage';
+import { GlBindingPoint } from '../GlBindingPoint';
+import { GlShaderStage } from '../enum/GlShaderStage';
+import { GlTextureUnit } from '../GlTextureUnit';
+import { GlTexture } from '../texture/GlTexture';
+import { GlSampler } from '../GlSampler';
 
 export class GlShaderProgram extends GlObject {
 
@@ -45,18 +48,23 @@ export class GlShaderProgram extends GlObject {
         return Gl.gl.getProgramInfoLog(this.getId());
     }
 
+    //connecting
     private connectUniforms(): void {
         this.uniforms.clear();
         for (let i = 0; i < Gl.gl.getProgramParameter(this.getId(), Gl.gl.ACTIVE_UNIFORMS); i++) {
             const info = Gl.gl.getActiveUniform(this.getId(), i);
             if (info.size > 1) {
-                for (let i = 0; i < info.size; i++) {
-                    const name = info.name.substring(0, info.name.length - 3) + `[${i}]`;
-                    this.connectUniform(name);
-                }
+                this.connectUniformArray(info);
             } else {
                 this.connectUniform(info.name);
             }
+        }
+    }
+
+    private connectUniformArray(info: WebGLActiveInfo): void {
+        for (let i = 0; i < info.size; i++) {
+            const name = info.name.substring(0, info.name.length - 3) + `[${i}]`;
+            this.connectUniform(name);
         }
     }
 
@@ -83,6 +91,18 @@ export class GlShaderProgram extends GlObject {
         }
     }
 
+    public getUniformLocation(uniformName: string): number {
+        return this.uniforms.has(uniformName) ? this.uniforms.get(uniformName) : -1;
+    }
+
+    public getAttributeLocation(attributeName: string): number {
+        return this.attributes.has(attributeName) ? this.attributes.get(attributeName) : -1;
+    }
+
+    public getUniformBlockIndex(uniformBlockName: string): number {
+        return this.uniformBlocks.has(uniformBlockName) ? this.uniformBlocks.get(uniformBlockName) : -1;
+    }
+
     public getUniformBlocksIterator(): IterableIterator<[string, number]> {
         return this.uniformBlocks.entries();
     }
@@ -95,20 +115,17 @@ export class GlShaderProgram extends GlObject {
         return this.attributes.entries();
     }
 
-    public bindUniformBlock(uniformBlock: string, bindingPoint: number): void {
-        Gl.gl.uniformBlockBinding(this.getId(), Gl.gl.getUniformBlockIndex(this.getId(), uniformBlock), bindingPoint);
-    }
-
-    public bindUniformBlockToBindingPoint(bindingPoint: BindingPoint): void {
-        this.bindUniformBlock(bindingPoint.name, bindingPoint.bindingPoint);
-    }
-
+    //loading uniforms
     public loadFloat(uniform: string, value: number): void {
         Gl.gl.uniform1f(this.getUniformLocation(uniform), value);
     }
 
     public loadInt(uniform: string, value: number): void {
         Gl.gl.uniform1i(this.getUniformLocation(uniform), value);
+    }
+
+    public loadBoolean(uniform: string, value: boolean): void {
+        Gl.gl.uniform1f(this.getUniformLocation(uniform), value ? 1 : 0);
     }
 
     public loadVector2(uniform: string, vector: vec2): void {
@@ -123,10 +140,6 @@ export class GlShaderProgram extends GlObject {
         Gl.gl.uniform4fv(this.getUniformLocation(uniform), vector);
     }
 
-    public loadBoolean(uniform: string, value: boolean): void {
-        Gl.gl.uniform1f(this.getUniformLocation(uniform), value ? 1 : 0);
-    }
-
     public loadMatrix3(uniform: string, matrix: mat3, transpose = false): void {
         Gl.gl.uniformMatrix3fv(this.getUniformLocation(uniform), transpose, matrix);
     }
@@ -135,20 +148,23 @@ export class GlShaderProgram extends GlObject {
         Gl.gl.uniformMatrix4fv(this.getUniformLocation(uniform), transpose, matrix);
     }
 
-    public connectTextureUnit(uniform: string, textureUnit: number): void {
-        Gl.gl.uniform1i(this.getUniformLocation(uniform), textureUnit);
+    public connectTextureUnit(uniform: string, textureUnit: GlTextureUnit): void {
+        Gl.gl.uniform1i(this.getUniformLocation(uniform), textureUnit.getIndex());
     }
 
-    public getUniformLocation(uniformName: string): number {
-        return this.uniforms.has(uniformName) ? this.uniforms.get(uniformName) : -1;
+    public loadTexture(textureUnit: GlTextureUnit, texture: GlTexture, sampler: GlSampler = null): void {
+        texture.bindToTextureUnit(textureUnit);
+        if (sampler) {
+            sampler.bindToTextureUnit(textureUnit);
+        } else {
+            GlSampler.unbindFromTextureUnit(textureUnit);
+        }
     }
 
-    public getAttributeLocation(attributeName: string): number {
-        return this.attributes.has(attributeName) ? this.attributes.get(attributeName) : -1;
-    }
-
-    public getUniformBlockIndex(uniformBlockName: string): number {
-        return this.uniformBlocks.has(uniformBlockName) ? this.uniformBlocks.get(uniformBlockName) : -1;
+    //misc
+    public bindUniformBlockToBindingPoint(bindingPoint: GlBindingPoint): void {
+        const ubi = this.getUniformBlockIndex(bindingPoint.getName());
+        Gl.gl.uniformBlockBinding(this.getId(), ubi, bindingPoint.getBindingPoint());
     }
 
     public start(): void {
@@ -165,8 +181,8 @@ export class GlShaderProgram extends GlObject {
         this.setShaderTo(null, shader.getStage());
     }
 
-    private setShaderTo(shader: GlShader, stage: ShaderStage): void {
-        if (stage === ShaderStage.VERTEX_SHADER) {
+    private setShaderTo(shader: GlShader, stage: GlShaderStage): void {
+        if (stage === GlShaderStage.VERTEX_SHADER) {
             this.vertexShader = shader;
         } else {
             this.fragmentShader = shader;

@@ -1,16 +1,16 @@
 import { GltfAccessorType } from "./enum/GltfAccessorType";
 import { GltfAccessorComponentType } from "./enum/GltfAccessorComponentType";
-import { VertexAttribPointerType } from "../webgl/enum/VertexAttribPointerType";
+import { GlVertexAttribPointerType } from "../webgl/enum/GlVertexAttribPointerType";
 import { GltfPrimitiveMode } from "./enum/GltfPrimitiveMode";
 import { RenderingMode } from "../resource/RenderingMode";
 import { IndicesType } from "../resource/IndicesType";
 import { vec3 } from "gl-matrix";
 import { GltfMinificationFilter } from "./enum/GltfMinificationFIlter";
-import { MinificationFilter } from "../webgl/enum/MinificationFilter";
+import { GlMinificationFilter } from "../webgl/enum/GlMinificationFilter";
 import { GltfMagnificationFilter } from "./enum/GltfMagnificationFilter";
-import { MagnificationFilter } from "../webgl/enum/MagnificationFIlter";
+import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
 import { GltfWrap } from "./enum/GltfWrap";
-import { TextureWrap } from "../webgl/enum/TextureWrap";
+import { GlWrap } from "../webgl/enum/GlWrap";
 import { GltfAlphaMode } from "./enum/GltfAlphaMode";
 import { AlphaMode } from "../material/AlphaMode";
 
@@ -28,14 +28,14 @@ export class GltfResolver {
         }
     }
 
-    public static computeType(componentType: GltfAccessorComponentType): VertexAttribPointerType {
+    public static computeType(componentType: GltfAccessorComponentType): GlVertexAttribPointerType {
         switch (componentType) {
-            case GltfAccessorComponentType.BYTE: return VertexAttribPointerType.BYTE;
-            case GltfAccessorComponentType.UNSIGNED_BYTE: return VertexAttribPointerType.UNSIGNED_BYTE;
-            case GltfAccessorComponentType.SHORT: return VertexAttribPointerType.SHORT;
-            case GltfAccessorComponentType.UNSIGNED_SHORT: return VertexAttribPointerType.UNSIGNED_SHORT;
-            case GltfAccessorComponentType.UNSIGNED_INT: return VertexAttribPointerType.UNSIGNED_INT;
-            case GltfAccessorComponentType.FLOAT: return VertexAttribPointerType.FLOAT;
+            case GltfAccessorComponentType.BYTE: return GlVertexAttribPointerType.BYTE;
+            case GltfAccessorComponentType.UNSIGNED_BYTE: return GlVertexAttribPointerType.UNSIGNED_BYTE;
+            case GltfAccessorComponentType.SHORT: return GlVertexAttribPointerType.SHORT;
+            case GltfAccessorComponentType.UNSIGNED_SHORT: return GlVertexAttribPointerType.UNSIGNED_SHORT;
+            case GltfAccessorComponentType.UNSIGNED_INT: return GlVertexAttribPointerType.UNSIGNED_INT;
+            case GltfAccessorComponentType.FLOAT: return GlVertexAttribPointerType.FLOAT;
         }
     }
 
@@ -90,32 +90,32 @@ export class GltfResolver {
         }
     }
 
-    public static computeMinificationFilter(minFilter: GltfMinificationFilter): MinificationFilter {
+    public static computeMinificationFilter(minFilter: GltfMinificationFilter): GlMinificationFilter {
         switch (minFilter) {
-            case GltfMinificationFilter.NEAREST: return MinificationFilter.NEAREST;
-            case GltfMinificationFilter.LINEAR: return MinificationFilter.LINEAR;
-            case GltfMinificationFilter.NEAREST_MIPMAP_NEAREST: return MinificationFilter.NEAREST_MIPMAP_NEAREST;
-            case GltfMinificationFilter.NEAREST_MIPMAP_LINEAR: return MinificationFilter.NEAREST_MIPMAP_LINEAR;
-            case GltfMinificationFilter.LINEAR_MIPMAP_NEAREST: return MinificationFilter.LINEAR_MIPMAP_NEAREST;
-            case GltfMinificationFilter.LINEAR_MIPMAP_LINEAR: return MinificationFilter.LINEAR_MIPMAP_LINEAR;
-            default: return MinificationFilter.LINEAR_MIPMAP_LINEAR;
+            case GltfMinificationFilter.NEAREST: return GlMinificationFilter.NEAREST;
+            case GltfMinificationFilter.LINEAR: return GlMinificationFilter.LINEAR;
+            case GltfMinificationFilter.NEAREST_MIPMAP_NEAREST: return GlMinificationFilter.NEAREST_MIPMAP_NEAREST;
+            case GltfMinificationFilter.NEAREST_MIPMAP_LINEAR: return GlMinificationFilter.NEAREST_MIPMAP_LINEAR;
+            case GltfMinificationFilter.LINEAR_MIPMAP_NEAREST: return GlMinificationFilter.LINEAR_MIPMAP_NEAREST;
+            case GltfMinificationFilter.LINEAR_MIPMAP_LINEAR: return GlMinificationFilter.LINEAR_MIPMAP_LINEAR;
+            default: return GlMinificationFilter.LINEAR_MIPMAP_LINEAR;
         }
     }
 
-    public static computeMagnificationFilter(magFilter: GltfMagnificationFilter): MagnificationFilter {
+    public static computeMagnificationFilter(magFilter: GltfMagnificationFilter): GlMagnificationFilter {
         switch (magFilter) {
-            case GltfMagnificationFilter.NEAREST: return MagnificationFilter.NEAREST;
-            case GltfMagnificationFilter.LINEAR: return MagnificationFilter.LINEAR;
-            default: return MagnificationFilter.LINEAR;
+            case GltfMagnificationFilter.NEAREST: return GlMagnificationFilter.NEAREST;
+            case GltfMagnificationFilter.LINEAR: return GlMagnificationFilter.LINEAR;
+            default: return GlMagnificationFilter.LINEAR;
         }
     }
 
-    public static computeWrap(wrap: GltfWrap): TextureWrap {
+    public static computeWrap(wrap: GltfWrap): GlWrap {
         switch (wrap) {
-            case GltfWrap.CLAMP_TO_EDGE: return TextureWrap.CLAMP_TO_EDGE;
-            case GltfWrap.MIRRORED_REPEAT: return TextureWrap.MIRRORED_REPEAT;
-            case GltfWrap.REPEAT: return TextureWrap.REPEAT;
-            default: return TextureWrap.REPEAT;
+            case GltfWrap.CLAMP_TO_EDGE: return GlWrap.CLAMP_TO_EDGE;
+            case GltfWrap.MIRRORED_REPEAT: return GlWrap.MIRRORED_REPEAT;
+            case GltfWrap.REPEAT: return GlWrap.REPEAT;
+            default: return GlWrap.REPEAT;
         }
     }
 

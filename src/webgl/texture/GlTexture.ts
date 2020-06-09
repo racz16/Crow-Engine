@@ -1,26 +1,26 @@
 import { GlObject } from '../GlObject';
 import { vec2 } from 'gl-matrix';
-import { InternalFormat, InternalFormatResolver } from '../enum/InternalFormat';
-import { TextureWrap, TextureWrapResolver } from '../enum/TextureWrap';
+import { GlInternalFormat, GlInternalFormatResolver } from '../enum/GlInternalFormat';
+import { GlWrap, GlWrapResolver } from '../enum/GlWrap';
 import { GlConstants } from '../GlConstants';
 import { Gl } from '../Gl';
 import { IResource } from '../../resource/IResource';
-import { GlSampler } from '../GlSampler';
-import { MagnificationFilter, MagnificationFilterResolver } from '../enum/MagnificationFIlter';
-import { MinificationFilter, MinificationFilterResolver } from '../enum/MinificationFilter';
+import { GlMagnificationFilter, GlMagnificationFilterResolver } from '../enum/GlMagnificationFIlter';
+import { GlMinificationFilter, GlMinificationFilterResolver } from '../enum/GlMinificationFilter';
+import { GlTextureUnit } from '../GlTextureUnit';
 
 export abstract class GlTexture extends GlObject implements IResource {
 
-    private size = vec2.create();
+    private readonly size = vec2.create();
     private layers = 1;
     private allocated: boolean;
-    private internalFormat: InternalFormat;
+    private internalFormat: GlInternalFormat;
     private mipmapLevelCount = 1;
     private anisotropicLevel = 1;
-    private magnificationFilter = MagnificationFilter.NEAREST;
-    private minificationFilter = MinificationFilter.NEAREST_MIPMAP_NEAREST;
-    private wrapU = TextureWrap.REPEAT;
-    private wrapV = TextureWrap.REPEAT;
+    private magnificationFilter = GlMagnificationFilter.LINEAR;
+    private minificationFilter = GlMinificationFilter.NEAREST_MIPMAP_LINEAR;
+    private wrapU = GlWrap.REPEAT;
+    private wrapV = GlWrap.REPEAT;
 
     public constructor() {
         super();
@@ -37,26 +37,24 @@ export abstract class GlTexture extends GlObject implements IResource {
         Gl.gl.bindTexture(this.getTarget(), this.getId());
     }
 
-    //
-    //allocate----------------------------------------------------------------------------------------------------------
-    //
-    protected allocate2D(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    //allocate
+    protected allocate2D(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
         this.allocationGeneral(internalFormat, size, layers, mipmaps);
-        const glInternalFormat = InternalFormatResolver.enumToGl(this.internalFormat).code;
+        const glInternalFormat = GlInternalFormatResolver.enumToGl(this.internalFormat).getCode();
         this.bind();
         Gl.gl.texStorage2D(this.getTarget(), this.mipmapLevelCount, glInternalFormat, this.size[0], this.size[1]);
         this.allocated = true;
     }
 
-    protected allocate3D(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    protected allocate3D(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
         this.allocationGeneral(internalFormat, size, layers, mipmaps);
-        const glInternalFormat = InternalFormatResolver.enumToGl(this.internalFormat).code;
+        const glInternalFormat = GlInternalFormatResolver.enumToGl(this.internalFormat).getCode();
         this.bind();
         Gl.gl.texStorage3D(this.getTarget(), this.mipmapLevelCount, glInternalFormat, this.size[0], this.size[1], layers);
         this.allocated = true;
     }
 
-    protected allocationGeneral(internalFormat: InternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    protected allocationGeneral(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
         this.setInternalFormat(internalFormat);
         this.setSize(size);
         this.setLayers(layers);
@@ -65,9 +63,10 @@ export abstract class GlTexture extends GlObject implements IResource {
     }
 
     protected computeDataSize(): number {
-        const pixelSizeInBits = InternalFormatResolver.enumToGl(this.internalFormat).bitDepth;
+        Gl.gl.getTexParameter
+        const pixelSizeInBits = GlInternalFormatResolver.enumToGl(this.internalFormat).getBitDepth();
         const numberOfPixels = this.size[0] * this.size[1] * this.layers;
-        const mipmapMultiplier = this.isMipmapped() ? 1 / 3 : 1;
+        const mipmapMultiplier = this.isMipmapped() ? 1 + 1 / 3 : 1;
         const dataSizeInBits = pixelSizeInBits * numberOfPixels * mipmapMultiplier;
         const dataSizeInBytes = dataSizeInBits / 8;
         return dataSizeInBytes;
@@ -77,9 +76,7 @@ export abstract class GlTexture extends GlObject implements IResource {
         return this.allocated;
     }
 
-    //
-    //mipmap------------------------------------------------------------------------------------------------------------
-    //
+    //mipmap
     public isMipmapped(): boolean {
         return this.mipmapLevelCount > 1;
     }
@@ -106,73 +103,59 @@ export abstract class GlTexture extends GlObject implements IResource {
         Gl.gl.texParameterf(this.getTarget(), GlConstants.ANISOTROPIC_FILTER_EXTENSION.TEXTURE_MAX_ANISOTROPY_EXT, this.anisotropicLevel);
     }
 
-    public static isAnisotropicFilterEnabled(): boolean {
-        return GlConstants.ANISOTROPIC_FILTER_ENABLED;
-    }
-
-    public static getMaxAnisotropicLevel(): number {
-        return GlConstants.MAX_ANISOTROPIC_FILTER_LEVEL;
-    }
-
-    //
-    //filter------------------------------------------------------------------------------------------------------------
-    //
-    public getMagnificationFilter(): MagnificationFilter {
+    //filter
+    public getMagnificationFilter(): GlMagnificationFilter {
         return this.magnificationFilter;
     }
 
-    public setMagnificationFilter(filter: MagnificationFilter): void {
+    public setMagnificationFilter(filter: GlMagnificationFilter): void {
         this.magnificationFilter = filter;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MAG_FILTER, MagnificationFilterResolver.enumToGl(filter));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MAG_FILTER, GlMagnificationFilterResolver.enumToGl(filter));
     }
 
-    public getMinificationFilter(): MinificationFilter {
+    public getMinificationFilter(): GlMinificationFilter {
         return this.minificationFilter;
     }
 
-    public setMinificationFilter(filter: MinificationFilter): void {
+    public setMinificationFilter(filter: GlMinificationFilter): void {
         this.minificationFilter = filter;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MIN_FILTER, MinificationFilterResolver.enumToGl(filter));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_MIN_FILTER, GlMinificationFilterResolver.enumToGl(filter));
     }
 
-    //
-    //wrap--------------------------------------------------------------------------------------------------------------
-    //
-    public getWrapU(): TextureWrap {
+    //wrap
+    public getWrapU(): GlWrap {
         return this.wrapU;
     }
 
-    public setWrapU(wrap: TextureWrap): void {
+    public setWrapU(wrap: GlWrap): void {
         this.wrapU = wrap;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_WRAP_S, TextureWrapResolver.enumToGl(wrap));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_WRAP_S, GlWrapResolver.enumToGl(wrap));
     }
 
-    public getWrapV(): TextureWrap {
+    public getWrapV(): GlWrap {
         return this.wrapV;
     }
 
-    public setWrapV(wrap: TextureWrap): void {
+    public setWrapV(wrap: GlWrap): void {
         this.wrapV = wrap;
         this.bind();
-        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_WRAP_T, TextureWrapResolver.enumToGl(wrap));
+        Gl.gl.texParameteri(this.getTarget(), Gl.gl.TEXTURE_WRAP_T, GlWrapResolver.enumToGl(wrap));
     }
 
-    //
-    //misc--------------------------------------------------------------------------------------------------------------
-    //
+    //misc
     public generateMipmaps(): void {
         this.bind();
         Gl.gl.generateMipmap(this.getTarget());
     }
 
-    public getInternalFormat(): InternalFormat {
+    public getInternalFormat(): GlInternalFormat {
         return this.internalFormat;
     }
 
-    protected setInternalFormat(internalFormat: InternalFormat): void {
+    protected setInternalFormat(internalFormat: GlInternalFormat): void {
         this.internalFormat = internalFormat;
     }
 
@@ -193,27 +176,12 @@ export abstract class GlTexture extends GlObject implements IResource {
     }
 
     public isSRgb(): boolean {
-        return this.internalFormat === InternalFormat.SRGB8_A8 || this.internalFormat === InternalFormat.SRGB8;
+        return this.internalFormat === GlInternalFormat.SRGB8_A8 || this.internalFormat === GlInternalFormat.SRGB8;
     }
 
-    public bindToTextureUnit(textureUnit: number): void {
-        Gl.gl.activeTexture(Gl.gl.TEXTURE0 + textureUnit);
-        Gl.gl.bindSampler(textureUnit, null);
+    public bindToTextureUnit(textureUnit: GlTextureUnit): void {
+        Gl.gl.activeTexture(textureUnit.getId());
         this.bind();
-    }
-
-    public bindToTextureUnitWithSampler(textureUnit: number, sampler: GlSampler): void {
-        Gl.gl.activeTexture(Gl.gl.TEXTURE0 + textureUnit);
-        sampler.bindToTextureUnit(textureUnit);
-        this.bind();
-    }
-
-    public static getMaxTextureUnits(): number {
-        return GlConstants.MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-    }
-
-    public static getMaxTextureUnitsSafe(): number {
-        return GlConstants.MAX_COMBINED_TEXTURE_IMAGE_UNITS_SAFE;
     }
 
     public isMultisampled(): boolean {

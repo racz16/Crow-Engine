@@ -1,6 +1,6 @@
-import { Ubo } from '../../webgl/buffer/Ubo';
+import { GlUbo } from '../../webgl/buffer/GlUbo';
 import { Utility } from '../../utility/Utility';
-import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
+import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
 import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { ICameraComponent } from './ICameraComponent';
@@ -10,11 +10,11 @@ import { Conventions } from '../../resource/Conventions';
 
 export class CameraStruct implements IInvalidatable {
 
-    private ubo: Ubo;
+    private ubo: GlUbo;
     private valid = false;
 
     private static instance: CameraStruct;
-    private static CAMERA_UBO_SIZE = 2 * Ubo.MAT4_SIZE + Ubo.VEC4_SIZE;
+    private static CAMERA_UBO_SIZE = 2 * GlUbo.MAT4_SIZE + GlUbo.VEC4_SIZE;
 
     private constructor() {
         Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
@@ -33,8 +33,8 @@ export class CameraStruct implements IInvalidatable {
 
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
-            this.ubo = new Ubo();
-            this.ubo.allocate(CameraStruct.CAMERA_UBO_SIZE, BufferObjectUsage.STATIC_DRAW);
+            this.ubo = new GlUbo();
+            this.ubo.allocate(CameraStruct.CAMERA_UBO_SIZE, GlBufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Camera Matrices ubo created');
         }
     }
@@ -49,8 +49,8 @@ export class CameraStruct implements IInvalidatable {
 
     private refreshUboUnsafe(camera: ICameraComponent): void {
         this.ubo.store(new Float32Array(camera.getViewMatrix()));
-        this.ubo.store(new Float32Array(camera.getProjectionMatrix()), Ubo.MAT4_SIZE);
-        this.ubo.store(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * Ubo.MAT4_SIZE);
+        this.ubo.store(new Float32Array(camera.getProjectionMatrix()), GlUbo.MAT4_SIZE);
+        this.ubo.store(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * GlUbo.MAT4_SIZE);
         this.valid = true;
         Log.logString(LogLevel.INFO_2, 'Camera Matrices ubo refreshed');
     }

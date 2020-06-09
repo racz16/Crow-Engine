@@ -14,30 +14,22 @@ import { Engine } from '../../core/Engine';
 import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { Utility } from '../../utility/Utility';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
+import { Conventions } from '../Conventions';
 
 export class BlinnPhongShader extends Shader {
-
-    private readonly SHADOW_TEXTURE_UNIT = 9;
-    private readonly DIFFUSE_TEXTURE_UNIT = 1;
-    private readonly SPECULAR_TEXTURE_UNIT = 2;
-    private readonly NORMAL_POM_TEXTURE_UNIT = 3;
-    private readonly REFLECTION_TEXTURE_UNIT = 4;
-    private readonly REFRACTION_TEXTURE_UNIT = 5;
-    private readonly ENVIRONMENT_INTENSITY_TEXTURE_UNIT = 6;
-    private readonly EMISSIVE_TEXTURE_UNIT = 7;
 
     private slotHelpers: Array<ShaderSlotHelper>;
 
     public constructor() {
         super();
-        this.slotHelpers = [
+        this.slotHelpers = [/*
             new DiffuseSlotHelper(this.getShaderProgram(), this.DIFFUSE_TEXTURE_UNIT, false),
             new SpecularSlotHelper(this.getShaderProgram(), this.SPECULAR_TEXTURE_UNIT, false),
-            new NormalSlotHelper(this.getShaderProgram(), this.NORMAL_POM_TEXTURE_UNIT, false),
+            new NormalSlotHelper(this.getShaderProgram(), Conventions.NORMAL_POM_TEXTURE_UNIT, false),
             new ReflectionSlotHelper(this.getShaderProgram(), this.REFLECTION_TEXTURE_UNIT, false),
             new RefractionSlotHelper(this.getShaderProgram(), this.REFRACTION_TEXTURE_UNIT, false),
             new EnvironmentSlotHelper(this.getShaderProgram(), this.ENVIRONMENT_INTENSITY_TEXTURE_UNIT, false),
-            new EmissiveSlotHelper(this.getShaderProgram(), this.EMISSIVE_TEXTURE_UNIT, false)
+            new EmissiveSlotHelper(this.getShaderProgram(), Conventions.EMISSIVE_TEXTURE_UNIT, false)*/
         ];
     }
 
@@ -62,10 +54,10 @@ export class BlinnPhongShader extends Shader {
         let shadowMap = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOWMAP);
         const isThereShadowMap = Utility.isUsable(shadowMap);
         if (!isThereShadowMap) {
-            shadowMap = Engine.getParameters().get(Engine.DEFAULT_TEXTURE_2D_ARRAY);
+            shadowMap = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D_ARRAY);
         }
-        shadowMap.bindToTextureUnit(this.SHADOW_TEXTURE_UNIT);
-        this.getShaderProgram().connectTextureUnit('shadowMap', this.SHADOW_TEXTURE_UNIT);
+        shadowMap.getNativeTexture().bindToTextureUnit(Conventions.SHADOW_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.SHADOW_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {

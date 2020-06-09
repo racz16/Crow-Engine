@@ -1,5 +1,5 @@
-import { MagnificationFilter } from "../../../webgl/enum/MagnificationFIlter";
-import { MinificationFilter } from "../../../webgl/enum/MinificationFilter";
+import { GlMagnificationFilter } from "../../../webgl/enum/GlMagnificationFIlter";
+import { GlMinificationFilter } from "../../../webgl/enum/GlMinificationFilter";
 
 export enum TextureFiltering {
     None,
@@ -13,21 +13,21 @@ export enum TextureFiltering {
 
 export class TextureFilteringResolver {
 
-    public static enumToGlMagnification(textureFilter: TextureFiltering): MagnificationFilter {
+    public static enumToGlMagnification(textureFilter: TextureFiltering): GlMagnificationFilter {
         if (textureFilter === TextureFiltering.None) {
-            return MagnificationFilter.NEAREST;
+            return GlMagnificationFilter.NEAREST;
         } else {
-            return MagnificationFilter.LINEAR;
+            return GlMagnificationFilter.LINEAR;
         }
     }
 
-    public static enumToGlMinification(textureFilter: TextureFiltering): MinificationFilter {
+    public static enumToGlMinification(textureFilter: TextureFiltering): GlMinificationFilter {
         if (textureFilter === TextureFiltering.None) {
-            return MinificationFilter.NEAREST_MIPMAP_NEAREST
+            return GlMinificationFilter.NEAREST_MIPMAP_NEAREST
         } else if (textureFilter === TextureFiltering.Bilinear) {
-            return MinificationFilter.LINEAR_MIPMAP_NEAREST
+            return GlMinificationFilter.LINEAR_MIPMAP_NEAREST
         } else {
-            return MinificationFilter.LINEAR_MIPMAP_LINEAR
+            return GlMinificationFilter.LINEAR_MIPMAP_LINEAR
         }
     }
 

@@ -5,6 +5,7 @@ import { Material } from '../../material/Material';
 import { MaterialSlot } from '../../material/MaterialSlot';
 import { Engine } from '../../core/Engine';
 import { Utility } from '../../utility/Utility';
+import { Conventions } from '../Conventions';
 
 export class SkyBoxShader extends Shader {
 
@@ -12,9 +13,9 @@ export class SkyBoxShader extends Shader {
         const slot = renderableComponent.getMaterial().getSlot(Material.SKYBOX);
         const usable = this.isCubeMapUsable(renderableComponent, slot);
         if (usable) {
-            slot.getCubeMapTexture().bindToTextureUnit(0);
+            slot.getCubeMapTexture().getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
         } else {
-            Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE).bindToTextureUnit(0);
+            Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE).getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
         }
 
         this.getShaderProgram().loadBoolean('isThereCubeMap', usable);
@@ -29,7 +30,7 @@ export class SkyBoxShader extends Shader {
     }
 
     protected connectTextureUnits(): void {
-        this.getShaderProgram().connectTextureUnit('cubeMap', 0);
+        this.getShaderProgram().connectTextureUnit('cubeMap', Conventions.ZERO_TEXTURE_UNIT);
     }
 
     protected getVertexShaderPath(): string {

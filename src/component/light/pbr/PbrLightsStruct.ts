@@ -1,5 +1,5 @@
-import { Ubo } from '../../../webgl/buffer/Ubo';
-import { BufferObjectUsage } from '../../../webgl/enum/BufferObjectUsage';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
+import { GlBufferObjectUsage } from '../../../webgl/enum/GlBufferObjectUsage';
 import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 import { Log } from '../../../utility/log/Log';
@@ -17,7 +17,7 @@ export class PbrLightsStruct {
     private static readonly LIGHT_DATASIZE = 80;
     private static readonly LIGHT_COUNT = 16;
 
-    private ubo: Ubo;
+    private ubo: GlUbo;
     private lights = new Array<PbrLightComponent>();
     private addedLightCount = 0;
     private shadowLightIndex = -1;
@@ -37,8 +37,8 @@ export class PbrLightsStruct {
 
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
-            this.ubo = new Ubo();
-            this.ubo.allocate(PbrLightsStruct.LIGHT_DATASIZE * (PbrLightsStruct.LIGHT_COUNT), BufferObjectUsage.STATIC_DRAW);
+            this.ubo = new GlUbo();
+            this.ubo.allocate(PbrLightsStruct.LIGHT_DATASIZE * (PbrLightsStruct.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'PBR Lights ubo created');
         }
     }

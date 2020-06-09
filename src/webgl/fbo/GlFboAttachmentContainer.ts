@@ -1,49 +1,57 @@
 import { GlTexture2D } from '../texture/GlTexture2D';
-import { Rbo } from './Rbo';
+import { GlRbo } from './GlRbo';
 import { Utility } from '../../utility/Utility';
-import { FboAttachmentSlot, AttachmentSlotResolver } from '../enum/FboAttachmentSlot';
+import { GlFboAttachmentSlot, GlAttachmentSlotResolver } from '../enum/GlFboAttachmentSlot';
 import { GlCubeMapTextureSide } from '../texture/GlCubeMapTextureSide';
-import { IFboAttachment } from './IFboAttachment';
-import { Fbo } from './Fbo';
+import { IGlFboAttachment } from './IGlFboAttachment';
+import { GlFbo } from './GlFbo';
 import { Gl } from '../Gl';
-import { CubeMapSideResolver } from '../enum/CubeMapSide';
+import { GlCubeMapSideResolver } from '../enum/GlCubeMapSide';
 import { GlTexture2DArrayLayer } from '../texture/GlTexture2DArrayLayer';
 
-export class FboAttachmentContainer {
+export class GlFboAttachmentContainer {
 
     private texture: GlTexture2D;
     private textureArrayLayer: GlTexture2DArrayLayer;
     private cubeMapSideTexture: GlCubeMapTextureSide;
-    private rbo: Rbo;
+    private rbo: GlRbo;
     private index: number;
-    private slot: FboAttachmentSlot;
-    private draw = false;
-    private fbo: Fbo;
+    private slot: GlFboAttachmentSlot;
+    private fbo: GlFbo;
 
-    public constructor(fbo: Fbo, slot: FboAttachmentSlot, index: number) {
+    public constructor(fbo: GlFbo, slot: GlFboAttachmentSlot, index = 0) {
         this.fbo = fbo;
         this.slot = slot;
         this.index = index;
-        if (index === 0) {
-            this.draw = true;
-        }
     }
 
     public getIndex(): number {
         return this.index;
     }
 
-    public getSlot(): FboAttachmentSlot {
+    public getId(): number {
+        return Gl.gl.COLOR_ATTACHMENT0 + this.getIndex();
+    }
+
+    public getSlot(): GlFboAttachmentSlot {
         return this.slot;
     }
 
-    public getFbo(): Fbo {
+    public getFbo(): GlFbo {
         return this.fbo;
     }
 
-    //getter------------------------------------------------------------------------------------------------------------
-    public getAttachment(): IFboAttachment {
-        return this.isThereRboAttachment() ? this.getRboAttachment() : (this.isThereTextureAttachment() ? this.getTextureAttachment() : (this.isThereTextureArrayLayerAttachment() ? this.getTextureArrayLayerAttachment() : this.getCubeMapSideTextureAttachment()));
+    //getter
+    public getAttachment(): IGlFboAttachment {
+        if (this.isThereRboAttachment()) {
+            return this.getRboAttachment();
+        } else if (this.isThereTextureAttachment()) {
+            return this.getTextureAttachment();
+        } else if (this.isThereTextureArrayLayerAttachment()) {
+            return this.getTextureArrayLayerAttachment();
+        } else {
+            return this.getCubeMapSideTextureAttachment();
+        }
     }
 
     public getTextureAttachment(): GlTexture2D {
@@ -58,18 +66,18 @@ export class FboAttachmentContainer {
         return this.isThereCubeMapSideTextureAttachment() ? this.cubeMapSideTexture : null;
     }
 
-    public getRboAttachment(): Rbo {
+    public getRboAttachment(): GlRbo {
         return this.isThereRboAttachment() ? this.rbo : null;
     }
 
-    //attach------------------------------------------------------------------------------------------------------------
+    //attach
     public attachTexture2D(texture: GlTexture2D): void {
         this.rbo = null;
         this.texture = texture;
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.TEXTURE_2D, texture.getId(), 0);
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.TEXTURE_2D, texture.getId(), 0);
     }
 
     public attachTexture2DArrayLayer(texture: GlTexture2DArrayLayer): void {
@@ -78,7 +86,7 @@ export class FboAttachmentContainer {
         this.textureArrayLayer = texture;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, texture.getTexture2DArray().getId(), 0, texture.getLayer());
+        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), texture.getTexture2DArray().getId(), 0, texture.getLayer());
     }
 
     public attachCubeMapTextureSide(texture: GlCubeMapTextureSide): void {
@@ -87,16 +95,16 @@ export class FboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = texture;
         this.fbo.bind();
-        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, texture.getCubeMapTexture().getId(), 0, CubeMapSideResolver.enumToGl(texture.getSide()));
+        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), texture.getCubeMapTexture().getId(), 0, GlCubeMapSideResolver.enumToGl(texture.getSide()));
     }
 
-    public attachRbo(rbo: Rbo): void {
+    public attachRbo(rbo: GlRbo): void {
         this.rbo = rbo;
         this.texture = null;
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferRenderbuffer(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.RENDERBUFFER, rbo.getId())
+        Gl.gl.framebufferRenderbuffer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.RENDERBUFFER, rbo.getId())
     }
 
     public detachAttachment(): void {
@@ -105,10 +113,10 @@ export class FboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, AttachmentSlotResolver.enumToGl(this.slot).attachmentPointCode, Gl.gl.TEXTURE_2D, null, 0);
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.TEXTURE_2D, null, 0);
     }
 
-    //contains----------------------------------------------------------------------------------------------------------
+    //contains
     public isThereAttachment(): boolean {
         return this.isThereTextureAttachment() ||
             this.isThereTextureArrayLayerAttachment() ||
@@ -132,21 +140,22 @@ export class FboAttachmentContainer {
         return Utility.isUsable(this.rbo);
     }
 
-    //draw--------------------------------------------------------------------------------------------------------------
+    //draw
     public isDrawBuffer(): boolean {
-        return this.draw;
-    }
-
-    private setDrawBuffer(draw: boolean): void {
-        this.draw = draw;
+        for (const drawBuffer of this.fbo.getDrawBuffersIterator()) {
+            if (drawBuffer === this) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public isReadBuffer(): boolean {
-        return this.fbo.getReadBufferIndex() === this.index;
+        return this.fbo.getReadBuffer() === this;
     }
 
     public setReadBuffer(): void {
-        this.fbo.setReadBuffer(this.index);
+        this.fbo.setReadBuffer(this);
     }
 
 }

@@ -9,8 +9,6 @@ export class GlConstants {
     private static _UNMASKED_VENDOR: string;
     private static _UNMASKED_RENDERER: string;
     private static _COLOR_BUFFER_FLOAT_ENABLED: boolean;
-    private static _FLOAT_BLEND_ENABLED: boolean;
-    private static _TEXTURE_FLOAT_ENABLED: boolean;
     private static _TEXTURE_FLOAT_LINEAR_ENABLED: boolean;
     //shader
     private static _DEBUG_SHADERS_EXTENSION: WEBGL_debug_shaders;
@@ -31,7 +29,6 @@ export class GlConstants {
     private static _MAX_ARRAY_TEXTURE_LAYERS: number;
     private static _MAX_ARRAY_TEXTURE_LAYERS_SAFE = 256;
     private static _ANISOTROPIC_FILTER_EXTENSION: EXT_texture_filter_anisotropic;
-    private static _ANISOTROPIC_FILTER_ENABLED: boolean;
     private static _MAX_ANISOTROPIC_FILTER_LEVEL: number;
     private static _MAX_RENDERBUFFER_SIZE: number;
     private static _MAX_RENDERBUFFER_SIZE_SAFE = 2048;
@@ -67,8 +64,6 @@ export class GlConstants {
     private static initializeShadersAndTextures(gl: WebGL2RenderingContext): void {
         this._DEBUG_SHADERS_EXTENSION = gl.getExtension('WEBGL_debug_shaders');
         this._COLOR_BUFFER_FLOAT_ENABLED = !!gl.getExtension('EXT_color_buffer_float');
-        this._FLOAT_BLEND_ENABLED = !!gl.getExtension('EXT_float_blend');
-        this._TEXTURE_FLOAT_ENABLED = !!gl.getExtension('OES_texture_float');
         this._TEXTURE_FLOAT_LINEAR_ENABLED = !!gl.getExtension('OES_texture_float_linear');
     }
 
@@ -85,7 +80,6 @@ export class GlConstants {
         this._MAX_RENDERBUFFER_SIZE = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         this._MAX_ARRAY_TEXTURE_LAYERS = gl.getParameter(gl.MAX_ARRAY_TEXTURE_LAYERS);
         this._ANISOTROPIC_FILTER_EXTENSION = gl.getExtension('EXT_texture_filter_anisotropic');
-        this._ANISOTROPIC_FILTER_ENABLED = !!this._ANISOTROPIC_FILTER_EXTENSION;
         this._MAX_ANISOTROPIC_FILTER_LEVEL = this._ANISOTROPIC_FILTER_EXTENSION ? gl.getParameter(this._ANISOTROPIC_FILTER_EXTENSION.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 0;
         this._MAX_COMBINED_TEXTURE_IMAGE_UNITS = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
     }
@@ -125,21 +119,17 @@ export class GlConstants {
         return this._COLOR_BUFFER_FLOAT_ENABLED;
     }
 
-    public static get FLOAT_BLEND_ENABLED(): boolean {
-        return this._FLOAT_BLEND_ENABLED;
-    }
-
-    public static get TEXTURE_FLOAT_ENABLED(): boolean {
-        return this._TEXTURE_FLOAT_ENABLED;
-    }
-
-    public static get TEXTURE_FLOAT_LINEAR(): boolean {
+    public static get TEXTURE_FLOAT_LINEAR_ENABLED(): boolean {
         return this._TEXTURE_FLOAT_LINEAR_ENABLED;
     }
 
     //shader
     public static get DEBUG_SHADERS_EXTENSION(): WEBGL_debug_shaders {
         return this._DEBUG_SHADERS_EXTENSION;
+    }
+
+    public static get DEBUG_SHADERS_ENABLED(): boolean {
+        return !!this._DEBUG_SHADERS_EXTENSION;
     }
 
     //buffer
@@ -221,7 +211,7 @@ export class GlConstants {
     }
 
     public static get ANISOTROPIC_FILTER_ENABLED(): boolean {
-        return this._ANISOTROPIC_FILTER_ENABLED;
+        return !!this._ANISOTROPIC_FILTER_EXTENSION;
     }
 
     public static get MAX_ANISOTROPIC_FILTER_LEVEL(): number {

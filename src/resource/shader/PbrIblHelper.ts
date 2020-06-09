@@ -4,12 +4,11 @@ import { RenderingPipeline } from '../../rendering/RenderingPipeline';
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
 import { Utility } from '../../utility/Utility';
 import { CubeMapTexture } from '../texture/CubeMapTexture';
+import { Conventions } from '../Conventions';
+import { GlTextureUnit } from '../../webgl/GlTextureUnit';
 
 export class PbrIblHelper {
 
-    private readonly DIFFUSE_IBL_TEXTURE_UNIT = 6;
-    private readonly SPECULAR_IBL_TEXTURE_UNIT = 7;
-    private readonly BRDF_LUT_TEXTURE_UNIT = 8;
     private readonly DIFFUSE_IBL_MAP_NAME = 'diffuseIblMap';
     private readonly SPECULAR_IBL_MAP_NAME = 'specularIblMap';
     private readonly BRDF_LUT_MAP_NAME = 'brdfLutMap';
@@ -40,33 +39,33 @@ export class PbrIblHelper {
     }
 
     private loadTextures(diffuseIblMap: CubeMapTexture, specularIblMap: CubeMapTexture): void {
-        this.shaderProgram.connectTextureUnit(this.DIFFUSE_IBL_MAP_NAME, this.DIFFUSE_IBL_TEXTURE_UNIT);
-        diffuseIblMap.bindToTextureUnit(this.DIFFUSE_IBL_TEXTURE_UNIT);
-        this.shaderProgram.connectTextureUnit(this.SPECULAR_IBL_MAP_NAME, this.SPECULAR_IBL_TEXTURE_UNIT);
-        specularIblMap.bindToTextureUnit(this.SPECULAR_IBL_TEXTURE_UNIT);
-        this.shaderProgram.connectTextureUnit(this.BRDF_LUT_MAP_NAME, this.BRDF_LUT_TEXTURE_UNIT);
-        this.brdfLut.bindToTextureUnit(this.BRDF_LUT_TEXTURE_UNIT);
+        this.shaderProgram.connectTextureUnit(this.DIFFUSE_IBL_MAP_NAME, Conventions.DIFFUSE_IBL_TEXTURE_UNIT);
+        diffuseIblMap.getNativeTexture().bindToTextureUnit(Conventions.DIFFUSE_IBL_TEXTURE_UNIT);
+        this.shaderProgram.connectTextureUnit(this.SPECULAR_IBL_MAP_NAME, Conventions.SPECULAR_IBL_TEXTURE_UNIT);
+        specularIblMap.getNativeTexture().bindToTextureUnit(Conventions.SPECULAR_IBL_TEXTURE_UNIT);
+        this.shaderProgram.connectTextureUnit(this.BRDF_LUT_MAP_NAME, Conventions.BRDF_LUT_TEXTURE_UNIT);
+        this.brdfLut.getNativeTexture().bindToTextureUnit(Conventions.BRDF_LUT_TEXTURE_UNIT);
         this.shaderProgram.loadBoolean(this.ARE_THERE_IBL_MAPS, true);
         this.shaderProgram.loadFloat('specularIblLodCount', this.SPECULAR_IBL_LOD_COUNT);
     }
 
     private loadDefaultTextures(): void {
-        this.loadDefaultCubeMapTexture(this.DIFFUSE_IBL_MAP_NAME, this.DIFFUSE_IBL_TEXTURE_UNIT);
-        this.loadDefaultCubeMapTexture(this.SPECULAR_IBL_MAP_NAME, this.SPECULAR_IBL_TEXTURE_UNIT);
-        this.loadDefaultTexture2D(this.BRDF_LUT_MAP_NAME, this.BRDF_LUT_TEXTURE_UNIT);
+        this.loadDefaultCubeMapTexture(this.DIFFUSE_IBL_MAP_NAME, Conventions.DIFFUSE_IBL_TEXTURE_UNIT);
+        this.loadDefaultCubeMapTexture(this.SPECULAR_IBL_MAP_NAME, Conventions.SPECULAR_IBL_TEXTURE_UNIT);
+        this.loadDefaultTexture2D(this.BRDF_LUT_MAP_NAME, Conventions.BRDF_LUT_TEXTURE_UNIT);
         this.shaderProgram.loadBoolean(this.ARE_THERE_IBL_MAPS, false);
     }
 
-    private loadDefaultTexture2D(mapName: string, textureUnit: number): void {
+    private loadDefaultTexture2D(mapName: string, textureUnit: GlTextureUnit): void {
         const texture = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D);
         this.shaderProgram.connectTextureUnit(mapName, textureUnit);
-        texture.bindToTextureUnit(textureUnit);
+        texture.getNativeTexture().bindToTextureUnit(textureUnit);
     }
 
-    private loadDefaultCubeMapTexture(mapName: string, textureUnit: number): void {
-        const texture = Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE);
+    private loadDefaultCubeMapTexture(mapName: string, textureUnit: GlTextureUnit): void {
+        const texture = Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE);
         this.shaderProgram.connectTextureUnit(mapName, textureUnit);
-        texture.bindToTextureUnit(textureUnit);
+        texture.getNativeTexture().bindToTextureUnit(textureUnit);
     }
 
 }

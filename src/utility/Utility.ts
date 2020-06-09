@@ -1,10 +1,11 @@
 import { mat4, vec3, vec4, quat } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
-import { Fbo } from '../webgl/fbo/Fbo';
-import { FboAttachmentSlot } from '../webgl/enum/FboAttachmentSlot';
-import { FboAttachmentContainer } from '../webgl/fbo/FboAttachmentContainer';
+import { GlFbo } from '../webgl/fbo/GlFbo';
+import { GlFboAttachmentSlot } from '../webgl/enum/GlFboAttachmentSlot';
+import { GlFboAttachmentContainer } from '../webgl/fbo/GlFboAttachmentContainer';
 import parseHdr, { HdrImageResult } from 'parse-hdr';
+import { GlConstants } from '../webgl/GlConstants';
 
 export class Utility {
 
@@ -106,19 +107,19 @@ export class Utility {
         return resource && resource.isUsable();
     }
 
-    public static releaseFboAndAttachments(fbo: Fbo): void {
+    public static releaseFboAndAttachments(fbo: GlFbo): void {
         if (this.isUsable(fbo)) {
-            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH));
-            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.STENCIL));
-            this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH_STENCIL));
-            for (let i = 0; i < Fbo.getMaxColorAttachments(); i++) {
-                this.releaseFboAttachment(fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, i));
+            this.releaseFboAttachment(fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH));
+            this.releaseFboAttachment(fbo.getAttachmentContainer(GlFboAttachmentSlot.STENCIL));
+            this.releaseFboAttachment(fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH_STENCIL));
+            for (let i = 0; i < GlConstants.MAX_COLOR_ATTACHMENTS; i++) {
+                this.releaseFboAttachment(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, i));
             }
             fbo.release();
         }
     }
 
-    private static releaseFboAttachment(attachmentContainer: FboAttachmentContainer): void {
+    private static releaseFboAttachment(attachmentContainer: GlFboAttachmentContainer): void {
         this.releaseIfUsable(attachmentContainer.getTextureAttachment());
         this.releaseIfUsable(attachmentContainer.getRboAttachment());
     }

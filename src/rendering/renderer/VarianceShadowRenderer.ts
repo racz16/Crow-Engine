@@ -1,34 +1,36 @@
 import { Renderer } from '../Renderer';
-import { Fbo } from '../../webgl/fbo/Fbo';
-import { FboAttachmentSlot } from '../../webgl/enum/FboAttachmentSlot';
+import { GlFbo } from '../../webgl/fbo/GlFbo';
+import { GlFboAttachmentSlot } from '../../webgl/enum/GlFboAttachmentSlot';
 import { Gl } from '../../webgl/Gl';
-import { CullFace } from '../../webgl/enum/CullFace';
-import { InternalFormat } from '../../webgl/enum/InternalFormat';
+import { GlCullFace } from '../../webgl/enum/GlCullFace';
+import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { ICameraComponent } from '../../component/camera/ICameraComponent';
-import { Rbo } from '../../webgl/fbo/Rbo';
+import { GlRbo } from '../../webgl/fbo/GlRbo';
 import { VarianceShadowShader } from '../../resource/shader/VarianceShadowShader';
 import { GaussianBlurShader } from '../../resource/shader/GaussianBlurShader';
 import { QuadMesh } from '../../resource/mesh/QuadMesh';
 import { mat4, vec2, vec4, vec3, quat } from 'gl-matrix';
 import { GlTexture2DArray } from '../../webgl/texture/GlTexture2DArray';
-import { TextureWrap } from '../../webgl/enum/TextureWrap';
+import { GlWrap } from '../../webgl/enum/GlWrap';
 import { FrustumCornerPointResolver } from '../../component/camera/frustum/FrustumCornerPoint';
 import { BlinnPhongLightsStruct } from '../../component/light/blinnphong/BlinnPhongLightsStruct';
 import { CameraType } from '../../component/camera/CameraType';
-import { MinificationFilter } from '../../webgl/enum/MinificationFilter';
-import { MagnificationFilter } from '../../webgl/enum/MagnificationFIlter';
+import { GlMinificationFilter } from '../../webgl/enum/GlMinificationFilter';
+import { GlMagnificationFilter } from '../../webgl/enum/GlMagnificationFIlter';
+import { Conventions } from '../../resource/Conventions';
+import { GlConstants } from '../../webgl/GlConstants';
 
 export class VarianceShadowRenderer extends Renderer {
 
     private readonly projectionViewMatrices = new Array<mat4>();
     private shader: VarianceShadowShader;
     private gaussianBlurShader: GaussianBlurShader;
-    private fbo: Fbo;
+    private fbo: GlFbo;
     private fboTextures = new Array<GlTexture2DArray>();
     private readonly resolution = 1024;
     private readonly splitCount = 3;//if you change, also change in the shaders
@@ -39,6 +41,9 @@ export class VarianceShadowRenderer extends Renderer {
 
     public constructor() {
         super('Variance Shadow Renderer');
+        if (!GlConstants.COLOR_BUFFER_FLOAT_ENABLED) {
+            throw new Error();
+        }
         this.shader = new VarianceShadowShader();
         this.gaussianBlurShader = new GaussianBlurShader();
         this.fboTextures = new Array<GlTexture2DArray>();
@@ -65,29 +70,33 @@ export class VarianceShadowRenderer extends Renderer {
 
     private createFbo(): void {
         if (!Utility.isUsable(this.fbo)) {
-            this.fbo = new Fbo();
+            this.fbo = new GlFbo();
 
             const tex1 = new GlTexture2DArray();
-            tex1.allocate(InternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
-            tex1.setMinificationFilter(MinificationFilter.LINEAR);
-            tex1.setMagnificationFilter(MagnificationFilter.LINEAR);
-            tex1.setWrapU(TextureWrap.REPEAT);
-            tex1.setWrapV(TextureWrap.REPEAT);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(tex1.getLayer(0));
+            //TODO
+            //miért rgba? nem rg-nek kéne lennie?
+            //rémlik, hogy volt ezzel valami gond, kifagyott az egész
+            //érdemes lenne ránézni
+            tex1.allocate(GlInternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
+            tex1.setMinificationFilter(GlMinificationFilter.LINEAR);
+            tex1.setMagnificationFilter(GlMagnificationFilter.LINEAR);
+            tex1.setWrapU(GlWrap.REPEAT);
+            tex1.setWrapV(GlWrap.REPEAT);
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(tex1.getLayer(0));
             this.fboTextures.push(tex1);
             Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOWMAP, tex1);
 
             const tex2 = new GlTexture2DArray();
-            tex2.allocate(InternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
-            tex2.setMinificationFilter(MinificationFilter.LINEAR);
-            tex2.setMagnificationFilter(MagnificationFilter.LINEAR);
-            tex2.setWrapU(TextureWrap.REPEAT);
-            tex2.setWrapV(TextureWrap.REPEAT);
+            tex2.allocate(GlInternalFormat.RGBA32F, vec2.fromValues(this.resolution, this.resolution), this.splitCount, false);
+            tex2.setMinificationFilter(GlMinificationFilter.LINEAR);
+            tex2.setMagnificationFilter(GlMagnificationFilter.LINEAR);
+            tex2.setWrapU(GlWrap.REPEAT);
+            tex2.setWrapV(GlWrap.REPEAT);
             this.fboTextures.push(tex2);
 
-            const rbo = new Rbo();
-            rbo.allocate(vec2.fromValues(this.resolution, this.resolution), InternalFormat.DEPTH32F, 1);
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).attachRbo(rbo);
+            const rbo = new GlRbo();
+            rbo.allocate(vec2.fromValues(this.resolution, this.resolution), GlInternalFormat.DEPTH32F, 1);
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).attachRbo(rbo);
 
             if (!this.fbo.isDrawComplete()) {
                 throw new Error();
@@ -165,8 +174,8 @@ export class VarianceShadowRenderer extends Renderer {
     protected renderUnsafe(): void {
         for (let i = 0; i < this.splitCount; i++) {
             this.index = i;
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
-            Gl.setViewport(this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getAttachment().getSize(), vec2.create());
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
+            Gl.setViewport(this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).getAttachment().getSize(), vec2.create());
             Gl.setClearColor(vec4.fromValues(1, 1, 1, 1));
             Gl.clear(true, true, false);
             const renderables = Engine.getRenderingPipeline().getRenderableContainer();
@@ -223,7 +232,7 @@ export class VarianceShadowRenderer extends Renderer {
     }
 
     protected afterRendering(): void {
-        Gl.setCullFace(CullFace.BACK);
+        Gl.setCullFace(GlCullFace.BACK);
         this.blurShadowMap();
         Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
     }
@@ -233,12 +242,12 @@ export class VarianceShadowRenderer extends Renderer {
         for (let i = 0; i < this.splitCount; i++) {
             //const blurOffset = (this.blur * 25) / ((this.wsSplitDistances[i + 1] - this.wsSplitDistances[i]) * this.resolution);
             const blurOffset = this.blur / this.resolution;
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[1].getLayer(i));
-            this.fboTextures[0].bindToTextureUnit(0);
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[1].getLayer(i));
+            this.fboTextures[0].bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
             this.renderGaussianPass(true, i, blurOffset);
 
-            this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
-            this.fboTextures[1].bindToTextureUnit(0);
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
+            this.fboTextures[1].bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
             this.renderGaussianPass(false, i, blurOffset);
         }
 
@@ -264,15 +273,15 @@ export class VarianceShadowRenderer extends Renderer {
 
     private releaseFbo(): void {
         if (Utility.isUsable(this.fbo)) {
-            const tex1 = this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).getTextureAttachment();
+            const tex1 = this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).getTextureAttachment();
             if (Utility.isUsable(tex1)) {
                 tex1.release();
             }
-            const tex2 = this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 1).getTextureAttachment();
+            const tex2 = this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).getTextureAttachment();
             if (Utility.isUsable(tex2)) {
                 tex2.release();
             }
-            const rbo = this.fbo.getAttachmentContainer(FboAttachmentSlot.DEPTH).getRboAttachment();
+            const rbo = this.fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).getRboAttachment();
             if (rbo) {
                 rbo.release();
             }

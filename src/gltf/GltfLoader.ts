@@ -13,12 +13,12 @@ import { PbrPointLightComponent } from "../component/light/pbr/PbrPointLightComp
 import { PbrSpotLightComponent } from "../component/light/pbr/PbrSpotLightComponent";
 import { GltfResult } from "./GltfResult";
 import { CameraType } from "../component/camera/CameraType";
-import { Vao } from "../webgl/Vao";
-import { Vbo } from "../webgl/buffer/Vbo";
-import { BufferObjectUsage } from "../webgl/enum/BufferObjectUsage";
+import { GlVao } from "../webgl/GlVao";
+import { GlVbo } from "../webgl/buffer/GlVbo";
+import { GlBufferObjectUsage } from "../webgl/enum/GlBufferObjectUsage";
 import { Conventions } from "../resource/Conventions";
-import { VertexAttribPointer } from "../webgl/VertexAttribPointer";
-import { Ebo } from "../webgl/buffer/Ebo";
+import { GlVertexAttribPointer } from "../webgl/GlVertexAttribPointer";
+import { GlEbo } from "../webgl/buffer/GlEbo";
 import { StaticMesh } from "../resource/mesh/StaticMesh";
 import { MeshComponent } from "../component/renderable/MeshComponent";
 import { Material } from "../material/Material";
@@ -33,12 +33,13 @@ import { GltfMaterial } from "./interface/GltfMaterial";
 import { GlTexture2D } from "../webgl/texture/GlTexture2D";
 import { GltfBuffer } from "./interface/GltfBuffer";
 import { GltfImage } from "./interface/GltfImage";
-import { InternalFormat } from "../webgl/enum/InternalFormat";
+import { GlInternalFormat } from "../webgl/enum/GlInternalFormat";
 import { GlSampler } from "../webgl/GlSampler";
-import { MinificationFilter } from "../webgl/enum/MinificationFilter";
-import { MagnificationFilter } from "../webgl/enum/MagnificationFIlter";
-import { TextureWrap } from "../webgl/enum/TextureWrap";
+import { GlMinificationFilter } from "../webgl/enum/GlMinificationFilter";
+import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
+import { GlWrap } from "../webgl/enum/GlWrap";
 import { GltfResolver } from "./GltfResolver";
+import { TagContainer } from "../core/TagContainer";
 
 export class GltfLoader implements IResource {
 
@@ -69,6 +70,8 @@ export class GltfLoader implements IResource {
     private static readonly BYTE = 4;
 
     private static glbBinaryStart: number;
+
+    private tagContainer = new TagContainer();
 
     private gltf: GltfFile;
 
@@ -189,13 +192,13 @@ export class GltfLoader implements IResource {
             const array = new Uint8Array(binary, bufferView.byteOffset, bufferView.byteLength);
             const blob = new Blob([array], { type: image.mimeType });
             const imageElement = await Utility.loadImage(URL.createObjectURL(blob));
-            return GlTexture2D.createTexture(imageElement, InternalFormat.RGBA8, true, false);
+            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
         } else if (image.uri.startsWith('data:')) {
             const imageElement = await Utility.loadImage(image.uri);
-            return GlTexture2D.createTexture(imageElement, InternalFormat.RGBA8, true, false);
+            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
         } else {
             const imageElement = await Utility.loadImage(`${basePath}/${image.uri}`);
-            return GlTexture2D.createTexture(imageElement, InternalFormat.RGBA8, true, false);
+            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
         }
     }
 
@@ -578,10 +581,10 @@ export class GltfLoader implements IResource {
     private createSampler(samplerIndex: number): GlSampler {
         if (samplerIndex == null) {
             const sampler = new GlSampler();
-            sampler.setMinificationFilter(MinificationFilter.LINEAR_MIPMAP_LINEAR);
-            sampler.setMagnificationFilter(MagnificationFilter.LINEAR);
-            sampler.setWrapU(TextureWrap.REPEAT);
-            sampler.setWrapV(TextureWrap.REPEAT);
+            sampler.setMinificationFilter(GlMinificationFilter.LINEAR_MIPMAP_LINEAR);
+            sampler.setMagnificationFilter(GlMagnificationFilter.LINEAR);
+            sampler.setWrapU(GlWrap.REPEAT);
+            sampler.setWrapV(GlWrap.REPEAT);
             return sampler;
         } else {
             const gltfSampler = this.gltf.samplers[samplerIndex];
@@ -606,8 +609,8 @@ export class GltfLoader implements IResource {
         }
     }
 
-    private createVao(primitive: GltfPrimitive): Vao {
-        const vao = new Vao();
+    private createVao(primitive: GltfPrimitive): GlVao {
+        const vao = new GlVao();
         this.addVbo(vao, Conventions.POSITIONS_VBO_INDEX, primitive.attributes.POSITION);
         this.addVbo(vao, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, primitive.attributes.TEXCOORD_0);
         this.addVbo(vao, Conventions.TEXTURE_COORDINATES_1_VBO_INDEX, primitive.attributes.TEXCOORD_1);
@@ -618,7 +621,7 @@ export class GltfLoader implements IResource {
         return vao;
     }
 
-    private addVbo(vao: Vao, vboIndex: number, accessorIndex: number): Promise<void> {
+    private addVbo(vao: GlVao, vboIndex: number, accessorIndex: number): Promise<void> {
         if (accessorIndex == null) {
             return;
         }
@@ -639,13 +642,13 @@ export class GltfLoader implements IResource {
         //buffer
         const binary = this.binaries[bufferView.buffer];
         //vbo
-        const posVbo = new Vbo();
-        posVbo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), BufferObjectUsage.STATIC_DRAW);
-        vao.getVertexAttribArray(vboIndex).setVbo(posVbo, new VertexAttribPointer(size, type, normalized, 0, stride));
+        const posVbo = new GlVbo();
+        posVbo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
+        vao.getVertexAttribArray(vboIndex).setVbo(posVbo, new GlVertexAttribPointer(size, type, normalized, 0, stride));
         vao.getVertexAttribArray(vboIndex).setEnabled(true);
     }
 
-    private addEbo(vao: Vao, accessorIndex: number): Promise<void> {
+    private addEbo(vao: GlVao, accessorIndex: number): Promise<void> {
         if (accessorIndex == null) {
             return;
         }
@@ -662,12 +665,12 @@ export class GltfLoader implements IResource {
         //buffer
         const binary = this.binaries[bufferView.buffer];
         //ebo
-        const ebo = new Ebo();
-        ebo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), BufferObjectUsage.STATIC_DRAW);
+        const ebo = new GlEbo();
+        ebo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
         vao.setEbo(ebo);
     }
 
-    private createStaticMesh(primitive: GltfPrimitive, vao: Vao): StaticMesh {
+    private createStaticMesh(primitive: GltfPrimitive, vao: GlVao): StaticMesh {
         const positionsAccessor = this.gltf.accessors[primitive.attributes.POSITION];
         const vertexCount = primitive.indices != null ? this.gltf.accessors[primitive.indices].count : positionsAccessor.count;
         const faceCount = GltfResolver.computeFaceCount(vertexCount, primitive.mode);
@@ -679,16 +682,16 @@ export class GltfLoader implements IResource {
         return new StaticMesh(vao, vertexCount, faceCount, renderingMode, indicesType, aabbMin, aabbMax, radius);
     }
 
-    public getAllDataSize(): number {
-        return this.getDataSize();
-    }
-
     public getDataSize(): number {
         let size = 0;
         for (const binary of this.binaries) {
             size += binary.byteLength;
         }
         return size;
+    }
+
+    public getAllDataSize(): number {
+        return this.getDataSize();
     }
 
     public release(): void {

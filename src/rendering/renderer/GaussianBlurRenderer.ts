@@ -3,6 +3,7 @@ import { GaussianBlurShader } from '../../resource/shader/GaussianBlurShader';
 import { Engine } from '../../core/Engine';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { Gl } from '../../webgl/Gl';
+import { Conventions } from '../../resource/Conventions';
 
 export class GaussianBlurRenderer extends PostProcessRenderer {
 
@@ -19,7 +20,7 @@ export class GaussianBlurRenderer extends PostProcessRenderer {
 
     protected renderUnsafe(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.bindToTextureUnit(0);
+        image.getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
         Gl.setEnableDepthTest(false);
         this.renderGaussianPass();
     }

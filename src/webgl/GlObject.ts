@@ -1,11 +1,14 @@
 import { IResource } from '../resource/IResource';
 import { Engine } from '../core/Engine';
+import { TagContainer } from '../core/TagContainer';
 
 export abstract class GlObject implements IResource {
 
     protected static readonly INVALID_ID = -1;
-    private dataSize = 0;
+
     private id = GlObject.INVALID_ID;
+    private tagContainer = new TagContainer();
+    private dataSize = 0;
 
     public constructor() {
         Engine.getResourceManager().add(this);
@@ -19,16 +22,16 @@ export abstract class GlObject implements IResource {
         this.id = id;
     }
 
-    public getAllDataSize(): number {
-        return this.dataSize;
-    }
-
     public getDataSize(): number {
         return this.dataSize;
     }
 
     protected setDataSize(size: number): void {
         this.dataSize = size;
+    }
+
+    public getAllDataSize(): number {
+        return this.dataSize;
     }
 
     public isUsable(): boolean {

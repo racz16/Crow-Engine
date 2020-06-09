@@ -1,37 +1,37 @@
 import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
-import { ShaderStage, ShaderStageResolver } from '../enum/ShaderStage';
+import { GlShaderStage, GlShaderStageResolver } from '../enum/GlShaderStage';
 import { GlConstants } from '../GlConstants';
 
 export class GlShader extends GlObject {
 
-    private stage: ShaderStage;
+    private stage: GlShaderStage;
 
-    public constructor(stage: ShaderStage) {
+    public constructor(stage: GlShaderStage) {
         super();
         this.setStage(stage);
         this.setId(this.createId());
     }
 
     private createId(): number {
-        const glStage = ShaderStageResolver.enumToGl(this.stage);
+        const glStage = GlShaderStageResolver.enumToGl(this.stage);
         return Gl.gl.createShader(glStage) as number;
+    }
+
+    public getShaderSource(): string {
+        return Gl.gl.getShaderSource(this.getId());
     }
 
     public getTranslatedShaderSource(): string {
         const debugExtension = GlConstants.DEBUG_SHADERS_EXTENSION;
-        if (debugExtension) {
-            return debugExtension.getTranslatedShaderSource(this.getId());
-        } else {
-            return null;
-        }
+        return debugExtension.getTranslatedShaderSource(this.getId());
     }
 
-    public getStage(): ShaderStage {
+    public getStage(): GlShaderStage {
         return this.stage;
     }
 
-    private setStage(stage: ShaderStage): void {
+    private setStage(stage: GlShaderStage): void {
         this.stage = stage;
     }
 
@@ -55,4 +55,5 @@ export class GlShader extends GlObject {
         Gl.gl.deleteShader(this.getId());
         this.setId(GlObject.INVALID_ID);
     }
+
 }

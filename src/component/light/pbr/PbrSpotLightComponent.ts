@@ -1,4 +1,4 @@
-import { Ubo } from '../../../webgl/buffer/Ubo';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { Utility } from '../../../utility/Utility';
 import { PbrLightComponent } from './PbrLightComponent';
 
@@ -43,7 +43,7 @@ export class PbrSpotLightComponent extends PbrLightComponent {
         this.range = range;
     }
 
-    protected refresh(ubo: Ubo, index: number) {
+    protected refresh(ubo: GlUbo, index: number) {
         ubo.store(new Float32Array(this.getColor()), this.computeOffset(PbrLightComponent.COLOR_OFFSET, index));
         ubo.store(new Float32Array(this.getGameObject().getTransform().getForwardVector()), this.computeOffset(PbrLightComponent.DIRECTION_OFFSET, index));
         ubo.store(new Float32Array(this.getGameObject().getTransform().getAbsolutePosition()), this.computeOffset(PbrLightComponent.POSITION_OFFSET, index));

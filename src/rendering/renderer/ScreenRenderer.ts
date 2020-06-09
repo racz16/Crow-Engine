@@ -5,7 +5,8 @@ import { TexturedQuadShader } from '../../resource/Shader/TexturedQuadShader';
 import { Gl } from '../../webgl/Gl';
 import { vec2, mat4 } from 'gl-matrix';
 import { Engine } from '../../core/Engine';
-import { Fbo } from '../../webgl/fbo/Fbo';
+import { GlFbo } from '../../webgl/fbo/GlFbo';
+import { Conventions } from '../../resource/Conventions';
 
 export class ScreenRenderer extends Renderer {
 
@@ -32,7 +33,7 @@ export class ScreenRenderer extends Renderer {
 
     protected beforeRendering(): void {
         super.beforeRendering();
-        Fbo.bindDefaultFrameBuffer();
+        GlFbo.bindDefaultFrameBuffer();
         Gl.clear(true, true, false);
         //this.shader.start();
         this.shader.setUniforms(this.transformation);
@@ -43,7 +44,7 @@ export class ScreenRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.bindToTextureUnit(10);
+        image.getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
     }
 
     protected draw(): void {

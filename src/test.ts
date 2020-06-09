@@ -24,7 +24,7 @@ import { CubeMesh } from './resource/mesh/CubeMesh';
 import { SkyboxRenderer } from './rendering/renderer/SkyboxRenderer';
 import { PbrRenderer } from './rendering/renderer/PbrRenderer';
 import { PbrDirectionalLightComponent } from './component/light/pbr/PbrDirectionalLightComponent';
-import { TextureWrap } from './webgl/enum/TextureWrap';
+import { GlWrap } from './webgl/enum/GlWrap';
 import { RenderingPipeline } from './rendering/RenderingPipeline';
 import { Utility } from './utility/Utility';
 import { BlinnPhongLightsStruct } from './component/light/blinnphong/BlinnPhongLightsStruct';
@@ -148,9 +148,9 @@ export class TestSceneBuilder {
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_DIFFUSE_IBL_MAP, diffuseIblMap);
         const specularIblMap = new CubeMapTexture(paths, true, TextureType.IMAGE);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_SPECULAR_IBL_MAP, specularIblMap);
-        specularIblMap.getNativeTexture().setWrapU(TextureWrap.CLAMP_TO_EDGE);
-        specularIblMap.getNativeTexture().setWrapV(TextureWrap.CLAMP_TO_EDGE);
-        specularIblMap.getNativeTexture().setWrapW(TextureWrap.CLAMP_TO_EDGE);
+        specularIblMap.getNativeTexture().setWrapU(GlWrap.CLAMP_TO_EDGE);
+        specularIblMap.getNativeTexture().setWrapV(GlWrap.CLAMP_TO_EDGE);
+        specularIblMap.getNativeTexture().setWrapW(GlWrap.CLAMP_TO_EDGE);
         specularIblMap.setTextureFiltering(TextureFiltering.Trilinear);
 
         const sky = new GameObject();

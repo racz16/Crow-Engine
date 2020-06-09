@@ -5,15 +5,16 @@ import { Material } from '../../../material/Material';
 import { Engine } from '../../../core/Engine';
 import { Utility } from '../../../utility/Utility';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { GlTextureUnit } from '../../../webgl/GlTextureUnit';
 
 export abstract class ShaderSlotHelper {
 
     protected slot: MaterialSlot;
     protected shaderProgram: GlShaderProgram;
-    protected textureUnit: number;
+    protected textureUnit: GlTextureUnit;
     protected multipleTextureCoordinates: boolean;
 
-    public constructor(sp: GlShaderProgram, textureUnit: number, multipleTextureCoordinates: boolean) {
+    public constructor(sp: GlShaderProgram, textureUnit: GlTextureUnit, multipleTextureCoordinates: boolean) {
         this.shaderProgram = sp;
         this.textureUnit = textureUnit;
         this.multipleTextureCoordinates = multipleTextureCoordinates;
@@ -56,7 +57,7 @@ export abstract class ShaderSlotHelper {
     protected loadTexture2D(): void {
         const texture = this.slot.getTexture2D();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
         this.shaderProgram.loadVector2(this.getTileName(), this.slot.getTextureTile());
         this.shaderProgram.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
@@ -68,7 +69,7 @@ export abstract class ShaderSlotHelper {
     protected loadCubeMapTexture(): void {
         const texture = this.slot.getCubeMapTexture();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
     }
 
@@ -85,7 +86,7 @@ export abstract class ShaderSlotHelper {
     protected loadDefaultTexture2D(): void {
         const texture = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
         if (this.multipleTextureCoordinates) {
             this.shaderProgram.loadInt(this.getTextureCoordinateName(), 0);
@@ -93,9 +94,9 @@ export abstract class ShaderSlotHelper {
     }
 
     protected loadDefaultCubeMapTexture(): void {
-        const texture = Engine.getParameters().get(Engine.DEFAULT_CUBE_MAP_TEXTURE);
+        const texture = Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.bindToTextureUnit(this.getTextureUnit());
+        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 
@@ -131,7 +132,7 @@ export abstract class ShaderSlotHelper {
         return this.slot && this.slot.isActive() && this.slot.getParameters().get(parameterKey) != null;
     }
 
-    protected getTextureUnit(): number {
+    protected getTextureUnit(): GlTextureUnit {
         return this.textureUnit;
     }
 

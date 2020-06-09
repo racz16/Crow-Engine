@@ -1,16 +1,19 @@
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
-import { InternalFormat } from '../../webgl/enum/InternalFormat';
+import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
 import { vec2 } from 'gl-matrix';
 import { ITexture2D } from './ITexture2D';
 import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
 import { Utility } from '../../utility/Utility';
 import { TextureType } from './enum/TextureType';
 import { GlSampler } from '../../webgl/GlSampler';
+import { TagContainer } from '../../core/TagContainer';
 
 export class Texture2D implements ITexture2D {
 
     private texture: GlTexture2D;
     private sampler: GlSampler;
+
+    private tagContainer = new TagContainer();
 
     public constructor(texture: GlTexture2D, sampler: GlSampler) {
         this.texture = texture;
@@ -27,23 +30,20 @@ export class Texture2D implements ITexture2D {
 
     public async createHdr(path: string, hasAlphaChannel: boolean, flipY = true): Promise<Texture2D> {
         const image = await Utility.loadHdrImage(path);
-        const internalFormat = hasAlphaChannel ? InternalFormat.RGBA32F : InternalFormat.RGB32F;
-        const texture = GlTexture2D.createHdrTexture(image, internalFormat, true, flipY);
+        const internalFormat = hasAlphaChannel ? GlInternalFormat.RGBA32F : GlInternalFormat.RGB32F;
+        const size = vec2.fromValues(image.shape[0], image.shape[1]);
+        const texture = GlTexture2D.createTextureFromBinary(image.data, size, internalFormat, true, flipY);
         return new Texture2D(texture, new GlSampler());
     }
 
-    private static computeInternalFormat(hasAlphaChannel: boolean, type: TextureType): InternalFormat {
+    private static computeInternalFormat(hasAlphaChannel: boolean, type: TextureType): GlInternalFormat {
         if (type === TextureType.IMAGE) {
-            return InternalFormat.SRGB8_A8;
+            return GlInternalFormat.SRGB8_A8;
         } else if (hasAlphaChannel && type === TextureType.DATA) {
-            return InternalFormat.RGBA8;
+            return GlInternalFormat.RGBA8;
         } else {
-            return InternalFormat.RGB8;
+            return GlInternalFormat.RGB8;
         }
-    }
-
-    public bindToTextureUnit(textureUnit: number): void {
-        this.texture.bindToTextureUnitWithSampler(textureUnit, this.sampler);
     }
 
     public setTextureFiltering(textureFiltering: TextureFiltering): void {

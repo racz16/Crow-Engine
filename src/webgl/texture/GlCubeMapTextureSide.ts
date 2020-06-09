@@ -1,19 +1,19 @@
 import { GlCubeMapTexture } from './GlCubeMapTexture';
-import { CubeMapSide, CubeMapSideResolver } from '../enum/CubeMapSide';
-import { InternalFormat } from '../enum/InternalFormat';
+import { GlCubeMapSide, GlCubeMapSideResolver } from '../enum/GlCubeMapSide';
+import { GlInternalFormat } from '../enum/GlInternalFormat';
 import { vec2 } from 'gl-matrix';
-import { IFboAttachment } from '../fbo/IFboAttachment';
-import { TextureWrap } from '../enum/TextureWrap';
+import { IGlFboAttachment } from '../fbo/IGlFboAttachment';
+import { GlWrap } from '../enum/GlWrap';
 import { Gl } from '../Gl';
-import { Format, FormatResolver } from '../enum/Format';
+import { GlFormat, GlFormatResolver } from '../enum/GlFormat';
 import { Utility } from '../../utility/Utility';
 
-export class GlCubeMapTextureSide implements IFboAttachment {
+export class GlCubeMapTextureSide implements IGlFboAttachment {
 
     private cubeMapTexture: GlCubeMapTexture;
-    private side: CubeMapSide;
+    private side: GlCubeMapSide;
 
-    public constructor(cubeMapTexture: GlCubeMapTexture, side: CubeMapSide) {
+    public constructor(cubeMapTexture: GlCubeMapTexture, side: GlCubeMapSide) {
         this.cubeMapTexture = cubeMapTexture;
         this.side = side;
     }
@@ -22,29 +22,29 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.cubeMapTexture;
     }
 
-    public getSide(): CubeMapSide {
+    public getSide(): GlCubeMapSide {
         return this.side;
     }
 
-    public store(data: HTMLImageElement, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
-        const glFormat = FormatResolver.enumToGl(format);
+    public store(data: TexImageSource, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+        const glFormat = GlFormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
-        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
+        Gl.gl.texSubImage2D(GlCubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
-    public storeHdr(data: ArrayBufferView, size: vec2, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
-        const glFormat = FormatResolver.enumToGl(format);
+    public storeFromBinary(data: ArrayBufferView, size: vec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+        const glFormat = GlFormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
-        Gl.gl.texSubImage2D(CubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], size[0], size[1], glFormat, Gl.gl.FLOAT, data);
+        Gl.gl.texSubImage2D(GlCubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], size[0], size[1], glFormat, Gl.gl.FLOAT, data);
     }
 
     public getSize(): vec2 {
         return this.cubeMapTexture.getSize();
     }
 
-    public getInternalFormat(): InternalFormat {
+    public getInternalFormat(): GlInternalFormat {
         return this.cubeMapTexture.getInternalFormat();
     }
 
@@ -68,15 +68,15 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.cubeMapTexture.getMipmapLevelCount();
     }
 
-    public getWrapU(): TextureWrap {
+    public getWrapU(): GlWrap {
         return this.cubeMapTexture.getWrapU();
     }
 
-    public getWrapV(): TextureWrap {
+    public getWrapV(): GlWrap {
         return this.cubeMapTexture.getWrapU();
     }
 
-    public getWrapW(): TextureWrap {
+    public getWrapW(): GlWrap {
         return this.cubeMapTexture.getWrapW();
     }
 
@@ -84,12 +84,12 @@ export class GlCubeMapTextureSide implements IFboAttachment {
         return this.cubeMapTexture.isSRgb();
     }
 
-    public getAllDataSize(): number {
-        return this.getDataSize();
-    }
-
     public getDataSize(): number {
         return this.cubeMapTexture.getDataSize() / 6;
+    }
+
+    public getAllDataSize(): number {
+        return this.getDataSize();
     }
 
     public isUsable(): boolean {

@@ -1,19 +1,20 @@
 import { IMesh } from './IMesh';
-import { Vao } from '../../webgl/Vao';
+import { GlVao } from '../../webgl/GlVao';
 import { vec3 } from 'gl-matrix';
-import { Ebo } from '../../webgl/buffer/Ebo';
-import { Vbo } from '../../webgl/buffer/Vbo';
-import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
-import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
+import { GlEbo } from '../../webgl/buffer/GlEbo';
+import { GlVbo } from '../../webgl/buffer/GlVbo';
+import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
+import { GlVertexAttribPointer } from '../../webgl/GlVertexAttribPointer';
 import { Gl } from '../../webgl/Gl';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
+import { TagContainer } from '../../core/TagContainer';
 
 export class QuadMesh implements IMesh {
 
     private static instace: QuadMesh;
-    private vao: Vao;
+    private vao: GlVao;
     private positions = [
         -1, 1, 0,       //top left
         1, 1, 0,        //top right
@@ -29,6 +30,8 @@ export class QuadMesh implements IMesh {
     private indices = [0, 2, 3, 1, 0, 3];
     private uv = [0, 1, 1, 1, 0, 0, 1, 0];
 
+    private tagContainer = new TagContainer();
+
     private constructor() {
         this.create();
         Engine.getResourceManager().add(this);
@@ -43,7 +46,7 @@ export class QuadMesh implements IMesh {
 
     public create(): void {
         if (!this.isUsable()) {
-            this.vao = new Vao();
+            this.vao = new GlVao();
             this.addEbo();
             this.addVbo(this.positions, Conventions.POSITIONS_VBO_INDEX, 3);
             this.addVbo(this.normals, Conventions.NORMALS_VBO_INDEX, 3);
@@ -52,15 +55,15 @@ export class QuadMesh implements IMesh {
     }
 
     private addEbo(): void {
-        const ebo = new Ebo();
+        const ebo = new GlEbo();
         this.vao.setEbo(ebo);
-        ebo.allocateAndStore(new Uint32Array(this.indices), BufferObjectUsage.STATIC_DRAW);
+        ebo.allocateAndStore(new Uint32Array(this.indices), GlBufferObjectUsage.STATIC_DRAW);
     }
 
     private addVbo(data: Array<number>, vertexAttribArrayIndex: number, vertexSize: number): void {
-        const vbo = new Vbo();
-        vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
-        this.vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new VertexAttribPointer(vertexSize));
+        const vbo = new GlVbo();
+        vbo.allocateAndStore(new Float32Array(data), GlBufferObjectUsage.STATIC_DRAW);
+        this.vao.getVertexAttribArray(vertexAttribArrayIndex).setVbo(vbo, new GlVertexAttribPointer(vertexSize));
         this.vao.getVertexAttribArray(vertexAttribArrayIndex).setEnabled(true);
     }
 

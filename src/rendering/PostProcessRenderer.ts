@@ -3,6 +3,7 @@ import { Gl } from '../webgl/Gl';
 import { QuadMesh } from '../resource/mesh/QuadMesh';
 import { Engine } from '../core/Engine';
 import { RenderingPipeline } from './RenderingPipeline';
+import { Conventions } from '../resource/Conventions';
 
 export abstract class PostProcessRenderer extends Renderer {
 
@@ -15,7 +16,8 @@ export abstract class PostProcessRenderer extends Renderer {
 
     protected renderUnsafe(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.bindToTextureUnit(0);
+        //this.getShader().getNativeShaderProgram().loadTexture(Conventions.ZERO_TEXTURE_UNIT, image.getNativeTexture()); //TODO a többit is így
+        image.getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
         Gl.setEnableDepthTest(false);
         this.getShader().setUniforms();
         this.quad.draw();

@@ -30,8 +30,8 @@ export class Engine {
 
     public static readonly BLACK_TEXTURE_2D = new ParameterKey<ITexture2D>('BLACK_TEXTURE_2D');
     public static readonly WHITE_TEXTURE_2D = new ParameterKey<ITexture2D>('WHITE_TEXTURE_2D');
-    public static readonly DEFAULT_TEXTURE_2D_ARRAY = new ParameterKey<ITexture2DArray>('DEFAULT_TEXTURE_2D_ARRAY');
-    public static readonly DEFAULT_CUBE_MAP_TEXTURE = new ParameterKey<ICubeMapTexture>('DEFAULT_CUBE_MAP_TEXTURE');
+    public static readonly BLACK_TEXTURE_2D_ARRAY = new ParameterKey<ITexture2DArray>('BLACK_TEXTURE_2D_ARRAY');
+    public static readonly BLACK_CUBE_MAP_TEXTURE = new ParameterKey<ICubeMapTexture>('BLACK_CUBE_MAP_TEXTURE');
 
     private static readonly PARAMETERS = new ParameterContainer();
 

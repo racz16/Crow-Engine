@@ -1,20 +1,20 @@
-import { VertexAttribArray } from './VertexAttribArray';
-import { Ebo } from './buffer/Ebo';
+import { GlVertexAttribArray } from './GlVertexAttribArray';
+import { GlEbo } from './buffer/GlEbo';
 import { Utility } from '../utility/Utility';
 import { GlObject } from './GlObject';
 import { GlConstants } from './GlConstants';
 import { Gl } from './Gl';
 
-export class Vao extends GlObject {
+export class GlVao extends GlObject {
 
-    private vertexAttribArrays = new Array<VertexAttribArray>();
-    private ebo: Ebo;
+    private vertexAttribArrays = new Array<GlVertexAttribArray>();
+    private ebo: GlEbo;
 
     public constructor() {
         super();
         this.setId(this.createId());
         for (let i = 0; i < GlConstants.MAX_VERTEX_ATTRIBS; i++) {
-            this.vertexAttribArrays.push(new VertexAttribArray(this, i));
+            this.vertexAttribArrays.push(new GlVertexAttribArray(this, i));
         }
     }
 
@@ -34,41 +34,27 @@ export class Vao extends GlObject {
         return size;
     }
 
-    //
-    //VAA-----------------------------------------------------------------------
-    //
-    public getVertexAttribArray(index: number): VertexAttribArray {
+    //VAA
+    public getVertexAttribArray(index: number): GlVertexAttribArray {
         return this.vertexAttribArrays[index];
     }
 
-    public getVertexAttribArraysIterator(): IterableIterator<VertexAttribArray> {
+    public getVertexAttribArraysIterator(): IterableIterator<GlVertexAttribArray> {
         return this.vertexAttribArrays.values();
     }
 
-    public static getMaxVertexAttribs(): number {
-        return GlConstants.MAX_VERTEX_ATTRIBS;
-    }
-
-    public static getMaxVertexAttribsSafe(): number {
-        return GlConstants.MAX_VERTEX_ATTRIBS_SAFE;
-    }
-
-    //
-    //EBO---------------------------------------------------------------------------------------------------------------
-    //
-    public setEbo(ebo: Ebo): void {
+    //EBO
+    public setEbo(ebo: GlEbo): void {
         this.bind();
         ebo.bind();
         this.ebo = ebo;
     }
 
-    public getEbo(): Ebo {
+    public getEbo(): GlEbo {
         return Utility.isUsable(this.ebo) ? this.ebo : null;
     }
 
-    //
-    //misc--------------------------------------------------------------------------------------------------------------
-    //
+    //misc
     public release(): void {
         Gl.gl.deleteVertexArray(this.getId());
         this.setId(GlObject.INVALID_ID);

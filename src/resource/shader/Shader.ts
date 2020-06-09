@@ -1,11 +1,14 @@
-import { ShaderStage } from '../../webgl/enum/ShaderStage';
+import { GlShaderStage } from '../../webgl/enum/GlShaderStage';
 import { GlShader } from '../../webgl/shader/GlShader';
 import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { IResource } from '../IResource';
+import { TagContainer } from '../../core/TagContainer';
 
 export abstract class Shader implements IResource {
+
+    private tagContainer = new TagContainer();
 
     private shaderProgram: GlShaderProgram;
     private loaded = false;
@@ -32,16 +35,18 @@ export abstract class Shader implements IResource {
     }
 
     protected createShaderProgram(vertexSource: string, fragmentSource: string): void {
-        const vertexShader = this.createAndttachShader(ShaderStage.VERTEX_SHADER, vertexSource);
-        const fragmentShader = this.createAndttachShader(ShaderStage.FRAGMENT_SHADER, fragmentSource);
+        const vertexShader = this.createAndttachShader(GlShaderStage.VERTEX_SHADER, vertexSource);
+        const fragmentShader = this.createAndttachShader(GlShaderStage.FRAGMENT_SHADER, fragmentSource);
         this.shaderProgram.link();
         this.validateIfDebug();
-        this.detachAndReleaseShader(vertexShader);
-        this.detachAndReleaseShader(fragmentShader);
+        if (!Engine.DEBUG) {
+            this.detachAndReleaseShader(vertexShader);
+            this.detachAndReleaseShader(fragmentShader);
+        }
         this.loaded = true;
     }
 
-    private createAndttachShader(stage: ShaderStage, source: string): GlShader {
+    private createAndttachShader(stage: GlShaderStage, source: string): GlShader {
         const shader = new GlShader(stage);
         shader.setSource(source);
         shader.compile();

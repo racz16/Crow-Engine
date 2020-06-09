@@ -1,18 +1,19 @@
 import { IMesh } from './IMesh';
-import { Vao } from '../../webgl/Vao';
+import { GlVao } from '../../webgl/GlVao';
 import { vec3 } from 'gl-matrix';
 import { Gl } from '../../webgl/Gl';
-import { Vbo } from '../../webgl/buffer/Vbo';
-import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
-import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
+import { GlVbo } from '../../webgl/buffer/GlVbo';
+import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
+import { GlVertexAttribPointer } from '../../webgl/GlVertexAttribPointer';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
+import { TagContainer } from '../../core/TagContainer';
 
 export class CubeMesh implements IMesh {
 
     private static instance: CubeMesh;
-    private vao: Vao;
+    private vao: GlVao;
     private positions = [
         -1, 1, -1,
         -1, -1, -1,
@@ -52,6 +53,8 @@ export class CubeMesh implements IMesh {
         1, -1, 1
     ];
 
+    private tagContainer = new TagContainer();
+
     private constructor() {
         this.create();
         Engine.getResourceManager().add(this);
@@ -66,10 +69,10 @@ export class CubeMesh implements IMesh {
 
     public create(): void {
         if (!this.isUsable()) {
-            this.vao = new Vao();
-            const pos = new Vbo();
-            pos.allocateAndStore(new Float32Array(this.positions), BufferObjectUsage.STATIC_DRAW);
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(pos, new VertexAttribPointer(3));
+            this.vao = new GlVao();
+            const pos = new GlVbo();
+            pos.allocateAndStore(new Float32Array(this.positions), GlBufferObjectUsage.STATIC_DRAW);
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(pos, new GlVertexAttribPointer(3));
             this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
         }
     }

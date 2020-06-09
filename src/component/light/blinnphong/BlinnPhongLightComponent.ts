@@ -2,7 +2,7 @@ import { Component } from '../../Component';
 import { vec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
-import { Ubo } from '../../../webgl/buffer/Ubo';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { BlinnPhongLightsStruct } from './BlinnPhongLightsStruct';
 
 export abstract class BlinnPhongLightComponent extends Component {
@@ -75,6 +75,6 @@ export abstract class BlinnPhongLightComponent extends Component {
         detached.getTransform().getInvalidatables().removeInvalidatable(this);
     }
 
-    protected abstract refresh(ubo: Ubo, index: number): void;
+    protected abstract refresh(ubo: GlUbo, index: number): void;
 
 }

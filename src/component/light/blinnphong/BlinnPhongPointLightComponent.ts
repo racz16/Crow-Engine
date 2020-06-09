@@ -1,12 +1,12 @@
 import { BlinnPhongPositionalLightComponent } from './BlinnPhongPositionalLightComponent';
-import { Ubo } from '../../../webgl/buffer/Ubo';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 
 export class BlinnPhongPointLightComponent extends BlinnPhongPositionalLightComponent {
 
     private static readonly POINT_LIGHT_TYPE = 1;
 
-    protected refresh(ubo: Ubo, index: number) {
+    protected refresh(ubo: GlUbo, index: number) {
         ubo.store(new Float32Array(this.getAmbientColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
         ubo.store(new Float32Array(this.getDiffuseColor()), this.computeOffset(BlinnPhongLightComponent.DIFFUSE_OFFSET, index));
         ubo.store(new Float32Array(this.getSpecularColor()), this.computeOffset(BlinnPhongLightComponent.SPECULAR_OFFSET, index));

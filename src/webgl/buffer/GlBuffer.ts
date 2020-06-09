@@ -1,11 +1,11 @@
 import { GlObject } from '../GlObject';
-import { BufferObjectUsage, BufferObjectUsageResolver } from '../enum/BufferObjectUsage';
+import { GlBufferObjectUsage, GlBufferObjectUsageResolver } from '../enum/GlBufferObjectUsage';
 import { Gl } from '../Gl';
 
 export abstract class GlBuffer extends GlObject {
 
     private allocated: boolean;
-    private usage: BufferObjectUsage;
+    private usage: GlBufferObjectUsage;
 
     public constructor() {
         super();
@@ -18,9 +18,7 @@ export abstract class GlBuffer extends GlObject {
 
     protected abstract getTarget(): number;
 
-    //
-    //bind--------------------------------------------------------------
-    //
+    //bind
     public bind(): void {
         Gl.gl.bindBuffer(this.getTarget(), this.getId());
     }
@@ -33,53 +31,45 @@ export abstract class GlBuffer extends GlObject {
         Gl.gl.bindBuffer(Gl.gl.COPY_WRITE_BUFFER, this.getId());
     }
 
-    //
-    //data allocation---------------------------------------------------
-    //
+    //data allocation
     public isAllocated(): boolean {
         return this.allocated;
     }
 
-    public allocate(size: number, usage: BufferObjectUsage): void {
+    public allocate(size: number, usage: GlBufferObjectUsage): void {
         this.bind();
         this.allocationGeneral(size, usage);
-        const glUsage = BufferObjectUsageResolver.enumToGl(usage);
+        const glUsage = GlBufferObjectUsageResolver.enumToGl(usage);
         Gl.gl.bufferData(this.getTarget(), size, glUsage);
     }
 
-    public allocateAndStore(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array | ArrayBuffer, usage: BufferObjectUsage): void {
+    public allocateAndStore(data: BufferSource, usage: GlBufferObjectUsage): void {
         this.bind();
         this.allocationGeneral(data.byteLength, usage);
-        const glUsage = BufferObjectUsageResolver.enumToGl(usage);
+        const glUsage = GlBufferObjectUsageResolver.enumToGl(usage);
         Gl.gl.bufferData(this.getTarget(), data, glUsage);
     }
 
-    protected allocationGeneral(size: number, usage: BufferObjectUsage): void {
+    protected allocationGeneral(size: number, usage: GlBufferObjectUsage): void {
         this.setDataSize(size);
         this.usage = usage;
         this.allocated = true;
     }
 
-    //
-    //data store--------------------------------------------------------
-    //
-    public store(data: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array |
-        Float64Array | ArrayBuffer, offset = 0): void {
+    //data store
+    public store(data: BufferSource, offset = 0): void {
         this.bind();
         Gl.gl.bufferSubData(this.getTarget(), offset, data);
     }
 
-    //
-    //misc--------------------------------------------------------------
-    //
+    //misc
     public copyDataFrom(readSource: GlBuffer, readOffset: number, writeOffset: number, size: number): void {
-        this.bindToWrite()
+        this.bindToWrite();
         readSource.bindToRead();
         Gl.gl.copyBufferSubData(Gl.gl.COPY_READ_BUFFER, Gl.gl.COPY_WRITE_BUFFER, readOffset, writeOffset, size);
     }
 
-    public getUsage(): BufferObjectUsage {
+    public getUsage(): GlBufferObjectUsage {
         return this.usage;
     }
 

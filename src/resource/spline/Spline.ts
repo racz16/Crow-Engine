@@ -1,14 +1,15 @@
 import { ISpline } from './ISpline';
 import { vec3 } from 'gl-matrix';
-import { Vao } from '../../webgl/Vao';
+import { GlVao } from '../../webgl/GlVao';
 import { Utility } from '../../utility/Utility';
 import { Gl } from '../../webgl/Gl';
-import { Vbo } from '../../webgl/buffer/Vbo';
-import { VertexAttribPointer } from '../../webgl/VertexAttribPointer';
-import { BufferObjectUsage } from '../../webgl/enum/BufferObjectUsage';
+import { GlVbo } from '../../webgl/buffer/GlVbo';
+import { GlVertexAttribPointer } from '../../webgl/GlVertexAttribPointer';
+import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
 import { SplinePoint } from './SplinePoint';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
+import { TagContainer } from '../../core/TagContainer';
 
 export class Spline implements ISpline {
     protected controlPoints: Array<SplinePoint> = [];
@@ -18,12 +19,14 @@ export class Spline implements ISpline {
     private distances: Array<number> = [];
     private loop: boolean;
 
-    private vao: Vao;
+    private vao: GlVao;
     private numberOfPoints: number;
 
     protected aabbMin = vec3.create();
     protected aabbMax = vec3.create();
     protected radius: number;
+
+    private tagContainer = new TagContainer();
 
     public constructor() {
         Engine.getResourceManager().add(this);
@@ -42,9 +45,9 @@ export class Spline implements ISpline {
 
     private createVao(): void {
         if (!Utility.isUsable(this.vao)) {
-            this.vao = new Vao();
-            const vbo = new Vbo();
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new VertexAttribPointer(3));
+            this.vao = new GlVao();
+            const vbo = new GlVbo();
+            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new GlVertexAttribPointer(3));
             this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
         }
     }
@@ -53,7 +56,7 @@ export class Spline implements ISpline {
         const data = this.computeSplineData();
         this.numberOfPoints = data.length / 3;
         const vbo = this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).getVbo();
-        vbo.allocateAndStore(new Float32Array(data), BufferObjectUsage.STATIC_DRAW);
+        vbo.allocateAndStore(new Float32Array(data), GlBufferObjectUsage.STATIC_DRAW);
         this.valid = true;
     }
 

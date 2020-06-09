@@ -10,6 +10,7 @@ import { Gl } from '../../webgl/Gl';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { Material } from '../../material/Material';
+import { GlConstants } from '../../webgl/GlConstants';
 
 export class PbrRenderer extends GeometryRenderer {
 
@@ -17,6 +18,9 @@ export class PbrRenderer extends GeometryRenderer {
 
     public constructor() {
         super('PBR Renderer');
+        if (!GlConstants.COLOR_BUFFER_FLOAT_ENABLED || !GlConstants.TEXTURE_FLOAT_LINEAR_ENABLED) {
+            throw new Error();
+        }
         this.shader = new PbrShader();
     }
 

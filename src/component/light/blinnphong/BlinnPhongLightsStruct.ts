@@ -1,5 +1,5 @@
-import { Ubo } from '../../../webgl/buffer/Ubo';
-import { BufferObjectUsage } from '../../../webgl/enum/BufferObjectUsage';
+import { GlUbo } from '../../../webgl/buffer/GlUbo';
+import { GlBufferObjectUsage } from '../../../webgl/enum/GlBufferObjectUsage';
 import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLightComponent';
 import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
@@ -17,7 +17,7 @@ export class BlinnPhongLightsStruct {
     private static readonly LIGHT_DATASIZE = 112;
     private static readonly LIGHT_COUNT = 16;
 
-    private ubo: Ubo;
+    private ubo: GlUbo;
     private lights = new Array<BlinnPhongLightComponent>();
     private addedLightCount = 0;
     private shadowLightIndex = -1;
@@ -37,8 +37,8 @@ export class BlinnPhongLightsStruct {
 
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
-            this.ubo = new Ubo();
-            this.ubo.allocate(BlinnPhongLightsStruct.LIGHT_DATASIZE * (BlinnPhongLightsStruct.LIGHT_COUNT), BufferObjectUsage.STATIC_DRAW);
+            this.ubo = new GlUbo();
+            this.ubo.allocate(BlinnPhongLightsStruct.LIGHT_DATASIZE * (BlinnPhongLightsStruct.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
             Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
         }
     }
@@ -111,7 +111,7 @@ export class BlinnPhongLightsStruct {
         this.shadowLightIndex = this.lights.indexOf(light);
     }
 
-    public getShadowLightSource(): BlinnPhongDirectionalLightComponent{
+    public getShadowLightSource(): BlinnPhongDirectionalLightComponent {
         return this.shadowLightIndex !== -1 ? this.lights[this.shadowLightIndex] as BlinnPhongDirectionalLightComponent : null;
     }
 

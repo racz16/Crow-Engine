@@ -1,13 +1,13 @@
-import { IFboAttachment } from "../fbo/IFboAttachment";
+import { IGlFboAttachment } from "../fbo/IGlFboAttachment";
 import { vec2 } from "gl-matrix";
-import { InternalFormat } from "../enum/InternalFormat";
+import { GlInternalFormat } from "../enum/GlInternalFormat";
 import { GlTexture2DArray } from "./GlTexture2DArray";
-import { TextureWrap } from "../enum/TextureWrap";
-import { Format, FormatResolver } from "../enum/Format";
+import { GlWrap } from "../enum/GlWrap";
+import { GlFormat, GlFormatResolver } from "../enum/GlFormat";
 import { Gl } from "../Gl";
 import { Utility } from "../../utility/Utility";
 
-export class GlTexture2DArrayLayer implements IFboAttachment {
+export class GlTexture2DArrayLayer implements IGlFboAttachment {
 
     private texture2DArray: GlTexture2DArray;
     private layer: number;
@@ -25,15 +25,15 @@ export class GlTexture2DArrayLayer implements IFboAttachment {
         return this.layer;
     }
 
-    public store(data: HTMLImageElement, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
-        const glFormat = FormatResolver.enumToGl(format);
+    public store(data: HTMLImageElement, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+        const glFormat = GlFormatResolver.enumToGl(format);
         this.texture2DArray.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, data.naturalWidth, data.naturalHeight, this.layer, glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
-    public storeHdr(data: ArrayBufferView, size: vec2, format: Format, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
-        const glFormat = FormatResolver.enumToGl(format);
+    public storeFromBinary(data: ArrayBufferView, size: vec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+        const glFormat = GlFormatResolver.enumToGl(format);
         this.texture2DArray.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, size[0], size[1], this.layer, glFormat, Gl.gl.FLOAT, data);
@@ -43,7 +43,7 @@ export class GlTexture2DArrayLayer implements IFboAttachment {
         return this.texture2DArray.getSize();
     }
 
-    public getInternalFormat(): InternalFormat {
+    public getInternalFormat(): GlInternalFormat {
         return this.texture2DArray.getInternalFormat();
     }
 
@@ -67,11 +67,11 @@ export class GlTexture2DArrayLayer implements IFboAttachment {
         return this.texture2DArray.getMipmapLevelCount();
     }
 
-    public getWrapU(): TextureWrap {
+    public getWrapU(): GlWrap {
         return this.texture2DArray.getWrapU();
     }
 
-    public getWrapV(): TextureWrap {
+    public getWrapV(): GlWrap {
         return this.texture2DArray.getWrapU();
     }
 
@@ -79,12 +79,12 @@ export class GlTexture2DArrayLayer implements IFboAttachment {
         return this.texture2DArray.isSRgb();
     }
 
-    public getAllDataSize(): number {
-        return this.getDataSize();
-    }
-
     public getDataSize(): number {
         return this.texture2DArray.getDataSize() / this.texture2DArray.getLayers();
+    }
+
+    public getAllDataSize(): number {
+        return this.getDataSize();
     }
 
     public isUsable(): boolean {

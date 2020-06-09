@@ -4,8 +4,8 @@ export interface IResource {
 
     getAllDataSize(): number;
 
-    release(): void;
-
     isUsable(): boolean;
+
+    release(): void;
 
 }
