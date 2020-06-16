@@ -1,12 +1,12 @@
 import { ShaderSlotHelper } from './ShaderSlotHelper';
-import { Material } from '../../../material/Material';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { Conventions } from '../../Conventions';
 
 export class RoughnessMetalnessSlotHelper extends ShaderSlotHelper {
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.ROUGHNESS_METALNESS;
+        return Conventions.MS_ROUGHNESS_METALNESS;
     }
 
     protected getMapName(): string {

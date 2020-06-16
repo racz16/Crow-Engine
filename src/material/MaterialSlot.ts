@@ -1,22 +1,10 @@
-import { vec4, vec2, vec3 } from 'gl-matrix';
-import { ParameterKey } from '../utility/parameter/ParameterKey';
+import { vec4, vec2 } from 'gl-matrix';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ITexture2D } from '../resource/texture/ITexture2D';
 import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
 import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
 
 export class MaterialSlot {
-
-    public static readonly USE_GLOSSINESS = new ParameterKey<boolean>('PARAM_USE_GLOSSINESS');
-    public static readonly NORMAL_SCALE = new ParameterKey<number>('PARAM_NORMAL_SCALE');
-    public static readonly USE_POM = new ParameterKey<boolean>('PARAM_USE_POM');
-    public static readonly POM_SCALE = new ParameterKey<number>('PARAM_POM_SCALE');
-    public static readonly POM_MIN_LAYERS = new ParameterKey<number>('PARAM_POM_MIN_LAYERS');
-    public static readonly POM_MAX_LAYERS = new ParameterKey<number>('PARAM_POM_MAX_LAYERS');
-    public static readonly REFRACTION_INDEX = new ParameterKey<number>('PARAM_REFRACTION_INDEX');
-    public static readonly PARALLAX_CORRECTION_GEOMETRY_PROXY_RADIUS = new ParameterKey<number>('PARAM_PARALLAX_CORRECTION_GEOMETRY_PROXY_RADIUS');
-    public static readonly PARALLAX_CORRECTION_ENVIRONMENT_PROBE_POSITION = new ParameterKey<vec3>('PARAM_PARALLAX_CORRECTION_ENVIRONMENT_PROBE_POSITION');
-    public static readonly OCCLUSION_STRENGTH = new ParameterKey<number>('PARAM_OCCLUSION_STRENGTH');
 
     private readonly textureTile = vec2.fromValues(1, 1);
     private readonly textureOffset = vec2.create();

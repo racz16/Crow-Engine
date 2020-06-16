@@ -1,12 +1,12 @@
-import { Material } from '../../../material/Material';
 import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';
+import { Conventions } from '../../Conventions';
 
 export class DiffuseSlotHelper extends ShaderSlotHelper {
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.DIFFUSE;
+        return Conventions.MS_DIFFUSE;
     }
 
     protected getMapName(): string {

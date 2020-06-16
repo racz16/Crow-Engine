@@ -2,6 +2,7 @@ import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { Material } from '../../../material/Material';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';
+import { Conventions } from '../../Conventions';
 
 export class RefractionSlotHelper extends ShaderSlotHelper {
 
@@ -9,14 +10,14 @@ export class RefractionSlotHelper extends ShaderSlotHelper {
         this.setSlot(material.getSlot(this.getMaterialSlotKey()));
         if (this.isCubeMapTextureUsable()) {
             this.loadCubeMapTexture();
-            this.loadFloatParameter('material.refractionIndex', MaterialSlot.REFRACTION_INDEX, 1 / 1.33);
+            this.loadFloatParameter('material.refractionIndex', Conventions.MSP_REFRACTION_INDEX, 1 / 1.33);
         } else {
             this.loadDefaultCubeMapTexture();
         }
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.REFRACTION;
+        return Conventions.MS_REFRACTION;
     }
 
     protected getMapName(): string {

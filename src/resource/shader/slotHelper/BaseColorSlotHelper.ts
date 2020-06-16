@@ -2,11 +2,12 @@ import { Material } from '../../../material/Material';
 import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';
+import { Conventions } from '../../Conventions';
 
 export class BaseColorSlotHelper extends ShaderSlotHelper {
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.BASE_COLOR;
+        return Conventions.MS_BASE_COLOR;
     }
 
     protected getMapName(): string {

@@ -7,7 +7,6 @@ import { ICameraComponent } from '../component/camera/ICameraComponent';
 import { Engine } from '../core/Engine';
 import { Conventions } from '../resource/Conventions';
 import { Utility } from '../utility/Utility';
-import { Material } from '../material/Material';
 import { AlphaMode } from '../material/AlphaMode';
 
 export abstract class GeometryRenderer extends Renderer {
@@ -39,7 +38,7 @@ export abstract class GeometryRenderer extends Renderer {
 
     protected beforeRendering(): void {
         super.beforeRendering();
-        this.getShader().getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.CAMERA_BINDING_POINT);
+        this.getShader().getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.BP_CAMERA);
         this.camera = Engine.getMainCamera();
     }
 
@@ -48,8 +47,8 @@ export abstract class GeometryRenderer extends Renderer {
     protected afterDrawRenderables(renderable: IRenderable, renderableComponents: IterableIterator<IRenderableComponent<IRenderable>>): void { }
 
     protected beforeDraw(renderableComponent: IRenderableComponent<IRenderable>): void {
-        Gl.setEnableCullFace(!renderableComponent.getMaterial().getParameters().get(Material.DOUBLE_SIDED));
-        const alphaMode = renderableComponent.getMaterial().getParameters().get(Material.ALPHA_MODE);
+        Gl.setEnableCullFace(!renderableComponent.getMaterial().getParameters().get(Conventions.MP_DOUBLE_SIDED));
+        const alphaMode = renderableComponent.getMaterial().getParameters().get(Conventions.MP_ALPHA_MODE);
         this.setAlphaMode(renderableComponent, alphaMode);
         this.incrementRenderedElementCountBy(1);
         this.incrementRenderedFaceCountBy(renderableComponent.getFaceCount());

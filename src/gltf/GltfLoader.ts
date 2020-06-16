@@ -451,10 +451,10 @@ export class GltfLoader implements IResource {
         if (!material) {
             const gltfMaterial = this.gltf.materials[materialIndex];
             material = new Material(PbrRenderer);
-            material.getParameters().set(Material.DOUBLE_SIDED, gltfMaterial.doubleSided ?? false);
+            material.getParameters().set(Conventions.MP_DOUBLE_SIDED, gltfMaterial.doubleSided ?? false);
             const alphaMode = GltfResolver.computeAlphaMode(gltfMaterial.alphaMode);
-            material.getParameters().set(Material.ALPHA_MODE, alphaMode);
-            material.getParameters().set(Material.ALPHA_CUTOFF, gltfMaterial.alphaCutoff);
+            material.getParameters().set(Conventions.MP_ALPHA_MODE, alphaMode);
+            material.getParameters().set(Conventions.MP_ALPHA_CUTOFF, gltfMaterial.alphaCutoff);
             if (gltfMaterial.pbrMetallicRoughness) {
                 this.addBaseColorSlot(material, gltfMaterial);
                 this.addRoughnessMetalnessSlot(material, gltfMaterial);
@@ -484,7 +484,7 @@ export class GltfLoader implements IResource {
         if (color) {
             slot.setColor(vec4.clone(color));
         }
-        material.setSlot(Material.BASE_COLOR, slot);
+        material.setSlot(Conventions.MS_BASE_COLOR, slot);
     }
 
     private async addRoughnessMetalnessSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
@@ -509,7 +509,7 @@ export class GltfLoader implements IResource {
             const roughnessMetalnessColor = vec4.fromValues(1, roughness, metalness, 1);
             slot.setColor(roughnessMetalnessColor);
         }
-        material.setSlot(Material.ROUGHNESS_METALNESS, slot);
+        material.setSlot(Conventions.MS_ROUGHNESS_METALNESS, slot);
     }
 
     private async addOcclusionSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
@@ -525,9 +525,9 @@ export class GltfLoader implements IResource {
         }
         const occlusionStrength = textureInfo.strength;
         if (occlusionStrength != null) {
-            slot.getParameters().set(MaterialSlot.OCCLUSION_STRENGTH, occlusionStrength);
+            slot.getParameters().set(Conventions.MSP_OCCLUSION_STRENGTH, occlusionStrength);
         }
-        material.setSlot(Material.OCCLUSION, slot);
+        material.setSlot(Conventions.MS_OCCLUSION, slot);
     }
 
     private async addNormalSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
@@ -541,7 +541,7 @@ export class GltfLoader implements IResource {
         if (textureInfo.texCoord != null) {
             slot.setTextureCoordinate(textureInfo.texCoord);
         }
-        material.setSlot(Material.NORMAL, slot);
+        material.setSlot(Conventions.MS_NORMAL, slot);
     }
 
     private async addEmissiveSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
@@ -562,7 +562,7 @@ export class GltfLoader implements IResource {
             const copiedColor = vec3.clone(color);
             slot.setColor(vec4.fromValues(copiedColor[0], copiedColor[1], copiedColor[2], 1));
         }
-        material.setSlot(Material.EMISSIVE, slot);
+        material.setSlot(Conventions.MS_EMISSIVE, slot);
     }
 
     private async createTexture(textureIndex: number): Promise<Texture2D> {
@@ -611,12 +611,12 @@ export class GltfLoader implements IResource {
 
     private createVao(primitive: GltfPrimitive): GlVao {
         const vao = new GlVao();
-        this.addVbo(vao, Conventions.POSITIONS_VBO_INDEX, primitive.attributes.POSITION);
-        this.addVbo(vao, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, primitive.attributes.TEXCOORD_0);
-        this.addVbo(vao, Conventions.TEXTURE_COORDINATES_1_VBO_INDEX, primitive.attributes.TEXCOORD_1);
-        this.addVbo(vao, Conventions.NORMALS_VBO_INDEX, primitive.attributes.NORMAL);
-        this.addVbo(vao, Conventions.TANGENTS_VBO_INDEX, primitive.attributes.TANGENT);
-        this.addVbo(vao, Conventions.VERTEX_COLORS_VBO_INDEX, primitive.attributes.COLOR_0);
+        this.addVbo(vao, Conventions.VI_POSITIONS, primitive.attributes.POSITION);
+        this.addVbo(vao, Conventions.VI_TEXTURE_COORDINATES_0, primitive.attributes.TEXCOORD_0);
+        this.addVbo(vao, Conventions.VI_TEXTURE_COORDINATES_1, primitive.attributes.TEXCOORD_1);
+        this.addVbo(vao, Conventions.VI_NORMALS, primitive.attributes.NORMAL);
+        this.addVbo(vao, Conventions.VI_TANGENTS, primitive.attributes.TANGENT);
+        this.addVbo(vao, Conventions.VI_VERTEX_COLORS, primitive.attributes.COLOR_0);
         this.addEbo(vao, primitive.indices);
         return vao;
     }

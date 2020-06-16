@@ -48,9 +48,9 @@ export class QuadMesh implements IMesh {
         if (!this.isUsable()) {
             this.vao = new GlVao();
             this.addEbo();
-            this.addVbo(this.positions, Conventions.POSITIONS_VBO_INDEX, 3);
-            this.addVbo(this.normals, Conventions.NORMALS_VBO_INDEX, 3);
-            this.addVbo(this.uv, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, 2);
+            this.addVbo(this.positions, Conventions.VI_POSITIONS, 3);
+            this.addVbo(this.normals, Conventions.VI_NORMALS, 3);
+            this.addVbo(this.uv, Conventions.VI_TEXTURE_COORDINATES_0, 2);
         }
     }
 

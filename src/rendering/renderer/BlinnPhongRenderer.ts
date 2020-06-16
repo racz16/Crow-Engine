@@ -19,7 +19,7 @@ export class BlinnPhongRenderer extends GeometryRenderer {
         super.beforeRendering();
         BlinnPhongLightsStruct.getInstance().refreshUbo();
         BlinnPhongLightsStruct.getInstance().useUbo();
-        this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
+        this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.BP_LIGHTS);
         let mats = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRICES);
         if (!mats || !mats.length) {
             mats = new Array<mat4>(mat4.create());

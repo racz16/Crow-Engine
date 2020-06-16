@@ -1,8 +1,8 @@
 import { ShaderSlotHelper } from './ShaderSlotHelper';
-import { Material } from '../../../material/Material';
 import { vec3 } from 'gl-matrix';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';
+import { Conventions } from '../../Conventions';
 
 export class EnvironmentSlotHelper extends ShaderSlotHelper {
 
@@ -11,7 +11,7 @@ export class EnvironmentSlotHelper extends ShaderSlotHelper {
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.ENVIRONMENT_INTENSITY;
+        return Conventions.MS_ENVIRONMENT_INTENSITY;
     }
 
     protected getMapName(): string {

@@ -31,11 +31,11 @@ export class PbrShader extends Shader {
         super();
         this.createBrdfLut();
         this.slotHelpers = [
-            new BaseColorSlotHelper(this.getShaderProgram(), Conventions.BASE_COLOR_TEXTURE_UNIT, true),
-            new NormalSlotHelper(this.getShaderProgram(), Conventions.NORMAL_POM_TEXTURE_UNIT, true),
-            new RoughnessMetalnessSlotHelper(this.getShaderProgram(), Conventions.ROUGHNESS_METALNESS_TEXTURE_UNIT, true),
-            new OcclusionSlotHelper(this.getShaderProgram(), Conventions.OCCLUSION_TEXTURE_UNIT, true),
-            new EmissiveSlotHelper(this.getShaderProgram(), Conventions.EMISSIVE_TEXTURE_UNIT, true)
+            new BaseColorSlotHelper(this.getShaderProgram(), Conventions.TU_BASE_COLOR, true),
+            new NormalSlotHelper(this.getShaderProgram(), Conventions.TU_NORMAL_POM, true),
+            new RoughnessMetalnessSlotHelper(this.getShaderProgram(), Conventions.TU_ROUGHNESS_METALNESS, true),
+            new OcclusionSlotHelper(this.getShaderProgram(), Conventions.TU_OCCLUSION, true),
+            new EmissiveSlotHelper(this.getShaderProgram(), Conventions.TU_EMISSIVE, true)
         ];
         this.pbrIblHelper = new PbrIblHelper(this.getShaderProgram(), this.brdfLut);
     }
@@ -78,8 +78,8 @@ export class PbrShader extends Shader {
         if (!isThereShadowMap) {
             shadowMap = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D_ARRAY);
         }
-        shadowMap.getNativeTexture().bindToTextureUnit(Conventions.SHADOW_TEXTURE_UNIT);
-        this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.SHADOW_TEXTURE_UNIT);
+        shadowMap.getNativeTexture().bindToTextureUnit(Conventions.TU_SHADOW);
+        this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.TU_SHADOW);
     }
 
     protected getVertexShaderPath(): string {

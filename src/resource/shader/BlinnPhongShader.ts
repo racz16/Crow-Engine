@@ -56,8 +56,8 @@ export class BlinnPhongShader extends Shader {
         if (!isThereShadowMap) {
             shadowMap = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D_ARRAY);
         }
-        shadowMap.getNativeTexture().bindToTextureUnit(Conventions.SHADOW_TEXTURE_UNIT);
-        this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.SHADOW_TEXTURE_UNIT);
+        shadowMap.getNativeTexture().bindToTextureUnit(Conventions.TU_SHADOW);
+        this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.TU_SHADOW);
     }
 
     protected getVertexShaderPath(): string {

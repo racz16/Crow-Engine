@@ -12,7 +12,7 @@ export class TexturedQuadShader extends Shader {
     }
 
     public connectTextureUnits(): void {
-        this.getShaderProgram().connectTextureUnit('image', Conventions.ZERO_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
     }
 
     public setUniforms(data: mat4): void {

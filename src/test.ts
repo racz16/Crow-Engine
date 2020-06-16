@@ -34,6 +34,7 @@ import { ObjLoader } from './resource/ObjLoader';
 import { StaticMesh } from './resource/mesh/StaticMesh';
 import { CameraType } from './component/camera/CameraType';
 import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
+import { Conventions } from './resource/Conventions';
 
 window.onload = async () => {
     const tsb = new TestSceneBuilder();
@@ -157,7 +158,7 @@ export class TestSceneBuilder {
         const skyMaterial = new Material(SkyboxRenderer);
         const slot = new MaterialSlot();
         slot.setCubeMapTexture(diffuseIblMap);
-        skyMaterial.setSlot(Material.SKYBOX, slot);
+        skyMaterial.setSlot(Conventions.MS_SKYBOX, slot);
         const skyRenderable = new MeshComponent(CubeMesh.getInstance(), skyMaterial);
         skyRenderable.setCastShadow(false);
         sky.getComponents().add(skyRenderable);
@@ -174,8 +175,8 @@ export class TestSceneBuilder {
         const material = new Material(PbrRenderer);
         const orm = new MaterialSlot();
         orm.setColor(vec4.fromValues(-1, 1, 0, -1));
-        material.setSlot(Material.ROUGHNESS_METALNESS, orm);
-        material.getParameters().set(Material.DOUBLE_SIDED, true);
+        material.setSlot(Conventions.MS_ROUGHNESS_METALNESS, orm);
+        material.getParameters().set(Conventions.MP_DOUBLE_SIDED, true);
         const objLoader = await ObjLoader.createLoader('res/meshes/plane.obj');
         const meshComponent = new MeshComponent(objLoader.loadMesh(), material);
         go.getComponents().add(meshComponent);
@@ -194,19 +195,19 @@ export class TestSceneBuilder {
 
         const bcs = new MaterialSlot();
         bcs.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/albedo.jpg', false, TextureType.DATA));
-        material.setSlot(Material.BASE_COLOR, bcs);
+        material.setSlot(Conventions.MS_BASE_COLOR, bcs);
 
         const ns = new MaterialSlot();
         ns.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/normal.jpg', false, TextureType.DATA));
-        material.setSlot(Material.NORMAL, ns);
+        material.setSlot(Conventions.MS_NORMAL, ns);
 
         const es = new MaterialSlot();
         es.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/emissive.jpg', false, TextureType.DATA));
-        material.setSlot(Material.EMISSIVE, es);
+        material.setSlot(Conventions.MS_EMISSIVE, es);
 
         const rms = new MaterialSlot();
         rms.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/metalRoughness.jpg', false, TextureType.DATA));
-        material.setSlot(Material.ROUGHNESS_METALNESS, rms);
+        material.setSlot(Conventions.MS_ROUGHNESS_METALNESS, rms);
     }
 
     public async createGoldSphere(): Promise<void> {
@@ -214,10 +215,10 @@ export class TestSceneBuilder {
         const sm = new Material(PbrRenderer);
         const sbcms = new MaterialSlot();
         sbcms.setColor(vec4.fromValues(1, 0.86, 0.57, 1));
-        sm.setSlot(Material.BASE_COLOR, sbcms);
+        sm.setSlot(Conventions.MS_BASE_COLOR, sbcms);
         const sormms = new MaterialSlot();
         sormms.setColor(vec4.fromValues(1, 0.2, 1, 1));
-        sm.setSlot(Material.ROUGHNESS_METALNESS, sormms);
+        sm.setSlot(Conventions.MS_ROUGHNESS_METALNESS, sormms);
         const objLoader = await ObjLoader.createLoader('res/meshes/sphere.obj');
         const smc = new MeshComponent(objLoader.loadMesh(), sm);
         sphere.getComponents().add(smc);
@@ -230,11 +231,11 @@ export class TestSceneBuilder {
 
         const ds = new MaterialSlot();
         ds.setTexture2D(await Texture2D.createNonHdr('res/textures/diffuse1.png', false, TextureType.IMAGE));
-        ma.setSlot(Material.DIFFUSE, ds);
+        ma.setSlot(Conventions.MS_DIFFUSE, ds);
 
         const ss = new MaterialSlot();
         ss.setTexture2D(await Texture2D.createNonHdr('res/textures/specular1.png', false, TextureType.DATA));
-        ma.setSlot(Material.SPECULAR, ss);
+        ma.setSlot(Conventions.MS_SPECULAR, ss);
 
         const mc = new MeshComponent(this.box, ma);
         go.getComponents().add(mc);
@@ -248,7 +249,7 @@ export class TestSceneBuilder {
 
         const ns = new MaterialSlot();
         ns.setTexture2D(await Texture2D.createNonHdr('res/textures/7259d9158be0b7e8c62c887fac57ed81.png', false, TextureType.DATA));
-        ma.setSlot(Material.NORMAL, ns);
+        ma.setSlot(Conventions.MS_NORMAL, ns);
 
         const mc = new MeshComponent(this.box, ma);
         go.getComponents().add(mc);
@@ -262,15 +263,15 @@ export class TestSceneBuilder {
 
         const ns = new MaterialSlot();
         ns.setTexture2D(await Texture2D.createNonHdr('res/textures/normal6.png', true, TextureType.DATA));
-        ma.setSlot(Material.NORMAL, ns);
-        ns.getParameters().set(MaterialSlot.USE_POM, true);
+        ma.setSlot(Conventions.MS_NORMAL, ns);
+        ns.getParameters().set(Conventions.MSP_USE_POM, true);
 
         const rc = new MeshComponent(this.box, ma);
         rc.setVisibilityInterval(vec2.fromValues(0, 5));
         go.getComponents().add(rc);
 
         const ma2 = new Material(BlinnPhongRenderer);
-        ma2.setSlot(Material.NORMAL, ns);
+        ma2.setSlot(Conventions.MS_NORMAL, ns);
 
         const rc2 = new MeshComponent(this.box, ma2);
         rc2.setVisibilityInterval(vec2.fromValues(5, 100));
@@ -284,11 +285,11 @@ export class TestSceneBuilder {
 
         const rs = new MaterialSlot();
         rs.setCubeMapTexture(Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.PBR_SPECULAR_IBL_MAP));
-        ma.setSlot(Material.REFLECTION, rs);
+        ma.setSlot(Conventions.MS_REFLECTION, rs);
 
         const is = new MaterialSlot();
         is.setColor(vec4.fromValues(0, 1, 0, 0));
-        ma.setSlot(Material.ENVIRONMENT_INTENSITY, is);
+        ma.setSlot(Conventions.MS_ENVIRONMENT_INTENSITY, is);
 
         const mc = new MeshComponent(this.box, ma);
         go.getComponents().add(mc);
@@ -329,7 +330,7 @@ export class TestSceneBuilder {
         const material = new Material(BlinnPhongRenderer);
         const diffuseSlot = new MaterialSlot();
         diffuseSlot.setColor(vec4.fromValues(0, 0, 0, 1));
-        material.setSlot(Material.DIFFUSE, diffuseSlot);
+        material.setSlot(Conventions.MS_DIFFUSE, diffuseSlot);
         const sc = new SplineComponent(bs, material);
         go.getComponents().add(sc);
     }

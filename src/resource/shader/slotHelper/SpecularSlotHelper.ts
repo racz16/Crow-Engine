@@ -3,6 +3,7 @@ import { Material } from '../../../material/Material';
 import { vec4 } from 'gl-matrix';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { Conventions } from '../../Conventions';
 
 export class SpecularSlotHelper extends ShaderSlotHelper {
 
@@ -13,7 +14,7 @@ export class SpecularSlotHelper extends ShaderSlotHelper {
         //texture
         if (this.isTexture2DUsable()) {
             this.loadTexture2D();
-            this.loadBooleanParameter('material.isThereGlossiness', MaterialSlot.USE_GLOSSINESS, false);
+            this.loadBooleanParameter('material.isThereGlossiness', Conventions.MSP_USE_GLOSSINESS, false);
         } else {
             this.loadDefaultTexture2D();
         }
@@ -28,7 +29,7 @@ export class SpecularSlotHelper extends ShaderSlotHelper {
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.SPECULAR;
+        return Conventions.MS_SPECULAR;
     }
 
     protected getMapName(): string {

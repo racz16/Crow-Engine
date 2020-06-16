@@ -72,8 +72,8 @@ export class CubeMesh implements IMesh {
             this.vao = new GlVao();
             const pos = new GlVbo();
             pos.allocateAndStore(new Float32Array(this.positions), GlBufferObjectUsage.STATIC_DRAW);
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(pos, new GlVertexAttribPointer(3));
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
+            this.vao.getVertexAttribArray(Conventions.VI_POSITIONS).setVbo(pos, new GlVertexAttribPointer(3));
+            this.vao.getVertexAttribArray(Conventions.VI_POSITIONS).setEnabled(true);
         }
     }
 

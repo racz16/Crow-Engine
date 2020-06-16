@@ -32,7 +32,7 @@ export class PbrLightsStruct {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
+        this.ubo.bindToBindingPoint(Conventions.BP_LIGHTS);
     }
 
     private createUboIfNotUsable(): void {

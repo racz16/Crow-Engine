@@ -12,7 +12,7 @@ export class DebugShader extends Shader {
     }
 
     public connectTextureUnits(): void {
-        this.getShaderProgram().connectTextureUnit('image', Conventions.ZERO_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
     }
 
     public setUniforms(data: { transformation: mat4, layer: number }): void {

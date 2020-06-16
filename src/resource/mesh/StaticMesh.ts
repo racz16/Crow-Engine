@@ -68,19 +68,19 @@ export class StaticMesh implements IMesh {
     public update(): void { }
 
     public hasTextureCoordinates(): boolean {
-        return !!this.vao.getVertexAttribArray(Conventions.TEXTURE_COORDINATES_0_VBO_INDEX).getVbo();
+        return !!this.vao.getVertexAttribArray(Conventions.VI_TEXTURE_COORDINATES_0).getVbo();
     }
 
     public hasNormals(): boolean {
-        return !!this.vao.getVertexAttribArray(Conventions.NORMALS_VBO_INDEX).getVbo();
+        return !!this.vao.getVertexAttribArray(Conventions.VI_NORMALS).getVbo();
     }
 
     public hasTangents(): boolean {
-        return !!this.vao.getVertexAttribArray(Conventions.TANGENTS_VBO_INDEX).getVbo();
+        return !!this.vao.getVertexAttribArray(Conventions.VI_TANGENTS).getVbo();
     }
 
     public hasVertexColors(): boolean {
-        return !!this.vao.getVertexAttribArray(Conventions.VERTEX_COLORS_VBO_INDEX).getVbo();
+        return !!this.vao.getVertexAttribArray(Conventions.VI_VERTEX_COLORS).getVbo();
     }
 
     public getAllDataSize(): number {

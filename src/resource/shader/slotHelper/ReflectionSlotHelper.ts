@@ -2,6 +2,7 @@ import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { Material } from '../../../material/Material';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { Conventions } from '../../Conventions';
 
 export class ReflectionSlotHelper extends ShaderSlotHelper {
 
@@ -17,8 +18,8 @@ export class ReflectionSlotHelper extends ShaderSlotHelper {
     }
 
     private loadParallaxCorrectionData(): void {
-        const gpr = this.slot.getParameters().get(MaterialSlot.PARALLAX_CORRECTION_GEOMETRY_PROXY_RADIUS);
-        const epp = this.slot.getParameters().get(MaterialSlot.PARALLAX_CORRECTION_ENVIRONMENT_PROBE_POSITION);
+        const gpr = this.slot.getParameters().get(Conventions.MSP_PARALLAX_CORRECTION_GEOMETRY_PROXY_RADIUS);
+        const epp = this.slot.getParameters().get(Conventions.MSP_PARALLAX_CORRECTION_ENVIRONMENT_PROBE_POSITION);
         if (gpr && epp) {
             this.shaderProgram.loadBoolean(this.getIsThereParallaxCorrectionName(), true);
             this.shaderProgram.loadFloat(this.getGeometryProxyRadiusName(), gpr);
@@ -29,7 +30,7 @@ export class ReflectionSlotHelper extends ShaderSlotHelper {
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.REFLECTION;
+        return Conventions.MS_REFLECTION;
     }
 
     protected getMapName(): string {

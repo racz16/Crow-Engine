@@ -28,7 +28,7 @@ export class CameraStruct implements IInvalidatable {
     }
 
     public useUbo(): void {
-        this.ubo.bindToBindingPoint(Conventions.CAMERA_BINDING_POINT);
+        this.ubo.bindToBindingPoint(Conventions.BP_CAMERA);
     }
 
     private createUboIfNotUsable(): void {

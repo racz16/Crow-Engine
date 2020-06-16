@@ -74,10 +74,10 @@ export class ObjLoader {
     private createVao(mesh: Mesh): GlVao {
         const vao = new GlVao();
         this.addEbo(vao, mesh.indices);
-        this.addVbo(vao, mesh.vertices, Conventions.POSITIONS_VBO_INDEX, 3);
-        this.addVbo(vao, mesh.textures, Conventions.TEXTURE_COORDINATES_0_VBO_INDEX, 2);
-        this.addVbo(vao, mesh.vertexNormals, Conventions.NORMALS_VBO_INDEX, 3);
-        this.addVbo(vao, mesh.tangents, Conventions.TANGENTS_VBO_INDEX, 3);
+        this.addVbo(vao, mesh.vertices, Conventions.VI_POSITIONS, 3);
+        this.addVbo(vao, mesh.textures, Conventions.VI_TEXTURE_COORDINATES_0, 2);
+        this.addVbo(vao, mesh.vertexNormals, Conventions.VI_NORMALS, 3);
+        this.addVbo(vao, mesh.tangents, Conventions.VI_TANGENTS, 3);
         return vao;
     }
 

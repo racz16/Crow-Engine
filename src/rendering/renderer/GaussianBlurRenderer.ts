@@ -20,7 +20,7 @@ export class GaussianBlurRenderer extends PostProcessRenderer {
 
     protected renderUnsafe(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.getNativeTexture().bindToTextureUnit(Conventions.ZERO_TEXTURE_UNIT);
+        image.getNativeTexture().bindToTextureUnit(Conventions.TU_ZERO);
         Gl.setEnableDepthTest(false);
         this.renderGaussianPass();
     }

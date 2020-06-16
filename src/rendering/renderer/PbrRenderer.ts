@@ -9,7 +9,6 @@ import { AlphaMode } from '../../material/AlphaMode';
 import { Gl } from '../../webgl/Gl';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
-import { Material } from '../../material/Material';
 import { GlConstants } from '../../webgl/GlConstants';
 
 export class PbrRenderer extends GeometryRenderer {
@@ -28,7 +27,7 @@ export class PbrRenderer extends GeometryRenderer {
         super.beforeRendering();
         PbrLightsStruct.getInstance().refreshUbo();
         PbrLightsStruct.getInstance().useUbo();
-        this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.LIGHTS_BINDING_POINT);
+        this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.BP_LIGHTS);
         let mats = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRICES);
         if (!mats || !mats.length) {
             mats = new Array<mat4>(mat4.create());
@@ -50,7 +49,7 @@ export class PbrRenderer extends GeometryRenderer {
         this.getShader().getNativeShaderProgram().loadInt('alphaMode', alphaMode);
         Gl.setEnableBlend(alphaMode === AlphaMode.BLEND);
         if (alphaMode === AlphaMode.MASK) {
-            const alphaCutoff = renderableComponent.getMaterial().getParameters().get(Material.ALPHA_CUTOFF) ?? 0.5;
+            const alphaCutoff = renderableComponent.getMaterial().getParameters().get(Conventions.MP_ALPHA_CUTOFF) ?? 0.5;
             this.getShader().getNativeShaderProgram().loadFloat('alphaCutoff', alphaCutoff);
         }
     }

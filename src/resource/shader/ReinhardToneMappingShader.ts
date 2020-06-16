@@ -4,7 +4,7 @@ import { Conventions } from '../Conventions';
 export class ReinhardToneMappingShader extends Shader {
 
     protected connectTextureUnits(): void {
-        this.getShaderProgram().connectTextureUnit('image', Conventions.ZERO_TEXTURE_UNIT);
+        this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
     }
 
     protected getVertexShaderPath(): string {

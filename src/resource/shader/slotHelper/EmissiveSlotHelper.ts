@@ -1,8 +1,8 @@
 import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';
-import { Material } from '../../../material/Material';
 import { vec3 } from 'gl-matrix';
+import { Conventions } from '../../Conventions';
 
 export class EmissiveSlotHelper extends ShaderSlotHelper {
 
@@ -11,7 +11,7 @@ export class EmissiveSlotHelper extends ShaderSlotHelper {
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.EMISSIVE;
+        return Conventions.MS_EMISSIVE;
     }
 
     protected getMapName(): string {

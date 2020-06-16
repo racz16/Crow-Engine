@@ -2,6 +2,7 @@ import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { Material } from '../../../material/Material';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { Conventions } from '../../Conventions';
 
 export class NormalSlotHelper extends ShaderSlotHelper {
 
@@ -23,17 +24,17 @@ export class NormalSlotHelper extends ShaderSlotHelper {
     }
 
     private loadPomParameters(): void {
-        this.loadFloatParameter('material.normalScale', MaterialSlot.NORMAL_SCALE, 1);
-        this.loadBooleanParameter('material.isTherePOM', MaterialSlot.USE_POM, false);
-        if (this.isThereParameter(MaterialSlot.USE_POM)) {
-            this.loadFloatParameter('material.POMScale', MaterialSlot.POM_SCALE, 0.15);
-            this.loadFloatParameter('material.POMMinLayers', MaterialSlot.POM_MIN_LAYERS, 15);
-            this.loadFloatParameter('material.POMMaxLayers', MaterialSlot.POM_MAX_LAYERS, 30);
+        this.loadFloatParameter('material.normalScale', Conventions.MSP_NORMAL_SCALE, 1);
+        this.loadBooleanParameter('material.isTherePOM', Conventions.MSP_USE_POM, false);
+        if (this.isThereParameter(Conventions.MSP_USE_POM)) {
+            this.loadFloatParameter('material.POMScale', Conventions.MSP_POM_SCALE, 0.15);
+            this.loadFloatParameter('material.POMMinLayers', Conventions.MSP_POM_MIN_LAYERS, 15);
+            this.loadFloatParameter('material.POMMaxLayers', Conventions.MSP_POM_MAX_LAYERS, 30);
         }
     }
 
     protected getMaterialSlotKey(): ParameterKey<MaterialSlot> {
-        return Material.NORMAL;
+        return Conventions.MS_NORMAL;
     }
 
     protected getMapName(): string {

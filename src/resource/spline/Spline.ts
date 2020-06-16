@@ -47,15 +47,15 @@ export class Spline implements ISpline {
         if (!Utility.isUsable(this.vao)) {
             this.vao = new GlVao();
             const vbo = new GlVbo();
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setVbo(vbo, new GlVertexAttribPointer(3));
-            this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).setEnabled(true);
+            this.vao.getVertexAttribArray(Conventions.VI_POSITIONS).setVbo(vbo, new GlVertexAttribPointer(3));
+            this.vao.getVertexAttribArray(Conventions.VI_POSITIONS).setEnabled(true);
         }
     }
 
     private refreshSpline(): void {
         const data = this.computeSplineData();
         this.numberOfPoints = data.length / 3;
-        const vbo = this.vao.getVertexAttribArray(Conventions.POSITIONS_VBO_INDEX).getVbo();
+        const vbo = this.vao.getVertexAttribArray(Conventions.VI_POSITIONS).getVbo();
         vbo.allocateAndStore(new Float32Array(data), GlBufferObjectUsage.STATIC_DRAW);
         this.valid = true;
     }
