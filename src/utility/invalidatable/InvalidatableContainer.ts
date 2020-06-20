@@ -11,35 +11,35 @@ export class InvalidatableContainer {
         this.container = container;
     }
 
-    public addInvalidatable(invalidatable: IInvalidatable): void {
+    public add(invalidatable: IInvalidatable): void {
         if (!invalidatable || invalidatable == this.container) {
             throw new Error();
         }
-        this.addInvalidatableUnsafe(invalidatable);
-    }
-
-    private addInvalidatableUnsafe(invalidatable: IInvalidatable): void {
-        if (!this.containsInvalidatable(invalidatable)) {
+        if (!this.contains(invalidatable)) {
             this.invalidatables.push(invalidatable);
         }
     }
 
-    public containsInvalidatable(invalidatable: IInvalidatable): boolean {
+    public contains(invalidatable: IInvalidatable): boolean {
         return this.invalidatables.includes(invalidatable);;
     }
 
-    public removeInvalidatable(invalidatable: IInvalidatable): void {
+    public remove(invalidatable: IInvalidatable): void {
         const index = this.invalidatables.indexOf(invalidatable);
         if (index !== -1) {
             Utility.removeElement(this.invalidatables, index);
         }
     }
 
-    public getInvalidatableCount(): number {
+    public getCount(): number {
         return this.invalidatables.length;
     }
 
-    public getInvalidatablesIterator(): IterableIterator<IInvalidatable> {
+    public get(index: number): IInvalidatable {
+        return this.invalidatables[index];
+    }
+
+    public getIterator(): IterableIterator<IInvalidatable> {
         return this.invalidatables.values();
     }
 

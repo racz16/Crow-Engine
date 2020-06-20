@@ -10,6 +10,8 @@ export class GlConstants {
     private static _UNMASKED_RENDERER: string;
     private static _COLOR_BUFFER_FLOAT_ENABLED: boolean;
     private static _TEXTURE_FLOAT_LINEAR_ENABLED: boolean;
+    private static _DISJOINT_TIMER_QUERY_EXTENSION: EXT_disjoint_timer_query_webgl2;
+    private static _TIMESTAMP_QUERY_BIT_PRECISION: number;
     //shader
     private static _DEBUG_SHADERS_EXTENSION: WEBGL_debug_shaders;
     //buffer
@@ -59,6 +61,8 @@ export class GlConstants {
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         this._UNMASKED_VENDOR = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : null;
         this._UNMASKED_RENDERER = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : null;
+        this._DISJOINT_TIMER_QUERY_EXTENSION = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+        this._TIMESTAMP_QUERY_BIT_PRECISION = this.DISJOINT_TIMER_QUERY_ENABLED ? gl.getQuery(this._DISJOINT_TIMER_QUERY_EXTENSION.TIMESTAMP_EXT, this._DISJOINT_TIMER_QUERY_EXTENSION.QUERY_COUNTER_BITS_EXT) as number : 0;
     }
 
     private static initializeShadersAndTextures(gl: WebGL2RenderingContext): void {
@@ -112,6 +116,18 @@ export class GlConstants {
 
     public static get UNMASKED_RENDERER(): string {
         return this._UNMASKED_RENDERER;
+    }
+
+    public static get DISJOINT_TIMER_QUERY_EXTENSION(): EXT_disjoint_timer_query_webgl2 {
+        return this._DISJOINT_TIMER_QUERY_EXTENSION;
+    }
+
+    public static get DISJOINT_TIMER_QUERY_ENABLED(): boolean {
+        return !!this._DISJOINT_TIMER_QUERY_EXTENSION;
+    }
+
+    public static get TIMESTAMP_QUERY_BIT_PRECISION(): number {
+        return this._TIMESTAMP_QUERY_BIT_PRECISION;
     }
 
     //texture

@@ -5,6 +5,7 @@ import { GlFboAttachmentSlot, GlAttachmentSlotResolver } from '../enum/GlFboAtta
 import { GlFboCompleteness, GlFboCompletenessResolver } from '../enum/GlFboCompleteness';
 import { vec2 } from 'gl-matrix';
 import { GlConstants } from '../GlConstants';
+import { Utility } from '../../utility/Utility';
 
 export class GlFbo extends GlObject {
 
@@ -166,6 +167,23 @@ export class GlFbo extends GlObject {
     public release(): void {
         Gl.gl.deleteFramebuffer(this.getId());
         this.setId(GlObject.INVALID_ID);
+    }
+
+    public releaseAll(): void {
+        if (this.isUsable()) {
+            this.releaseAttachment(this.getAttachmentContainer(GlFboAttachmentSlot.DEPTH));
+            this.releaseAttachment(this.getAttachmentContainer(GlFboAttachmentSlot.STENCIL));
+            this.releaseAttachment(this.getAttachmentContainer(GlFboAttachmentSlot.DEPTH_STENCIL));
+            for (let i = 0; i < GlConstants.MAX_COLOR_ATTACHMENTS; i++) {
+                this.releaseAttachment(this.getAttachmentContainer(GlFboAttachmentSlot.COLOR, i));
+            }
+            this.release();
+        }
+    }
+
+    private releaseAttachment(attachmentContainer: GlFboAttachmentContainer): void {
+        Utility.releaseIfUsable(attachmentContainer.getTextureAttachment());
+        Utility.releaseIfUsable(attachmentContainer.getRboAttachment());
     }
 
 }

@@ -5,7 +5,6 @@ import { IComponent } from './IComponent';
 export class Component implements IComponent {
 
     private readonly invalidatables = new InvalidatableContainer(this);
-    private readonly parameterInvalidatables = new InvalidatableContainer(this);
     private gameObject: GameObject;
     private active = true;
     private valid = false;
@@ -14,14 +13,9 @@ export class Component implements IComponent {
         return this.invalidatables;
     }
 
-    private getParameterInvalidatables(): InvalidatableContainer {
-        return this.parameterInvalidatables;
-    }
-
     public invalidate(sender?: any): void {
         this.valid = false;
         this.invalidatables.invalidate();
-        this.parameterInvalidatables.invalidate();
     }
 
     protected isValid(): boolean {

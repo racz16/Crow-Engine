@@ -1,10 +1,10 @@
 export enum LogLevel {
-    NONE = 0,
-    ERROR = 1,
-    WARNING = 2,
-    INFO_1 = 3,
-    INFO_2 = 4,
-    INFO_3 = 5,
+    NONE = 1,
+    ERROR = 2,
+    WARNING = 3,
+    INFO_1 = 4,
+    INFO_2 = 5,
+    INFO_3 = 6,
 }
 
 export class LogLevelResolver {

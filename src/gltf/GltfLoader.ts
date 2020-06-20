@@ -1,5 +1,4 @@
 import { GltfFile } from "./interface/GltfFile";
-import { Log } from "../utility/log/Log";
 import { LogLevel } from "../utility/log/LogLevel";
 import { CameraComponent } from "../component/camera/CameraComponent";
 import { GltfCameraMode } from "./enum/GltfCameraType";
@@ -40,6 +39,7 @@ import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
 import { GlWrap } from "../webgl/enum/GlWrap";
 import { GltfResolver } from "./GltfResolver";
 import { TagContainer } from "../core/TagContainer";
+import { Engine } from "../core/Engine";
 
 export class GltfLoader implements IResource {
 
@@ -207,9 +207,7 @@ export class GltfLoader implements IResource {
         return path.substring(0, index);
     }
 
-    //
     //load scene
-    //
     public loadDefaultScene(): GltfResult {
         return this.loadScene(this.gltf.scene);
     }
@@ -229,9 +227,7 @@ export class GltfLoader implements IResource {
         return this.gltfResult;
     }
 
-    //
     //checks
-    //
     private checkVersionCompatibility(): void {
         const asset = this.gltf.asset;
         if (asset.minVersion) {
@@ -245,7 +241,7 @@ export class GltfLoader implements IResource {
             throw new Error(`GLTF version '${asset.version}' is not supported.`);
         }
         if (minorVersion > GltfLoader.SUPPORTED_MINOR_VERSION) {
-            Log.logString(LogLevel.WARNING, `GLTF version '${asset.version}' is not supported. New structures since version ${GltfLoader.SUPPORTED_MAJOR_VERSION}.${GltfLoader.SUPPORTED_MINOR_VERSION} will be ignored.`);
+            Engine.getLog().logString(LogLevel.WARNING, `GLTF version '${asset.version}' is not supported. New structures since version ${GltfLoader.SUPPORTED_MAJOR_VERSION}.${GltfLoader.SUPPORTED_MINOR_VERSION} will be ignored.`);
         }
     }
 
@@ -257,7 +253,7 @@ export class GltfLoader implements IResource {
         });
         this.gltf.extensionsUsed?.forEach((extension) => {
             if (!GltfLoader.SUPPORTED_EXTENSIONS.includes(extension)) {
-                Log.logString(LogLevel.WARNING, `Extension '${extension}' is not supported. It will be ignored.`);
+                Engine.getLog().logString(LogLevel.WARNING, `Extension '${extension}' is not supported. It will be ignored.`);
             }
         });
     }
@@ -267,9 +263,7 @@ export class GltfLoader implements IResource {
         return [+versions[0], +versions[1]];
     }
 
-    //
     //nodes
-    //
     private loadNode(nodeIndex: number, parent: GameObject = null): void {
         const node = this.gltf.nodes[nodeIndex];
 

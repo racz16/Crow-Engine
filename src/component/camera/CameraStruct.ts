@@ -1,7 +1,6 @@
 import { GlUbo } from '../../webgl/buffer/GlUbo';
 import { Utility } from '../../utility/Utility';
 import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
-import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { ICameraComponent } from './ICameraComponent';
 import { IInvalidatable } from '../../utility/invalidatable/IInvalidatable';
@@ -35,7 +34,7 @@ export class CameraStruct implements IInvalidatable {
         if (!this.isUsable()) {
             this.ubo = new GlUbo();
             this.ubo.allocate(CameraStruct.CAMERA_UBO_SIZE, GlBufferObjectUsage.STATIC_DRAW);
-            Log.logString(LogLevel.INFO_1, 'Camera Matrices ubo created');
+            Engine.getLog().logString(LogLevel.INFO_1, 'Camera Matrices ubo created');
         }
     }
 
@@ -52,7 +51,7 @@ export class CameraStruct implements IInvalidatable {
         this.ubo.store(new Float32Array(camera.getProjectionMatrix()), GlUbo.MAT4_SIZE);
         this.ubo.store(new Float32Array(camera.getGameObject().getTransform().getAbsolutePosition()), 2 * GlUbo.MAT4_SIZE);
         this.valid = true;
-        Log.logString(LogLevel.INFO_2, 'Camera Matrices ubo refreshed');
+        Engine.getLog().logString(LogLevel.INFO_2, 'Camera Matrices ubo refreshed');
     }
 
     public releaseUbo(): void {
@@ -60,7 +59,7 @@ export class CameraStruct implements IInvalidatable {
             this.ubo.release();
             this.ubo = null;
             this.valid = false;
-            Log.logString(LogLevel.INFO_1, 'Camera Matrices ubo released');
+            Engine.getLog().logString(LogLevel.INFO_1, 'Camera Matrices ubo released');
         }
     }
 

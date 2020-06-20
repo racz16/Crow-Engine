@@ -195,11 +195,11 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     protected handleAttach(attached: GameObject): void {
-        attached.getTransform().getInvalidatables().addInvalidatable(this);
+        attached.getTransform().getInvalidatables().add(this);
     }
 
     protected handleDetach(detached: GameObject): void {
-        detached.getTransform().getInvalidatables().removeInvalidatable(this);
+        detached.getTransform().getInvalidatables().remove(this);
         this.stop();
     }
 

@@ -2,7 +2,6 @@ import { GlBlendFunc, GlBlendFuncResolver } from './enum/GlBlendFunc';
 import { GlCullFace, GlCullFaceResolver } from './enum/GlCullFace';
 import { GlConstants } from './GlConstants';
 import { vec2, vec4 } from 'gl-matrix';
-import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { GlTexture2D } from './texture/GlTexture2D';
 import { GlInternalFormat } from './enum/GlInternalFormat';
@@ -29,7 +28,7 @@ export class Gl {
         }
         Gl.canvas = canvas;
         this.initializeUnsafe();
-        Log.logString(LogLevel.INFO_1, 'WebGL initialized');
+        Engine.getLog().logString(LogLevel.INFO_1, 'WebGL initialized');
     }
 
     private static initializeUnsafe(): void {

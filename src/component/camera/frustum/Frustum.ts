@@ -27,11 +27,11 @@ export abstract class Frustum implements IInvalidatable {
 
     protected setCameraComponent(cameraComponent: ICameraComponent): void {
         if (this.cameraComponent) {
-            this.cameraComponent.getInvalidatables().removeInvalidatable(this);
+            this.cameraComponent.getInvalidatables().remove(this);
         }
         this.cameraComponent = cameraComponent;
         if (this.cameraComponent) {
-            this.cameraComponent.getInvalidatables().addInvalidatable(this);
+            this.cameraComponent.getInvalidatables().add(this);
         }
         this.invalidate();
     }

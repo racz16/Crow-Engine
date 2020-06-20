@@ -1,6 +1,7 @@
 import { ParameterKey } from './ParameterKey';
 import { IInvalidatable } from '../invalidatable/IInvalidatable';
 import { Utility } from '../Utility';
+import { InvalidatableContainer } from '../invalidatable/InvalidatableContainer';
 
 export class ParameterContainer {
 
@@ -21,29 +22,38 @@ export class ParameterContainer {
     }
 
     protected removeInvalidatablesFromParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
-        if (parameter && typeof parameter.getParameterInvalidatables === 'function') {
+        const ic = this.getInvalidatableContainer(parameter);
+        if (ic) {
             if (invalidate) {
-                parameter.invalidate(this);
+                parameter.invalidate();
             }
             if (invalidatables) {
                 for (const invalidatable of invalidatables) {
-                    parameter.getParameterInvalidatables().removeInvalidatable(invalidatable);
+                    ic.remove(invalidatable);
                 }
             }
         }
     }
 
     protected addInvalidatablesToParameter(parameter: any, invalidate: boolean, invalidatables: Array<IInvalidatable>): void {
-        if (parameter && typeof parameter.getParameterInvalidatables === 'function') {
+        const ic = this.getInvalidatableContainer(parameter);
+        if (ic) {
             if (invalidate) {
                 parameter.invalidate(this);
             }
             if (invalidatables) {
                 for (const invalidatable of invalidatables) {
-                    parameter.getParameterInvalidatables().addInvalidatable(invalidatable);
+                    ic.add(invalidatable);
                 }
             }
         }
+    }
+
+    private getInvalidatableContainer(parameter: any): InvalidatableContainer {
+        if (!parameter || typeof parameter.getInvalidatables !== 'function') {
+            return null;
+        }
+        return parameter.getInvalidatables();
     }
 
     protected invalidateInvalidatables(invalidatables: Array<IInvalidatable>) {

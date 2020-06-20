@@ -1,17 +1,17 @@
 import { GameObject } from './GameObject';
-import { Log } from '../utility/log/Log';
 import { IGameObjectContainer } from './IGameObjectContainer';
+import { Engine } from './Engine';
 
 export class GameObjectContainer implements IGameObjectContainer {
 
     private gameObjects = new Array<GameObject>();
 
     public update(): void {
-        Log.startGroup('updating components');
+        Engine.getLog().startGroup('updating components');
         for (const go of this.gameObjects) {
             go.update();
         }
-        Log.endGroup();
+        Engine.getLog().endGroup();
     }
 
     public add(gameObject: GameObject): void {

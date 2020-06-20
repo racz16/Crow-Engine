@@ -1,6 +1,5 @@
 import { ComponentContainer } from './ComponentContainer';
 import { ChildContainer } from './ChildContainer';
-import { vec3, quat } from 'gl-matrix';
 import { Transform } from './Transform';
 import { Engine } from './Engine';
 
@@ -57,7 +56,7 @@ export class GameObject {
     private removeParent(): void {
         if (this.parent) {
             (this.parent.getChildren() as any).removeChild(this);
-            this.parent.getTransform().getInvalidatables().removeInvalidatable(this.transform);
+            this.parent.getTransform().getInvalidatables().remove(this.transform);
             parent = null;
             this.setRoot(this);
         }
@@ -68,7 +67,7 @@ export class GameObject {
         if (parent) {
             this.setRoot(parent.getRoot());
             (parent.getChildren() as any).addChild(this);
-            parent.getTransform().getInvalidatables().addInvalidatable(this.getTransform());
+            parent.getTransform().getInvalidatables().add(this.getTransform());
         }
     }
 

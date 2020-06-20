@@ -4,7 +4,6 @@ import { IRenderable } from '../../../resource/IRenderable';
 import { Utility } from '../../../utility/Utility';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 import { Transform } from '../../../core/Transform';
-import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { Engine } from '../../../core/Engine';
 import { Axis } from '../../../utility/Axis';
@@ -24,12 +23,12 @@ export abstract class Billboard implements IInvalidatable {
 
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+            this.renderableComponent.getInvalidatables().remove(this);
             Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().addInvalidatable(this);
+            this.renderableComponent.getInvalidatables().add(this);
             Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.invalidate();
@@ -65,7 +64,7 @@ export abstract class Billboard implements IInvalidatable {
         if (!this.valid) {
             this.refreshUnsafe();
             this.valid = true;
-            Log.logString(LogLevel.INFO_3, 'Billboard matrices refreshed');
+            Engine.getLog().logString(LogLevel.INFO_3, 'Billboard matrices refreshed');
         }
     }
 

@@ -58,7 +58,7 @@ export class CubeMapTexture implements ICubeMapTexture {
         }
     }
 
-    private async loadImages(paths: Array<string>): Promise<Array<HTMLImageElement>> {
+    private async loadImages(paths: Array<string>): Promise<Array<TexImageSource>> {
         return await Promise.all(
             paths.map(async path => {
                 return Utility.loadImage(path);
@@ -74,7 +74,7 @@ export class CubeMapTexture implements ICubeMapTexture {
         );
     }
 
-    private addTextureSides(images: Array<HTMLImageElement>, format: GlFormat): void {
+    private addTextureSides(images: Array<TexImageSource>, format: GlFormat): void {
         const mipmapCount = images.length / GlCubeMapTexture.SIDE_COUNT;
         for (let i = 0; i < GlCubeMapTexture.SIDE_COUNT; i++) {
             const sideImages = images.slice(i * mipmapCount, i * mipmapCount + mipmapCount);

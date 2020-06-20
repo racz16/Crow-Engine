@@ -10,6 +10,7 @@ import { Gl } from '../../webgl/Gl';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { GlConstants } from '../../webgl/GlConstants';
+import { GlTimeElapsedQuery } from '../../webgl/query/GlTimeElapsedQuery';
 
 export class PbrRenderer extends GeometryRenderer {
 
@@ -21,7 +22,20 @@ export class PbrRenderer extends GeometryRenderer {
             throw new Error();
         }
         this.shader = new PbrShader();
+
+        this.query = new GlTimeElapsedQuery();
     }
+
+    query: GlTimeElapsedQuery;
+
+    /*protected renderUnsafe(): void {
+        if (this.query.isResultAvailable()) {
+            console.log(`${this.query.getResult() / 1000000} ms`);
+        }
+        this.query.beginQuery();
+        super.renderUnsafe();
+        this.query.endQuery();
+    }*/
 
     protected beforeRendering(): void {
         super.beforeRendering();

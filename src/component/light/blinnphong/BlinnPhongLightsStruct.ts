@@ -3,7 +3,6 @@ import { GlBufferObjectUsage } from '../../../webgl/enum/GlBufferObjectUsage';
 import { BlinnPhongDirectionalLightComponent } from './BlinnPhongDirectionalLightComponent';
 import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
-import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 import { Engine } from '../../../core/Engine';
@@ -39,7 +38,7 @@ export class BlinnPhongLightsStruct {
         if (!this.isUsable()) {
             this.ubo = new GlUbo();
             this.ubo.allocate(BlinnPhongLightsStruct.LIGHT_DATASIZE * (BlinnPhongLightsStruct.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
-            Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
+            Engine.getLog().logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
         }
     }
 
@@ -47,7 +46,7 @@ export class BlinnPhongLightsStruct {
         if (this.isUsable()) {
             this.ubo.release();
             this.ubo = null;
-            Log.logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo released');
+            Engine.getLog().logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo released');
         }
     }
 
@@ -56,7 +55,7 @@ export class BlinnPhongLightsStruct {
         this.sortLights();
         this.refreshLightsInUbo();
         this.refreshRemainingSlotsInUbo();
-        Log.logString(LogLevel.INFO_2, `Blinn-Phong Lights ubo refreshed (${this.addedLightCount} light sources)`);
+        Engine.getLog().logString(LogLevel.INFO_2, `Blinn-Phong Lights ubo refreshed (${this.addedLightCount} light sources)`);
     }
 
     private refreshLightsInUbo(): void {

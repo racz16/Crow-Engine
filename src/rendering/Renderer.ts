@@ -1,4 +1,3 @@
-import { Log } from '../utility/log/Log';
 import { Shader } from '../resource/shader/Shader';
 import { Utility } from '../utility/Utility';
 import { Engine } from '../core/Engine';
@@ -20,11 +19,11 @@ export abstract class Renderer {
     }
 
     public render(): void {
-        Log.startGroup(this.name)
+        Engine.getLog().startGroup(this.name)
         this.beforeRendering();
         this.renderUnsafe();
         this.afterRendering();
-        Log.endGroup();
+        Engine.getLog().endGroup();
     }
 
     public getName(): string {

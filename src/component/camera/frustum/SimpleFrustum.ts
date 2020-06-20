@@ -4,8 +4,8 @@ import { FrustumPlane } from './FrustumPlane';
 import { FrustumSide, FrustumSideResolver } from './FrustumSide';
 import { Utility } from '../../../utility/Utility';
 import { Frustum } from './Frustum';
-import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
+import { Engine } from '../../../core/Engine';
 
 export class SimpleFrustum extends Frustum {
 
@@ -75,7 +75,7 @@ export class SimpleFrustum extends Frustum {
             this.refreshCenterPoint();
             this.refreshPlanes();
             this.valid = true;
-            Log.logString(LogLevel.INFO_3, 'Camera frustum refreshed');
+            Engine.getLog().logString(LogLevel.INFO_3, 'Camera frustum refreshed');
         }
     }
 

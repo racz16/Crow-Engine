@@ -2,7 +2,6 @@ import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { GlBufferObjectUsage } from '../../../webgl/enum/GlBufferObjectUsage';
 import { vec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
-import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
 import { Engine } from '../../../core/Engine';
 import { ICameraComponent } from '../../camera/ICameraComponent';
@@ -39,7 +38,7 @@ export class PbrLightsStruct {
         if (!this.isUsable()) {
             this.ubo = new GlUbo();
             this.ubo.allocate(PbrLightsStruct.LIGHT_DATASIZE * (PbrLightsStruct.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
-            Log.logString(LogLevel.INFO_1, 'PBR Lights ubo created');
+            Engine.getLog().logString(LogLevel.INFO_1, 'PBR Lights ubo created');
         }
     }
 
@@ -47,7 +46,7 @@ export class PbrLightsStruct {
         if (this.isUsable()) {
             this.ubo.release();
             this.ubo = null;
-            Log.logString(LogLevel.INFO_1, 'PBR Lights ubo released');
+            Engine.getLog().logString(LogLevel.INFO_1, 'PBR Lights ubo released');
         }
     }
 
@@ -56,7 +55,7 @@ export class PbrLightsStruct {
         this.sortLights();
         this.refreshLightsInUbo();
         this.refreshRemainingSlotsInUbo();
-        Log.logString(LogLevel.INFO_2, `PBR Lights ubo refreshed (${this.addedLightCount} light sources)`);
+        Engine.getLog().logString(LogLevel.INFO_2, `PBR Lights ubo refreshed (${this.addedLightCount} light sources)`);
     }
 
     private refreshLightsInUbo(): void {

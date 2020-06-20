@@ -57,9 +57,7 @@ export class GltfResult {
         this.vaos.push([vao, gltfPrimitive]);
     }
 
-    //
     //getters
-    //
     public getGameObjects(): IterableIterator<[GameObject, GltfNode]> {
         return this.gameObjects.values();
     }

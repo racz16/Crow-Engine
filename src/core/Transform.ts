@@ -21,7 +21,6 @@ export class Transform implements IInvalidatable {
     private gameObject: GameObject;
     private valid = false;
     private readonly invalidatables = new InvalidatableContainer(this);
-    private readonly parameterInvalidatables = new InvalidatableContainer(this);
 
     public getRelativePosition(): vec3 {
         return vec3.clone(this.relativePosition);
@@ -99,10 +98,7 @@ export class Transform implements IInvalidatable {
         }
     }
 
-
-    //
-    //matrices------------------------------------------------------------------
-    //
+    //matrices
     public getModelMatrix(): mat4 {
         this.refreshFromRelative();
         return mat4.clone(this.modelMatrix);
@@ -113,9 +109,7 @@ export class Transform implements IInvalidatable {
         return mat4.clone(this.inverseModelMatrix);
     }
 
-    //
-    //direction vectors---------------------------------------------------------
-    //
+    //direction vectors
     public getForwardVector(): vec3 {
         this.refreshFromRelative();
         return vec3.clone(this.forward);
@@ -131,9 +125,7 @@ export class Transform implements IInvalidatable {
         return vec3.clone(this.up);
     }
 
-    //
-    //refreshing----------------------------------------------------------------
-    //
+    //refreshing
     private refreshFromAbsolute(absolutePosition: vec3, absoluteRotation: quat, absoluteScale: vec3): void {
         this.refreshAbsoluteFromAbsolute(absolutePosition, absoluteRotation, absoluteScale);
         this.refreshMatricesFromAbsolute();
@@ -201,9 +193,7 @@ export class Transform implements IInvalidatable {
         vec3.cross(this.up, this.right, this.forward);
     }
 
-    //
-    //GameObject related--------------------------------------------------------
-    //
+    //GameObject related
     public update(): void { }
 
     protected attachToGameObject(gameObject: GameObject): void {
@@ -221,16 +211,11 @@ export class Transform implements IInvalidatable {
 
     public invalidate(): void {
         this.invalidatables.invalidate();
-        this.parameterInvalidatables.invalidate();
         this.valid = false;
     }
 
     public getInvalidatables(): InvalidatableContainer {
         return this.invalidatables;
-    }
-
-    private getParameterInvalidatables(): InvalidatableContainer {
-        return this.parameterInvalidatables;
     }
 
 }

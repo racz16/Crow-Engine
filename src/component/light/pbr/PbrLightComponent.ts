@@ -57,11 +57,11 @@ export abstract class PbrLightComponent extends Component {
     }
 
     protected handleAttach(attached: GameObject): void {
-        attached.getTransform().getInvalidatables().addInvalidatable(this);
+        attached.getTransform().getInvalidatables().add(this);
     }
 
     protected handleDetach(detached: GameObject): void {
-        detached.getTransform().getInvalidatables().removeInvalidatable(this);
+        detached.getTransform().getInvalidatables().remove(this);
     }
 
     protected abstract refresh(ubo: GlUbo, index: number): void;

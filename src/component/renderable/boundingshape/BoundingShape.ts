@@ -2,8 +2,8 @@ import { IRenderable } from '../../../resource/IRenderable';
 import { vec4, vec3 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
-import { Log } from '../../../utility/log/Log';
 import { LogLevel } from '../../../utility/log/LogLevel';
+import { Engine } from '../../../core/Engine';
 
 export abstract class BoundingShape implements IInvalidatable {
 
@@ -26,7 +26,7 @@ export abstract class BoundingShape implements IInvalidatable {
         if (!this.isValid()) {
             this.refreshUnsafe();
             this.setValid(true);
-            Log.logString(LogLevel.INFO_3, 'Bounding shape refreshed');
+            Engine.getLog().logString(LogLevel.INFO_3, 'Bounding shape refreshed');
         }
     }
 
@@ -69,11 +69,11 @@ export abstract class BoundingShape implements IInvalidatable {
 
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+            this.renderableComponent.getInvalidatables().remove(this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().addInvalidatable(this);
+            this.renderableComponent.getInvalidatables().add(this);
         }
         this.invalidate();
     }

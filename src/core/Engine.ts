@@ -17,6 +17,8 @@ import { ITimeManager } from './ITimeManager';
 import { IGameObjectContainer } from './IGameObjectContainer';
 import { IResourceManager } from '../resource/IResourceManager';
 import { IRenderingPipeline } from '../rendering/IRenderingPipeline';
+import { ILog } from '../utility/log/ILog';
+import { ConsoleLogHandler } from '../utility/log/ConsoleLogHandler';
 
 export class Engine {
 
@@ -27,6 +29,7 @@ export class Engine {
     public static readonly TIME_MANAGER = new ParameterKey<ITimeManager>('TIME_MANAGER');
     public static readonly RESOURCE_MANAGER = new ParameterKey<IResourceManager>('RESOURCE_MANAGER');
     public static readonly RENDERING_PIPELINE = new ParameterKey<IRenderingPipeline>('RENDERING_PIPELINE');
+    public static readonly LOG = new ParameterKey<ILog>('LOG');
 
     public static readonly BLACK_TEXTURE_2D = new ParameterKey<ITexture2D>('BLACK_TEXTURE_2D');
     public static readonly WHITE_TEXTURE_2D = new ParameterKey<ITexture2D>('WHITE_TEXTURE_2D');
@@ -45,20 +48,27 @@ export class Engine {
         try {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
-            Log.logObject(LogLevel.ERROR, error);
+            this.getLog().logObject(LogLevel.ERROR, error);
             this.getResourceManager().release();
         }
     }
 
     private static initializeUnsafe(canvas: HTMLCanvasElement, logLevel: LogLevel): void {
-        Log.startGroup('initialization');
-        Log.initialize(logLevel);
+        this.addLogSystem(logLevel);
+        this.getLog().startGroup('initialization');
         this.addSystemsBeforeInitialize();
         Gl.initialize(canvas);
         Audio.initialize();
         this.addSystemsAfterInitialize();
         Engine.initialized = true;
-        Log.endGroup();
+        this.getLog().endGroup();
+    }
+
+    public static addLogSystem(logLevel = LogLevel.WARNING): void {
+        const log = new Log(logLevel);
+        log.addHandler(new ConsoleLogHandler());
+        log.logString(LogLevel.INFO_1, 'Logging initialized');
+        this.PARAMETERS.set(this.LOG, log);
     }
 
     private static addSystemsBeforeInitialize(): void {
@@ -73,9 +83,7 @@ export class Engine {
         renderingPipeline.initialize();
     }
 
-    //
     //parameters
-    //
     public static getParameters(): ParameterContainer {
         return this.PARAMETERS;
     }
@@ -86,7 +94,7 @@ export class Engine {
 
     public static setMainCamera(camera: ICameraComponent): void {
         if (!camera) {
-            Log.logString(LogLevel.WARNING, 'Main camera set to null');
+            this.getLog().logString(LogLevel.WARNING, 'Main camera set to null');
         }
         this.PARAMETERS.set(this.MAIN_CAMERA, camera);
     }
@@ -97,7 +105,7 @@ export class Engine {
 
     public static setMainAudioListener(audioListenerComponent: AudioListenerComponent): void {
         if (!audioListenerComponent) {
-            Log.logString(LogLevel.WARNING, 'Main audio listener set to null');
+            this.getLog().logString(LogLevel.WARNING, 'Main audio listener set to null');
         }
         this.PARAMETERS.set(this.MAIN_AUDIO_LISTENER, audioListenerComponent);
     }
@@ -108,7 +116,7 @@ export class Engine {
 
     public static setGameObjectContainer(gameObjectContainer: IGameObjectContainer): void {
         if (!gameObjectContainer) {
-            Log.logString(LogLevel.WARNING, 'GameObject container set to null');
+            this.getLog().logString(LogLevel.WARNING, 'GameObject container set to null');
         }
         this.PARAMETERS.set(this.GAMEOBJECT_CONTAINER, gameObjectContainer);
     }
@@ -119,7 +127,7 @@ export class Engine {
 
     public static setTimeManager(timeManager: ITimeManager): void {
         if (!timeManager) {
-            Log.logString(LogLevel.WARNING, 'Time Manager set to null');
+            this.getLog().logString(LogLevel.WARNING, 'Time Manager set to null');
         }
         this.PARAMETERS.set(this.TIME_MANAGER, timeManager);
     }
@@ -130,7 +138,7 @@ export class Engine {
 
     public static setResourceManager(resourceManager: IResourceManager): void {
         if (!resourceManager) {
-            Log.logString(LogLevel.WARNING, 'Resource Manager set to null');
+            this.getLog().logString(LogLevel.WARNING, 'Resource Manager set to null');
         }
         this.PARAMETERS.set(this.RESOURCE_MANAGER, resourceManager);
     }
@@ -141,14 +149,23 @@ export class Engine {
 
     public static setRenderingPipeline(renderingPipeline: IRenderingPipeline): void {
         if (!renderingPipeline) {
-            Log.logString(LogLevel.WARNING, 'Rendering Pipeline set to null');
+            this.getLog().logString(LogLevel.WARNING, 'Rendering Pipeline set to null');
         }
         this.PARAMETERS.set(this.RENDERING_PIPELINE, renderingPipeline);
     }
 
-    //
+    public static getLog(): ILog {
+        return this.PARAMETERS.get(this.LOG);
+    }
+
+    public static setLog(log: ILog): void {
+        if (!log) {
+            this.getLog().logString(LogLevel.WARNING, 'Log set to null');
+        }
+        this.PARAMETERS.set(this.LOG, log);
+    }
+
     //engine lifecycle
-    //
     public static start(): void {
         if (!Engine.initialized) {
             throw new Error('The engine is not yet initialized');
@@ -157,14 +174,14 @@ export class Engine {
             throw new Error('The engine is already started');
         }
         Engine.started = true;
-        Log.logString(LogLevel.INFO_1, 'Engine started');
+        this.getLog().logString(LogLevel.INFO_1, 'Engine started');
         Engine.createNextFrame();
     }
 
     public static stop(): void {
         if (Engine.started) {
             this.started = false;
-            Log.logString(LogLevel.INFO_1, 'Engine stopped');
+            this.getLog().logString(LogLevel.INFO_1, 'Engine stopped');
         }
     }
 
@@ -174,18 +191,18 @@ export class Engine {
                 Engine.createNextFrameUnsafe();
             }
         } catch (error) {
-            Log.logObject(LogLevel.ERROR, error);
+            this.getLog().logObject(LogLevel.ERROR, error);
             this.getResourceManager().release();
         }
     }
 
     private static createNextFrameUnsafe(): void {
-        Log.startGroup(`frame ${this.getTimeManager().getFrameCount()}`);
-        this.PARAMETERS.get(this.TIME_MANAGER).endFrame();
+        this.getLog().startGroup(`frame ${this.getTimeManager().getFrameCount()}`);
+        this.getTimeManager().endFrame();
         this.getGameObjectContainer().update();
         this.getRenderingPipeline().render();
-        Log.endGroup();
-        Log.endFrame();
+        this.getLog().endGroup();
+        this.getLog().endFrame();
         window.requestAnimationFrame(Engine.createNextFrame);
     }
 

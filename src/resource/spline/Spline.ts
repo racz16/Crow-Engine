@@ -203,9 +203,7 @@ export class Spline implements ISpline {
         return this.numberOfPoints;
     }
 
-    //
-    //control points------------------------------------------------------------
-    //
+    //control points
     public getNumberOfControlPoints(): number {
         return this.controlPoints.length;
     }
@@ -254,9 +252,7 @@ export class Spline implements ISpline {
         return 2;
     }
 
-    //
-    //frustum culling-----------------------------------------------------------
-    //
+    //frustum culling
     public getObjectSpaceRadius(): number {
         this.refresh();
         return this.radius;
@@ -272,18 +268,14 @@ export class Spline implements ISpline {
         return vec3.clone(this.aabbMax);
     }
 
-    //
     //rendering
-    //
     public draw(): void {
         this.refresh();
         this.vao.bind();
         Gl.gl.drawArrays(this.isLoop() ? Gl.gl.LINE_LOOP : Gl.gl.LINE_STRIP, 0, this.getVertexCount());
     }
 
-    //
-    //misc----------------------------------------------------------------------
-    //
+    //misc
     public getDataSize(): number {
         return Utility.isUsable(this.vao) ? this.vao.getDataSize() : 0;
     }

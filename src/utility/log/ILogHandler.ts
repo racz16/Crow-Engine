@@ -1,7 +1,7 @@
 import { LogLevel } from './LogLevel';
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
-export interface ILogEventHandler {
+export interface ILogHandler {
 
     startGroup(title: string): void;
 

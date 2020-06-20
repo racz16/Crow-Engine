@@ -1,6 +1,6 @@
 import { IAudioSourceComponent } from '../component/audio/IAudioSourceComponent';
-import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
+import { Engine } from '../core/Engine';
 
 export class Audio {
 
@@ -14,7 +14,7 @@ export class Audio {
     public static initialize(): void {
         this.ctx = new AudioContext();
         this.deprecated = this.ctx.listener.positionX === undefined; // Firefox supports only the legacy API
-        Log.logString(LogLevel.INFO_1, 'Web Audio API initialized');
+        Engine.getLog().logString(LogLevel.INFO_1, 'Web Audio API initialized');
     }
 
     public static addAudioSource(audioSource: IAudioSourceComponent): void {

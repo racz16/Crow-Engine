@@ -1,8 +1,8 @@
-import { ILogEventHandler } from './ILogHandler';
+import { ILogHandler } from './ILogHandler';
 import { LogLevel, LogLevelResolver } from './LogLevel';
 import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
 
-export class ConsoleLogEventHandler implements ILogEventHandler {
+export class ConsoleLogHandler implements ILogHandler {
 
     private startedGroups = new Array<string>();
     private reallyStartedGroupCount = 0;

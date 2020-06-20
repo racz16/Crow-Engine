@@ -3,7 +3,6 @@ import { Utility } from '../../utility/Utility';
 import { GameObject } from '../../core/GameObject';
 import { SimpleFrustum } from './frustum/SimpleFrustum';
 import { Frustum } from './frustum/Frustum';
-import { Log } from '../../utility/log/Log';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { Engine } from '../../core/Engine';
 import { ICameraComponent } from './ICameraComponent';
@@ -112,7 +111,7 @@ export class CameraComponent extends Component implements ICameraComponent {
             }
             this.refreshProjectionMatrix();
             this.refreshViewMatrix();
-            Log.logString(LogLevel.INFO_3, 'Camera matrices refreshed');
+            Engine.getLog().logString(LogLevel.INFO_3, 'Camera matrices refreshed');
         }
     }
 
@@ -178,11 +177,11 @@ export class CameraComponent extends Component implements ICameraComponent {
     }
 
     protected handleAttach(attached: GameObject): void {
-        attached.getTransform().getInvalidatables().addInvalidatable(this);
+        attached.getTransform().getInvalidatables().add(this);
     }
 
     protected handleDetach(detached: GameObject): void {
-        detached.getTransform().getInvalidatables().removeInvalidatable(this);
+        detached.getTransform().getInvalidatables().remove(this);
     }
 
 }

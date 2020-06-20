@@ -58,12 +58,12 @@ export class ObbBoundingShape extends BoundingShape {
 
     protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().removeInvalidatable(this);
+            this.renderableComponent.getInvalidatables().remove(this);
             Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.renderableComponent = renderableComponent;
         if (this.renderableComponent) {
-            this.renderableComponent.getInvalidatables().addInvalidatable(this);
+            this.renderableComponent.getInvalidatables().add(this);
             Engine.getParameters().addInvalidatable(Engine.MAIN_CAMERA, this);
         }
         this.invalidate();

@@ -10,7 +10,6 @@ import { vec2, mat4, quat, vec3, } from 'gl-matrix';
 import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
 import { ScreenRenderer } from './renderer/ScreenRenderer';
-import { Log } from '../utility/log/Log';
 import { LogLevel } from '../utility/log/LogLevel';
 import { CameraStruct } from '../component/camera/CameraStruct';
 import { Engine } from '../core/Engine';
@@ -69,7 +68,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.postProcessRenderers.addToTheEnd(new GammaCorrectionRenderer());
         this.screenRenderer = new ScreenRenderer();
         this.refresh();
-        Log.logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
+        Engine.getLog().logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
     }
 
     public getGeometryRendererContainer(): RendererContainer<GeometryRenderer> {
@@ -142,7 +141,7 @@ export class RenderingPipeline implements IRenderingPipeline {
 
     private createFbo(): void {
         if (Utility.isUsable(this.fbo)) {
-            Utility.releaseFboAndAttachments(this.fbo);
+            this.fbo.releaseAll();
             Utility.releaseIfUsable(this.fboTextures[0]);
             Utility.releaseIfUsable(this.fboTextures[1]);
         }
@@ -182,7 +181,7 @@ export class RenderingPipeline implements IRenderingPipeline {
 
     public render(): void {
         //this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
-        Log.startGroup('rendering');
+        Engine.getLog().startGroup('rendering');
         this.beforePipeline();
         this.renderIfRendererIsUsableAndActive(this.shadowRenderer);
         this.renderGeometry();
@@ -190,7 +189,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
         this.renderToScreen();
         this.afterPipeline();
-        Log.endGroup();
+        Engine.getLog().endGroup();
     }
 
     protected beforePipeline(): void {
@@ -260,7 +259,7 @@ export class RenderingPipeline implements IRenderingPipeline {
 
     protected logWarningIfRendererIsNotUsable(renderer: Renderer): void {
         if (!Utility.isUsable(renderer)) {
-            Log.logString(LogLevel.WARNING, `The ${renderer.getName()} is not usable`);
+            Engine.getLog().logString(LogLevel.WARNING, `The ${renderer.getName()} is not usable`);
         }
     }
 
