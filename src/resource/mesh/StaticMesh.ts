@@ -2,12 +2,11 @@ import { IMesh } from "./IMesh";
 import { GlVao } from "../../webgl/GlVao";
 import { Utility } from "../../utility/Utility";
 import { Conventions } from "../Conventions";
-import { vec3 } from "gl-matrix";
+import { vec3, ReadonlyVec3 } from "gl-matrix";
 import { Gl } from "../../webgl/Gl";
 import { RenderingMode, RenderingModeResolver } from "../RenderingMode";
 import { IndicesType, IndicesTypeResolver } from "../IndicesType";
 import { Engine } from "../../core/Engine";
-import { TagContainer } from "../../core/TagContainer";
 
 export class StaticMesh implements IMesh {
 
@@ -20,16 +19,14 @@ export class StaticMesh implements IMesh {
     private aabbMax: vec3;
     private radius: number;
 
-    private tagContainer = new TagContainer();
-
-    public constructor(vao: GlVao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, aabbMin: vec3, aabbMax: vec3, radius: number) {
+    public constructor(vao: GlVao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, aabbMin: ReadonlyVec3, aabbMax: ReadonlyVec3, radius: number) {
         this.vao = vao;
         this.vertexCount = vertexCount;
         this.faceCount = faceCount;
         this.renderingMode = renderingMode;
         this.indicesType = indicesType;
-        this.aabbMin = aabbMin;
-        this.aabbMax = aabbMax;
+        this.aabbMin = Utility.createVec3(aabbMin);
+        this.aabbMax = Utility.createVec3(aabbMax);
         this.radius = radius;
         Engine.getResourceManager().add(this);
     }
@@ -46,12 +43,12 @@ export class StaticMesh implements IMesh {
         return this.radius;
     }
 
-    public getObjectSpaceAabbMin(): vec3 {
-        return vec3.clone(this.aabbMin);
+    public getObjectSpaceAabbMin(): ReadonlyVec3 {
+        return this.aabbMin;
     }
 
-    public getObjectSpaceAabbMax(): vec3 {
-        return vec3.clone(this.aabbMax);
+    public getObjectSpaceAabbMax(): ReadonlyVec3 {
+        return this.aabbMax;
     }
 
     public draw(): void {

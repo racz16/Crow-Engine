@@ -4,9 +4,9 @@
   "description": "TypeScript based 3D game engine.",
   "main": "index.js",
   "dependencies": {
-    "gl-matrix": "^3.2.1",
+    "gl-matrix": "^3.3.0",
     "parse-hdr": "^1.0.0",
-    "webgl-obj-loader": "^2.0.3"
+    "webgl-obj-loader": "^2.0.8"
   },
   "devDependencies": {},
   "scripts": {

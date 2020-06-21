@@ -1,5 +1,5 @@
 import { ISpline } from './ISpline';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { GlVao } from '../../webgl/GlVao';
 import { Utility } from '../../utility/Utility';
 import { Gl } from '../../webgl/Gl';
@@ -9,7 +9,6 @@ import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
 import { SplinePoint } from './SplinePoint';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
-import { TagContainer } from '../../core/TagContainer';
 
 export class Spline implements ISpline {
     protected controlPoints: Array<SplinePoint> = [];
@@ -25,8 +24,6 @@ export class Spline implements ISpline {
     protected aabbMin = vec3.create();
     protected aabbMax = vec3.create();
     protected radius: number;
-
-    private tagContainer = new TagContainer();
 
     public constructor() {
         Engine.getResourceManager().add(this);
@@ -208,24 +205,24 @@ export class Spline implements ISpline {
         return this.controlPoints.length;
     }
 
-    public addControlPointToTheEnd(point: vec3): void {
-        this.controlPoints.push(new SplinePoint(vec3.clone(point)));
+    public addControlPointToTheEnd(point: ReadonlyVec3): void {
+        this.controlPoints.push(new SplinePoint(point));
         this.valid = false;
         this.lengthValid = false;
     }
 
-    public addControlPointToIndex(index: number, point: vec3): void {
-        this.controlPoints[index] = new SplinePoint(vec3.clone(point));
+    public addControlPointToIndex(index: number, point: ReadonlyVec3): void {
+        this.controlPoints[index] = new SplinePoint(point);
         this.valid = false;
         this.lengthValid = false;
     }
 
-    public getControlPoint(index: number): vec3 {
-        return vec3.clone(this.controlPoints[index].getPoint());
+    public getControlPoint(index: number): ReadonlyVec3 {
+        return this.controlPoints[index].getPoint();
     }
 
-    public setControlPoint(index: number, point: vec3) {
-        this.controlPoints[index] = new SplinePoint(vec3.clone(point));
+    public setControlPoint(index: number, point: ReadonlyVec3) {
+        this.controlPoints[index] = new SplinePoint(point);
         this.valid = false;
         this.lengthValid = false;
     }
@@ -258,14 +255,14 @@ export class Spline implements ISpline {
         return this.radius;
     }
 
-    public getObjectSpaceAabbMin() {
+    public getObjectSpaceAabbMin(): ReadonlyVec3 {
         this.refresh();
-        return vec3.clone(this.aabbMin);
+        return this.aabbMin;
     }
 
-    public getObjectSpaceAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): ReadonlyVec3 {
         this.refresh();
-        return vec3.clone(this.aabbMax);
+        return this.aabbMax;
     }
 
     //rendering

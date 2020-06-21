@@ -1,5 +1,5 @@
 import { IResource } from './IResource';
-import { vec3 } from 'gl-matrix';
+import { ReadonlyVec3 } from 'gl-matrix';
 
 export interface IRenderable extends IResource {
 
@@ -7,9 +7,9 @@ export interface IRenderable extends IResource {
 
     getObjectSpaceRadius(): number;
 
-    getObjectSpaceAabbMin(): vec3;
+    getObjectSpaceAabbMin(): ReadonlyVec3;
 
-    getObjectSpaceAabbMax(): vec3;
+    getObjectSpaceAabbMax(): ReadonlyVec3;
 
     draw(): void;
 

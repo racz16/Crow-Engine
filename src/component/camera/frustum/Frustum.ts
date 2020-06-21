@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { ReadonlyVec3 } from 'gl-matrix';
 import { FrustumCornerPoint } from './FrustumCornerPoint';
 import { FrustumPlane } from './FrustumPlane';
 import { FrustumSide } from './FrustumSide';
@@ -9,11 +9,11 @@ export abstract class Frustum implements IInvalidatable {
 
     protected cameraComponent: ICameraComponent;
 
-    public abstract getCenterPoint(): vec3;
+    public abstract getCenterPoint(): ReadonlyVec3;
 
-    public abstract getCornerPointsIterator(): IterableIterator<vec3>;
+    public abstract getCornerPointsIterator(): IterableIterator<ReadonlyVec3>;
 
-    public abstract getCornerPoint(cornerPoint: FrustumCornerPoint): vec3;
+    public abstract getCornerPoint(cornerPoint: FrustumCornerPoint): ReadonlyVec3;
 
     public abstract getPlanesIterator(): IterableIterator<FrustumPlane>;
 

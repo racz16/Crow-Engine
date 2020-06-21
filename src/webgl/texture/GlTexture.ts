@@ -1,5 +1,5 @@
 import { GlObject } from '../GlObject';
-import { vec2 } from 'gl-matrix';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
 import { GlInternalFormat, GlInternalFormatResolver } from '../enum/GlInternalFormat';
 import { GlWrap, GlWrapResolver } from '../enum/GlWrap';
 import { GlConstants } from '../GlConstants';
@@ -38,7 +38,7 @@ export abstract class GlTexture extends GlObject implements IResource {
     }
 
     //allocate
-    protected allocate2D(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    protected allocate2D(internalFormat: GlInternalFormat, size: ReadonlyVec2, layers: number, mipmaps: boolean): void {
         this.allocationGeneral(internalFormat, size, layers, mipmaps);
         const glInternalFormat = GlInternalFormatResolver.enumToGl(this.internalFormat).getCode();
         this.bind();
@@ -46,7 +46,7 @@ export abstract class GlTexture extends GlObject implements IResource {
         this.allocated = true;
     }
 
-    protected allocate3D(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    protected allocate3D(internalFormat: GlInternalFormat, size: ReadonlyVec2, layers: number, mipmaps: boolean): void {
         this.allocationGeneral(internalFormat, size, layers, mipmaps);
         const glInternalFormat = GlInternalFormatResolver.enumToGl(this.internalFormat).getCode();
         this.bind();
@@ -54,7 +54,7 @@ export abstract class GlTexture extends GlObject implements IResource {
         this.allocated = true;
     }
 
-    protected allocationGeneral(internalFormat: GlInternalFormat, size: vec2, layers: number, mipmaps: boolean): void {
+    protected allocationGeneral(internalFormat: GlInternalFormat, size: ReadonlyVec2, layers: number, mipmaps: boolean): void {
         this.setInternalFormat(internalFormat);
         this.setSize(size);
         this.setLayers(layers);
@@ -159,11 +159,11 @@ export abstract class GlTexture extends GlObject implements IResource {
         this.internalFormat = internalFormat;
     }
 
-    public getSize(): vec2 {
-        return vec2.clone(this.size);
+    public getSize(): ReadonlyVec2 {
+        return this.size;
     }
 
-    protected setSize(size: vec2): void {
+    protected setSize(size: ReadonlyVec2): void {
         vec2.copy(this.size, size);
     }
 

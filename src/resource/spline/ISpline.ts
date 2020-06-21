@@ -1,5 +1,5 @@
 import { IRenderable } from '../IRenderable';
-import { vec3 } from 'gl-matrix';
+import { ReadonlyVec3 } from 'gl-matrix';
 
 export interface ISpline extends IRenderable {
 
@@ -7,8 +7,8 @@ export interface ISpline extends IRenderable {
 
     getApproximatedLength(): number;
 
-    getForwardVector(t: number): vec3;
+    getForwardVector(t: number): ReadonlyVec3;
 
-    getApproximatedPosition(t: number): vec3;
+    getApproximatedPosition(t: number): ReadonlyVec3;
 
 }

@@ -2,7 +2,7 @@ import { Renderer } from '../Renderer';
 import { QuadMesh } from '../../resource/mesh/QuadMesh';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { Gl } from '../../webgl/Gl';
-import { vec2, mat4 } from 'gl-matrix';
+import { vec2, mat4, ReadonlyMat4 } from 'gl-matrix';
 import { Engine } from '../../core/Engine';
 import { DebugShader } from '../../resource/shader/DebugShader';
 import { Conventions } from '../../resource/Conventions';
@@ -12,7 +12,7 @@ export class DebugRenderer extends Renderer {
     private shader: DebugShader;
     private quad: QuadMesh;
 
-    private transformation: mat4;
+    private readonly transformation = mat4.create();
     private layer: number;
 
     public constructor() {
@@ -21,8 +21,8 @@ export class DebugRenderer extends Renderer {
         this.quad = QuadMesh.getInstance();
     }
 
-    public setData(transformation: mat4, layer: number): void {
-        this.transformation = transformation;
+    public setData(transformation: ReadonlyMat4, layer: number): void {
+        mat4.copy(this.transformation, transformation);
         this.layer = layer;
     }
 

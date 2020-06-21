@@ -1,4 +1,4 @@
-import { mat4, vec3, quat } from 'gl-matrix';
+import { mat4, vec3, quat, ReadonlyMat4, ReadonlyVec3, ReadonlyQuat } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
 import { Utility } from '../../../utility/Utility';
@@ -75,7 +75,7 @@ export abstract class Billboard implements IInvalidatable {
         return this.renderableComponent && this.renderableComponent.getGameObject() && camera && camera.getGameObject() != null;
     }
 
-    public getModelMatrix(): mat4 {
+    public getModelMatrix(): ReadonlyMat4 {
         if (this.isUsable()) {
             this.refresh();
             return this.modelMatrix;
@@ -84,7 +84,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getInverseModelMatrix(): mat4 {
+    public getInverseModelMatrix(): ReadonlyMat4 {
         if (this.isUsable()) {
             this.refresh();
             return this.inverseModelMatrix;
@@ -93,7 +93,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getForwardVector(): vec3 {
+    public getForwardVector(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
             return this.forward;
@@ -102,7 +102,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getRightVector(): vec3 {
+    public getRightVector(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
             return this.right;
@@ -111,7 +111,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getUpVector(): vec3 {
+    public getUpVector(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
             return this.up;
@@ -120,7 +120,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getRelativeRotation(): quat {
+    public getRelativeRotation(): ReadonlyQuat {
         if (this.isUsable()) {
             this.refresh();
             return this.relativeRotation;
@@ -129,7 +129,7 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    public getAbsoluteRotation(): quat {
+    public getAbsoluteRotation(): ReadonlyQuat {
         if (this.isUsable()) {
             this.refresh();
             return this.absoluteRotation;

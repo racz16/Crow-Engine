@@ -1,5 +1,5 @@
 import { BoundingShape } from './BoundingShape';
-import { vec3, vec4 } from 'gl-matrix';
+import { vec3, vec4, ReadonlyVec3 } from 'gl-matrix';
 import { Engine } from '../../../core/Engine';
 import { ICameraComponent } from '../../camera/ICameraComponent';
 
@@ -28,7 +28,7 @@ export class AabbBoundingShape extends BoundingShape {
         return true;
     }
 
-    protected computeNormalAlignedAabbVertexMax(aabbMin: vec3, aabbMax: vec3, normalVector: vec3): vec3 {
+    protected computeNormalAlignedAabbVertexMax(aabbMin: ReadonlyVec3, aabbMax: ReadonlyVec3, normalVector: ReadonlyVec3): vec3 {
         const result = vec3.create();
         result[0] = normalVector[0] >= 0 ? aabbMax[0] : aabbMin[0];
         result[1] = normalVector[1] >= 0 ? aabbMax[1] : aabbMin[1];
@@ -65,27 +65,27 @@ export class AabbBoundingShape extends BoundingShape {
         }
     }
 
-    public getObjectSpaceAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): ReadonlyVec3 {
         return super.getObjectSpaceAabbMin();
     }
 
-    public getWorldSpaceAabbMin(): vec3 {
+    public getWorldSpaceAabbMin(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
-            return vec3.clone(this.aabbMin);
+            return this.aabbMin;
         } else {
             return null;
         }
     }
 
-    public getObjectSpaceAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): ReadonlyVec3 {
         return super.getObjectSpaceAabbMax();
     }
 
-    public getWorldSpaceAabbMax(): vec3 {
+    public getWorldSpaceAabbMax(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
-            return vec3.clone(this.aabbMax);
+            return this.aabbMax;
         } else {
             return null;
         }

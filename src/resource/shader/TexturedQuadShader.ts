@@ -1,5 +1,5 @@
 import { Shader } from './Shader';
-import { mat4 } from 'gl-matrix';
+import { ReadonlyMat4 } from 'gl-matrix';
 import { Conventions } from '../Conventions';
 
 export class TexturedQuadShader extends Shader {
@@ -15,7 +15,7 @@ export class TexturedQuadShader extends Shader {
         this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
     }
 
-    public setUniforms(data: mat4): void {
+    public setUniforms(data: ReadonlyMat4): void {
         this.getShaderProgram().loadMatrix4("transformation", data);
     }
 

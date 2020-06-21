@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, ReadonlyMat4 } from 'gl-matrix';
 import { Spline } from './Spline';
 
 export abstract class CubicSpline extends Spline {
@@ -47,8 +47,8 @@ export abstract class CubicSpline extends Spline {
 
     protected abstract refreshBasisMatrix(): void;
 
-    public getBasisMatrix(): mat4 {
-        return mat4.clone(this.basisMatrix);
+    public getBasisMatrix(): ReadonlyMat4 {
+        return this.basisMatrix;
     }
 
 }

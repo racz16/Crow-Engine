@@ -1,7 +1,7 @@
 import { GlBlendFunc, GlBlendFuncResolver } from './enum/GlBlendFunc';
 import { GlCullFace, GlCullFaceResolver } from './enum/GlCullFace';
 import { GlConstants } from './GlConstants';
-import { vec2, vec4 } from 'gl-matrix';
+import { vec2, vec4, ReadonlyVec2, ReadonlyVec4 } from 'gl-matrix';
 import { LogLevel } from '../utility/log/LogLevel';
 import { GlTexture2D } from './texture/GlTexture2D';
 import { GlInternalFormat } from './enum/GlInternalFormat';
@@ -152,17 +152,17 @@ export class Gl {
         }
     }
 
-    public static getViewportSize(): vec2 {
+    public static getViewportSize(): ReadonlyVec2 {
         const viewport = Gl.gl.getParameter(Gl.gl.VIEWPORT);
         return vec2.fromValues(viewport[2], viewport[3]);
     }
 
-    public static getViewportOffset(): vec2 {
+    public static getViewportOffset(): ReadonlyVec2 {
         const viewport = Gl.gl.getParameter(Gl.gl.VIEWPORT);
         return vec2.fromValues(viewport[0], viewport[1]);
     }
 
-    public static setViewport(size: vec2, offset: vec2): void {
+    public static setViewport(size: ReadonlyVec2, offset: ReadonlyVec2): void {
         if (size[0] <= 0 || size[1] <= 0) {
             throw new Error();
         }
@@ -174,7 +174,7 @@ export class Gl {
         return vec4.fromValues(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
     }
 
-    public static setClearColor(color: vec4): void {
+    public static setClearColor(color: ReadonlyVec4): void {
         Gl.gl.clearColor(color[0], color[1], color[2], color[3]);
     }
 

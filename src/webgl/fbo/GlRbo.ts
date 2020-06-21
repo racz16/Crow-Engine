@@ -1,12 +1,12 @@
 import { GlObject } from '../GlObject';
 import { IGlFboAttachment } from './IGlFboAttachment';
-import { vec2 } from 'gl-matrix';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
 import { GlInternalFormat, GlInternalFormatResolver } from '../enum/GlInternalFormat';
 import { Gl } from '../Gl';
 
 export class GlRbo extends GlObject implements IGlFboAttachment {
 
-    private size = vec2.create();
+    private readonly size = vec2.create();
     private internalFormat: GlInternalFormat;
     private sampleCount = 1;
     private allocated = false;
@@ -28,7 +28,7 @@ export class GlRbo extends GlObject implements IGlFboAttachment {
         Gl.gl.bindRenderbuffer(this.getTarget(), this.getId());
     }
 
-    public allocate(size: vec2, internalFormat: GlInternalFormat, sampleCount: number): void {
+    public allocate(size: ReadonlyVec2, internalFormat: GlInternalFormat, sampleCount: number): void {
         this.allocationGeneral(size, internalFormat, sampleCount);
         this.bind();
         const glInternalFormat = GlInternalFormatResolver.enumToGl(this.internalFormat).getCode();
@@ -39,7 +39,7 @@ export class GlRbo extends GlObject implements IGlFboAttachment {
         }
     }
 
-    private allocationGeneral(size: vec2, internalFormat: GlInternalFormat, sampleCount: number): void {
+    private allocationGeneral(size: ReadonlyVec2, internalFormat: GlInternalFormat, sampleCount: number): void {
         this.setInternalFormat(internalFormat);
         this.setSize(size);
         this.setSampleCount(sampleCount);
@@ -67,11 +67,11 @@ export class GlRbo extends GlObject implements IGlFboAttachment {
         this.internalFormat = internalFormat;
     }
 
-    public getSize(): vec2 {
-        return vec2.clone(this.size);
+    public getSize(): ReadonlyVec2 {
+        return this.size;
     }
 
-    private setSize(size: vec2): void {
+    private setSize(size: ReadonlyVec2): void {
         vec2.copy(this.size, size);
     }
 

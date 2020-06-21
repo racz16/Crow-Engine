@@ -1,5 +1,5 @@
 import { Component } from '../../Component';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { GlUbo } from '../../../webgl/buffer/GlUbo';
@@ -33,11 +33,11 @@ export abstract class PbrLightComponent extends Component {
         return index * PbrLightComponent.LIGHT_DATASIZE + offset;
     }
 
-    public getColor(): vec3 {
-        return vec3.clone(this.color);
+    public getColor(): ReadonlyVec3 {
+        return this.color;
     }
 
-    public setColor(color: vec3): void {
+    public setColor(color: ReadonlyVec3): void {
         if (!Utility.isColor(color)) {
             throw new Error();
         }

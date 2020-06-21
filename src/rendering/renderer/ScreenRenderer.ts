@@ -3,7 +3,7 @@ import { QuadMesh } from '../../resource/mesh/QuadMesh';
 import { RenderingPipeline } from '../RenderingPipeline';
 import { TexturedQuadShader } from '../../resource/Shader/TexturedQuadShader';
 import { Gl } from '../../webgl/Gl';
-import { vec2, mat4 } from 'gl-matrix';
+import { vec2, mat4, ReadonlyMat4 } from 'gl-matrix';
 import { Engine } from '../../core/Engine';
 import { GlFbo } from '../../webgl/fbo/GlFbo';
 import { Conventions } from '../../resource/Conventions';
@@ -13,7 +13,7 @@ export class ScreenRenderer extends Renderer {
     private shader: TexturedQuadShader;
     private quad: QuadMesh;
 
-    private transformation: mat4;
+    private readonly transformation = mat4.create();
 
     public constructor() {
         super('Screen Renderer');
@@ -21,8 +21,8 @@ export class ScreenRenderer extends Renderer {
         this.quad = QuadMesh.getInstance();
     }
 
-    public setTransformation(transformation: mat4): void {
-        this.transformation = transformation;
+    public setTransformation(transformation: ReadonlyMat4): void {
+        mat4.copy(this.transformation, transformation);
     }
 
     protected renderUnsafe(): void {

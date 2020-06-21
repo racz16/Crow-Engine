@@ -1,6 +1,5 @@
 import { BoundingShape } from './BoundingShape';
-import { vec4, mat4 } from 'gl-matrix';
-import { Utility } from '../../../utility/Utility';
+import { vec4, mat4, ReadonlyVec4 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IRenderable } from '../../../resource/IRenderable';
 import { Engine } from '../../../core/Engine';
@@ -74,10 +73,10 @@ export class ObbBoundingShape extends BoundingShape {
         return camera && camera.getGameObject() && super.isUsable();
     }
 
-    public getClipSpaceObbCornerPoints(): IterableIterator<vec4> {
+    public getClipSpaceObbCornerPoints(): IterableIterator<ReadonlyVec4> {
         if (this.isUsable()) {
             this.refresh();
-            return Utility.cloneVec4(this.clipSpaceObbCornerPoints.values()).values();
+            return this.clipSpaceObbCornerPoints.values();
         } else {
             return null;
         }

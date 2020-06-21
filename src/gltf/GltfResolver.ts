@@ -4,7 +4,7 @@ import { GlVertexAttribPointerType } from "../webgl/enum/GlVertexAttribPointerTy
 import { GltfPrimitiveMode } from "./enum/GltfPrimitiveMode";
 import { RenderingMode } from "../resource/RenderingMode";
 import { IndicesType } from "../resource/IndicesType";
-import { vec3 } from "gl-matrix";
+import { vec3, ReadonlyVec3 } from "gl-matrix";
 import { GltfMinificationFilter } from "./enum/GltfMinificationFIlter";
 import { GlMinificationFilter } from "../webgl/enum/GlMinificationFilter";
 import { GltfMagnificationFilter } from "./enum/GltfMagnificationFilter";
@@ -39,7 +39,7 @@ export class GltfResolver {
         }
     }
 
-    public static computeRadius(aabbMin: vec3, aabbMax: vec3): number {
+    public static computeRadius(aabbMin: ReadonlyVec3, aabbMax: ReadonlyVec3): number {
         const position = vec3.fromValues(
             Math.max(Math.abs(aabbMin[0]), Math.abs(aabbMax[0])),
             Math.max(Math.abs(aabbMin[1]), Math.abs(aabbMax[1])),

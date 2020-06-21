@@ -1,8 +1,9 @@
-import { vec4, vec2 } from 'gl-matrix';
+import { vec4, vec2, ReadonlyVec2, ReadonlyVec4 } from 'gl-matrix';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ITexture2D } from '../resource/texture/ITexture2D';
 import { ICubeMapTexture } from '../resource/texture/ICubeMapTexture';
 import { ITexture2DArray } from '../resource/texture/ITexture2DArray';
+import { Utility } from '../utility/Utility';
 
 export class MaterialSlot {
 
@@ -25,12 +26,12 @@ export class MaterialSlot {
         this.active = active;
     }
 
-    public getColor(): vec4 {
+    public getColor(): ReadonlyVec4 {
         return this.color;
     }
 
-    public setColor(color: vec4): void {
-        this.color = color;
+    public setColor(color: ReadonlyVec4): void {
+        this.color = Utility.createVec4(color);
     }
 
     public getTexture2D(): ITexture2D {
@@ -57,19 +58,19 @@ export class MaterialSlot {
         this.cubeMapTexture = cubeMapTexture;
     }
 
-    public getTextureTile(): vec2 {
+    public getTextureTile(): ReadonlyVec2 {
         return this.textureTile;
     }
 
-    public setTextureTile(textureTile: vec2): void {
+    public setTextureTile(textureTile: ReadonlyVec2): void {
         vec2.copy(this.textureTile, textureTile);
     }
 
-    public getTextureOffset(): vec2 {
+    public getTextureOffset(): ReadonlyVec2 {
         return this.textureOffset;
     }
 
-    public setTextureOffset(textureOffset: vec2): void {
+    public setTextureOffset(textureOffset: ReadonlyVec2): void {
         vec2.copy(this.textureOffset, textureOffset);
     }
 
@@ -89,7 +90,7 @@ export class MaterialSlot {
         return this.textureCoordinate;
     }
 
-    public setTextureCoordinate(textureCoordinate): void {
+    public setTextureCoordinate(textureCoordinate: number): void {
         if (textureCoordinate < 0) {
             throw new Error();
         }

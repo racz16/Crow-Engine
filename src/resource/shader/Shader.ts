@@ -4,11 +4,8 @@ import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { IResource } from '../IResource';
-import { TagContainer } from '../../core/TagContainer';
 
 export abstract class Shader implements IResource {
-
-    private tagContainer = new TagContainer();
 
     private shaderProgram: GlShaderProgram;
     private loaded = false;

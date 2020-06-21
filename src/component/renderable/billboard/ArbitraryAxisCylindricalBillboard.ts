@@ -1,5 +1,5 @@
 import { Billboard } from './Billboard';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 
 export class ArbitraryAxisCylindricalBillboard extends Billboard {
@@ -11,11 +11,11 @@ export class ArbitraryAxisCylindricalBillboard extends Billboard {
         this.setAxis(axis);
     }
 
-    public getAxis(): vec3 {
-        return vec3.clone(this.axis);
+    public getAxis(): ReadonlyVec3 {
+        return this.axis;
     }
 
-    public setAxis(axis: vec3): void {
+    public setAxis(axis: ReadonlyVec3): void {
         if (!axis || Utility.isNullVector(axis)) {
             throw new Error();
         }

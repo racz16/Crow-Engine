@@ -1,5 +1,5 @@
 import { Shader } from './Shader';
-import { mat4 } from 'gl-matrix';
+import { ReadonlyMat4 } from 'gl-matrix';
 import { Conventions } from '../Conventions';
 
 export class DebugShader extends Shader {
@@ -15,7 +15,7 @@ export class DebugShader extends Shader {
         this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
     }
 
-    public setUniforms(data: { transformation: mat4, layer: number }): void {
+    public setUniforms(data: { transformation: ReadonlyMat4, layer: number }): void {
         this.getShaderProgram().loadMatrix4("transformation", data.transformation);
         this.getShaderProgram().loadInt("layer", data.layer);
     }

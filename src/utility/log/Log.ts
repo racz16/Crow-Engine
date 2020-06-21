@@ -1,5 +1,5 @@
 import { LogLevel } from './LogLevel';
-import { mat4, mat3, vec3, vec4 } from 'gl-matrix';
+import { ReadonlyMat3, ReadonlyMat4, ReadonlyVec4, ReadonlyVec3 } from 'gl-matrix';
 import { ILogHandler } from './ILogHandler';
 import { Utility } from '../Utility';
 import { ILog } from './ILog';
@@ -99,7 +99,7 @@ export class Log implements ILog {
         }
     }
 
-    public logVec3(logLevel: LogLevel, vec: vec3): void {
+    public logVec3(logLevel: LogLevel, vec: ReadonlyVec3): void {
         if (this.canLog(logLevel)) {
             for (const handler of this.logHandlers) {
                 handler.logVec3(logLevel, vec);
@@ -107,7 +107,7 @@ export class Log implements ILog {
         }
     }
 
-    public logVec4(logLevel: LogLevel, vec: vec4): void {
+    public logVec4(logLevel: LogLevel, vec: ReadonlyVec4): void {
         if (this.canLog(logLevel)) {
             for (const handler of this.logHandlers) {
                 handler.logVec4(logLevel, vec);
@@ -115,7 +115,7 @@ export class Log implements ILog {
         }
     }
 
-    public logMat3(logLevel: LogLevel, mat: mat3): void {
+    public logMat3(logLevel: LogLevel, mat: ReadonlyMat3): void {
         if (this.canLog(logLevel)) {
             for (const handler of this.logHandlers) {
                 handler.logMat3(logLevel, mat);
@@ -123,7 +123,7 @@ export class Log implements ILog {
         }
     }
 
-    public logMat4(logLevel: LogLevel, mat: mat4): void {
+    public logMat4(logLevel: LogLevel, mat: ReadonlyMat4): void {
         if (this.canLog(logLevel)) {
             for (const handler of this.logHandlers) {
                 handler.logMat4(logLevel, mat);

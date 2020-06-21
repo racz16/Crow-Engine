@@ -1,5 +1,5 @@
 import { IRenderable } from '../../../resource/IRenderable';
-import { vec4, vec3 } from 'gl-matrix';
+import { vec4, ReadonlyVec3 } from 'gl-matrix';
 import { IRenderableComponent } from '../IRenderableComponent';
 import { IInvalidatable } from '../../../utility/invalidatable/IInvalidatable';
 import { LogLevel } from '../../../utility/log/LogLevel';
@@ -32,7 +32,7 @@ export abstract class BoundingShape implements IInvalidatable {
 
     protected abstract refreshUnsafe(): void;
 
-    protected getObjectSpaceAabbMin(): vec3 {
+    protected getObjectSpaceAabbMin(): ReadonlyVec3 {
         if (this.renderableComponent) {
             return this.renderableComponent.getRenderable().getObjectSpaceAabbMin();
         } else {
@@ -40,7 +40,7 @@ export abstract class BoundingShape implements IInvalidatable {
         }
     }
 
-    protected getObjectSpaceAabbMax(): vec3 {
+    protected getObjectSpaceAabbMax(): ReadonlyVec3 {
         if (this.renderableComponent) {
             return this.renderableComponent.getRenderable().getObjectSpaceAabbMax();
         } else {
@@ -54,7 +54,7 @@ export abstract class BoundingShape implements IInvalidatable {
         return this.getObjectSpaceAabbCornerPoints(osAabbMin, osAabbMax);
     }
 
-    private getObjectSpaceAabbCornerPoints(osAabbMin: vec3, osAabbMax: vec3): Array<vec4> {
+    private getObjectSpaceAabbCornerPoints(osAabbMin: ReadonlyVec3, osAabbMax: ReadonlyVec3): Array<vec4> {
         const cornerPoints = new Array<vec4>(8);
         cornerPoints[0] = vec4.fromValues(osAabbMax[0], osAabbMax[1], osAabbMax[2], 1);//right-top-front
         cornerPoints[1] = vec4.fromValues(osAabbMax[0], osAabbMin[1], osAabbMax[2], 1);//right-bottom-front

@@ -1,7 +1,7 @@
 import { ICubeMapTexture } from './ICubeMapTexture';
 import { GlCubeMapTexture } from '../../webgl/texture/GlCubeMapTexture';
 import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
-import { vec2 } from 'gl-matrix';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
 import { GlCubeMapSideResolver } from '../../webgl/enum/GlCubeMapSide';
 import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
 import { Utility } from '../../utility/Utility';
@@ -9,7 +9,6 @@ import { TextureType } from './enum/TextureType';
 import { GlFormat } from '../../webgl/enum/GlFormat';
 import { HdrImageResult } from 'parse-hdr';
 import { GlSampler } from '../../webgl/GlSampler';
-import { TagContainer } from '../../core/TagContainer';
 
 export class CubeMapTexture implements ICubeMapTexture {
 
@@ -17,8 +16,6 @@ export class CubeMapTexture implements ICubeMapTexture {
     private sampler: GlSampler;
     private textureFiltering: TextureFiltering
     private loaded = false;
-
-    private tagContainer = new TagContainer();
 
     public constructor(paths: Array<string>, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
         this.sampler = new GlSampler();
@@ -123,7 +120,7 @@ export class CubeMapTexture implements ICubeMapTexture {
         return this.texture;
     }
 
-    public getSize(): vec2 {
+    public getSize(): ReadonlyVec2 {
         return this.texture.getSize();
     }
 

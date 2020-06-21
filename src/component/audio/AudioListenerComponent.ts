@@ -2,7 +2,7 @@ import { Component } from '../Component';
 import { GameObject } from '../../core/GameObject';
 import { Audio } from '../../resource/Audio';
 import { Engine } from '../../core/Engine';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { Axis } from '../../utility/Axis';
 
 export class AudioListenerComponent extends Component {
@@ -32,12 +32,12 @@ export class AudioListenerComponent extends Component {
         this.setAudioListenerDirections(forward, up);
     }
 
-    public setAudioListener(position: vec3, forward: vec3, up: vec3): void {
+    public setAudioListener(position: ReadonlyVec3, forward: ReadonlyVec3, up: ReadonlyVec3): void {
         this.setAudioListenerPosition(position);
         this.setAudioListenerDirections(forward, up);
     }
 
-    private setAudioListenerPosition(position: vec3): void {
+    private setAudioListenerPosition(position: ReadonlyVec3): void {
         const listener = Audio.context.listener;
         if (Audio.isDeprecated()) {
             listener.setPosition(position[0], position[1], position[2]);
@@ -48,7 +48,7 @@ export class AudioListenerComponent extends Component {
         }
     }
 
-    private setAudioListenerDirections(forward: vec3, up: vec3): void {
+    private setAudioListenerDirections(forward: ReadonlyVec3, up: ReadonlyVec3): void {
         const listener = Audio.context.listener;
         if (Audio.isDeprecated()) {
             listener.setOrientation(forward[0], forward[1], forward[2], up[0], up[1], up[2]);
@@ -57,7 +57,7 @@ export class AudioListenerComponent extends Component {
         }
     }
 
-    private setAudioListenerOrientation(listener: AudioListener, forward: vec3, up: vec3): void {
+    private setAudioListenerOrientation(listener: AudioListener, forward: ReadonlyVec3, up: ReadonlyVec3): void {
         listener.forwardX.setValueAtTime(forward[0], 0);
         listener.forwardY.setValueAtTime(forward[1], 0);
         listener.forwardZ.setValueAtTime(forward[2], 0);

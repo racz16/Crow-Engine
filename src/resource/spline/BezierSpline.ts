@@ -1,5 +1,5 @@
 import { CubicSpline } from './CubicSpline';
-import { vec3, vec4, mat4 } from 'gl-matrix';
+import { vec3, vec4, mat4, ReadonlyVec3 } from 'gl-matrix';
 
 export class BezierSpline extends CubicSpline {
 
@@ -21,8 +21,8 @@ export class BezierSpline extends CubicSpline {
         }
     }
 
-    private computeClosestControlAndHelperPoints(startIndex: number): Array<vec3> {
-        const closest = new Array<vec3>(4);
+    private computeClosestControlAndHelperPoints(startIndex: number): Array<ReadonlyVec3> {
+        const closest = new Array<ReadonlyVec3>(4);
         closest[0] = this.controlPoints[startIndex].getPoint();
         closest[1] = this.controlPoints[startIndex].getRight();
         const loop = startIndex + 1 === this.getNumberOfControlPoints() && this.isLoop();
@@ -31,21 +31,21 @@ export class BezierSpline extends CubicSpline {
         return closest;
     }
 
-    public getLeftHelperPoint(index: number): vec3 {
-        return vec3.clone(this.controlPoints[index].getLeft());
+    public getLeftHelperPoint(index: number): ReadonlyVec3 {
+        return this.controlPoints[index].getLeft();
     }
 
-    public getRightHelperPoint(index: number): vec3 {
-        return vec3.clone(this.controlPoints[index].getRight());
+    public getRightHelperPoint(index: number): ReadonlyVec3 {
+        return this.controlPoints[index].getRight();
     }
 
-    public setLeftHelperPoint(index: number, helperPoint: vec3): void {
-        this.controlPoints[index].setLeft(vec3.clone(helperPoint));
+    public setLeftHelperPoint(index: number, helperPoint: ReadonlyVec3): void {
+        this.controlPoints[index].setLeft(helperPoint);
         this.valid = false;
     }
 
-    public setRightHelperPoint(index: number, helperPoint: vec3): void {
-        this.controlPoints[index].setRight(vec3.clone(helperPoint));
+    public setRightHelperPoint(index: number, helperPoint: ReadonlyVec3): void {
+        this.controlPoints[index].setRight(helperPoint);
         this.valid = false;
     }
 

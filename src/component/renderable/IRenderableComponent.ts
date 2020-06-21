@@ -1,7 +1,7 @@
 import { IComponent } from '../IComponent';
 import { IRenderable } from '../../resource/IRenderable';
 import { Material } from '../../material/Material';
-import { vec2, mat4 } from 'gl-matrix';
+import { ReadonlyMat4, ReadonlyVec2 } from 'gl-matrix';
 import { BoundingShape } from './boundingshape/BoundingShape';
 import { Billboard } from './billboard/Billboard';
 
@@ -23,11 +23,11 @@ export interface IRenderableComponent<T extends IRenderable> extends IComponent 
 
     isMaterialActive(): boolean;
 
-    getVisibilityInterval(): vec2;
+    getVisibilityInterval(): ReadonlyVec2;
 
-    getModelMatrix(): mat4;
+    getModelMatrix(): ReadonlyMat4;
 
-    getInverseModelMatrix(): mat4;
+    getInverseModelMatrix(): ReadonlyMat4;
 
     getFaceCount(): number;
 

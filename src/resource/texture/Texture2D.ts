@@ -1,19 +1,16 @@
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
 import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
-import { vec2 } from 'gl-matrix';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
 import { ITexture2D } from './ITexture2D';
 import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
 import { Utility } from '../../utility/Utility';
 import { TextureType } from './enum/TextureType';
 import { GlSampler } from '../../webgl/GlSampler';
-import { TagContainer } from '../../core/TagContainer';
 
 export class Texture2D implements ITexture2D {
 
     private texture: GlTexture2D;
     private sampler: GlSampler;
-
-    private tagContainer = new TagContainer();
 
     public constructor(texture: GlTexture2D, sampler: GlSampler) {
         this.texture = texture;
@@ -60,7 +57,7 @@ export class Texture2D implements ITexture2D {
         return this.sampler;
     }
 
-    public getSize(): vec2 {
+    public getSize(): ReadonlyVec2 {
         return this.texture.getSize();
     }
 

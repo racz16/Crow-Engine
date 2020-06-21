@@ -4,7 +4,7 @@ import { GameObject } from '../../core/GameObject';
 import { Material } from '../../material/Material';
 import { SphereBoundingShape } from './boundingshape/SphereBoundingShape';
 import { IRenderableComponent } from './IRenderableComponent';
-import { vec2, mat4, vec3, quat } from 'gl-matrix';
+import { vec2, ReadonlyVec2, ReadonlyMat4, ReadonlyVec3, ReadonlyQuat } from 'gl-matrix';
 import { BlinnPhongRenderer } from '../../rendering/renderer/BlinnPhongRenderer';
 import { BoundingShape } from './boundingshape/BoundingShape';
 import { Billboard } from './billboard/Billboard';
@@ -121,11 +121,11 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.invalidate();
     }
 
-    public getVisibilityInterval(): vec2 {
-        return vec2.clone(this.visibilityInterval);
+    public getVisibilityInterval(): ReadonlyVec2 {
+        return this.visibilityInterval;
     }
 
-    public setVisibilityInterval(interval: vec2): void {
+    public setVisibilityInterval(interval: ReadonlyVec2): void {
         if (!interval) {
             throw new Error();
         }
@@ -133,7 +133,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.visibilityInterval[1] = interval[1];
     }
 
-    public getModelMatrix(): mat4 {
+    public getModelMatrix(): ReadonlyMat4 {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getModelMatrix();
@@ -145,7 +145,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getInverseModelMatrix(): mat4 {
+    public getInverseModelMatrix(): ReadonlyMat4 {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getInverseModelMatrix();
@@ -157,7 +157,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getForwardVector(): vec3 {
+    public getForwardVector(): ReadonlyVec3 {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getForwardVector();
@@ -169,7 +169,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getRightVector(): vec3 {
+    public getRightVector(): ReadonlyVec3 {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getRightVector();
@@ -181,7 +181,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getUpVector(): vec3 {
+    public getUpVector(): ReadonlyVec3 {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getUpVector();
@@ -193,7 +193,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getRelativeRotation(): quat {
+    public getRelativeRotation(): ReadonlyQuat {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getRelativeRotation();
@@ -205,7 +205,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         }
     }
 
-    public getAbsoluteRotation(): quat {
+    public getAbsoluteRotation(): ReadonlyQuat {
         if (this.getGameObject()) {
             if (this.billboard) {
                 return this.billboard.getAbsoluteRotation();

@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, ReadonlyMat4 } from 'gl-matrix';
 import { Utility } from '../../utility/Utility';
 import { GameObject } from '../../core/GameObject';
 import { SimpleFrustum } from './frustum/SimpleFrustum';
@@ -142,18 +142,18 @@ export class CameraComponent extends Component implements ICameraComponent {
         }
     }
 
-    public getViewMatrix(): mat4 {
+    public getViewMatrix(): ReadonlyMat4 {
         if (this.getGameObject()) {
             this.refresh();
-            return mat4.clone(this.viewMatrix);
+            return this.viewMatrix;
         } else {
             return null;
         }
     }
 
-    public getProjectionMatrix(): mat4 {
+    public getProjectionMatrix(): ReadonlyMat4 {
         this.refresh();
-        return mat4.clone(this.projectionMatrix);
+        return this.projectionMatrix;
     }
 
     public getFrustum(): Frustum {

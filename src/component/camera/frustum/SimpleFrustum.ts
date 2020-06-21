@@ -1,5 +1,5 @@
 import { FrustumCornerPoint, FrustumCornerPointResolver } from './FrustumCornerPoint';
-import { vec3, mat4, vec4 } from 'gl-matrix';
+import { vec3, mat4, ReadonlyVec3 } from 'gl-matrix';
 import { FrustumPlane } from './FrustumPlane';
 import { FrustumSide, FrustumSideResolver } from './FrustumSide';
 import { Utility } from '../../../utility/Utility';
@@ -16,31 +16,31 @@ export class SimpleFrustum extends Frustum {
     private IV: mat4;
     private valid = false;
 
-    public getCenterPoint(): vec3 {
+    public getCenterPoint(): ReadonlyVec3 {
         if (this.isUsable()) {
             this.refresh();
-            return vec3.clone(this.centerPoint);
+            return this.centerPoint;
         } else {
             return null;
         }
     }
 
-    public getCornerPointsIterator(): IterableIterator<vec3> {
+    public getCornerPointsIterator(): IterableIterator<ReadonlyVec3> {
         if (this.isUsable()) {
             this.refresh();
-            return Utility.cloneVec3(this.cornerPoints.values()).values();
+            return this.cornerPoints.values();
         } else {
             return null;
         }
     }
 
-    public getCornerPoint(cornerPoint: FrustumCornerPoint): vec3 {
+    public getCornerPoint(cornerPoint: FrustumCornerPoint): ReadonlyVec3 {
         if (!cornerPoint) {
             throw new Error();
         }
         if (this.isUsable()) {
             this.refresh();
-            return vec3.clone(this.cornerPoints.get(cornerPoint));
+            return this.cornerPoints.get(cornerPoint);
         } else {
             return null;
         }
@@ -113,7 +113,7 @@ export class SimpleFrustum extends Frustum {
         }
     }
 
-    private transformCornerPointsToPlane(p0: vec3, p1: vec3, p2: vec3): FrustumPlane {
+    private transformCornerPointsToPlane(p0: ReadonlyVec3, p1: ReadonlyVec3, p2: ReadonlyVec3): FrustumPlane {
         const v1 = vec3.normalize(vec3.create(), vec3.sub(vec3.create(), p1, p0));
         const v2 = vec3.normalize(vec3.create(), vec3.sub(vec3.create(), p2, p0));
         const normalVector = vec3.cross(vec3.create(), v1, v2);

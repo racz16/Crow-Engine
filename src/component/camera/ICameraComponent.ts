@@ -1,13 +1,13 @@
-import { mat4 } from 'gl-matrix';
+import { ReadonlyMat4 } from 'gl-matrix';
 import { Frustum } from './frustum/Frustum';
 import { IComponent } from '../IComponent';
 import { CameraType } from './CameraType';
 
 export interface ICameraComponent extends IComponent {
 
-    getViewMatrix(): mat4;
+    getViewMatrix(): ReadonlyMat4;
 
-    getProjectionMatrix(): mat4;
+    getProjectionMatrix(): ReadonlyMat4;
 
     getFrustum(): Frustum;
 

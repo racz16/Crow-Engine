@@ -1,13 +1,11 @@
 import { IResource } from '../resource/IResource';
 import { Engine } from '../core/Engine';
-import { TagContainer } from '../core/TagContainer';
 
 export abstract class GlObject implements IResource {
 
     protected static readonly INVALID_ID = -1;
 
     private id = GlObject.INVALID_ID;
-    private tagContainer = new TagContainer();
     private dataSize = 0;
 
     public constructor() {

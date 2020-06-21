@@ -2,7 +2,7 @@ import { RendererContainer } from './RendererContainer';
 import { GeometryRenderer } from './GeometryRenderer';
 import { PostProcessRenderer } from './PostProcessRenderer';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
-import { vec2 } from 'gl-matrix';
+import { ReadonlyVec2 } from 'gl-matrix';
 import { IRenderableContainer } from '../core/IRenderableContainer';
 
 export interface IRenderingPipeline {
@@ -19,7 +19,7 @@ export interface IRenderingPipeline {
 
     setRenderingScale(renderingScale: number): void;
 
-    getRenderingSize(): vec2;
+    getRenderingSize(): ReadonlyVec2;
 
     getRenderedFaceCount(): number;
 

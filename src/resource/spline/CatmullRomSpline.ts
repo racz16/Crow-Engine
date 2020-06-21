@@ -1,5 +1,5 @@
 import { CubicSpline } from './CubicSpline';
-import { vec3, mat4, vec4 } from 'gl-matrix';
+import { vec3, mat4, vec4, ReadonlyVec3 } from 'gl-matrix';
 
 export class CatmullRomSpline extends CubicSpline {
     private tension: number;
@@ -22,8 +22,8 @@ export class CatmullRomSpline extends CubicSpline {
         }
     }
 
-    private refreshClosestControlPoints(startIndex: number): void {
-        const closestControlPoints = new Array<vec3>(4);
+    private refreshClosestControlPoints(startIndex: number): Array<ReadonlyVec3> {
+        const closestControlPoints = new Array<ReadonlyVec3>(4);
         for (let i = -1; i < 3; i++) {
             if (this.isLoop()) {
                 closestControlPoints[i + 1] = this.computeLoopClosestControlPoint(startIndex, i);
@@ -31,9 +31,10 @@ export class CatmullRomSpline extends CubicSpline {
                 closestControlPoints[i + 1] = this.computeNormalClosestControlPoint(startIndex, i);
             }
         }
+        return closestControlPoints;
     }
 
-    private computeLoopClosestControlPoint(startIndex: number, index: number): vec3 {
+    private computeLoopClosestControlPoint(startIndex: number, index: number): ReadonlyVec3 {
         if (startIndex + index === -1) {
             return this.getControlPoint(this.getNumberOfControlPoints() - 1);
         } else if (startIndex + index === this.getNumberOfControlPoints()) {
@@ -45,7 +46,7 @@ export class CatmullRomSpline extends CubicSpline {
         }
     }
 
-    private computeNormalClosestControlPoint(startIndex: number, index: number): vec3 {
+    private computeNormalClosestControlPoint(startIndex: number, index: number): ReadonlyVec3 {
         if (startIndex + index === -1) {
             return vec3.add(vec3.create(), this.getControlPoint(0), vec3.sub(vec3.create(), this.getControlPoint(0), this.getControlPoint(1)));
         } else if (startIndex + index === this.getNumberOfControlPoints()) {

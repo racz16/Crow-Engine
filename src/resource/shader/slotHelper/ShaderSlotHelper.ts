@@ -1,4 +1,4 @@
-import { vec3, vec4 } from 'gl-matrix';
+import { vec3, ReadonlyVec4 } from 'gl-matrix';
 import { MaterialSlot } from '../../../material/MaterialSlot';
 import { GlShaderProgram } from '../../../webgl/shader/GlShaderProgram';
 import { Material } from '../../../material/Material';
@@ -104,7 +104,7 @@ export abstract class ShaderSlotHelper {
         this.shaderProgram.loadVector3(this.getColorName(), vec3.fromValues(defaultColor[0], defaultColor[1], defaultColor[2]));
     }
 
-    protected loadDefaultColor4(defaultColor: vec4): void {
+    protected loadDefaultColor4(defaultColor: ReadonlyVec4): void {
         this.shaderProgram.loadVector4(this.getColorName(), defaultColor);
     }
 

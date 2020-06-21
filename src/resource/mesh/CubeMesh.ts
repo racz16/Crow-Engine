@@ -1,6 +1,6 @@
 import { IMesh } from './IMesh';
 import { GlVao } from '../../webgl/GlVao';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { Gl } from '../../webgl/Gl';
 import { GlVbo } from '../../webgl/buffer/GlVbo';
 import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
@@ -8,7 +8,6 @@ import { GlVertexAttribPointer } from '../../webgl/GlVertexAttribPointer';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
-import { TagContainer } from '../../core/TagContainer';
 
 export class CubeMesh implements IMesh {
 
@@ -53,8 +52,6 @@ export class CubeMesh implements IMesh {
         1, -1, 1
     ];
 
-    private tagContainer = new TagContainer();
-
     private constructor() {
         this.create();
         Engine.getResourceManager().add(this);
@@ -89,11 +86,11 @@ export class CubeMesh implements IMesh {
         return Math.sqrt(3);
     }
 
-    public getObjectSpaceAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): ReadonlyVec3 {
         return vec3.fromValues(-1, -1, -1);
     }
 
-    public getObjectSpaceAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): ReadonlyVec3 {
         return vec3.fromValues(1, 1, 1);
     }
 

@@ -1,5 +1,5 @@
 import { IGlFboAttachment } from "../fbo/IGlFboAttachment";
-import { vec2 } from "gl-matrix";
+import { vec2, ReadonlyVec2 } from "gl-matrix";
 import { GlInternalFormat } from "../enum/GlInternalFormat";
 import { GlTexture2DArray } from "./GlTexture2DArray";
 import { GlWrap } from "../enum/GlWrap";
@@ -25,21 +25,21 @@ export class GlTexture2DArrayLayer implements IGlFboAttachment {
         return this.layer;
     }
 
-    public store(data: HTMLImageElement, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+    public store(data: HTMLImageElement, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
         const glFormat = GlFormatResolver.enumToGl(format);
         this.texture2DArray.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, data.naturalWidth, data.naturalHeight, this.layer, glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
-    public storeFromBinary(data: ArrayBufferView, size: vec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+    public storeFromBinary(data: ArrayBufferView, size: ReadonlyVec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
         const glFormat = GlFormatResolver.enumToGl(format);
         this.texture2DArray.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, size[0], size[1], this.layer, glFormat, Gl.gl.FLOAT, data);
     }
 
-    public getSize(): vec2 {
+    public getSize(): ReadonlyVec2 {
         return this.texture2DArray.getSize();
     }
 

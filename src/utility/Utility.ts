@@ -1,4 +1,4 @@
-import { mat4, vec3, vec4, quat } from 'gl-matrix';
+import { mat4, vec3, vec4, quat, ReadonlyMat4, ReadonlyVec4, ReadonlyQuat, ReadonlyVec3 } from 'gl-matrix';
 import { IResource } from '../resource/IResource';
 import { Gl } from '../webgl/Gl';
 import parseHdr, { HdrImageResult } from 'parse-hdr';
@@ -7,16 +7,16 @@ export class Utility {
 
     private constructor() { }
 
-    public static isParallel(a: vec3, b: vec3): boolean {
+    public static isParallel(a: ReadonlyVec3, b: ReadonlyVec3): boolean {
         const dot = vec3.dot(a, b);
         return dot === 1 || dot === -1;
     }
 
-    public static computeModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
+    public static computeModelMatrix(position: ReadonlyVec3, rotation: ReadonlyQuat, scale: ReadonlyVec3): mat4 {
         return mat4.fromRotationTranslationScale(mat4.create(), rotation, position, scale);
     }
 
-    public static computeInverseModelMatrix(position: vec3, rotation: quat, scale: vec3): mat4 {
+    public static computeInverseModelMatrix(position: ReadonlyVec3, rotation: ReadonlyQuat, scale: ReadonlyVec3): mat4 {
         const model = mat4.create();
         mat4.scale(model, model, vec3.div(vec3.create(), vec3.fromValues(1, 1, 1), scale));
         const axis = vec3.create();
@@ -28,7 +28,7 @@ export class Utility {
         return model;
     }
 
-    public static computeModelMatrixFromDirections(forward: vec3, up: vec3, right: vec3, position: vec3, scale: vec3): mat4 {
+    public static computeModelMatrixFromDirections(forward: ReadonlyVec3, up: ReadonlyVec3, right: ReadonlyVec3, position: ReadonlyVec3, scale: ReadonlyVec3): mat4 {
         const mat = mat4.fromValues(
             right[0], right[1], right[2], 0,
             up[0], up[1], up[2], 0,
@@ -39,7 +39,7 @@ export class Utility {
         return mat;
     }
 
-    public static computeInverseModelMatrixFromDirections(forward: vec3, up: vec3, right: vec3, position: vec3, scale: vec3): mat4 {
+    public static computeInverseModelMatrixFromDirections(forward: ReadonlyVec3, up: ReadonlyVec3, right: ReadonlyVec3, position: ReadonlyVec3, scale: ReadonlyVec3): mat4 {
         const scaleMatrix = mat4.fromScaling(mat4.create(), scale);
         const rotationTranslationMatrix = mat4.fromValues(
             right[0], up[0], forward[0], 0,
@@ -50,11 +50,11 @@ export class Utility {
         return mat4.mul(mat4.create(), scaleMatrix, rotationTranslationMatrix);
     }
 
-    public static computeViewMatrix(position: vec3, rotation: quat): mat4 {
+    public static computeViewMatrix(position: ReadonlyVec3, rotation: ReadonlyQuat): mat4 {
         return Utility.computeInverseModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
     }
 
-    public static computeInverseViewMatrix(position: vec3, rotation: quat): mat4 {
+    public static computeInverseViewMatrix(position: ReadonlyVec3, rotation: ReadonlyQuat): mat4 {
         return Utility.computeModelMatrix(position, rotation, vec3.fromValues(1, 1, 1));
     }
 
@@ -76,7 +76,7 @@ export class Utility {
         return Gl.getCanvas().clientWidth / Gl.getCanvas().clientHeight;
     }
 
-    public static computeoWorldSpacePosition(ndcPosition: vec4, inverseProjection: mat4, inverseView: mat4): vec4 {
+    public static computeoWorldSpacePosition(ndcPosition: ReadonlyVec4, inverseProjection: ReadonlyMat4, inverseView: ReadonlyMat4): vec4 {
         const viewSpacePosition = vec4.transformMat4(vec4.create(), ndcPosition, inverseProjection);
         vec4.scale(viewSpacePosition, viewSpacePosition, 1 / viewSpacePosition[3]);
         const worldSpacePosition = vec4.transformMat4(vec4.create(), viewSpacePosition, inverseView);
@@ -109,11 +109,11 @@ export class Utility {
         }
     }
 
-    public static isColor(data: vec3): boolean {
+    public static isColor(data: ReadonlyVec3): boolean {
         return data[0] >= 0 && data[1] >= 0 && data[2] >= 0;
     }
 
-    public static getMaxCoordinate(vector: vec3): number {
+    public static getMaxCoordinate(vector: ReadonlyVec3): number {
         let max = Number.NEGATIVE_INFINITY;
         for (const coordinate of vector) {
             if (coordinate > max) {
@@ -123,25 +123,15 @@ export class Utility {
         return max;
     }
 
-    public static cloneVec3(vectors: IterableIterator<vec3>): Array<vec3> {
-        const newArray = new Array<vec3>();
-        for (const vector of vectors) {
-            const newVector = vec3.clone(vector);
-            newArray.push(newVector);
-        }
-        return newArray;
+    public static createVec3(rv3: ReadonlyVec3): vec3 {
+        return vec3.fromValues(rv3[0], rv3[1], rv3[2]);
     }
 
-    public static cloneVec4(vectors: IterableIterator<vec4>): Array<vec4> {
-        const newArray = new Array<vec4>();
-        for (const vector of vectors) {
-            const newVector = vec4.clone(vector);
-            newArray.push(newVector);
-        }
-        return newArray;
+    public static createVec4(rv4: ReadonlyVec4): vec4 {
+        return vec4.fromValues(rv4[0], rv4[1], rv4[2], rv4[3]);
     }
 
-    public static isNullVector(vector: vec3): boolean {
+    public static isNullVector(vector: ReadonlyVec3): boolean {
         return vec3.length(vector) === 0;
     }
 

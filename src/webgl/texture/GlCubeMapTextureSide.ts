@@ -1,7 +1,7 @@
 import { GlCubeMapTexture } from './GlCubeMapTexture';
 import { GlCubeMapSide, GlCubeMapSideResolver } from '../enum/GlCubeMapSide';
 import { GlInternalFormat } from '../enum/GlInternalFormat';
-import { vec2 } from 'gl-matrix';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
 import { IGlFboAttachment } from '../fbo/IGlFboAttachment';
 import { GlWrap } from '../enum/GlWrap';
 import { Gl } from '../Gl';
@@ -26,21 +26,21 @@ export class GlCubeMapTextureSide implements IGlFboAttachment {
         return this.side;
     }
 
-    public store(data: TexImageSource, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+    public store(data: TexImageSource, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
         const glFormat = GlFormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage2D(GlCubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
-    public storeFromBinary(data: ArrayBufferView, size: vec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset = vec2.create()): void {
+    public storeFromBinary(data: ArrayBufferView, size: ReadonlyVec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
         const glFormat = GlFormatResolver.enumToGl(format);
         this.cubeMapTexture.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
         Gl.gl.texSubImage2D(GlCubeMapSideResolver.enumToGl(this.side), mipmapLevel, offset[0], offset[1], size[0], size[1], glFormat, Gl.gl.FLOAT, data);
     }
 
-    public getSize(): vec2 {
+    public getSize(): ReadonlyVec2 {
         return this.cubeMapTexture.getSize();
     }
 

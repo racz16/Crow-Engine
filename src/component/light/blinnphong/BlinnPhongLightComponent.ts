@@ -1,5 +1,5 @@
 import { Component } from '../../Component';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { GlUbo } from '../../../webgl/buffer/GlUbo';
@@ -31,11 +31,11 @@ export abstract class BlinnPhongLightComponent extends Component {
         return index * BlinnPhongLightComponent.LIGHT_DATASIZE + offset;
     }
 
-    public getDiffuseColor(): vec3 {
-        return vec3.clone(this.diffuseColor);
+    public getDiffuseColor(): ReadonlyVec3 {
+        return this.diffuseColor;
     }
 
-    public setDiffuseColor(diffuse: vec3): void {
+    public setDiffuseColor(diffuse: ReadonlyVec3): void {
         if (!Utility.isColor(diffuse)) {
             throw new Error();
         }
@@ -43,11 +43,11 @@ export abstract class BlinnPhongLightComponent extends Component {
         this.invalidate();
     }
 
-    public getSpecularColor(): vec3 {
-        return vec3.clone(this.specularColor);
+    public getSpecularColor(): ReadonlyVec3 {
+        return this.specularColor;
     }
 
-    public setSpecularColor(specular: vec3): void {
+    public setSpecularColor(specular: ReadonlyVec3): void {
         if (!Utility.isColor(specular)) {
             throw new Error();
         }
@@ -55,11 +55,11 @@ export abstract class BlinnPhongLightComponent extends Component {
         this.invalidate();
     }
 
-    public getAmbientColor(): vec3 {
-        return vec3.clone(this.ambientColor);
+    public getAmbientColor(): ReadonlyVec3 {
+        return this.ambientColor;
     }
 
-    public setAmbientColor(ambient: vec3): void {
+    public setAmbientColor(ambient: ReadonlyVec3): void {
         if (!Utility.isColor(ambient)) {
             throw new Error();
         }

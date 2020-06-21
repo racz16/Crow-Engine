@@ -1,9 +1,9 @@
-import { vec2 } from 'gl-matrix';
+import { ReadonlyVec2 } from 'gl-matrix';
 import { GlInternalFormat } from '../enum/GlInternalFormat';
 
 export interface IGlFboAttachment {
 
-    getSize(): vec2;
+    getSize(): ReadonlyVec2;
 
     getInternalFormat(): GlInternalFormat;
 

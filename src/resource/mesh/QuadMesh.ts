@@ -1,6 +1,6 @@
 import { IMesh } from './IMesh';
 import { GlVao } from '../../webgl/GlVao';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { GlEbo } from '../../webgl/buffer/GlEbo';
 import { GlVbo } from '../../webgl/buffer/GlVbo';
 import { GlBufferObjectUsage } from '../../webgl/enum/GlBufferObjectUsage';
@@ -9,7 +9,6 @@ import { Gl } from '../../webgl/Gl';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { Conventions } from '../Conventions';
-import { TagContainer } from '../../core/TagContainer';
 
 export class QuadMesh implements IMesh {
 
@@ -29,8 +28,6 @@ export class QuadMesh implements IMesh {
     ]
     private indices = [0, 2, 3, 1, 0, 3];
     private uv = [0, 1, 1, 1, 0, 0, 1, 0];
-
-    private tagContainer = new TagContainer();
 
     private constructor() {
         this.create();
@@ -79,11 +76,11 @@ export class QuadMesh implements IMesh {
         return Math.sqrt(2);
     }
 
-    public getObjectSpaceAabbMin(): vec3 {
+    public getObjectSpaceAabbMin(): ReadonlyVec3 {
         return vec3.fromValues(-1, -1, 0);
     }
 
-    public getObjectSpaceAabbMax(): vec3 {
+    public getObjectSpaceAabbMax(): ReadonlyVec3 {
         return vec3.fromValues(1, 1, 0);
     }
 

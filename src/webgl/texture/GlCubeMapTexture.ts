@@ -5,7 +5,7 @@ import { Gl } from '../Gl';
 import { GlCubeMapTextureSide } from './GlCubeMapTextureSide';
 import { ICubeMapTexture } from '../../resource/texture/ICubeMapTexture';
 import { GlInternalFormat } from '../enum/GlInternalFormat';
-import { vec2 } from 'gl-matrix';
+import { ReadonlyVec2 } from 'gl-matrix';
 
 export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
 
@@ -22,7 +22,7 @@ export class GlCubeMapTexture extends GlTexture implements ICubeMapTexture {
         return Gl.gl.TEXTURE_CUBE_MAP;
     }
 
-    public allocate(internalFormat: GlInternalFormat, size: vec2, mipmaps: boolean): void {
+    public allocate(internalFormat: GlInternalFormat, size: ReadonlyVec2, mipmaps: boolean): void {
         this.allocate2D(internalFormat, size, GlCubeMapTexture.SIDE_COUNT, mipmaps);
         for (let i = 0; i < GlCubeMapTexture.SIDE_COUNT; i++) {
             const side = GlCubeMapSideResolver.indexToEnum(i);

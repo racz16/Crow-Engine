@@ -1,4 +1,4 @@
-import { vec3, mat4, quat } from 'gl-matrix';
+import { vec3, mat4, quat, ReadonlyMat4, ReadonlyQuat, ReadonlyVec3 } from 'gl-matrix';
 import { GameObject } from './GameObject';
 import { Utility } from '../utility/Utility';
 import { IInvalidatable } from '../utility/invalidatable/IInvalidatable';
@@ -22,21 +22,21 @@ export class Transform implements IInvalidatable {
     private valid = false;
     private readonly invalidatables = new InvalidatableContainer(this);
 
-    public getRelativePosition(): vec3 {
-        return vec3.clone(this.relativePosition);
+    public getRelativePosition(): ReadonlyVec3 {
+        return this.relativePosition;
     }
 
-    public setRelativePosition(position: vec3): void {
+    public setRelativePosition(position: ReadonlyVec3): void {
         vec3.copy(this.relativePosition, position);
         this.invalidate();
     }
 
-    public getAbsolutePosition(): vec3 {
+    public getAbsolutePosition(): ReadonlyVec3 {
         this.refreshFromRelative();
-        return vec3.clone(this.absolutePosition);
+        return this.absolutePosition;
     }
 
-    public setAbsolutePosition(position: vec3): void {
+    public setAbsolutePosition(position: ReadonlyVec3): void {
         if (this.haveParent()) {
             this.refreshFromAbsolute(position, this.getAbsoluteRotation(), this.getAbsoluteScale());
         } else {
@@ -44,26 +44,26 @@ export class Transform implements IInvalidatable {
         }
     }
 
-    public move(movement: vec3): void {
+    public move(movement: ReadonlyVec3): void {
         vec3.add(this.relativePosition, this.relativePosition, movement);
         this.invalidate();
     }
 
-    public getRelativeRotation(): quat {
-        return quat.clone(this.relativeRotation);
+    public getRelativeRotation(): ReadonlyQuat {
+        return this.relativeRotation;
     }
 
-    public setRelativeRotation(rotation: quat): void {
+    public setRelativeRotation(rotation: ReadonlyQuat): void {
         quat.copy(this.relativeRotation, rotation);
         this.invalidate();
     }
 
-    public getAbsoluteRotation(): quat {
+    public getAbsoluteRotation(): ReadonlyQuat {
         this.refreshFromRelative();
-        return quat.clone(this.absoluteRotation);
+        return this.absoluteRotation;
     }
 
-    public setAbsoluteRotation(rotation: quat): void {
+    public setAbsoluteRotation(rotation: ReadonlyQuat): void {
         if (this.haveParent()) {
             this.refreshFromAbsolute(this.getAbsolutePosition(), rotation, this.getAbsoluteScale());
         } else {
@@ -71,26 +71,26 @@ export class Transform implements IInvalidatable {
         }
     }
 
-    public rotate(rotation: quat): void {
+    public rotate(rotation: ReadonlyQuat): void {
         quat.mul(this.relativeRotation, rotation, this.relativeRotation);
         this.invalidate();
     }
 
-    public getRelativeScale(): vec3 {
-        return vec3.clone(this.relativeScale);
+    public getRelativeScale(): ReadonlyVec3 {
+        return this.relativeScale;
     }
 
-    public setRelativeScale(scale: vec3): void {
+    public setRelativeScale(scale: ReadonlyVec3): void {
         vec3.copy(this.relativeScale, scale);
         this.invalidate();
     }
 
-    public getAbsoluteScale(): vec3 {
+    public getAbsoluteScale(): ReadonlyVec3 {
         this.refreshFromRelative();
-        return vec3.clone(this.absoluteScale);
+        return this.absoluteScale;
     }
 
-    public setAbsoluteScale(scale: vec3): void {
+    public setAbsoluteScale(scale: ReadonlyVec3): void {
         if (this.haveParent()) {
             this.refreshFromAbsolute(this.getAbsolutePosition(), this.getAbsoluteRotation(), scale);
         } else {
@@ -99,34 +99,34 @@ export class Transform implements IInvalidatable {
     }
 
     //matrices
-    public getModelMatrix(): mat4 {
+    public getModelMatrix(): ReadonlyMat4 {
         this.refreshFromRelative();
-        return mat4.clone(this.modelMatrix);
+        return this.modelMatrix;
     }
 
-    public getInverseModelMatrix(): mat4 {
+    public getInverseModelMatrix(): ReadonlyMat4 {
         this.refreshFromRelative();
-        return mat4.clone(this.inverseModelMatrix);
+        return this.inverseModelMatrix;
     }
 
     //direction vectors
-    public getForwardVector(): vec3 {
+    public getForwardVector(): ReadonlyVec3 {
         this.refreshFromRelative();
-        return vec3.clone(this.forward);
+        return this.forward;
     }
 
-    public getRightVector(): vec3 {
+    public getRightVector(): ReadonlyVec3 {
         this.refreshFromRelative();
-        return vec3.clone(this.right);
+        return this.right;
     }
 
-    public getUpVector(): vec3 {
+    public getUpVector(): ReadonlyVec3 {
         this.refreshFromRelative();
-        return vec3.clone(this.up);
+        return this.up;
     }
 
     //refreshing
-    private refreshFromAbsolute(absolutePosition: vec3, absoluteRotation: quat, absoluteScale: vec3): void {
+    private refreshFromAbsolute(absolutePosition: ReadonlyVec3, absoluteRotation: ReadonlyQuat, absoluteScale: ReadonlyVec3): void {
         this.refreshAbsoluteFromAbsolute(absolutePosition, absoluteRotation, absoluteScale);
         this.refreshMatricesFromAbsolute();
         this.refreshRelativeFromAbsolte();
@@ -134,15 +134,15 @@ export class Transform implements IInvalidatable {
         this.valid = true;
     }
 
-    private refreshAbsoluteFromAbsolute(absolutePosition: vec3, absoluteRotation: quat, absoluteScale: vec3): void {
+    private refreshAbsoluteFromAbsolute(absolutePosition: ReadonlyVec3, absoluteRotation: ReadonlyQuat, absoluteScale: ReadonlyVec3): void {
         vec3.copy(this.absolutePosition, absolutePosition);
         quat.copy(this.absoluteRotation, absoluteRotation);
         vec3.copy(this.absoluteScale, absoluteScale);
     }
 
     private refreshMatricesFromAbsolute(): void {
-        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
-        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        this.modelMatrix = Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale);
+        this.inverseModelMatrix = Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale);
     }
 
     private refreshRelativeFromAbsolte(): void {
@@ -173,8 +173,8 @@ export class Transform implements IInvalidatable {
         vec3.copy(this.absolutePosition, this.relativePosition);
         quat.copy(this.absoluteRotation, this.relativeRotation);
         vec3.copy(this.absoluteScale, this.relativeScale);
-        mat4.copy(this.modelMatrix, Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
-        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        this.modelMatrix = Utility.computeModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale);
+        this.inverseModelMatrix = Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale);
     }
 
     private refreshWhenAbsoluteNotEqualsRelative(): void {
@@ -184,7 +184,7 @@ export class Transform implements IInvalidatable {
         mat4.getTranslation(this.absolutePosition, this.modelMatrix);
         mat4.getRotation(this.absoluteRotation, this.modelMatrix);
         mat4.getScaling(this.absoluteScale, this.modelMatrix);
-        mat4.copy(this.inverseModelMatrix, Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale));
+        this.inverseModelMatrix = Utility.computeInverseModelMatrix(this.absolutePosition, this.absoluteRotation, this.absoluteScale);
     }
 
     private refreshDirectionVectors(): void {

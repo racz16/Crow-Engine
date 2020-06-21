@@ -38,7 +38,6 @@ import { GlMinificationFilter } from "../webgl/enum/GlMinificationFilter";
 import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
 import { GlWrap } from "../webgl/enum/GlWrap";
 import { GltfResolver } from "./GltfResolver";
-import { TagContainer } from "../core/TagContainer";
 import { Engine } from "../core/Engine";
 
 export class GltfLoader implements IResource {
@@ -70,8 +69,6 @@ export class GltfLoader implements IResource {
     private static readonly BYTE = 4;
 
     private static glbBinaryStart: number;
-
-    private tagContainer = new TagContainer();
 
     private gltf: GltfFile;
 
@@ -476,7 +473,7 @@ export class GltfLoader implements IResource {
             }
         }
         if (color) {
-            slot.setColor(vec4.clone(color));
+            slot.setColor(color);
         }
         material.setSlot(Conventions.MS_BASE_COLOR, slot);
     }
@@ -553,8 +550,7 @@ export class GltfLoader implements IResource {
             }
         }
         if (color) {
-            const copiedColor = vec3.clone(color);
-            slot.setColor(vec4.fromValues(copiedColor[0], copiedColor[1], copiedColor[2], 1));
+            slot.setColor(vec4.fromValues(color[0], color[1], color[2], 1));
         }
         material.setSlot(Conventions.MS_EMISSIVE, slot);
     }

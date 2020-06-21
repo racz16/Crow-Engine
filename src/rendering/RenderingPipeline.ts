@@ -6,7 +6,7 @@ import { ITexture2D } from '../resource/texture/ITexture2D';
 import { GlTexture2D } from '../webgl/texture/GlTexture2D';
 import { GlFbo } from '../webgl/fbo/GlFbo';
 import { GlFboAttachmentSlot } from '../webgl/enum/GlFboAttachmentSlot';
-import { vec2, mat4, quat, vec3, } from 'gl-matrix';
+import { vec2, mat4, ReadonlyVec2, } from 'gl-matrix';
 import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
 import { ScreenRenderer } from './renderer/ScreenRenderer';
@@ -99,7 +99,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.refresh();
     }
 
-    public getRenderingSize(): vec2 {
+    public getRenderingSize(): ReadonlyVec2 {
         const renderingSize = vec2.create();
         const canvas = Gl.getCanvas();
         renderingSize[0] = canvas.clientWidth * this.renderingScale;
@@ -129,7 +129,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.fbo.bind();
     }
 
-    private getFboSize(): vec2 {
+    private getFboSize(): ReadonlyVec2 {
         return this.fboTextures[0].getSize();
     }
 

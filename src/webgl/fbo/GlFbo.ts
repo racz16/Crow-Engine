@@ -3,7 +3,7 @@ import { GlFboAttachmentContainer } from './GlFboAttachmentContainer';
 import { Gl } from '../Gl';
 import { GlFboAttachmentSlot, GlAttachmentSlotResolver } from '../enum/GlFboAttachmentSlot';
 import { GlFboCompleteness, GlFboCompletenessResolver } from '../enum/GlFboCompleteness';
-import { vec2 } from 'gl-matrix';
+import { ReadonlyVec2 } from 'gl-matrix';
 import { GlConstants } from '../GlConstants';
 import { Utility } from '../../utility/Utility';
 
@@ -130,7 +130,7 @@ export class GlFbo extends GlObject {
     }
 
     //blit
-    public blitTo(destination: GlFbo, fromOffset: vec2, fromSize: vec2, toOffset: vec2, toSize: vec2, slots: GlFboAttachmentSlot): void {
+    public blitTo(destination: GlFbo, fromOffset: ReadonlyVec2, fromSize: ReadonlyVec2, toOffset: ReadonlyVec2, toSize: ReadonlyVec2, slots: GlFboAttachmentSlot): void {
         this.bindToRead();
         destination.bindToDraw();
         Gl.gl.blitFramebuffer(fromOffset[0], fromOffset[1], fromSize[0], fromSize[1], toOffset[0], toOffset[1], toSize[0], toSize[1], GlAttachmentSlotResolver.enumFlagToGl(slots), Gl.gl.NEAREST);
@@ -148,15 +148,15 @@ export class GlFbo extends GlObject {
         return size;
     }
 
-    public readRgbaPixels(offset: vec2, size: vec2): Uint8Array {
+    public readRgbaPixels(offset: ReadonlyVec2, size: ReadonlyVec2): Uint8Array {
         return this.readPixelsUnsafe(offset, size, 4);
     }
 
-    public readRgbPixels(offset: vec2, size: vec2): Uint8Array {
+    public readRgbPixels(offset: ReadonlyVec2, size: ReadonlyVec2): Uint8Array {
         return this.readPixelsUnsafe(offset, size, 3);
     }
 
-    private readPixelsUnsafe(offset: vec2, size: vec2, components: number): Uint8Array {
+    private readPixelsUnsafe(offset: ReadonlyVec2, size: ReadonlyVec2, components: number): Uint8Array {
         const glType = components === 3 ? Gl.gl.RGB : Gl.gl.RGBA;
         const destination = new Uint8Array(size[0] * size[1] * components);
         this.bind();

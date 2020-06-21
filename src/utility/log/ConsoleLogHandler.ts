@@ -1,6 +1,6 @@
 import { ILogHandler } from './ILogHandler';
 import { LogLevel, LogLevelResolver } from './LogLevel';
-import { vec3, vec4, mat3, mat4 } from 'gl-matrix';
+import { ReadonlyMat3, ReadonlyMat4, ReadonlyVec4, ReadonlyVec3 } from 'gl-matrix';
 
 export class ConsoleLogHandler implements ILogHandler {
 
@@ -55,17 +55,17 @@ export class ConsoleLogHandler implements ILogHandler {
         console.trace(message);
     }
 
-    public logVec3(logLevel: LogLevel, vec: vec3): void {
+    public logVec3(logLevel: LogLevel, vec: ReadonlyVec3): void {
         this.openGroups();
         console.table(vec);
     }
 
-    public logVec4(logLevel: LogLevel, vec: vec4): void {
+    public logVec4(logLevel: LogLevel, vec: ReadonlyVec4): void {
         this.openGroups();
         console.table(vec);
     }
 
-    public logMat3(logLevel: LogLevel, mat: mat3): void {
+    public logMat3(logLevel: LogLevel, mat: ReadonlyMat3): void {
         this.openGroups();
         console.table([
             [mat[0], mat[3], mat[6]],
@@ -74,7 +74,7 @@ export class ConsoleLogHandler implements ILogHandler {
         ]);
     }
 
-    public logMat4(logLevel: LogLevel, mat: mat4): void {
+    public logMat4(logLevel: LogLevel, mat: ReadonlyMat4): void {
         this.openGroups();
         console.table([
             [mat[0], mat[4], mat[8], mat[12]],

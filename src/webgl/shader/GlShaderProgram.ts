@@ -1,6 +1,6 @@
 import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
-import { vec2, vec3, vec4, mat4, mat3 } from 'gl-matrix';
+import { ReadonlyVec2, ReadonlyMat3, ReadonlyMat4, ReadonlyVec4, ReadonlyVec3 } from 'gl-matrix';
 import { GlShader } from './GlShader';
 import { GlBindingPoint } from '../GlBindingPoint';
 import { GlShaderStage } from '../enum/GlShaderStage';
@@ -128,23 +128,23 @@ export class GlShaderProgram extends GlObject {
         Gl.gl.uniform1f(this.getUniformLocation(uniform), value ? 1 : 0);
     }
 
-    public loadVector2(uniform: string, vector: vec2): void {
+    public loadVector2(uniform: string, vector: ReadonlyVec2): void {
         Gl.gl.uniform2fv(this.getUniformLocation(uniform), vector);
     }
 
-    public loadVector3(uniform: string, vector: vec3): void {
+    public loadVector3(uniform: string, vector: ReadonlyVec3): void {
         Gl.gl.uniform3fv(this.getUniformLocation(uniform), vector);
     }
 
-    public loadVector4(uniform: string, vector: vec4): void {
+    public loadVector4(uniform: string, vector: ReadonlyVec4): void {
         Gl.gl.uniform4fv(this.getUniformLocation(uniform), vector);
     }
 
-    public loadMatrix3(uniform: string, matrix: mat3, transpose = false): void {
+    public loadMatrix3(uniform: string, matrix: ReadonlyMat3, transpose = false): void {
         Gl.gl.uniformMatrix3fv(this.getUniformLocation(uniform), transpose, matrix);
     }
 
-    public loadMatrix4(uniform: string, matrix: mat4, transpose = false): void {
+    public loadMatrix4(uniform: string, matrix: ReadonlyMat4, transpose = false): void {
         Gl.gl.uniformMatrix4fv(this.getUniformLocation(uniform), transpose, matrix);
     }
 

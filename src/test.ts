@@ -35,7 +35,6 @@ import { StaticMesh } from './resource/mesh/StaticMesh';
 import { CameraType } from './component/camera/CameraType';
 import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
 import { Conventions } from './resource/Conventions';
-import { LogLevel } from './utility/log/LogLevel';
 
 window.onload = async () => {
     const tsb = new TestSceneBuilder();
