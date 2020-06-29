@@ -9,7 +9,7 @@ export class CatmullRomSpline extends CubicSpline {
         this.setTension(tension);
     }
 
-    protected getValue(startIndex: number, t: number): vec3 {
+    protected getValue(startIndex: number, t: number): ReadonlyVec3 {
         if (this.getNumberOfControlPoints() < this.getRequiredControlPoints()) {
             return super.getValue(startIndex, t);
         } else {

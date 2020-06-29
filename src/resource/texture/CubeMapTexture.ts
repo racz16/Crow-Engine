@@ -120,6 +120,10 @@ export class CubeMapTexture implements ICubeMapTexture {
         return this.texture;
     }
 
+    public getNativeSampler(): GlSampler {
+        return this.sampler;
+    }
+
     public getSize(): ReadonlyVec2 {
         return this.texture.getSize();
     }

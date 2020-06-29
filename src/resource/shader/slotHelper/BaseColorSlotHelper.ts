@@ -1,4 +1,3 @@
-import { Material } from '../../../material/Material';
 import { ShaderSlotHelper } from './ShaderSlotHelper';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { MaterialSlot } from '../../../material/MaterialSlot';

@@ -5,7 +5,7 @@ import { GltfCameraMode } from "./enum/GltfCameraType";
 import { Utility } from "../utility/Utility";
 import { GameObject } from "../core/GameObject";
 import { GltfNode } from "./interface/GltfNode";
-import { mat4, vec3, quat, vec4 } from "gl-matrix";
+import { mat4, vec3, quat, vec4, vec2 } from "gl-matrix";
 import { GltfLightType } from "./enum/GltfLightType";
 import { PbrDirectionalLightComponent } from "../component/light/pbr/PbrDirectionalLightComponent";
 import { PbrPointLightComponent } from "../component/light/pbr/PbrPointLightComponent";
@@ -39,13 +39,18 @@ import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
 import { GlWrap } from "../webgl/enum/GlWrap";
 import { GltfResolver } from "./GltfResolver";
 import { Engine } from "../core/Engine";
+import { GltfTextureInfo } from "./interface/GltfTextureInfo";
+import { GltfAccessor } from "./interface/GltfAccessor";
+import { GlFormat } from "../webgl/enum/GlFormat";
+import { Transform } from "../core/Transform";
+import { GltfCamera } from "./interface/GltfCamera";
+import { GltfLight } from "./interface/GltfLight";
 
 export class GltfLoader implements IResource {
 
     //TODO
     //saját PBR implementáció vs GLTF spec
 
-    //interleaved data esetén elég egy vbo
     //blinn-phongra átvezetni
     //  uniformok pl. normalScale, isThereNormal, isThereTangent
     //  ha nincs normal vagy tangent, akkor számoljuk ki (meg ugye TBN-es baszakodás)
@@ -72,16 +77,20 @@ export class GltfLoader implements IResource {
 
     private gltf: GltfFile;
 
+    private createGameObjects: boolean;
+
     private binaries: Array<ArrayBuffer>;
-    private images: Array<GlTexture2D>;
+    private images: Map<number, GlTexture2D>;
 
     private meshes = new Map<number, Array<[IMesh, Material<PbrRenderer>]>>();
+    private vbos = new Map<number, GlVbo>();
+    private ebos = new Map<number, GlEbo>();
     private textures = new Map<number, Texture2D>();
     private materials = new Map<number, Material<PbrRenderer>>();
 
     private gltfResult: GltfResult;
 
-    private constructor(gltf: GltfFile, binaries: Array<ArrayBuffer>, images: Array<GlTexture2D>) {
+    private constructor(gltf: GltfFile, binaries: Array<ArrayBuffer>, images: Map<number, GlTexture2D>) {
         this.gltf = gltf;
         this.binaries = binaries;
         this.images = images;
@@ -100,8 +109,10 @@ export class GltfLoader implements IResource {
     private static async createLoaderFromGltf(path: string): Promise<GltfLoader> {
         const basePath = this.computeBasePath(path);
         const gltf = await this.loadGltf(path);
+        const images = new Map<number, GlTexture2D>();
+        this.loadNonBinaryImages(gltf, basePath, images);
         const binaries = await this.loadBinaries(gltf, basePath);
-        const images = await this.loadImages(gltf, basePath, binaries);
+        this.loadBinaryImages(gltf, binaries, images);
         return new GltfLoader(gltf, binaries, images);
     }
 
@@ -110,8 +121,10 @@ export class GltfLoader implements IResource {
         const glb = await this.loadGlb(path);
         this.checkGlb(glb);
         const gltf = this.getGltf(glb);
+        const images = new Map<number, GlTexture2D>();
+        this.loadNonBinaryImages(gltf, basePath, images);
         const binaries = this.loadBinariesFromGlb(glb);
-        const images = await this.loadImages(gltf, basePath, binaries);
+        this.loadBinaryImages(gltf, binaries, images);
         return new GltfLoader(gltf, binaries, images);
     }
 
@@ -146,7 +159,8 @@ export class GltfLoader implements IResource {
         const startOffset = (this.GLB_HEADER_COUNT + this.GLB_CHUNK_HEADER_COUNT) * this.BYTE;
         this.glbBinaryStart = (startOffset + length) / this.BYTE;
         const chunkData = new Uint8Array(glb, startOffset, length);
-        return JSON.parse(String.fromCharCode.apply(null, chunkData));
+        const jsonString = new TextDecoder("utf-8").decode(chunkData);
+        return JSON.parse(jsonString);
     }
 
     private static async loadBinaries(gltf: GltfFile, basePath: string): Promise<Array<ArrayBuffer>> {
@@ -174,29 +188,51 @@ export class GltfLoader implements IResource {
         return await response.arrayBuffer();
     }
 
-    private static async loadImages(gltf: GltfFile, basePath: string, binaries: Array<ArrayBuffer>): Promise<Array<GlTexture2D>> {
-        return await Promise.all(
-            gltf.images?.map(async image => {
-                return this.loadImage(gltf, image, basePath, binaries);
-            }) ?? []
-        );
+    private static async loadNonBinaryImages(gltf: GltfFile, basePath: string, images: Map<number, GlTexture2D>): Promise<void> {
+        for (let i = 0; i < gltf.images?.length; i++) {
+            const image = gltf.images[i];
+            if (image.uri != null) {
+                const texture = new GlTexture2D();
+                images.set(i, texture);
+                this.loadNonBinaryImage(texture, image, basePath);
+            }
+        }
     }
 
-    private static async loadImage(gltf: GltfFile, image: GltfImage, basePath: string, binaries: Array<ArrayBuffer>): Promise<GlTexture2D> {
-        if (image.bufferView != null) {
-            const bufferView = gltf.bufferViews[image.bufferView];
-            const binary = binaries[bufferView.buffer];
-            const array = new Uint8Array(binary, bufferView.byteOffset, bufferView.byteLength);
-            const blob = new Blob([array], { type: image.mimeType });
-            const imageElement = await Utility.loadImage(URL.createObjectURL(blob));
-            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
-        } else if (image.uri.startsWith('data:')) {
-            const imageElement = await Utility.loadImage(image.uri);
-            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
-        } else {
-            const imageElement = await Utility.loadImage(`${basePath}/${image.uri}`);
-            return GlTexture2D.createTexture(imageElement, GlInternalFormat.RGBA8, true, false);
+    private static async loadBinaryImages(gltf: GltfFile, binaries: Array<ArrayBuffer>, images: Map<number, GlTexture2D>): Promise<void> {
+        for (let i = 0; i < gltf.images?.length; i++) {
+            const image = gltf.images[i];
+            if (image.bufferView != null) {
+                const texture = new GlTexture2D();
+                images.set(i, texture);
+                this.loadBinaryImage(texture, image, gltf, binaries);
+            }
         }
+    }
+
+    private static async loadNonBinaryImage(texture: GlTexture2D, image: GltfImage, basePath: string): Promise<void> {
+        let imageElement: TexImageSource;
+        if (image.uri.startsWith('data:')) {
+            imageElement = await Utility.loadImage(image.uri);
+        } else {
+            imageElement = await Utility.loadImage(`${basePath}/${image.uri}`);
+        }
+        this.storeImage(texture, imageElement);
+    }
+
+    private static async loadBinaryImage(texture: GlTexture2D, image: GltfImage, gltf: GltfFile, binaries: Array<ArrayBuffer>): Promise<void> {
+        const bufferView = gltf.bufferViews[image.bufferView];
+        const binary = binaries[bufferView.buffer];
+        const array = new Uint8Array(binary, bufferView.byteOffset, bufferView.byteLength);
+        const blob = new Blob([array], { type: image.mimeType });
+        const imageElement = await Utility.loadImage(URL.createObjectURL(blob));
+        this.storeImage(texture, imageElement);
+    }
+
+    private static storeImage(texture: GlTexture2D, imageElement: TexImageSource): void {
+        texture.allocate(GlInternalFormat.RGBA8, vec2.fromValues(imageElement.width, imageElement.height), true);
+        texture.store(imageElement, GlFormat.RGBA, false);
+        texture.generateMipmaps();
     }
 
     private static computeBasePath(path: string): string {
@@ -205,18 +241,22 @@ export class GltfLoader implements IResource {
     }
 
     //load scene
-    public loadDefaultScene(): GltfResult {
-        return this.loadScene(this.gltf.scene);
+    public loadDefaultScene(createGameObjects = true): GltfResult {
+        return this.loadScene(this.gltf.scene, createGameObjects);
     }
 
-    public loadScene(sceneIndex = 0): GltfResult {
+    public loadScene(sceneIndex = 0, createGameObjects = true): GltfResult {
         this.gltfResult = new GltfResult();
         this.checkVersionCompatibility();
         this.checkExtensionsCompatibility();
         if (this.gltf.animations) {
             throw new Error('Animations are currently not supported.');
         }
+        this.createGameObjects = createGameObjects;
+        return this.loadSceneUnsafe(sceneIndex);
+    }
 
+    private loadSceneUnsafe(sceneIndex: number): GltfResult {
         const scene = this.gltf.scenes[sceneIndex];
         scene.nodes?.forEach(async nodeIndex => {
             this.loadNode(nodeIndex);
@@ -271,40 +311,59 @@ export class GltfLoader implements IResource {
             throw new Error('Weights are currently not supported.')
         }
 
-        const gameObject = new GameObject();
-        gameObject.setParent(parent);
-        this.gltfResult.addGameObject(gameObject, node);
-
-        this.setTransform(gameObject, node);
-        this.addCameraComponent(gameObject, node);
-        this.addLightComponent(gameObject, node);
-        this.addMeshComponents(gameObject, node);
-
+        const gameObject = this.createGameObject(parent, node);
+        this.addComponents(gameObject, node);
         node.children?.forEach(childNodeIndex => {
             this.loadNode(childNodeIndex, gameObject);
         });
     }
 
+    private createGameObject(parent: GameObject, node: GltfNode): GameObject {
+        if (this.createGameObjects) {
+            const gameObject = new GameObject();
+            gameObject.setParent(parent);
+            this.gltfResult.addGameObject(gameObject, node);
+            this.setTransform(gameObject, node);
+            return gameObject;
+        } else {
+            return null;
+        }
+    }
+
     private setTransform(gameObject: GameObject, node: GltfNode): void {
         const transform = gameObject.getTransform();
         if (node.matrix) {
-            const scale = mat4.getScaling(vec3.create(), node.matrix);
-            const rotation = mat4.getRotation(quat.create(), node.matrix);
-            const translation = mat4.getTranslation(vec3.create(), node.matrix);
-            transform.setRelativeScale(scale);
-            transform.setRelativeRotation(rotation);
-            transform.setRelativePosition(translation);
+            this.setTransformMatrix(transform, node);
         } else {
-            if (node.scale) {
-                transform.setRelativeScale(node.scale);
-            }
-            if (node.rotation) {
-                transform.setRelativeRotation(node.rotation);
-            }
-            if (node.translation) {
-                transform.setRelativePosition(node.translation);
-            }
+            this.setTransformVectors(transform, node);
         }
+    }
+
+    private setTransformMatrix(transform: Transform, node: GltfNode): void {
+        const scale = mat4.getScaling(vec3.create(), node.matrix);
+        const rotation = mat4.getRotation(quat.create(), node.matrix);
+        const translation = mat4.getTranslation(vec3.create(), node.matrix);
+        transform.setRelativeScale(scale);
+        transform.setRelativeRotation(rotation);
+        transform.setRelativePosition(translation);
+    }
+
+    private setTransformVectors(transform: Transform, node: GltfNode): void {
+        if (node.scale) {
+            transform.setRelativeScale(node.scale);
+        }
+        if (node.rotation) {
+            transform.setRelativeRotation(node.rotation);
+        }
+        if (node.translation) {
+            transform.setRelativePosition(node.translation);
+        }
+    }
+
+    private addComponents(gameObject: GameObject, node: GltfNode): void {
+        this.addCameraComponent(gameObject, node);
+        this.addLightComponent(gameObject, node);
+        this.addMeshComponents(gameObject, node);
     }
 
     private addCameraComponent(gameObject: GameObject, node: GltfNode): void {
@@ -313,79 +372,98 @@ export class GltfLoader implements IResource {
         }
         const camera = this.gltf.cameras[node.camera];
         if (camera.type === GltfCameraMode.ORTHOGRAPHIC) {
-            const horizontalScale = camera.orthographic.xmag / 2;
-            const vertivalScale = camera.orthographic.ymag / 2;
-            const nearPlane = camera.orthographic.znear;
-            const farPlane = camera.orthographic.zfar;
-            const cameraComponent = new CameraComponent(CameraType.ORTHOGRAPHIC);
-            cameraComponent.setHorizontalScale(horizontalScale);
-            cameraComponent.setVerticalScale(vertivalScale);
-            cameraComponent.setNearPlaneDistance(nearPlane);
-            cameraComponent.setFarPlaneDistance(farPlane);
-            this.gltfResult.addCameraComponent(cameraComponent, camera);
-            gameObject.getComponents().add(cameraComponent);
+            this.addOrthographicCamera(gameObject, camera);
         } else {
-            const fov = Utility.toDegrees(camera.perspective.yfov);
-            const aspectRatio = camera.perspective.aspectRatio ?? Utility.getCanvasAspectRatio();
-            const nearPlane = camera.perspective.znear;
-            const farPlane = camera.perspective.zfar ?? Number.POSITIVE_INFINITY;
-            const cameraComponent = new CameraComponent(CameraType.PERSPECTIVE);
-            cameraComponent.setFov(fov);
-            cameraComponent.setAspectRatio(aspectRatio);
-            cameraComponent.setNearPlaneDistance(nearPlane);
-            cameraComponent.setFarPlaneDistance(farPlane);
-            this.gltfResult.addCameraComponent(cameraComponent, camera);
-            gameObject.getComponents().add(cameraComponent);
+            this.addPerspectiveCamera(gameObject, camera);
         }
+    }
+
+    private addOrthographicCamera(gameObject: GameObject, camera: GltfCamera): void {
+        const horizontalScale = camera.orthographic.xmag / 2;
+        const vertivalScale = camera.orthographic.ymag / 2;
+        const nearPlane = camera.orthographic.znear;
+        const farPlane = camera.orthographic.zfar;
+        const cameraComponent = new CameraComponent(CameraType.ORTHOGRAPHIC);
+        cameraComponent.setHorizontalScale(horizontalScale);
+        cameraComponent.setVerticalScale(vertivalScale);
+        cameraComponent.setNearPlaneDistance(nearPlane);
+        cameraComponent.setFarPlaneDistance(farPlane);
+        this.gltfResult.addCameraComponent(cameraComponent, camera);
+        gameObject?.getComponents().add(cameraComponent);
+    }
+
+    private addPerspectiveCamera(gameObject: GameObject, camera: GltfCamera): void {
+        const fov = Utility.toDegrees(camera.perspective.yfov);
+        const aspectRatio = camera.perspective.aspectRatio ?? Utility.getCanvasAspectRatio();
+        const nearPlane = camera.perspective.znear;
+        const farPlane = camera.perspective.zfar ?? Number.POSITIVE_INFINITY;
+        const cameraComponent = new CameraComponent(CameraType.PERSPECTIVE);
+        cameraComponent.setFov(fov);
+        cameraComponent.setAspectRatio(aspectRatio);
+        cameraComponent.setNearPlaneDistance(nearPlane);
+        cameraComponent.setFarPlaneDistance(farPlane);
+        this.gltfResult.addCameraComponent(cameraComponent, camera);
+        gameObject?.getComponents().add(cameraComponent);
     }
 
     private addLightComponent(gameObject: GameObject, node: GltfNode): void {
         if (node.extensions?.KHR_lights_punctual == null) {
-            return
+            return;
         }
         const lightIndex = node.extensions.KHR_lights_punctual.light;
         const light = this.gltf.extensions.KHR_lights_punctual.lights[lightIndex];
         if (light.type === GltfLightType.DIRECTIONAL) {
-            const dlc = new PbrDirectionalLightComponent();
-            if (light.color) {
-                dlc.setColor(light.color);
-            }
-            if (light.intensity != null) {
-                dlc.setIntensity(light.intensity);
-            }
-            this.gltfResult.addLightComponent(dlc, light);
-            gameObject.getComponents().add(dlc);
+            this.addDirectionalLight(gameObject, light);
         } else if (light.type === GltfLightType.POINT) {
-            const plc = new PbrPointLightComponent();
-            const range = light.range ?? Number.POSITIVE_INFINITY;
-            plc.setRange(range);
-            if (light.color) {
-                plc.setColor(light.color);
-            }
-            if (light.intensity != null) {
-                plc.setIntensity(light.intensity);
-            }
-            this.gltfResult.addLightComponent(plc, light);
-            gameObject.getComponents().add(plc);
+            this.addPointLight(gameObject, light);
         } else if (light.type === GltfLightType.SPOT) {
-            const slc = new PbrSpotLightComponent();
-            const range = light.range ?? Number.POSITIVE_INFINITY;
-            const cutOff = Utility.toDegrees(light.spot.innerConeAngle ?? 0);
-            const outerCutoff = Utility.toDegrees(light.spot.outerConeAngle ?? Math.PI / 4);
-            slc.setCutoff(cutOff);
-            slc.setOuterCutoff(outerCutoff);
-            slc.setRange(range);
-            if (light.color) {
-                slc.setColor(light.color);
-            }
-            if (light.intensity != null) {
-                slc.setIntensity(light.intensity);
-            }
-            this.gltfResult.addLightComponent(slc, light);
-            gameObject.getComponents().add(slc);
+            this.addSpotLight(gameObject, light);
         }
     }
 
+    private addDirectionalLight(gameObject: GameObject, light: GltfLight): void {
+        const dlc = new PbrDirectionalLightComponent();
+        if (light.color) {
+            dlc.setColor(light.color);
+        }
+        if (light.intensity != null) {
+            dlc.setIntensity(light.intensity);
+        }
+        this.gltfResult.addLightComponent(dlc, light);
+        gameObject?.getComponents().add(dlc);
+    }
+
+    private addPointLight(gameObject: GameObject, light: GltfLight): void {
+        const plc = new PbrPointLightComponent();
+        const range = light.range ?? Number.POSITIVE_INFINITY;
+        plc.setRange(range);
+        if (light.color) {
+            plc.setColor(light.color);
+        }
+        if (light.intensity != null) {
+            plc.setIntensity(light.intensity);
+        }
+        this.gltfResult.addLightComponent(plc, light);
+        gameObject?.getComponents().add(plc);
+    }
+
+    private addSpotLight(gameObject: GameObject, light: GltfLight): void {
+        const slc = new PbrSpotLightComponent();
+        const range = light.range ?? Number.POSITIVE_INFINITY;
+        const cutOff = Utility.toDegrees(light.spot.innerConeAngle ?? 0);
+        const outerCutoff = Utility.toDegrees(light.spot.outerConeAngle ?? Math.PI / 4);
+        slc.setCutoff(cutOff);
+        slc.setOuterCutoff(outerCutoff);
+        slc.setRange(range);
+        if (light.color) {
+            slc.setColor(light.color);
+        }
+        if (light.intensity != null) {
+            slc.setIntensity(light.intensity);
+        }
+        this.gltfResult.addLightComponent(slc, light);
+        gameObject?.getComponents().add(slc);
+    }
 
     private addMeshComponents(gameObject: GameObject, node: GltfNode): void {
         if (node.mesh == null) {
@@ -399,7 +477,7 @@ export class GltfLoader implements IResource {
         if (meshArray) {
             meshArray.forEach(([staticMesh, material], primitiveIndex) => {
                 const meshComponent = new MeshComponent(staticMesh, material);
-                gameObject.getComponents().add(meshComponent);
+                gameObject?.getComponents().add(meshComponent);
                 this.gltfResult.addMeshComponent(meshComponent, mesh, mesh.primitives[primitiveIndex]);
             });
         } else {
@@ -417,11 +495,12 @@ export class GltfLoader implements IResource {
 
         const vao = this.createVao(primitive);
         const staticMesh = this.createStaticMesh(primitive, vao);
-        const meshComponent = new MeshComponent(staticMesh);
-        gameObject.getComponents().add(meshComponent);
         const material = this.createMaterial(primitive.material);
-        meshComponent.setMaterial(material);
+        const meshComponent = new MeshComponent(staticMesh, material);
+        gameObject?.getComponents().add(meshComponent);
 
+        const gltfMaterial = primitive.material == null ? null : this.gltf.materials[primitive.material];
+        this.gltfResult.addMaterial(material, gltfMaterial);
         this.gltfResult.addMeshComponent(meshComponent, mesh, primitive);
         this.gltfResult.addMesh(staticMesh, mesh, primitive);
         this.gltfResult.addVao(vao, primitive);
@@ -458,7 +537,7 @@ export class GltfLoader implements IResource {
         return material;
     }
 
-    private async addBaseColorSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
+    private addBaseColorSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
         const textureInfo = gltfMaterial.pbrMetallicRoughness.baseColorTexture;
         const color = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
         if (!textureInfo && !color) {
@@ -466,7 +545,7 @@ export class GltfLoader implements IResource {
         }
         const slot = new MaterialSlot();
         if (textureInfo) {
-            const texture = await this.createTexture(textureInfo.index);
+            const texture = this.createTexture(textureInfo);
             slot.setTexture2D(texture);
             if (textureInfo.texCoord != null) {
                 slot.setTextureCoordinate(textureInfo.texCoord);
@@ -478,7 +557,7 @@ export class GltfLoader implements IResource {
         material.setSlot(Conventions.MS_BASE_COLOR, slot);
     }
 
-    private async addRoughnessMetalnessSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
+    private addRoughnessMetalnessSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
         const textureInfo = gltfMaterial.pbrMetallicRoughness.metallicRoughnessTexture;
         const metalnessColor = gltfMaterial.pbrMetallicRoughness.metallicFactor;
         const roughnessColor = gltfMaterial.pbrMetallicRoughness.roughnessFactor;
@@ -487,7 +566,7 @@ export class GltfLoader implements IResource {
         }
         const slot = new MaterialSlot();
         if (textureInfo) {
-            const texture = await this.createTexture(textureInfo.index);
+            const texture = this.createTexture(textureInfo);
             slot.setTexture2D(texture);
             if (textureInfo.texCoord != null) {
                 slot.setTextureCoordinate(textureInfo.texCoord);
@@ -503,13 +582,13 @@ export class GltfLoader implements IResource {
         material.setSlot(Conventions.MS_ROUGHNESS_METALNESS, slot);
     }
 
-    private async addOcclusionSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
+    private addOcclusionSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
         const textureInfo = gltfMaterial.occlusionTexture;
         if (!textureInfo) {
             return;
         }
         const slot = new MaterialSlot();
-        const texture = await this.createTexture(textureInfo.index);
+        const texture = this.createTexture(textureInfo);
         slot.setTexture2D(texture);
         if (textureInfo.texCoord != null) {
             slot.setTextureCoordinate(textureInfo.texCoord);
@@ -521,13 +600,13 @@ export class GltfLoader implements IResource {
         material.setSlot(Conventions.MS_OCCLUSION, slot);
     }
 
-    private async addNormalSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
+    private addNormalSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
         const textureInfo = gltfMaterial.normalTexture;
         if (!textureInfo) {
             return;
         }
         const slot = new MaterialSlot();
-        const texture = await this.createTexture(textureInfo.index);
+        const texture = this.createTexture(textureInfo);
         slot.setTexture2D(texture);
         if (textureInfo.texCoord != null) {
             slot.setTextureCoordinate(textureInfo.texCoord);
@@ -535,7 +614,7 @@ export class GltfLoader implements IResource {
         material.setSlot(Conventions.MS_NORMAL, slot);
     }
 
-    private async addEmissiveSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
+    private addEmissiveSlot(material: Material<PbrRenderer>, gltfMaterial: GltfMaterial): Promise<void> {
         const textureInfo = gltfMaterial.emissiveTexture;
         const color = gltfMaterial.emissiveFactor;
         if (!textureInfo && !color) {
@@ -543,7 +622,7 @@ export class GltfLoader implements IResource {
         }
         const slot = new MaterialSlot();
         if (textureInfo) {
-            const texture = await this.createTexture(textureInfo.index);
+            const texture = this.createTexture(textureInfo);
             slot.setTexture2D(texture);
             if (textureInfo.texCoord != null) {
                 slot.setTextureCoordinate(textureInfo.texCoord);
@@ -555,16 +634,20 @@ export class GltfLoader implements IResource {
         material.setSlot(Conventions.MS_EMISSIVE, slot);
     }
 
-    private async createTexture(textureIndex: number): Promise<Texture2D> {
+    private createTexture(textureInfo: GltfTextureInfo): Texture2D {
+        const textureIndex = textureInfo.index;
         let texture = this.textures.get(textureIndex);
+        const gltfTexture = this.gltf.textures[textureIndex];
+        const imageIndex = gltfTexture.source;
+        const gltfIamge = this.gltf.images[imageIndex];
+        const gltfSampler = gltfTexture.sampler == null ? null : this.gltf.samplers[gltfTexture.sampler];
         if (!texture) {
-            const gltfTexture = this.gltf.textures[textureIndex];
-            const imageIndex = gltfTexture.source;
-            const image = this.images[imageIndex];
+            const image = this.images.get(imageIndex);
             const sampler = this.createSampler(gltfTexture.sampler);
             texture = new Texture2D(image, sampler);
             this.textures.set(textureIndex, texture);
         }
+        this.gltfResult.addTexture(texture, textureInfo, gltfTexture, gltfIamge, gltfSampler);
         return texture;
     }
 
@@ -611,7 +694,7 @@ export class GltfLoader implements IResource {
         return vao;
     }
 
-    private addVbo(vao: GlVao, vboIndex: number, accessorIndex: number): Promise<void> {
+    private addVbo(vao: GlVao, vboIndex: number, accessorIndex: number): void {
         if (accessorIndex == null) {
             return;
         }
@@ -624,21 +707,25 @@ export class GltfLoader implements IResource {
         const normalized = accessor.normalized ?? false;
         const size = GltfResolver.computeSize(accessor.type);
         const type = GltfResolver.computeType(accessor.componentType);
-        //buffer view
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
-        const offset = bufferView.byteOffset ?? 0;
-        const length = bufferView.byteLength;
         const stride = bufferView.byteStride ?? 0;
-        //buffer
-        const binary = this.binaries[bufferView.buffer];
-        //vbo
-        const posVbo = new GlVbo();
-        posVbo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
-        vao.getVertexAttribArray(vboIndex).setVbo(posVbo, new GlVertexAttribPointer(size, type, normalized, 0, stride));
+        let vbo = this.vbos.get(accessor.bufferView);
+        if (!vbo) {
+            //buffer view
+            const offset = bufferView.byteOffset ?? 0;
+            const length = bufferView.byteLength;
+            //buffer
+            const binary = this.binaries[bufferView.buffer];
+            //vbo
+            vbo = new GlVbo();
+            vbo.allocateAndStore(binary.slice(offset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
+            this.vbos.set(accessor.bufferView, vbo);
+        }
+        vao.getVertexAttribArray(vboIndex).setVbo(vbo, new GlVertexAttribPointer(size, type, normalized, additionalOffset, stride));
         vao.getVertexAttribArray(vboIndex).setEnabled(true);
     }
 
-    private addEbo(vao: GlVao, accessorIndex: number): Promise<void> {
+    private addEbo(vao: GlVao, accessorIndex: number): void {
         if (accessorIndex == null) {
             return;
         }
@@ -647,7 +734,15 @@ export class GltfLoader implements IResource {
         if (accessor.sparse) {
             throw new Error('Sparse are currently not supported.');
         }
-        const additionalOffset = accessor.byteOffset ?? 0;
+        if (this.ebos.has(accessor.bufferView)) {
+            const ebo = this.ebos.get(accessor.bufferView);
+            vao.setEbo(ebo);
+        } else {
+            this.addNewEbo(accessor, vao);
+        }
+    }
+
+    private addNewEbo(accessor: GltfAccessor, vao: GlVao): void {
         //buffer view
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const offset = bufferView.byteOffset ?? 0;
@@ -656,8 +751,9 @@ export class GltfLoader implements IResource {
         const binary = this.binaries[bufferView.buffer];
         //ebo
         const ebo = new GlEbo();
-        ebo.allocateAndStore(binary.slice(offset + additionalOffset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
+        ebo.allocateAndStore(binary.slice(offset, offset + length), GlBufferObjectUsage.STATIC_DRAW);
         vao.setEbo(ebo);
+        this.ebos.set(accessor.bufferView, ebo);
     }
 
     private createStaticMesh(primitive: GltfPrimitive, vao: GlVao): StaticMesh {
@@ -669,13 +765,17 @@ export class GltfLoader implements IResource {
         const radius = GltfResolver.computeRadius(aabbMin, aabbMax);
         const renderingMode = GltfResolver.computeRenderingMode(primitive.mode);
         const indicesType = primitive.indices != null ? GltfResolver.computeIndicesType(this.gltf.accessors[primitive.indices].componentType) : null;
-        return new StaticMesh(vao, vertexCount, faceCount, renderingMode, indicesType, aabbMin, aabbMax, radius);
+        const indicesOffset = primitive.indices != null ? (this.gltf.accessors[primitive.indices].byteOffset ?? 0) : 0;
+        return new StaticMesh(vao, vertexCount, faceCount, renderingMode, indicesType, indicesOffset, aabbMin, aabbMax, radius);
     }
 
     public getDataSize(): number {
         let size = 0;
         for (const binary of this.binaries) {
             size += binary.byteLength;
+        }
+        for (const image of this.images.values()) {
+            size += image.getDataSize();
         }
         return size;
     }
@@ -687,6 +787,7 @@ export class GltfLoader implements IResource {
     public release(): void {
         if (this.isUsable()) {
             this.binaries = null;
+            this.images = null;
             this.gltf = null;
         }
     }

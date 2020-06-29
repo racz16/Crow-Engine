@@ -37,7 +37,7 @@ export class ObjLoader {
         const faceCount = vertexCount / 3;
         const vao = this.createVao(mesh);
         const [radius, aabbMin, aabbMax] = this.computeFrustumCullingData(mesh);
-        return new StaticMesh(vao, vertexCount, faceCount, RenderingMode.TRIANGLES, IndicesType.UNSIGNED_INT, aabbMin, aabbMax, radius);
+        return new StaticMesh(vao, vertexCount, faceCount, RenderingMode.TRIANGLES, IndicesType.UNSIGNED_INT, 0, aabbMin, aabbMax, radius);
     }
 
     private computeFrustumCullingData(mesh: Mesh): [number, vec3, vec3] {

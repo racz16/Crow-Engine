@@ -49,7 +49,6 @@ void main(){
     if(useNormalMap && isThereNormal && isThereTangent){
         vec3 tangentColumn = normalize(mat3(modelMatrix) * normalize(i_tangent.xyz));
         vec3 normalColumn = normalize(inverseTransposedModelMatrix3x3 * i_normal);
-        tangentColumn = vec3(1,0,0);
         vec3 bitangentColumn = cross(normalColumn, tangentColumn) * i_tangent.w;
         io_TBN = mat3(tangentColumn, bitangentColumn, normalColumn);
     }

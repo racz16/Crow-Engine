@@ -329,11 +329,11 @@ float calculateShadowInCascade(vec3 N, vec3 L, int cascade){
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
     float layerHeight = 1.0f / numLayers;
-    float curLayerHeight = 0.0f;
+    float curLayerHeight = 0.0f;//mix(0.0f, 1000.0f, material.isTherePOM);//TODO
     vec2 dtex = material.POMScale * tangentViewDirection.xy / numLayers;
     vec2 currentTextureCoords = textureCoordinates;
     float heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
-    while(heightFromTexture > curLayerHeight){
+    while(heightFromTexture > curLayerHeight && bool(mix(1.0, 0.0, material.isTherePOM))){
         curLayerHeight += layerHeight; 
         currentTextureCoords -= dtex;
         heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
@@ -354,30 +354,33 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
 // collecting info-------------------------------------------------------------------------------------------------
 //
 
-vec3 getNormalVector(vec2 textureCoordinates){
-    if(material.isThereNormalMap){
-        mat3 tbn;
-        if(!bool(io_isThereTangent)) {
-            vec3 pos_dx = dFdx(io_fragmentPosition);
-            vec3 pos_dy = dFdy(io_fragmentPosition);
-            vec3 tex_dx = dFdx(vec3(textureCoordinates, 0.0f));
-            vec3 tex_dy = dFdy(vec3(textureCoordinates, 0.0f));
-            vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
-
-            vec3 ng;
-            if(bool(io_isThereNormal)) {
-                ng = normalize(io_normal);
-            }else{
-                ng = cross(pos_dx, pos_dy);
-            }
-
-            t = normalize(t - ng * dot(ng, t));
-            vec3 b = normalize(cross(ng, t));
-            tbn = mat3(t, b, ng);
+mat3 computeTbn(vec2 textureCoordinates) {
+    mat3 tbn;
+    if(!bool(io_isThereTangent)) {
+        vec3 pos_dx = dFdx(io_fragmentPosition);
+        vec3 pos_dy = dFdy(io_fragmentPosition);
+        vec3 tex_dx = dFdx(vec3(textureCoordinates, 0.0f));
+        vec3 tex_dy = dFdy(vec3(textureCoordinates, 0.0f));
+        vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
+        vec3 ng;
+        if(bool(io_isThereNormal)) {
+            ng = normalize(io_normal);
         }else{
-            tbn = io_TBN;
+            ng = cross(pos_dx, pos_dy);
         }
 
+        t = normalize(t - ng * dot(ng, t));
+        vec3 b = normalize(cross(ng, t));
+        tbn = mat3(t, b, ng);
+    }else{
+        tbn = io_TBN;
+    }
+    return tbn;
+}
+
+vec3 getNormalVector(vec2 textureCoordinates){
+    if(material.isThereNormalMap){
+        mat3 tbn = computeTbn(textureCoordinates);//TODO
         vec3 normal = texture(material.normalMap, textureCoordinates * material.normalMapTile + material.normalMapOffset).rgb;
         normal = normal * 2.0f - 1.0f;
         normal *= vec3(material.normalScale, material.normalScale, 1.0f);
@@ -443,8 +446,9 @@ void getTextureCoordinates(out vec2 textureCoordinates_0, out vec2 textureCoordi
 
 vec2 transformTextureCoordinates(vec2 textureCoordinates) {
     if(material.isThereNormalMap && material.isTherePOM){
-        vec3 tangentViewPosition = io_viewPosition * io_TBN;
-        vec3 tangentFragmentPosition = io_fragmentPosition * io_TBN;
+        mat3 tbn = computeTbn(textureCoordinates);//TODO
+        vec3 tangentViewPosition = io_viewPosition * tbn;
+        vec3 tangentFragmentPosition = io_fragmentPosition * tbn;
         vec3 tangentViewDirection = normalize(tangentViewPosition - tangentFragmentPosition);
         return parallaxMapping(tangentViewDirection, textureCoordinates * material.normalMapTile + material.normalMapOffset);
     }else{

@@ -14,9 +14,9 @@ export abstract class Billboard implements IInvalidatable {
     protected renderableComponent: IRenderableComponent<IRenderable>;
     protected modelMatrix: mat4;
     protected inverseModelMatrix: mat4;
-    protected forward: vec3;
-    protected right: vec3;
-    protected up: vec3;
+    protected readonly forward = vec3.create();
+    protected readonly right = vec3.create();
+    protected readonly up = vec3.create();
     protected relativeRotation: quat;
     protected absoluteRotation: quat;
     private valid = false;
@@ -138,16 +138,16 @@ export abstract class Billboard implements IInvalidatable {
         }
     }
 
-    protected refreshDataFromDirections(forward: vec3, up: vec3, right: vec3): void {
+    protected refreshDataFromDirections(forward: ReadonlyVec3, up: ReadonlyVec3, right: ReadonlyVec3): void {
         this.refreshDirectionVectors(forward, up, right);
         this.refreshMatrices();
         this.refreshRotation();
     }
 
-    private refreshDirectionVectors(forward: vec3, up: vec3, right: vec3): void {
-        this.forward = forward;
-        this.up = up;
-        this.right = right;
+    private refreshDirectionVectors(forward: ReadonlyVec3, up: ReadonlyVec3, right: ReadonlyVec3): void {
+        vec3.copy(this.forward, forward);
+        vec3.copy(this.up, up);
+        vec3.copy(this.right, right);
     }
 
     private refreshMatrices(): void {

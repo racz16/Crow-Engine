@@ -6,6 +6,7 @@ import { Engine } from '../../../core/Engine';
 import { Utility } from '../../../utility/Utility';
 import { ParameterKey } from '../../../utility/parameter/ParameterKey';
 import { GlTextureUnit } from '../../../webgl/GlTextureUnit';
+import { Texture2D } from '../../texture/Texture2D';
 
 export abstract class ShaderSlotHelper {
 
@@ -58,6 +59,9 @@ export abstract class ShaderSlotHelper {
         const texture = this.slot.getTexture2D();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
         texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        if (texture instanceof Texture2D) {
+            texture.getNativeSampler()?.bindToTextureUnit(this.getTextureUnit());//TODO
+        }
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
         this.shaderProgram.loadVector2(this.getTileName(), this.slot.getTextureTile());
         this.shaderProgram.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());

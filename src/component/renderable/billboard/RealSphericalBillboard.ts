@@ -1,5 +1,5 @@
 import { Billboard } from './Billboard';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 
 export class RealSphericalBillboard extends Billboard {
@@ -14,7 +14,7 @@ export class RealSphericalBillboard extends Billboard {
         this.refreshMatricesOrSetToDefault(forward, cameraUp);
     }
 
-    private refreshMatricesOrSetToDefault(forward: vec3, cameraUp: vec3): void {
+    private refreshMatricesOrSetToDefault(forward: ReadonlyVec3, cameraUp: ReadonlyVec3): void {
         if (Utility.isParallel(forward, cameraUp)) {
             this.setMatricesToDefault();
         } else {
@@ -22,7 +22,7 @@ export class RealSphericalBillboard extends Billboard {
         }
     }
 
-    private refreshData(forward: vec3, cameraUp: vec3): void {
+    private refreshData(forward: ReadonlyVec3, cameraUp: ReadonlyVec3): void {
         const right = vec3.cross(vec3.create(), cameraUp, forward);
         const up = vec3.cross(vec3.create(), forward, right);
         this.refreshDataFromDirections(forward, up, right);

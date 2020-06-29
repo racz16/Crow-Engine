@@ -3,7 +3,7 @@ import { GameObject } from './core/GameObject';
 import { MeshComponent } from './component/renderable/MeshComponent';
 import { Material } from './material/Material';
 import { CameraComponent } from './component/camera/CameraComponent';
-import { vec3, vec4, vec2, quat } from 'gl-matrix';
+import { vec3, vec4, vec2, quat, ReadonlyQuat } from 'gl-matrix';
 import { InfoComponent } from './test/InfoComponent';
 import { RotateComponent } from './test/RotateComponent';
 import { BlinnPhongDirectionalLightComponent } from './component/light/blinnphong/BlinnPhongDirectionalLightComponent';
@@ -35,6 +35,8 @@ import { StaticMesh } from './resource/mesh/StaticMesh';
 import { CameraType } from './component/camera/CameraType';
 import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
 import { Conventions } from './resource/Conventions';
+import { RenderableComponent } from './component/renderable/RenderableComponent';
+import { IMesh } from './resource/mesh/IMesh';
 
 window.onload = async () => {
     const tsb = new TestSceneBuilder();
@@ -42,7 +44,7 @@ window.onload = async () => {
     await tsb.loadResources();
     tsb.setUpScene();
     tsb.createUi();
-    tsb.createGround();
+    //tsb.createGround();
     //tsb.createDamagedHelmet();
     //tsb.createGoldSphere();
 
@@ -53,25 +55,26 @@ window.onload = async () => {
     //tsb.createDragon();
     //tsb.createBezierSpline();
 
-    //await tsb.loadGltfSampleModel('BarramundiFish', 'glTF-Binary', 10, true);
+    await tsb.loadGltfSampleModel('DamagedHelmet', 'glTF-Binary', 1, true);
     //await tsb.loadSketchfabModel('toyota_land_cruiser', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.01, 0));
     //await tsb.loadSketchfabModel('akm_47', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 2, 0));
     //await tsb.loadSketchfabModel('gold_pharaoh', 1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.1, 0));
     //await tsb.loadSketchfabModel('soviet_t-34_tank', 0.02, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -2.55, 0));
     //await tsb.loadSketchfabModel('crash_of_a_b-17', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 5, 0));
 
+    //await tsb.loadSketchfabModel('aegis_idris_frigate_-_new', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion());
     /*const loader = await GltfLoader.createLoader('res/meshes/metro.glb');
     const result = loader.loadDefaultScene();
     for (const [camera, _] of result.getCameraComponents()) {
         Engine.setMainCamera(camera);
     }*/
 
-    const loader = await GltfLoader.createLoader('res/meshes/room2.glb');
+    /*const loader = await GltfLoader.createLoader('res/meshes/room2.glb');
     const result = loader.loadDefaultScene();
     for (const [camera, _] of result.getCameraComponents()) {
         //Engine.setMainCamera(camera);
         (camera as CameraComponent).setFarPlaneDistance(160);
-    }
+    }*/
 
     //tsb.createAudioSource();
 
@@ -359,7 +362,7 @@ export class TestSceneBuilder {
         }
     }
 
-    public async loadSketchfabModel(name: string, scale = 1, rotation = quat.create(), translation = vec3.create()): Promise<void> {
+    public async loadSketchfabModel(name: string, scale = 1, rotation: ReadonlyQuat = quat.create(), translation = vec3.create()): Promise<void> {
         const loader = await GltfLoader.createLoader(`res/meshes/sketchfab/${name}/scene.gltf`);
         const result = loader.loadDefaultScene();
         for (const [go, _] of result.getGameObjects()) {

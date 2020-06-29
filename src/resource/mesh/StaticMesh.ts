@@ -15,16 +15,18 @@ export class StaticMesh implements IMesh {
     private faceCount: number;
     private renderingMode: RenderingMode;
     private indicesType: IndicesType;
+    private indicesOffset: number;
     private aabbMin: vec3;
     private aabbMax: vec3;
     private radius: number;
 
-    public constructor(vao: GlVao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, aabbMin: ReadonlyVec3, aabbMax: ReadonlyVec3, radius: number) {
+    public constructor(vao: GlVao, vertexCount: number, faceCount: number, renderingMode: RenderingMode, indicesType: IndicesType, indicesOffset: number, aabbMin: ReadonlyVec3, aabbMax: ReadonlyVec3, radius: number) {
         this.vao = vao;
         this.vertexCount = vertexCount;
         this.faceCount = faceCount;
         this.renderingMode = renderingMode;
         this.indicesType = indicesType;
+        this.indicesOffset = indicesOffset;
         this.aabbMin = Utility.createVec3(aabbMin);
         this.aabbMax = Utility.createVec3(aabbMax);
         this.radius = radius;
@@ -56,7 +58,7 @@ export class StaticMesh implements IMesh {
         this.vao.bind();
         if (this.vao.getEbo()) {
             const type = IndicesTypeResolver.enumToGl(this.indicesType);
-            Gl.gl.drawElements(mode, this.getVertexCount(), type, 0);
+            Gl.gl.drawElements(mode, this.getVertexCount(), type, this.indicesOffset);
         } else {
             Gl.gl.drawArrays(mode, 0, this.getVertexCount());
         }

@@ -8,28 +8,27 @@ export class NormalSlotHelper extends ShaderSlotHelper {
 
     public loadSlot(material: Material<any>): void {
         this.setSlot(material.getSlot(this.getMaterialSlotKey()));
+        this.loadParameters();
         if (this.isTexture2DUsable()) {
-            this.loadNormalMap();
+            this.loadTexture2D();
+            this.shaderProgram.loadBoolean(this.getUseNormalMapName(), true);
         } else {
             this.loadDefaultTexture2D();
             this.shaderProgram.loadBoolean(this.getUseNormalMapName(), false);
         }
     }
 
-    private loadNormalMap(): void {
-        this.shaderProgram.loadBoolean(this.getUseNormalMapName(), true);
-        this.shaderProgram.loadFloat('material.normalScale', 1);
-        this.loadTexture2D();
-        this.loadPomParameters();
-    }
-
-    private loadPomParameters(): void {
+    private loadParameters(): void {
         this.loadFloatParameter('material.normalScale', Conventions.MSP_NORMAL_SCALE, 1);
         this.loadBooleanParameter('material.isTherePOM', Conventions.MSP_USE_POM, false);
         if (this.isThereParameter(Conventions.MSP_USE_POM)) {
             this.loadFloatParameter('material.POMScale', Conventions.MSP_POM_SCALE, 0.15);
             this.loadFloatParameter('material.POMMinLayers', Conventions.MSP_POM_MIN_LAYERS, 15);
             this.loadFloatParameter('material.POMMaxLayers', Conventions.MSP_POM_MAX_LAYERS, 30);
+        } else {
+            this.shaderProgram.loadFloat('material.POMScale', 1);
+            this.shaderProgram.loadFloat('material.POMMinLayers', 1);
+            this.shaderProgram.loadFloat('material.POMMaxLayers', 1);
         }
     }
 

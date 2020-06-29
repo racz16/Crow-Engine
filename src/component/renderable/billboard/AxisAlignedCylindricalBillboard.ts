@@ -1,6 +1,6 @@
 import { Billboard } from './Billboard';
 import { BillboardAxis } from './BillboardAxis';
-import { vec3 } from 'gl-matrix';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
 import { Utility } from '../../../utility/Utility';
 
 export class AxisAlignedCylindricalBillboard extends Billboard {
@@ -43,7 +43,7 @@ export class AxisAlignedCylindricalBillboard extends Billboard {
         return up;
     }
 
-    private computeForward(cameraPosition: vec3, position: vec3): vec3 {
+    private computeForward(cameraPosition: ReadonlyVec3, position: ReadonlyVec3): vec3 {
         const forward = vec3.subtract(vec3.create(), cameraPosition, position);
         forward[this.axis] = 0;
         vec3.normalize(forward, forward);

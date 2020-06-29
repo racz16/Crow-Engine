@@ -41,8 +41,10 @@ export class PbrIblHelper {
     private loadTextures(diffuseIblMap: CubeMapTexture, specularIblMap: CubeMapTexture): void {
         this.shaderProgram.connectTextureUnit(this.DIFFUSE_IBL_MAP_NAME, Conventions.TU_DIFFUSE_IBL);
         diffuseIblMap.getNativeTexture().bindToTextureUnit(Conventions.TU_DIFFUSE_IBL);
+        diffuseIblMap.getNativeSampler()?.bindToTextureUnit(Conventions.TU_DIFFUSE_IBL);//TODO
         this.shaderProgram.connectTextureUnit(this.SPECULAR_IBL_MAP_NAME, Conventions.TU_SPECULAR_IBL);
         specularIblMap.getNativeTexture().bindToTextureUnit(Conventions.TU_SPECULAR_IBL);
+        specularIblMap.getNativeSampler()?.bindToTextureUnit(Conventions.TU_SPECULAR_IBL);//TODO
         this.shaderProgram.connectTextureUnit(this.BRDF_LUT_MAP_NAME, Conventions.TU_BRDF_LUT);
         this.brdfLut.getNativeTexture().bindToTextureUnit(Conventions.TU_BRDF_LUT);
         this.shaderProgram.loadBoolean(this.ARE_THERE_IBL_MAPS, true);

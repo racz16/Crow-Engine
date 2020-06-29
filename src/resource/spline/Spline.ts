@@ -75,19 +75,19 @@ export class Spline implements ISpline {
         return data;
     }
 
-    protected addPositionToData(position: vec3, data: Array<number>): void {
+    protected addPositionToData(position: ReadonlyVec3, data: Array<number>): void {
         for (let j = 0; j < 3; j++) {
             data.push(position[j]);
         }
     }
 
-    protected refreshRadius(position: vec3): void {
+    protected refreshRadius(position: ReadonlyVec3): void {
         if (this.radius < vec3.length(position)) {
             this.radius = vec3.length(position);
         }
     }
 
-    protected refreshAabb(position: vec3): void {
+    protected refreshAabb(position: ReadonlyVec3): void {
         for (let i = 0; i < 3; i++) {
             if (position[i] < this.aabbMin[i]) {
                 this.aabbMin[i] = position[i];
@@ -119,7 +119,7 @@ export class Spline implements ISpline {
         }
     }
 
-    public getApproximatedPosition(t: number): vec3 {
+    public getApproximatedPosition(t: number): ReadonlyVec3 {
         t = this.normalizeT(t);
         if (this.getNumberOfControlPoints() < 1) {
             return null;
@@ -135,7 +135,7 @@ export class Spline implements ISpline {
         return t < 0 ? 1 - (t % -1) : t % 1;
     }
 
-    private getApproximatedPositionInRealSpline(t: number): vec3 {
+    private getApproximatedPositionInRealSpline(t: number): ReadonlyVec3 {
         let index = 0;
         let dist = this.distances[0];
         const wantedDistance = this.length * t;
@@ -147,7 +147,7 @@ export class Spline implements ISpline {
         return this.getValue(index, localT);
     }
 
-    protected getValue(startIndex: number, t: number): vec3 {
+    protected getValue(startIndex: number, t: number): ReadonlyVec3 {
         if (this.getNumberOfControlPoints() < 1) {
             return null;
         } else if (this.getNumberOfControlPoints() === 1) {
