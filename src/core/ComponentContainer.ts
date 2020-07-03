@@ -15,25 +15,23 @@ export class ComponentContainer {
     }
 
     public update(): void {
-        for (const component of this.components) {
-            if (component.isActive()) {
-                (component as any).updateComponent();
+        if (!this.gameObject.isDestroyed()) {
+            for (const component of this.components) {
+                if (component.isActive()) {
+                    component.updateComponent();
+                }
             }
         }
     }
 
     public add(component: Component): void {
-        if (component.getGameObject()) {
+        if (component.getGameObject() || this.gameObject.isDestroyed()) {
             throw new Error();
         }
         if (!this.contains(component)) {
-            this.addUnsafe(component);
+            component._attachToGameObject(this.gameObject);
+            this.components.push(component);
         }
-    }
-
-    private addUnsafe(component: Component): void {
-        (component as any).attachToGameObject(this.gameObject);
-        this.components.push(component);
     }
 
     public contains(component: Component): boolean {
@@ -43,7 +41,7 @@ export class ComponentContainer {
     public remove(component: Component): void {
         const index = this.components.indexOf(component);
         if (index !== -1) {
-            (this.components[index] as any).detachFromGameObject();
+            this.components[index]._detachFromGameObject();
             Utility.removeElement(this.components, index);
         }
     }
@@ -52,7 +50,7 @@ export class ComponentContainer {
         for (let i = this.components.length - 1; i >= 0; i--) {
             const component = this.components[i];
             if (component instanceof type) {
-                (component as any).detachFromGameObject();
+                component._detachFromGameObject();
                 Utility.removeElement(this.components, i);
             }
         }

@@ -196,7 +196,7 @@ export class Transform implements IInvalidatable {
     //GameObject related
     public update(): void { }
 
-    protected attachToGameObject(gameObject: GameObject): void {
+    public _attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
         this.invalidate();
     }

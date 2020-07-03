@@ -159,7 +159,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         this.panner.coneOuterGain = volume;
     }
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         if (this.getGameObject() && !this.isValid() && this.isActive()) {
             this.updatePositionAndOrientationUnsafe();
             this.setVolume(this.volume);

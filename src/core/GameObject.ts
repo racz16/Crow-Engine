@@ -10,6 +10,7 @@ export class GameObject {
     private parent: GameObject;
     private root: GameObject;
     private transform: Transform;
+    private destroyed = false;
 
     public constructor(transform = new Transform()) {
         this.setTransform(transform);
@@ -20,8 +21,10 @@ export class GameObject {
     }
 
     public update(): void {
-        this.transform.update();
-        this.components.update();
+        if (!this.destroyed) {
+            this.transform.update();
+            this.components.update();
+        }
     }
 
     public getRoot(): GameObject {
@@ -40,22 +43,18 @@ export class GameObject {
     }
 
     public setParent(parent: GameObject): void {
-        if (parent == this || this.children.containsDeep(parent)) {
+        if (parent == this || this.children.containsDeep(parent) || this.destroyed || parent?.isDestroyed()) {
             throw new Error();
         }
         if (parent != this.getParent()) {
-            this.setParentUnsafe(parent);
+            this.removeParent();
+            this.addParent(parent);
         }
-    }
-
-    private setParentUnsafe(parent: GameObject): void {
-        this.removeParent();
-        this.addParent(parent);
     }
 
     private removeParent(): void {
         if (this.parent) {
-            (this.parent.getChildren() as any).removeChild(this);
+            this.parent.getChildren()._removeChild(this);
             this.parent.getTransform().getInvalidatables().remove(this.transform);
             parent = null;
             this.setRoot(this);
@@ -66,7 +65,7 @@ export class GameObject {
         this.parent = parent;
         if (parent) {
             this.setRoot(parent.getRoot());
-            (parent.getChildren() as any).addChild(this);
+            parent.getChildren()._addChild(this);
             parent.getTransform().getInvalidatables().add(this.getTransform());
         }
     }
@@ -80,7 +79,7 @@ export class GameObject {
             throw new Error();
         }
         this.transform = transform;
-        (transform as any).attachToGameObject(this);
+        transform._attachToGameObject(this);
     }
 
     public getComponents(): ComponentContainer {
@@ -89,6 +88,19 @@ export class GameObject {
 
     public getChildren(): ChildContainer {
         return this.children;
+    }
+
+    public destroy(): void {
+        for (const child of this.children.getIterator()) {
+            child.destroy();
+        }
+        this.setParent(null);
+        this.components.clear();
+        this.destroyed = true;
+    }
+
+    public isDestroyed(): boolean {
+        return this.destroyed;
     }
 
 }

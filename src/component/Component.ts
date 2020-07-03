@@ -39,7 +39,7 @@ export class Component implements IComponent {
         return this.gameObject;
     }
 
-    protected attachToGameObject(gameObject: GameObject): void {
+    public _attachToGameObject(gameObject: GameObject): void {
         this.gameObject = gameObject;
         this.invalidate();
         this.handleAttach(gameObject);
@@ -49,7 +49,7 @@ export class Component implements IComponent {
 
     }
 
-    protected detachFromGameObject(): void {
+    public _detachFromGameObject(): void {
         const detached = this.gameObject;
         this.gameObject = null;
         this.invalidate();
@@ -60,6 +60,6 @@ export class Component implements IComponent {
 
     }
 
-    protected updateComponent(): void { }
+    public updateComponent(): void { }
 
 }

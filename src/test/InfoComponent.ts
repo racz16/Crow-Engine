@@ -45,7 +45,7 @@ export class InfoComponent extends Component {
         Audio.setVolume(1);
     }
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         this.textNode.nodeValue = Engine.getTimeManager().getFps() + '';
         document.getElementById('faces').textContent = Engine.getRenderingPipeline().getRenderedFaceCount() + '';
         document.getElementById('elements').textContent = Engine.getRenderingPipeline().getRenderedElementCount() + '';

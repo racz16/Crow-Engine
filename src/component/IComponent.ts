@@ -4,6 +4,8 @@ import { InvalidatableContainer } from '../utility/invalidatable/InvalidatableCo
 
 export interface IComponent extends IInvalidatable {
 
+    updateComponent(): void;
+
     getInvalidatables(): InvalidatableContainer;
 
     isActive(): boolean;

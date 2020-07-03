@@ -223,7 +223,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         this.renderable.draw();
     }
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         this.renderable.update();
     }
 

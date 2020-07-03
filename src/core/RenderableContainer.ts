@@ -17,6 +17,10 @@ export class RenderableContainer implements IRenderableContainer {
         return this.renderables.length;
     }
 
+    public get(index: number): IRenderableComponent<IRenderable> {
+        return this.renderables[index];
+    }
+
     public getIterator(): IterableIterator<IRenderableComponent<IRenderable>> {
         return this.renderables.values();
     }

@@ -7,6 +7,8 @@ export interface IRenderableContainer {
 
     getCount(): number;
 
+    get(index: number): IRenderableComponent<IRenderable>;
+
     getIterator(): IterableIterator<IRenderableComponent<IRenderable>>;
 
     remove(renderable: IRenderableComponent<IRenderable>): void;

@@ -12,9 +12,9 @@ export class ConsoleLogHandler implements ILogHandler {
     }
 
     public endGroup(): void {
-        if (this.reallyStartedGroupCount === 0) {
+        if (this.startedGroups.length > 0) {
             this.startedGroups.pop();
-        } else {
+        } else if (this.reallyStartedGroupCount > 0) {
             console.groupEnd();
             this.reallyStartedGroupCount--;
         }

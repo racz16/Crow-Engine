@@ -27,7 +27,7 @@ export class PlayerComponent extends Component {
         return false;
     }
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         const moveSpeed = 0.01;
         const rotateSpeed = 0.05;
         const deltaTime = Engine.getTimeManager().getDeltaTimeFactor();

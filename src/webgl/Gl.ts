@@ -22,7 +22,7 @@ export class Gl {
     private constructor() { }
 
     public static initialize(canvas: HTMLCanvasElement): void {
-        Gl.context = canvas.getContext('webgl2');
+        Gl.context = canvas.getContext('webgl2', { depth: false, antialias: false });
         if (!Gl.context) {
             throw new Error('WebGL 2.0 isn\'t supported in your browser');
         }

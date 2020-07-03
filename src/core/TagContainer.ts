@@ -6,7 +6,11 @@ export class TagContainer {
         return this.tags.has(tag);
     }
 
-    public get(): IterableIterator<string> {
+    public getCount(): number {
+        return this.tags.size;
+    }
+
+    public getIterator(): IterableIterator<string> {
         return this.tags.values();
     }
 

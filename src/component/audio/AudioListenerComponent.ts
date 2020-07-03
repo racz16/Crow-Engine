@@ -7,7 +7,7 @@ import { Axis } from '../../utility/Axis';
 
 export class AudioListenerComponent extends Component {
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         const mainAudioListener = Engine.getMainAudioListener();
         if (this.isTheMainAudioListener() && !this.isValid() && this.getGameObject() && this.isActive()) {
             this.updateUnsafe();

@@ -33,6 +33,10 @@ export class ChildContainer {
         return false;
     }
 
+    public get(index: number): GameObject {
+        return this.children[index];
+    }
+
     public getCount(): number {
         return this.children.length;
     }
@@ -47,7 +51,7 @@ export class ChildContainer {
         }
     }
 
-    private removeChild(child: GameObject): void {
+    public _removeChild(child: GameObject): void {
         const index = this.children.indexOf(child);
         Utility.removeElement(this.children, index);
     }
@@ -56,7 +60,7 @@ export class ChildContainer {
         child.setParent(this.gameObject);
     }
 
-    private addChild(child: GameObject): void {
+    public _addChild(child: GameObject): void {
         this.children.push(child);
     }
 

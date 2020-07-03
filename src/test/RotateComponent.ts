@@ -5,7 +5,7 @@ import { Axis } from '../utility/Axis';
 
 export class RotateComponent extends Component {
 
-    protected updateComponent(): void {
+    public updateComponent(): void {
         const rotationSpeed = 0.1;
         const deltaTime = Engine.getTimeManager().getDeltaTimeFactor();
         const rotation = RotationBuilder.createRotation(Axis.Y, rotationSpeed * deltaTime).getQuaternion();
