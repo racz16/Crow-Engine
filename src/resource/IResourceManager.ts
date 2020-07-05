@@ -6,6 +6,8 @@ export interface IResourceManager {
 
     contains(resource: IResource): boolean;
 
+    get(index: number): IResource;
+
     getIterator(): IterableIterator<IResource>;
 
     getTypedIterator<T extends IResource>(type: new (..._) => T): IterableIterator<T>;

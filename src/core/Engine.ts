@@ -49,6 +49,7 @@ export class Engine {
             this.initializeUnsafe(canvas, logLevel);
         } catch (error) {
             this.getLog().logObject(LogLevel.ERROR, error);
+            this.getGameObjectContainer().destroyAll();
             this.getResourceManager().release();
         }
     }
@@ -192,6 +193,7 @@ export class Engine {
             }
         } catch (error) {
             this.getLog().logObject(LogLevel.ERROR, error);
+            this.getGameObjectContainer().destroyAll();
             this.getResourceManager().release();
         }
     }

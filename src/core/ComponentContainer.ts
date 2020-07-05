@@ -79,6 +79,10 @@ export class ComponentContainer {
         return null;
     }
 
+    public get(index: number): Component {
+        return this.components[index];
+    }
+
     public getCount(): number {
         return this.components.length;
     }

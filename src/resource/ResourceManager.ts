@@ -15,6 +15,10 @@ export class ResourceManager implements IResourceManager {
         return this.resources.includes(resource);
     }
 
+    public get(index: number): IResource {
+        return this.resources[index];
+    }
+
     public getIterator(): IterableIterator<IResource> {
         return this.resources.values();
     }

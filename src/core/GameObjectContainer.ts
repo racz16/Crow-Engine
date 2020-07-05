@@ -1,6 +1,7 @@
 import { GameObject } from './GameObject';
 import { IGameObjectContainer } from './IGameObjectContainer';
 import { Engine } from './Engine';
+import { Utility } from '../utility/Utility';
 
 export class GameObjectContainer implements IGameObjectContainer {
 
@@ -15,12 +16,32 @@ export class GameObjectContainer implements IGameObjectContainer {
     }
 
     public add(gameObject: GameObject): void {
-        if (!gameObject) {
-            throw new Error('Can\'t add null to the Game Object Container');
+        if (!gameObject || gameObject.isDestroyed()) {
+            throw new Error();
         }
         if (!this.gameObjects.includes(gameObject)) {
             this.gameObjects.push(gameObject);
         }
+    }
+
+    public remove(gameObject: GameObject): void {
+        if (!gameObject || !gameObject.isDestroyed()) {
+            throw new Error();
+        }
+        const index = this.gameObjects.indexOf(gameObject);
+        if (index !== -1) {
+            Utility.removeElement(this.gameObjects, index);
+        }
+    }
+
+    public destroyAll(): void {
+        for (const gameObject of this.gameObjects) {
+            gameObject.destroy();
+        }
+    }
+
+    public get(index: number): GameObject {
+        return this.gameObjects[index];
     }
 
     public getIterator(): IterableIterator<GameObject> {

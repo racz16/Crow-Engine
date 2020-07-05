@@ -97,6 +97,7 @@ export class GameObject {
         this.setParent(null);
         this.components.clear();
         this.destroyed = true;
+        Engine.getGameObjectContainer().remove(this);
     }
 
     public isDestroyed(): boolean {
