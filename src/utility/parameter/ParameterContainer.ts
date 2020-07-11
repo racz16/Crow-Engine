@@ -96,8 +96,7 @@ export class ParameterContainer {
         if (invalidatables && invalidatables.includes(invalidatable)) {
             const parameter = this.get(key);
             this.removeInvalidatablesFromParameter(parameter, false, [invalidatable]);
-            const index = invalidatables.indexOf(invalidatable);
-            Utility.removeElement(invalidatables, index);
+            Utility.removeElement(invalidatables, invalidatable);
             if (invalidatables.length === 0) {
                 this.invalidatables.delete(key.getKey());
             }

@@ -228,13 +228,13 @@ export class Spline implements ISpline {
     }
 
     public removeControlPointFromTheEnd(): void {
-        Utility.removeElement(this.controlPoints, this.controlPoints.length - 1);
+        Utility.removeElementByIndex(this.controlPoints, this.controlPoints.length - 1);
         this.valid = false;
         this.lengthValid = false;
     }
 
     public removeControlPoint(index: number): void {
-        Utility.removeElement(this.controlPoints, index);
+        Utility.removeElementByIndex(this.controlPoints, index);
         this.valid = false;
         this.lengthValid = false;
     }

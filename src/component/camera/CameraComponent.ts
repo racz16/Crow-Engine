@@ -1,8 +1,8 @@
 import { mat4, ReadonlyMat4 } from 'gl-matrix';
 import { Utility } from '../../utility/Utility';
 import { GameObject } from '../../core/GameObject';
-import { SimpleFrustum } from './frustum/SimpleFrustum';
 import { Frustum } from './frustum/Frustum';
+import { IFrustum } from './frustum/IFrustum';
 import { LogLevel } from '../../utility/log/LogLevel';
 import { Engine } from '../../core/Engine';
 import { ICameraComponent } from './ICameraComponent';
@@ -14,7 +14,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     private type: CameraType;
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
-    private frustum: Frustum;
+    private frustum: IFrustum;
     private nearPlaneDistance = 0.01;
     private farPlaneDistance = 100;
     private fov = 55;
@@ -25,7 +25,7 @@ export class CameraComponent extends Component implements ICameraComponent {
     public constructor(type = CameraType.PERSPECTIVE) {
         super();
         this.setType(type);
-        this.setFrustum(new SimpleFrustum());
+        this.setFrustum(new Frustum());
     }
 
     public getType(): CameraType {
@@ -118,9 +118,11 @@ export class CameraComponent extends Component implements ICameraComponent {
     private refreshProjectionMatrix(): void {
         if (this.type === CameraType.PERSPECTIVE) {
             this.projectionMatrix = Utility.computePerspectiveProjectionMatrix(
-                this.fov, this.aspectRatio,
+                this.fov,
+                this.aspectRatio,
                 this.nearPlaneDistance,
-                this.farPlaneDistance);
+                this.farPlaneDistance
+            );
         } else {
             this.projectionMatrix = Utility.computeOrthographicProjectionMatrix(
                 -this.horizontalScale,
@@ -128,7 +130,8 @@ export class CameraComponent extends Component implements ICameraComponent {
                 -this.verticalScale,
                 this.verticalScale,
                 this.nearPlaneDistance,
-                this.farPlaneDistance);
+                this.farPlaneDistance
+            );
         }
     }
 
@@ -156,19 +159,19 @@ export class CameraComponent extends Component implements ICameraComponent {
         return this.projectionMatrix;
     }
 
-    public getFrustum(): Frustum {
+    public getFrustum(): IFrustum {
         return this.frustum;
     }
 
-    public setFrustum(frustum: Frustum): void {
+    public setFrustum(frustum: IFrustum): void {
         if (!frustum || frustum.getCameraComponent()) {
             throw new Error();
         }
         if (this.frustum) {
-            (this.frustum as any).setCameraComponent(null);
+            this.frustum._setCameraComponent(null);
         }
         this.frustum = frustum;
-        (this.frustum as any).setCameraComponent(this);
+        this.frustum._setCameraComponent(this);
         this.invalidate();
     }
 

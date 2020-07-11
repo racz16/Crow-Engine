@@ -4,33 +4,15 @@ import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { PbrLightsStruct } from './PbrLightsStruct';
+import { PbrLightStructConstants } from './PbrLightStructConstants';
 
 export abstract class PbrLightComponent extends Component {
-
-    protected static readonly COLOR_OFFSET = 0;
-    protected static readonly DIRECTION_OFFSET = 16;
-    protected static readonly POSITION_OFFSET = 32;
-    protected static readonly CUTOFF_OFFSET = 48;
-    protected static readonly INTENSITY_OFFSET = 56;
-    protected static readonly RANGE_OFFSET = 60;
-    protected static readonly TYPE_OFFSET = 64;
-    protected static readonly ACTIVE_OFFSET = 68;
-
-    protected static readonly LIGHT_DATASIZE = 80;
-    protected static readonly DIRECTIONAL_LIGHT_TYPE = 0;
-    protected static readonly POINT_LIGHT_TYPE = 1;
-    protected static readonly SPOT_LIGHT_TYPE = 2;
 
     private color = vec3.fromValues(1, 1, 1);
     private intensity = 1.0;
 
-    public constructor() {
-        super();
-        PbrLightsStruct.getInstance().addLight(this);
-    }
-
     protected computeOffset(offset: number, index: number): number {
-        return index * PbrLightComponent.LIGHT_DATASIZE + offset;
+        return index * PbrLightStructConstants.LIGHT_DATASIZE + offset;
     }
 
     public getColor(): ReadonlyVec3 {
@@ -58,12 +40,14 @@ export abstract class PbrLightComponent extends Component {
 
     protected handleAttach(attached: GameObject): void {
         attached.getTransform().getInvalidatables().add(this);
+        PbrLightsStruct.getInstance().addLight(this);
     }
 
     protected handleDetach(detached: GameObject): void {
         detached.getTransform().getInvalidatables().remove(this);
+        PbrLightsStruct.getInstance().removeLight(this);
     }
 
-    protected abstract refresh(ubo: GlUbo, index: number): void;
+    public abstract _refresh(ubo: GlUbo, index: number): void;
 
 }

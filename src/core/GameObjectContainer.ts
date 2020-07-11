@@ -28,10 +28,7 @@ export class GameObjectContainer implements IGameObjectContainer {
         if (!gameObject || !gameObject.isDestroyed()) {
             throw new Error();
         }
-        const index = this.gameObjects.indexOf(gameObject);
-        if (index !== -1) {
-            Utility.removeElement(this.gameObjects, index);
-        }
+        Utility.removeElement(this.gameObjects, gameObject);
     }
 
     public destroyAll(): void {

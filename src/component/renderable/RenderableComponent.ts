@@ -20,7 +20,6 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     private materialActive = true;
     private castShadow = true;
     private receiveShadow = true;
-    private reflectable = false;
 
     public constructor(renderable: T, material: Material<any> = new Material(BlinnPhongRenderer), boundingShape: BoundingShape = new SphereBoundingShape()) {
         super();
@@ -58,14 +57,14 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
     }
 
     public setBoundingShape(boundingShape: BoundingShape): void {
-        if (!boundingShape || boundingShape.getRenderableComponent()) {
+        if (boundingShape && boundingShape.getRenderableComponent()) {
             throw new Error();
         }
         if (this.boundingShape) {
-            (this.boundingShape as any).setRenderableComponent(null);
+            this.boundingShape._setRenderableComponent(null);
         }
         this.boundingShape = boundingShape;
-        (this.boundingShape as any).setRenderableComponent(this);
+        this.boundingShape?._setRenderableComponent(this);
         this.invalidate();
     }
 
@@ -78,19 +77,10 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
             throw new Error();
         }
         if (this.billboard) {
-            (this.billboard as any).setRenderableComponent(null);
+            this.billboard._setRenderableComponent(null);
         }
         this.billboard = billboard;
-        (this.billboard as any).setRenderableComponent(this);
-        this.invalidate();
-    }
-
-    public isReflectable(): boolean {
-        return this.reflectable;
-    }
-
-    public setReflectable(reflectable: boolean): void {
-        this.reflectable = reflectable;
+        this.billboard?._setRenderableComponent(this);
         this.invalidate();
     }
 
@@ -129,8 +119,7 @@ export abstract class RenderableComponent<T extends IRenderable> extends Compone
         if (!interval) {
             throw new Error();
         }
-        this.visibilityInterval[0] = interval[0];
-        this.visibilityInterval[1] = interval[1];
+        vec2.copy(this.visibilityInterval, interval);
     }
 
     public getModelMatrix(): ReadonlyMat4 {

@@ -91,8 +91,15 @@ export class Utility {
         return angle * 180 / Math.PI;
     }
 
-    public static removeElement<T>(array: Array<T>, index: number): void {
+    public static removeElementByIndex<T>(array: Array<T>, index: number): void {
         array.splice(index, 1);
+    }
+
+    public static removeElement<T>(array: Array<T>, element: T): void {
+        const index = array.indexOf(element);
+        if (index !== -1) {
+            this.removeElementByIndex(array, index);
+        }
     }
 
     public static addElement<T>(array: Array<T>, index: number, element: T): void {

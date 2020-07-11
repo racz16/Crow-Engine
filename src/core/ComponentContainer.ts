@@ -42,7 +42,7 @@ export class ComponentContainer {
         const index = this.components.indexOf(component);
         if (index !== -1) {
             this.components[index]._detachFromGameObject();
-            Utility.removeElement(this.components, index);
+            Utility.removeElementByIndex(this.components, index);
         }
     }
 
@@ -51,7 +51,7 @@ export class ComponentContainer {
             const component = this.components[i];
             if (component instanceof type) {
                 component._detachFromGameObject();
-                Utility.removeElement(this.components, i);
+                Utility.removeElementByIndex(this.components, i);
             }
         }
     }

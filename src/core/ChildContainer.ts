@@ -52,8 +52,7 @@ export class ChildContainer {
     }
 
     public _removeChild(child: GameObject): void {
-        const index = this.children.indexOf(child);
-        Utility.removeElement(this.children, index);
+        Utility.removeElement(this.children, child);
     }
 
     public add(child: GameObject): void {

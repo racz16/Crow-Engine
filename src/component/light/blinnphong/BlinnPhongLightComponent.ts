@@ -4,31 +4,16 @@ import { GameObject } from '../../../core/GameObject';
 import { Utility } from '../../../utility/Utility';
 import { GlUbo } from '../../../webgl/buffer/GlUbo';
 import { BlinnPhongLightsStruct } from './BlinnPhongLightsStruct';
+import { BlinnPhongLightStructConstants } from './BlinnPhongLightStructConstants';
 
 export abstract class BlinnPhongLightComponent extends Component {
-
-    protected static readonly AMBIENT_OFFSET = 0;
-    protected static readonly DIFFUSE_OFFSET = 16;
-    protected static readonly SPECULAR_OFFSET = 32;
-    protected static readonly DIRECTION_OFFSET = 48;
-    protected static readonly POSITION_OFFSET = 64;
-    protected static readonly ATTENUATION_OFFSET = 80;
-    protected static readonly CUTOFF_OFFSET = 96;
-    protected static readonly TYPE_OFFSET = 104;
-    protected static readonly ACTIVE_OFFSET = 108;
-    protected static readonly LIGHT_DATASIZE = 112;
 
     private diffuseColor = vec3.fromValues(1, 1, 1);
     private specularColor = vec3.fromValues(1, 1, 1);
     private ambientColor = vec3.fromValues(0.1, 0.1, 0.1);
 
-    public constructor() {
-        super();
-        BlinnPhongLightsStruct.getInstance().addLight(this);
-    }
-
     protected computeOffset(offset: number, index: number): number {
-        return index * BlinnPhongLightComponent.LIGHT_DATASIZE + offset;
+        return index * BlinnPhongLightStructConstants.LIGHT_DATASIZE + offset;
     }
 
     public getDiffuseColor(): ReadonlyVec3 {
@@ -69,12 +54,14 @@ export abstract class BlinnPhongLightComponent extends Component {
 
     protected handleAttach(attached: GameObject): void {
         attached.getTransform().getInvalidatables().add(this);
+        BlinnPhongLightsStruct.getInstance().addLight(this);
     }
 
     protected handleDetach(detached: GameObject): void {
         detached.getTransform().getInvalidatables().remove(this);
+        BlinnPhongLightsStruct.getInstance().removeLight(this);
     }
 
-    protected abstract refresh(ubo: GlUbo, index: number): void;
+    public abstract _refresh(ubo: GlUbo, index: number): void;
 
 }

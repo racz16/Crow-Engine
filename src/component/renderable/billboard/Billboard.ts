@@ -21,7 +21,7 @@ export abstract class Billboard implements IInvalidatable {
     protected absoluteRotation: quat;
     private valid = false;
 
-    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    public _setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().remove(this);
             Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);
@@ -168,4 +168,5 @@ export abstract class Billboard implements IInvalidatable {
     protected getMainCameraTransform(): Transform {
         return Engine.getMainCamera().getGameObject().getTransform();
     }
+
 }

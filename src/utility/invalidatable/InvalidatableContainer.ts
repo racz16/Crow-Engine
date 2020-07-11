@@ -25,10 +25,7 @@ export class InvalidatableContainer {
     }
 
     public remove(invalidatable: IInvalidatable): void {
-        const index = this.invalidatables.indexOf(invalidatable);
-        if (index !== -1) {
-            Utility.removeElement(this.invalidatables, index);
-        }
+        Utility.removeElement(this.invalidatables, invalidatable);
     }
 
     public getCount(): number {

@@ -11,16 +11,17 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     private panner: PannerNode;
     private bufferSource: AudioBufferSourceNode;
     private volume = 1;
+    private ctx: AudioContext;
     private loaded = false;
 
     public constructor(soundPath: string) {
         super();
-        const ctx = Audio.context;
-        this.bufferSource = ctx.createBufferSource();
+        this.ctx = Audio.context;
+        this.bufferSource = this.ctx.createBufferSource();
         this.setAudioSource(soundPath);
-        this.panner = ctx.createPanner();
-        this.gain = ctx.createGain();
-        this.bufferSource.connect(this.panner).connect(this.gain).connect(ctx.destination);
+        this.panner = this.ctx.createPanner();
+        this.gain = this.ctx.createGain();
+        this.bufferSource.connect(this.panner).connect(this.gain).connect(this.ctx.destination);
         this.gain.gain.value = this.volume;
         Audio.addAudioSource(this);
     }
@@ -34,10 +35,9 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public async setAudioSource(soundPath: string): Promise<void> {
-        const ctx = Audio.context;
         const response = await fetch(soundPath);
         const arrayBuffer = await response.arrayBuffer();
-        const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
         this.bufferSource.buffer = audioBuffer;
         this.loaded = true;
     }
@@ -59,7 +59,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
             throw new Error();
         }
         this.volume = volume;
-        this.gain.gain.setValueAtTime(volume * Audio.getVolume(), Audio.context.currentTime);
+        this.gain.gain.setValueAtTime(volume * Audio.getVolume(), this.ctx.currentTime);
     }
 
     public isLoop(): boolean {
@@ -78,7 +78,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         if (speed < 0) {
             throw new Error();
         }
-        this.bufferSource.playbackRate.setValueAtTime(speed, Audio.context.currentTime);
+        this.bufferSource.playbackRate.setValueAtTime(speed, this.ctx.currentTime);
     }
 
     public getPanningModel(): PanningModelType {
@@ -120,7 +120,7 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public setReductionSpeed(reductionSpeed: number): void {
-        if (reductionSpeed < 0 || reductionSpeed > 0) {
+        if (reductionSpeed < 0) {
             throw new Error();
         }
         this.panner.rolloffFactor = reductionSpeed;
@@ -168,15 +168,14 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     private updatePositionAndOrientationUnsafe(): void {
-        const ctx = Audio.context;
         const position = this.getGameObject().getTransform().getAbsolutePosition();
         const forward = this.getGameObject().getTransform().getForwardVector();
-        this.panner.positionX.setValueAtTime(position[0], ctx.currentTime);
-        this.panner.positionY.setValueAtTime(position[1], ctx.currentTime);
-        this.panner.positionZ.setValueAtTime(position[2], ctx.currentTime);
-        this.panner.orientationX.setValueAtTime(forward[0], ctx.currentTime);
-        this.panner.orientationY.setValueAtTime(forward[1], ctx.currentTime);
-        this.panner.orientationZ.setValueAtTime(forward[2], ctx.currentTime);
+        this.panner.positionX.setValueAtTime(position[0], this.ctx.currentTime);
+        this.panner.positionY.setValueAtTime(position[1], this.ctx.currentTime);
+        this.panner.positionZ.setValueAtTime(position[2], this.ctx.currentTime);
+        this.panner.orientationX.setValueAtTime(forward[0], this.ctx.currentTime);
+        this.panner.orientationY.setValueAtTime(forward[1], this.ctx.currentTime);
+        this.panner.orientationZ.setValueAtTime(forward[2], this.ctx.currentTime);
     }
 
     public setActive(active: boolean): void {

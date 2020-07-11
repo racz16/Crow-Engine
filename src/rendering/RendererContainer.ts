@@ -38,7 +38,7 @@ export class RendererContainer<T extends Renderer>{
     public remove(renderer: T): void {
         const index = this.renderers.indexOf(renderer);
         if (index !== -1) {
-            Utility.removeElement(this.renderers, index);
+            Utility.removeElementByIndex(this.renderers, index);
             (renderer as any).removedFromThePipeline();
         }
     }

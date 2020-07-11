@@ -1,5 +1,5 @@
 import { ReadonlyMat4 } from 'gl-matrix';
-import { Frustum } from './frustum/Frustum';
+import { IFrustum } from './frustum/IFrustum';
 import { IComponent } from '../IComponent';
 import { CameraType } from './CameraType';
 
@@ -9,7 +9,7 @@ export interface ICameraComponent extends IComponent {
 
     getProjectionMatrix(): ReadonlyMat4;
 
-    getFrustum(): Frustum;
+    getFrustum(): IFrustum;
 
     getType(): CameraType;
 

@@ -202,6 +202,7 @@ export class Engine {
         this.getLog().startGroup(`frame ${this.getTimeManager().getFrameCount()}`);
         this.getTimeManager().endFrame();
         this.getGameObjectContainer().update();
+        Audio.update();
         this.getRenderingPipeline().render();
         this.getLog().endGroup();
         this.getLog().endFrame();

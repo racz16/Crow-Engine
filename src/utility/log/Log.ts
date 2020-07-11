@@ -35,10 +35,7 @@ export class Log implements ILog {
     }
 
     public removeHandler(handler: ILogHandler): void {
-        const index = this.logHandlers.indexOf(handler);
-        if (index !== -1) {
-            Utility.removeElement(this.logHandlers, index);
-        }
+        Utility.removeElement(this.logHandlers, handler);
     }
 
     public containsHandler(handler: ILogHandler): boolean {

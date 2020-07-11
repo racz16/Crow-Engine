@@ -274,7 +274,6 @@ export class RenderingPipeline implements IRenderingPipeline {
         if (!mainCamera || !mainCamera.getGameObject() || !mainCamera.isActive()) {
             throw new Error();
         }
-        CameraStruct.getInstance().refreshUbo();
         CameraStruct.getInstance().useUbo();
     }
 

@@ -67,7 +67,7 @@ export abstract class BoundingShape implements IInvalidatable {
         return cornerPoints;
     }
 
-    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    public _setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().remove(this);
         }

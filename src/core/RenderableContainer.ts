@@ -28,7 +28,7 @@ export class RenderableContainer implements IRenderableContainer {
     public remove(renderable: IRenderableComponent<IRenderable>): void {
         const index = this.renderables.indexOf(renderable);
         if (index !== -1 && !renderable.getGameObject()) {
-            Utility.removeElement(this.renderables, index);
+            Utility.removeElementByIndex(this.renderables, index);
         }
     }
 

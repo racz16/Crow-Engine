@@ -55,7 +55,7 @@ export class ObbBoundingShape extends BoundingShape {
         this.clipSpaceObbCornerPoints = cornerPoints;
     }
 
-    protected setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
+    public _setRenderableComponent(renderableComponent: IRenderableComponent<IRenderable>): void {
         if (this.renderableComponent) {
             this.renderableComponent.getInvalidatables().remove(this);
             Engine.getParameters().removeInvalidatable(Engine.MAIN_CAMERA, this);

@@ -39,7 +39,6 @@ export class PbrRenderer extends GeometryRenderer {
 
     protected beforeRendering(): void {
         super.beforeRendering();
-        PbrLightsStruct.getInstance().refreshUbo();
         PbrLightsStruct.getInstance().useUbo();
         this.shader.getNativeShaderProgram().bindUniformBlockToBindingPoint(Conventions.BP_LIGHTS);
         let mats = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRICES);

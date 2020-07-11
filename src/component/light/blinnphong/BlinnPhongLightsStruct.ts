@@ -8,13 +8,11 @@ import { BlinnPhongLightComponent } from './BlinnPhongLightComponent';
 import { Engine } from '../../../core/Engine';
 import { ICameraComponent } from '../../camera/ICameraComponent';
 import { Conventions } from '../../../resource/Conventions';
+import { BlinnPhongLightStructConstants } from './BlinnPhongLightStructConstants';
 
 export class BlinnPhongLightsStruct {
 
     private static instance: BlinnPhongLightsStruct;
-    private static readonly ACTIVE_OFFSET = 108;
-    private static readonly LIGHT_DATASIZE = 112;
-    private static readonly LIGHT_COUNT = 16;
 
     private ubo: GlUbo;
     private lights = new Array<BlinnPhongLightComponent>();
@@ -31,13 +29,14 @@ export class BlinnPhongLightsStruct {
     }
 
     public useUbo(): void {
+        this.refreshUbo();
         this.ubo.bindToBindingPoint(Conventions.BP_LIGHTS);
     }
 
     private createUboIfNotUsable(): void {
         if (!this.isUsable()) {
             this.ubo = new GlUbo();
-            this.ubo.allocate(BlinnPhongLightsStruct.LIGHT_DATASIZE * (BlinnPhongLightsStruct.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
+            this.ubo.allocate(BlinnPhongLightStructConstants.LIGHT_DATASIZE * (BlinnPhongLightStructConstants.LIGHT_COUNT), GlBufferObjectUsage.STATIC_DRAW);
             Engine.getLog().logString(LogLevel.INFO_1, 'Blinn-Phong Lights ubo created');
         }
     }
@@ -61,19 +60,19 @@ export class BlinnPhongLightsStruct {
     private refreshLightsInUbo(): void {
         this.addedLightCount = 0;
         for (const light of this.lights) {
-            if (this.addedLightCount === BlinnPhongLightsStruct.LIGHT_COUNT) {
+            if (this.addedLightCount === BlinnPhongLightStructConstants.LIGHT_COUNT) {
                 return;
             }
-            if (light.isActive() && light.getGameObject()) {
-                (light as any).refresh(this.ubo, this.addedLightCount);
+            if (light.isActive()) {
+                light._refresh(this.ubo, this.addedLightCount);
                 this.addedLightCount++;
             }
         }
     }
 
     private refreshRemainingSlotsInUbo(): void {
-        for (let i = this.addedLightCount; i < BlinnPhongLightsStruct.LIGHT_COUNT; i++) {
-            this.ubo.store(new Int32Array([0]), i * BlinnPhongLightsStruct.LIGHT_DATASIZE + BlinnPhongLightsStruct.ACTIVE_OFFSET);
+        for (let i = this.addedLightCount; i < BlinnPhongLightStructConstants.LIGHT_COUNT; i++) {
+            this.ubo.store(new Int32Array([0]), i * BlinnPhongLightStructConstants.LIGHT_DATASIZE + BlinnPhongLightStructConstants.ACTIVE_OFFSET);
         }
     }
 
@@ -87,7 +86,7 @@ export class BlinnPhongLightsStruct {
     }
 
     private computeLightDistanceFromCamera(light: BlinnPhongLightComponent, camera: ICameraComponent): number {
-        if (!light.isActive() || !light.getGameObject()) {
+        if (!light.isActive()) {
             return Number.POSITIVE_INFINITY;
         } else if (light instanceof BlinnPhongDirectionalLightComponent) {
             return 0;
@@ -98,12 +97,19 @@ export class BlinnPhongLightsStruct {
     }
 
     public addLight(light: BlinnPhongLightComponent): void {
-        if (!light) {
+        if (!light || !light.getGameObject()) {
             throw new Error();
         }
         if (!this.lights.includes(light)) {
             this.lights.push(light);
         }
+    }
+
+    public removeLight(light: BlinnPhongLightComponent): void {
+        if (!light || light.getGameObject()) {
+            throw new Error();
+        }
+        Utility.removeElement(this.lights, light);
     }
 
     public setShadowLightSource(light: BlinnPhongDirectionalLightComponent): void {
@@ -119,7 +125,11 @@ export class BlinnPhongLightsStruct {
     }
 
     public getLightCount(): number {
-        return BlinnPhongLightsStruct.LIGHT_COUNT;
+        return BlinnPhongLightStructConstants.LIGHT_COUNT;
+    }
+
+    public getLight(index: number): BlinnPhongLightComponent {
+        return this.lights[index];
     }
 
     public getLightsIterator(): IterableIterator<BlinnPhongLightComponent> {
