@@ -44,7 +44,7 @@ export class ScreenRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.WORK);
-        image.getNativeTexture().bindToTextureUnit(Conventions.TU_ZERO);
+        this.getShader().loadTexture2D(image, Conventions.TU_ZERO);
     }
 
     protected draw(): void {

@@ -8,6 +8,7 @@ import { IResource } from '../../resource/IResource';
 import { GlMagnificationFilter, GlMagnificationFilterResolver } from '../enum/GlMagnificationFIlter';
 import { GlMinificationFilter, GlMinificationFilterResolver } from '../enum/GlMinificationFilter';
 import { GlTextureUnit } from '../GlTextureUnit';
+import { GlSampler } from '../GlSampler';
 
 export abstract class GlTexture extends GlObject implements IResource {
 
@@ -182,6 +183,10 @@ export abstract class GlTexture extends GlObject implements IResource {
     public bindToTextureUnit(textureUnit: GlTextureUnit): void {
         Gl.gl.activeTexture(textureUnit.getId());
         this.bind();
+    }
+
+    public getNativeSampler(): GlSampler {
+        return null;
     }
 
     public isMultisampled(): boolean {

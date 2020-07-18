@@ -142,17 +142,6 @@ export class Utility {
         return vec3.length(vector) === 0;
     }
 
-    public static getCubemapSideNames(path: string, name: string, sideNames: Array<string>, mipmapCount: number, extension: string): Array<string> {
-        const paths = new Array<string>();
-        for (let i = 0; i < sideNames.length; i++) {
-            const side = sideNames[i];
-            for (let mipmapLevel = 0; mipmapLevel < mipmapCount; mipmapLevel++) {
-                paths.push(`${path}/${name}_${side}_${mipmapLevel}.${extension}`);
-            }
-        }
-        return paths;
-    }
-
     public static async loadImage(path: string): Promise<TexImageSource> {
         return new Promise((resolve, reject) => {
             const image = new Image();

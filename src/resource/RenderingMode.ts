@@ -21,7 +21,7 @@ export class RenderingModeResolver {
             case RenderingMode.TRIANGLES: return Gl.gl.TRIANGLES;
             case RenderingMode.TRIANGLE_STRIP: return Gl.gl.TRIANGLE_STRIP;
             case RenderingMode.TRIANGLE_FAN: return Gl.gl.TRIANGLE_FAN;
-            default: throw new Error('Invalid enum TextureFiltering');
+            default: throw new Error('Invalid enum RenderingMode');
         }
     }
 

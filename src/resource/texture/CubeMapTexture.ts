@@ -1,152 +1,75 @@
 import { ICubeMapTexture } from './ICubeMapTexture';
 import { GlCubeMapTexture } from '../../webgl/texture/GlCubeMapTexture';
 import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
-import { vec2, ReadonlyVec2 } from 'gl-matrix';
-import { GlCubeMapSideResolver } from '../../webgl/enum/GlCubeMapSide';
-import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
-import { Utility } from '../../utility/Utility';
-import { TextureType } from './enum/TextureType';
+import { vec2 } from 'gl-matrix';
 import { GlFormat } from '../../webgl/enum/GlFormat';
 import { HdrImageResult } from 'parse-hdr';
 import { GlSampler } from '../../webgl/GlSampler';
+import { TextureWrap, TextureWrapResolver } from './enum/TextureWrap';
+import { AbstractTexture } from './AbstractTexture';
+import { CubeMapTextureConfig } from './config/CubeMapTextureConfig';
+import { CubeMapTextureSideResolver } from './enum/CubeMapTextureSide';
 
-export class CubeMapTexture implements ICubeMapTexture {
+export class CubeMapTexture extends AbstractTexture<GlCubeMapTexture> implements ICubeMapTexture {
 
-    private texture: GlCubeMapTexture;
-    private sampler: GlSampler;
-    private textureFiltering: TextureFiltering
-    private loaded = false;
+    public static async createTextureFromConfig(config: CubeMapTextureConfig): Promise<CubeMapTexture> {
+        const sampler = new GlSampler();
+        const texture = new GlCubeMapTexture();
+        this.loadTexture(texture, config);
+        return new CubeMapTexture(texture, sampler);
+    }
 
-    public constructor(paths: Array<string>, hasAlphaChannel = true, type = TextureType.IMAGE, textureFiltering = TextureFiltering.None) {
-        this.sampler = new GlSampler();
-        this.setTextureFiltering(textureFiltering);
-        this.texture = new GlCubeMapTexture();
-        const isHdr = paths[0].toLowerCase().endsWith('.hdr');
-        if (isHdr) {
-            this.createHdrTexture(paths, hasAlphaChannel);
-        } else {
-            this.createTexture(paths, hasAlphaChannel, type);
+    public static async createHdrTextureFromConfig(config: CubeMapTextureConfig): Promise<CubeMapTexture> {
+        const sampler = new GlSampler();
+        const texture = new GlCubeMapTexture();
+        this.loadHdrTexture(texture, config);
+        return new CubeMapTexture(texture, sampler);
+    }
+
+    private static async loadTexture(texture: GlCubeMapTexture, config: CubeMapTextureConfig): Promise<void> {
+        const images = await this.loadAllImages(config.getElements());
+        this.allocateAndStore(texture, config, images);
+        if (config.isGenerateMipmaps()) {
+            texture.generateMipmaps();
         }
     }
 
-    private async createTexture(paths: Array<string>, hasAlphaChannel: boolean, type: TextureType): Promise<void> {
-        const images = await this.loadImages(paths);
-        const internalFormat = this.computeInternalFormat(hasAlphaChannel, type);
+    private static allocateAndStore(texture: GlCubeMapTexture, config: CubeMapTextureConfig, images: Array<TexImageSource>): void {
+        const mipmaps = config.isGenerateMipmaps() || config.getElements().some(e => e.getMipmapLevel() > 0);
+        const internalFormat = config.hasAlphaChannel ? GlInternalFormat.RGBA8 : GlInternalFormat.RGB8;
         const format = internalFormat === GlInternalFormat.RGB8 ? GlFormat.RGB : GlFormat.RGBA;
-        this.texture.allocate(internalFormat, vec2.fromValues(images[0].width, images[0].height), true);
-        this.addTextureSides(images, format);
-        this.generateMipmapsIfNeeded(images.length);
-        this.loaded = true;
+        texture.allocate(internalFormat, vec2.fromValues(images[0].width, images[0].height), mipmaps);
+        for (let i = 0; i < config.getElements().length; i++) {
+            const image = images[i];
+            const element = config.getElements()[i];
+            const side = CubeMapTextureSideResolver.enumToGl(element.getSide());
+            texture.getSide(side).store(image, format, element.isFlipY(), element.getMipmapLevel());
+        }
     }
 
-    private async createHdrTexture(paths: Array<string>, hasAlphaChannel: boolean): Promise<void> {
-        const images = await this.loadHdrImages(paths);
-        const internalFormat = hasAlphaChannel ? GlInternalFormat.RGBA32F : GlInternalFormat.RGB32F;
+    private static async loadHdrTexture(texture: GlCubeMapTexture, config: CubeMapTextureConfig): Promise<void> {
+        const images = await this.loadAllHdrImages(config.getElements());
+        this.allocateAndStoreHdr(texture, config, images);
+        if (config.isGenerateMipmaps()) {
+            texture.generateMipmaps();
+        }
+    }
+
+    private static allocateAndStoreHdr(texture: GlCubeMapTexture, config: CubeMapTextureConfig, images: Array<HdrImageResult>): void {
+        const mipmaps = config.isGenerateMipmaps() || config.getElements().some(e => e.getMipmapLevel() > 0);
+        const internalFormat = config.hasAlphaChannel() ? GlInternalFormat.RGBA32F : GlInternalFormat.RGB32F;
         const format = internalFormat === GlInternalFormat.RGB32F ? GlFormat.RGB : GlFormat.RGBA;
-        this.texture.allocate(internalFormat, vec2.fromValues(images[0].shape[0], images[0].shape[1]), true);
-        this.addHdrTextureSides(images, format);
-        this.generateMipmapsIfNeeded(images.length);
-        this.loaded = true;
-    }
-
-    private generateMipmapsIfNeeded(imageCount: number): void {
-        if (imageCount === 6) {
-            this.texture.generateMipmaps();
+        texture.allocate(internalFormat, vec2.fromValues(images[0].shape[0], images[0].shape[1]), mipmaps);
+        for (let i = 0; i < config.getElements().length; i++) {
+            const image = images[i];
+            const element = config.getElements()[i];
+            const side = CubeMapTextureSideResolver.enumToGl(element.getSide());
+            texture.getSide(side).storeFromBinary(image.data, vec2.fromValues(images[i].shape[0], images[i].shape[1]), format, element.isFlipY(), element.getMipmapLevel());
         }
     }
 
-    private async loadImages(paths: Array<string>): Promise<Array<TexImageSource>> {
-        return await Promise.all(
-            paths.map(async path => {
-                return Utility.loadImage(path);
-            })
-        );
-    }
-
-    private async loadHdrImages(paths: Array<string>): Promise<Array<HdrImageResult>> {
-        return await Promise.all(
-            paths.map(async path => {
-                return Utility.loadHdrImage(path);
-            })
-        );
-    }
-
-    private addTextureSides(images: Array<TexImageSource>, format: GlFormat): void {
-        const mipmapCount = images.length / GlCubeMapTexture.SIDE_COUNT;
-        for (let i = 0; i < GlCubeMapTexture.SIDE_COUNT; i++) {
-            const sideImages = images.slice(i * mipmapCount, i * mipmapCount + mipmapCount);
-            const side = GlCubeMapSideResolver.indexToEnum(i);
-            for (let mipmapLevel = 0; mipmapLevel < mipmapCount; mipmapLevel++) {
-                const image = sideImages[mipmapLevel];
-                this.texture.getSide(side).store(image, format, false, mipmapLevel);
-            }
-        }
-    }
-
-    private addHdrTextureSides(images: Array<HdrImageResult>, format: GlFormat): void {
-        const mipmapCount = images.length / GlCubeMapTexture.SIDE_COUNT;
-        for (let i = 0; i < GlCubeMapTexture.SIDE_COUNT; i++) {
-            const sideImages = images.slice(i * mipmapCount, i * mipmapCount + mipmapCount);
-            const side = GlCubeMapSideResolver.indexToEnum(i);
-            for (let mipmapLevel = 0; mipmapLevel < mipmapCount; mipmapLevel++) {
-                const image = sideImages[mipmapLevel];
-                this.texture.getSide(side).storeFromBinary(image.data, vec2.fromValues(image.shape[0], image.shape[1]), format, false, mipmapLevel);
-            }
-        }
-    }
-
-    private computeInternalFormat(hasAlphaChannel: boolean, type: TextureType): GlInternalFormat {
-        if (type === TextureType.IMAGE) {
-            return GlInternalFormat.SRGB8_A8;
-        } else if (hasAlphaChannel && type === TextureType.DATA) {
-            return GlInternalFormat.RGBA8;
-        } else {
-            return GlInternalFormat.RGB8;
-        }
-    }
-
-    public getTextureFiltering(): TextureFiltering {
-        return this.textureFiltering;
-    }
-
-    public setTextureFiltering(textureFiltering: TextureFiltering): void {
-        this.textureFiltering = textureFiltering;
-        this.sampler.setMinificationFilter(TextureFilteringResolver.enumToGlMinification(textureFiltering));
-        this.sampler.setMagnificationFilter(TextureFilteringResolver.enumToGlMagnification(textureFiltering));
-        this.sampler.setAnisotropicLevel(TextureFilteringResolver.enumToGlAnisotropicValue(textureFiltering));
-    }
-
-    public getNativeTexture(): GlCubeMapTexture {
-        return this.texture;
-    }
-
-    public getNativeSampler(): GlSampler {
-        return this.sampler;
-    }
-
-    public getSize(): ReadonlyVec2 {
-        return this.texture.getSize();
-    }
-
-    public getDataSize(): number {
-        return this.texture.getDataSize();
-    }
-
-    public getAllDataSize(): number {
-        return this.getDataSize();
-    }
-
-    public release(): void {
-        if (this.isUsable()) {
-            this.texture.release();
-            this.texture = null;
-            this.sampler.release();
-            this.sampler = null;
-        }
-    }
-
-    public isUsable(): boolean {
-        return Utility.isUsable(this.sampler) && Utility.isUsable(this.texture) && this.loaded;
+    public setTextureWrapW(textureWrap: TextureWrap): void {
+        this.sampler.setWrapW(TextureWrapResolver.enumToGl(textureWrap));
     }
 
 }

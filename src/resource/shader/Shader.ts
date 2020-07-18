@@ -4,6 +4,10 @@ import { GlShaderProgram } from '../../webgl/shader/GlShaderProgram';
 import { Utility } from '../../utility/Utility';
 import { Engine } from '../../core/Engine';
 import { IResource } from '../IResource';
+import { ITexture2D } from '../texture/ITexture2D';
+import { GlTextureUnit } from '../../webgl/GlTextureUnit';
+import { ITexture2DArray } from '../texture/ITexture2DArray';
+import { ICubeMapTexture } from '../texture/ICubeMapTexture';
 
 export abstract class Shader implements IResource {
 
@@ -73,6 +77,18 @@ export abstract class Shader implements IResource {
 
     protected getShaderProgram(): GlShaderProgram {
         return this.shaderProgram;
+    }
+
+    public loadTexture2D(texture: ITexture2D, textureUnit: GlTextureUnit): void {
+        this.shaderProgram.loadTexture(textureUnit, texture.getNativeTexture(), texture.getNativeSampler());
+    }
+
+    public loadTexture2DArray(texture: ITexture2DArray, textureUnit: GlTextureUnit): void {
+        this.shaderProgram.loadTexture(textureUnit, texture.getNativeTexture(), texture.getNativeSampler());
+    }
+
+    public loadCubeMapTexture(texture: ICubeMapTexture, textureUnit: GlTextureUnit): void {
+        this.shaderProgram.loadTexture(textureUnit, texture.getNativeTexture(), texture.getNativeSampler());
     }
 
     public start(): void {

@@ -243,11 +243,11 @@ export class VarianceShadowRenderer extends Renderer {
             //const blurOffset = (this.blur * 25) / ((this.wsSplitDistances[i + 1] - this.wsSplitDistances[i]) * this.resolution);
             const blurOffset = this.blur / this.resolution;
             this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[1].getLayer(i));
-            this.fboTextures[0].bindToTextureUnit(Conventions.TU_ZERO);
+            this.getShader().loadTexture2DArray(this.fboTextures[0], Conventions.TU_ZERO);
             this.renderGaussianPass(true, i, blurOffset);
 
             this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
-            this.fboTextures[1].bindToTextureUnit(Conventions.TU_ZERO);
+            this.getShader().loadTexture2DArray(this.fboTextures[1], Conventions.TU_ZERO);
             this.renderGaussianPass(false, i, blurOffset);
         }
 

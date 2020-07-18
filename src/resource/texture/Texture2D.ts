@@ -1,84 +1,74 @@
 import { GlTexture2D } from '../../webgl/texture/GlTexture2D';
 import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
-import { vec2, ReadonlyVec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import { ITexture2D } from './ITexture2D';
-import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
-import { Utility } from '../../utility/Utility';
-import { TextureType } from './enum/TextureType';
 import { GlSampler } from '../../webgl/GlSampler';
+import { GlFormat } from '../../webgl/enum/GlFormat';
+import { GlTextureDataType } from '../../webgl/enum/GlTextureDataType';
+import { AbstractTexture } from './AbstractTexture';
+import { Texture2DConfig } from './config/Texture2DConfig';
+import { TextureConfigElement } from './config/TextureConfigElement';
+import { HdrImageResult } from 'parse-hdr';
 
-export class Texture2D implements ITexture2D {
+export class Texture2D extends AbstractTexture<GlTexture2D> implements ITexture2D {
 
-    private texture: GlTexture2D;
-    private sampler: GlSampler;
-
-    public constructor(texture: GlTexture2D, sampler: GlSampler) {
-        this.texture = texture;
-        this.sampler = sampler;
+    public static async createTexture(path: string, alphaChannel = true, generateMipmaps = true, flipY = true): Promise<Texture2D> {
+        const element = new TextureConfigElement(path, flipY);
+        const config = new Texture2DConfig([element], alphaChannel, generateMipmaps);
+        return await this.createTextureFromConfig(config);
     }
 
-    public static async createNonHdr(path: string, hasAlphaChannel: boolean, type: TextureType, flipY = true): Promise<Texture2D> {
-        const image = await Utility.loadImage(path);
+    public static async createTextureFromConfig(config: Texture2DConfig): Promise<Texture2D> {
         const sampler = new GlSampler();
-        const internalFormat = this.computeInternalFormat(hasAlphaChannel, type);
-        const texture = GlTexture2D.createTexture(image, internalFormat, true, flipY);
+        const texture = new GlTexture2D();
+        this.loadTexture(texture, config);
         return new Texture2D(texture, sampler);
     }
 
-    public async createHdr(path: string, hasAlphaChannel: boolean, flipY = true): Promise<Texture2D> {
-        const image = await Utility.loadHdrImage(path);
-        const internalFormat = hasAlphaChannel ? GlInternalFormat.RGBA32F : GlInternalFormat.RGB32F;
-        const size = vec2.fromValues(image.shape[0], image.shape[1]);
-        const texture = GlTexture2D.createTextureFromBinary(image.data, size, internalFormat, true, flipY);
-        return new Texture2D(texture, new GlSampler());
+    public static async createHdrTextureFromConfig(config: Texture2DConfig): Promise<Texture2D> {
+        const sampler = new GlSampler();
+        const texture = new GlTexture2D();
+        this.loadHdrTexture(texture, config);
+        return new Texture2D(texture, sampler);
     }
 
-    private static computeInternalFormat(hasAlphaChannel: boolean, type: TextureType): GlInternalFormat {
-        if (type === TextureType.IMAGE) {
-            return GlInternalFormat.SRGB8_A8;
-        } else if (hasAlphaChannel && type === TextureType.DATA) {
-            return GlInternalFormat.RGBA8;
-        } else {
-            return GlInternalFormat.RGB8;
+    private static async loadTexture(texture: GlTexture2D, config: Texture2DConfig): Promise<void> {
+        const images = await this.loadAllImages(config.getElements());
+        this.allocateAndStore(texture, config, images);
+        if (config.isGenerateMipmaps()) {
+            texture.generateMipmaps();
         }
     }
 
-    public setTextureFiltering(textureFiltering: TextureFiltering): void {
-        this.sampler.setMinificationFilter(TextureFilteringResolver.enumToGlMinification(textureFiltering));
-        this.sampler.setMagnificationFilter(TextureFilteringResolver.enumToGlMagnification(textureFiltering));
-        this.sampler.setAnisotropicLevel(TextureFilteringResolver.enumToGlAnisotropicValue(textureFiltering));
+    private static allocateAndStore(texture: GlTexture2D, config: Texture2DConfig, images: Array<TexImageSource>): void {
+        const mipmaps = config.isGenerateMipmaps() || config.getElements().some(e => e.getMipmapLevel() > 0);
+        const internalFormat = config.hasAlphaChannel ? GlInternalFormat.RGBA8 : GlInternalFormat.RGB8;
+        const format = internalFormat === GlInternalFormat.RGB8 ? GlFormat.RGB : GlFormat.RGBA;
+        texture.allocate(internalFormat, vec2.fromValues(images[0].width, images[0].height), mipmaps);
+        for (let i = 0; i < config.getElements().length; i++) {
+            const image = images[i];
+            const element = config.getElements()[i];
+            texture.store(image, format, element.isFlipY(), element.getMipmapLevel());
+        }
     }
 
-    public getNativeTexture(): GlTexture2D {
-        return this.texture;
+    private static async loadHdrTexture(texture: GlTexture2D, config: Texture2DConfig): Promise<void> {
+        const images = await this.loadAllHdrImages(config.getElements());
+        this.allocateAndStoreHdr(texture, config, images);
+        if (config.isGenerateMipmaps()) {
+            texture.generateMipmaps();
+        }
     }
 
-    public getNativeSampler(): GlSampler {
-        return this.sampler;
-    }
-
-    public getSize(): ReadonlyVec2 {
-        return this.texture.getSize();
-    }
-
-    public getDataSize(): number {
-        return this.texture.getDataSize();
-    }
-
-    public getAllDataSize(): number {
-        return this.getDataSize();
-    }
-
-    public isUsable(): boolean {
-        return Utility.isUsable(this.sampler) && Utility.isUsable(this.texture);
-    }
-
-    public release(): void {
-        if (this.isUsable()) {
-            this.texture.release();
-            this.texture = null;
-            this.sampler.release();
-            this.sampler = null;
+    private static allocateAndStoreHdr(texture: GlTexture2D, config: Texture2DConfig, images: Array<HdrImageResult>): void {
+        const mipmaps = config.isGenerateMipmaps() || config.getElements().some(e => e.getMipmapLevel() > 0);
+        const internalFormat = config.hasAlphaChannel() ? GlInternalFormat.RGBA32F : GlInternalFormat.RGB32F;
+        const format = internalFormat === GlInternalFormat.RGB32F ? GlFormat.RGB : GlFormat.RGBA;
+        texture.allocate(internalFormat, vec2.fromValues(images[0].shape[0], images[0].shape[1]), mipmaps);
+        for (let i = 0; i < config.getElements().length; i++) {
+            const image = images[i];
+            const element = config.getElements()[i];
+            texture.storeFromBinary(image.data, vec2.fromValues(images[i].shape[0], images[i].shape[1]), format, GlTextureDataType.FLOAT, element.isFlipY());
         }
     }
 

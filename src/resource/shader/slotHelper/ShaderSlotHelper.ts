@@ -58,10 +58,7 @@ export abstract class ShaderSlotHelper {
     protected loadTexture2D(): void {
         const texture = this.slot.getTexture2D();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
-        if (texture instanceof Texture2D) {
-            texture.getNativeSampler()?.bindToTextureUnit(this.getTextureUnit());//TODO
-        }
+        this.shaderProgram.loadTexture(this.getTextureUnit(), texture.getNativeTexture(), texture.getNativeSampler());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
         this.shaderProgram.loadVector2(this.getTileName(), this.slot.getTextureTile());
         this.shaderProgram.loadVector2(this.getOffsetName(), this.slot.getTextureOffset());
@@ -73,7 +70,7 @@ export abstract class ShaderSlotHelper {
     protected loadCubeMapTexture(): void {
         const texture = this.slot.getCubeMapTexture();
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        this.shaderProgram.loadTexture(this.getTextureUnit(), texture.getNativeTexture(), texture.getNativeSampler());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), true);
     }
 
@@ -90,7 +87,7 @@ export abstract class ShaderSlotHelper {
     protected loadDefaultTexture2D(): void {
         const texture = Engine.getParameters().get(Engine.BLACK_TEXTURE_2D);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        this.shaderProgram.loadTexture(this.getTextureUnit(), texture.getNativeTexture(), texture.getNativeSampler());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
         if (this.multipleTextureCoordinates) {
             this.shaderProgram.loadInt(this.getTextureCoordinateName(), 0);
@@ -100,7 +97,7 @@ export abstract class ShaderSlotHelper {
     protected loadDefaultCubeMapTexture(): void {
         const texture = Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE);
         this.shaderProgram.connectTextureUnit(this.getMapName(), this.getTextureUnit());
-        texture.getNativeTexture().bindToTextureUnit(this.getTextureUnit());
+        this.shaderProgram.loadTexture(this.getTextureUnit(), texture.getNativeTexture(), texture.getNativeSampler());
         this.shaderProgram.loadBoolean(this.getIsThereMapName(), false);
     }
 

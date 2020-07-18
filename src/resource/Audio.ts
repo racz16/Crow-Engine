@@ -3,6 +3,7 @@ import { LogLevel } from '../utility/log/LogLevel';
 import { Engine } from '../core/Engine';
 import { ReadonlyVec3, vec3 } from 'gl-matrix';
 import { Axis } from '../utility/Axis';
+import { Utility } from '../utility/Utility';
 
 export class Audio {
 
@@ -69,9 +70,19 @@ export class Audio {
     }
 
     public static addAudioSource(audioSource: IAudioSourceComponent): void {
+        if (!audioSource || !audioSource.getGameObject()) {
+            throw new Error();
+        }
         if (!this.containsAudioSource(audioSource)) {
             this.audioSources.push(audioSource);
         }
+    }
+
+    public static removeAudioSource(audioSource: IAudioSourceComponent): void {
+        if (!audioSource || audioSource.getGameObject()) {
+            throw new Error();
+        }
+        Utility.removeElement(this.audioSources, audioSource);
     }
 
     public static containsAudioSource(audioSource: IAudioSourceComponent): boolean {
@@ -80,6 +91,10 @@ export class Audio {
 
     public static getAudioSourceCount(): number {
         return this.audioSources.length;
+    }
+
+    public static getAudioSource(index: number): IAudioSourceComponent {
+        return this.audioSources[index];
     }
 
     public static getAudioSourcesIterator(): IterableIterator<IAudioSourceComponent> {

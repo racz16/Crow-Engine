@@ -23,7 +23,6 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
         this.gain = this.ctx.createGain();
         this.bufferSource.connect(this.panner).connect(this.gain).connect(this.ctx.destination);
         this.gain.gain.value = this.volume;
-        Audio.addAudioSource(this);
     }
 
     public static createAmbientAudioSourceComponent(soundPath: string): AudioSourceComponent {
@@ -43,7 +42,9 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
     }
 
     public start(): void {
-        this.bufferSource.start();
+        if (this.getGameObject() && this.isActive()) {
+            this.bufferSource.start();
+        }
     }
 
     public stop(): void {
@@ -195,11 +196,13 @@ export class AudioSourceComponent extends Component implements IAudioSourceCompo
 
     protected handleAttach(attached: GameObject): void {
         attached.getTransform().getInvalidatables().add(this);
+        Audio.addAudioSource(this);
     }
 
     protected handleDetach(detached: GameObject): void {
         detached.getTransform().getInvalidatables().remove(this);
         this.stop();
+        Audio.removeAudioSource(this);
     }
 
 }

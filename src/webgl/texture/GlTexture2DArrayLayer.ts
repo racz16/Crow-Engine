@@ -25,11 +25,11 @@ export class GlTexture2DArrayLayer implements IGlFboAttachment {
         return this.layer;
     }
 
-    public store(data: HTMLImageElement, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
+    public store(data: TexImageSource, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {
         const glFormat = GlFormatResolver.enumToGl(format);
         this.texture2DArray.bind();
         Gl.gl.pixelStorei(Gl.gl.UNPACK_FLIP_Y_WEBGL, flipYAxis);
-        Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, data.naturalWidth, data.naturalHeight, this.layer, glFormat, Gl.gl.UNSIGNED_BYTE, data);
+        Gl.gl.texSubImage3D(Gl.gl.TEXTURE_2D_ARRAY, mipmapLevel, offset[0], offset[1], 0, data.width, data.height, this.layer, glFormat, Gl.gl.UNSIGNED_BYTE, data);
     }
 
     public storeFromBinary(data: ArrayBufferView, size: ReadonlyVec2, format: GlFormat, flipYAxis = false, mipmapLevel = 0, offset: ReadonlyVec2 = vec2.create()): void {

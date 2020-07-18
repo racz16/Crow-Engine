@@ -12,9 +12,9 @@ export class SkyBoxShader extends Shader {
         const slot = renderableComponent.getMaterial().getSlot(Conventions.MS_SKYBOX);
         const usable = this.isCubeMapUsable(renderableComponent, slot);
         if (usable) {
-            slot.getCubeMapTexture().getNativeTexture().bindToTextureUnit(Conventions.TU_ZERO);
+            this.loadCubeMapTexture(slot.getCubeMapTexture(), Conventions.TU_ZERO);
         } else {
-            Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE).getNativeTexture().bindToTextureUnit(Conventions.TU_ZERO);
+            this.loadCubeMapTexture(Engine.getParameters().get(Engine.BLACK_CUBE_MAP_TEXTURE), Conventions.TU_ZERO);
         }
 
         this.getShaderProgram().loadBoolean('isThereCubeMap', usable);

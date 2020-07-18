@@ -54,8 +54,9 @@ export class ObjLoader {
     }
 
     private refreshRadius(radius: number, position: vec3): number {
-        if (radius < vec3.length(position)) {
-            return vec3.length(position);
+        const newRadius = vec3.length(position);
+        if (radius < newRadius) {
+            return newRadius;
         }
         return radius;
     }

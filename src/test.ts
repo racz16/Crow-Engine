@@ -19,7 +19,6 @@ import { BlinnPhongRenderer } from './rendering/renderer/BlinnPhongRenderer';
 import { ObbBoundingShape } from './component/renderable/boundingshape/ObbBoundingShape';
 import { RotationBuilder } from './utility/RotationBuilder';
 import { Axis } from './utility/Axis';
-import { TextureType } from './resource/texture/enum/TextureType';
 import { CubeMesh } from './resource/mesh/CubeMesh';
 import { SkyboxRenderer } from './rendering/renderer/SkyboxRenderer';
 import { PbrRenderer } from './rendering/renderer/PbrRenderer';
@@ -37,6 +36,10 @@ import { TextureFiltering } from './resource/texture/enum/TextureFiltering';
 import { Conventions } from './resource/Conventions';
 import { RenderableComponent } from './component/renderable/RenderableComponent';
 import { IMesh } from './resource/mesh/IMesh';
+import { Texture2DConfig } from './resource/texture/config/Texture2DConfig';
+import { CubeMapTextureConfig } from './resource/texture/config/CubeMapTextureConfig';
+import { CubeMapTextureConfigElement } from './resource/texture/config/CubeMapTextureConfigElement';
+import { CubeMapTextureSideResolver, CubeMapTextureSide } from './resource/texture/enum/CubeMapTextureSide';
 
 window.onload = async () => {
     const tsb = new TestSceneBuilder();
@@ -45,7 +48,7 @@ window.onload = async () => {
     tsb.setUpScene();
     tsb.createUi();
     tsb.createGround();
-    //tsb.createDamagedHelmet();
+    //await tsb.createDamagedHelmet();
     //tsb.createGoldSphere();
 
     //tsb.createDiffuseBox();
@@ -55,7 +58,7 @@ window.onload = async () => {
     //tsb.createDragon();
     //tsb.createBezierSpline();
 
-    //await tsb.loadGltfSampleModel('DamagedHelmet', 'glTF-Binary', 1, true);
+    await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1, true);
     //await tsb.loadSketchfabModel('toyota_land_cruiser', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.01, 0));
     //await tsb.loadSketchfabModel('akm_47', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 2, 0));
     //await tsb.loadSketchfabModel('gold_pharaoh', 1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.1, 0));
@@ -69,12 +72,12 @@ window.onload = async () => {
         Engine.setMainCamera(camera);
     }*/
 
-    /**/const loader = await GltfLoader.createLoader('res/meshes/room2.glb');
+    /*const loader = await GltfLoader.createLoader('res/meshes/room2.glb');
     const result = loader.loadDefaultScene();
     for (const [camera, _] of result.getCameraComponents()) {
         //Engine.setMainCamera(camera);
         (camera as CameraComponent).setFarPlaneDistance(160);
-    }
+    }*/
 
     //tsb.createAudioSource();
 
@@ -136,21 +139,11 @@ export class TestSceneBuilder {
     }
 
     private async createSkybox(): Promise<void> {
-        const pisa = [
-            'res/textures/pisa/diffuse/diffuse_right_0.hdr',
-            'res/textures/pisa/diffuse/diffuse_left_0.hdr',
-            'res/textures/pisa/diffuse/diffuse_top_0.hdr',
-            'res/textures/pisa/diffuse/diffuse_bottom_0.hdr',
-            'res/textures/pisa/diffuse/diffuse_front_0.hdr',
-            'res/textures/pisa/diffuse/diffuse_back_0.hdr',
-        ];
-        const sides = ['right', 'left', 'top', 'bottom', 'front', 'back'];
-        const paths = Utility.getCubemapSideNames('res/textures/pisa/specular', 'specular', sides, 10, 'hdr');
-
         const renderingPipeline = Engine.getRenderingPipeline();
-        const diffuseIblMap = new CubeMapTexture(pisa);
+        const diffuseIblMap = await this.createIblMap('res/textures/pisa/diffuse', 'diffuse', 1);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_DIFFUSE_IBL_MAP, diffuseIblMap);
-        const specularIblMap = new CubeMapTexture(paths, true, TextureType.IMAGE);
+
+        const specularIblMap = await this.createIblMap('res/textures/pisa/specular', 'specular', 11);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_SPECULAR_IBL_MAP, specularIblMap);
         specularIblMap.getNativeTexture().setWrapU(GlWrap.CLAMP_TO_EDGE);
         specularIblMap.getNativeTexture().setWrapV(GlWrap.CLAMP_TO_EDGE);
@@ -165,6 +158,27 @@ export class TestSceneBuilder {
         const skyRenderable = new MeshComponent(CubeMesh.getInstance(), skyMaterial);
         skyRenderable.setCastShadow(false);
         sky.getComponents().add(skyRenderable);
+    }
+
+    private async createIblMap(basePath: string, namePrefix: string, mipmapCount: number): Promise<CubeMapTexture> {
+        const connections: Array<[string, CubeMapTextureSide]> = [
+            ['right', CubeMapTextureSide.RIGHT],
+            ['left', CubeMapTextureSide.LEFT],
+            ['top', CubeMapTextureSide.UP],
+            ['bottom', CubeMapTextureSide.DOWN],
+            ['front', CubeMapTextureSide.FRONT],
+            ['back', CubeMapTextureSide.BACK]
+        ];
+        const elements = new Array<CubeMapTextureConfigElement>();
+        for (const connection of connections) {
+            const sideSrting = connection[0];
+            const side = connection[1];
+            for (let i = 0; i < mipmapCount; i++) {
+                const element = new CubeMapTextureConfigElement(`${basePath}/${namePrefix}_${sideSrting}_${i}.hdr`, side, false, i);
+                elements.push(element);
+            }
+        }
+        return await CubeMapTexture.createHdrTextureFromConfig(new CubeMapTextureConfig(elements, true, false));
     }
 
     public createUi(): void {
@@ -189,7 +203,7 @@ export class TestSceneBuilder {
 
     public async createDamagedHelmet(): Promise<void> {
         const helmet = new GameObject();
-        helmet.getTransform().setRelativePosition(vec3.fromValues(-15, 1, 0))
+        helmet.getTransform().setRelativePosition(vec3.fromValues(0, 1, 0))
         const material = new Material(PbrRenderer);
 
         const objLoader = await ObjLoader.createLoader('res/meshes/damaged-helmet.obj');
@@ -197,19 +211,19 @@ export class TestSceneBuilder {
         helmet.getComponents().add(mc);
 
         const bcs = new MaterialSlot();
-        bcs.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/albedo.jpg', false, TextureType.DATA));
+        bcs.setTexture2D(await Texture2D.createTexture('res/textures/damaged-helmet/albedo.jpg', false));
         material.setSlot(Conventions.MS_BASE_COLOR, bcs);
 
         const ns = new MaterialSlot();
-        ns.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/normal.jpg', false, TextureType.DATA));
+        ns.setTexture2D(await Texture2D.createTexture('res/textures/damaged-helmet/normal.jpg', false));
         material.setSlot(Conventions.MS_NORMAL, ns);
 
         const es = new MaterialSlot();
-        es.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/emissive.jpg', false, TextureType.DATA));
+        es.setTexture2D(await Texture2D.createTexture('res/textures/damaged-helmet/emissive.jpg', false));
         material.setSlot(Conventions.MS_EMISSIVE, es);
 
         const rms = new MaterialSlot();
-        rms.setTexture2D(await Texture2D.createNonHdr('res/textures/damaged-helmet/metalRoughness.jpg', false, TextureType.DATA));
+        rms.setTexture2D(await Texture2D.createTexture('res/textures/damaged-helmet/metalRoughness.jpg', false));
         material.setSlot(Conventions.MS_ROUGHNESS_METALNESS, rms);
     }
 
@@ -233,11 +247,11 @@ export class TestSceneBuilder {
         const ma = new Material(BlinnPhongRenderer);
 
         const ds = new MaterialSlot();
-        ds.setTexture2D(await Texture2D.createNonHdr('res/textures/diffuse1.png', false, TextureType.IMAGE));
+        ds.setTexture2D(await Texture2D.createTexture('res/textures/diffuse1.png', false));
         ma.setSlot(Conventions.MS_DIFFUSE, ds);
 
         const ss = new MaterialSlot();
-        ss.setTexture2D(await Texture2D.createNonHdr('res/textures/specular1.png', false, TextureType.DATA));
+        ss.setTexture2D(await Texture2D.createTexture('res/textures/specular1.png', false));
         ma.setSlot(Conventions.MS_SPECULAR, ss);
 
         const mc = new MeshComponent(this.box, ma);
@@ -251,7 +265,7 @@ export class TestSceneBuilder {
         const ma = new Material(BlinnPhongRenderer);
 
         const ns = new MaterialSlot();
-        ns.setTexture2D(await Texture2D.createNonHdr('res/textures/7259d9158be0b7e8c62c887fac57ed81.png', false, TextureType.DATA));
+        ns.setTexture2D(await Texture2D.createTexture('res/textures/7259d9158be0b7e8c62c887fac57ed81.png', false));
         ma.setSlot(Conventions.MS_NORMAL, ns);
 
         const mc = new MeshComponent(this.box, ma);
@@ -265,7 +279,7 @@ export class TestSceneBuilder {
         const ma = new Material(BlinnPhongRenderer);
 
         const ns = new MaterialSlot();
-        ns.setTexture2D(await Texture2D.createNonHdr('res/textures/normal6.png', true, TextureType.DATA));
+        ns.setTexture2D(await Texture2D.createTexture('res/textures/normal6.png', true));
         ma.setSlot(Conventions.MS_NORMAL, ns);
         ns.getParameters().set(Conventions.MSP_USE_POM, true);
 
