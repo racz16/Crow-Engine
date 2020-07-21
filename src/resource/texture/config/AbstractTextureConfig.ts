@@ -1,4 +1,4 @@
-import { TextureConfigElement } from "./TextureConfigElement";
+import { TextureConfigElement } from './TextureConfigElement';
 
 export abstract class AbstractTextureConfig<T extends TextureConfigElement> {
 

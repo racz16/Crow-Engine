@@ -1,6 +1,6 @@
-import { LogLevel } from "./LogLevel";
-import { ReadonlyMat3, ReadonlyMat4, ReadonlyVec4, ReadonlyVec3 } from "gl-matrix";
-import { ILogHandler } from "./ILogHandler";
+import { LogLevel } from './LogLevel';
+import { ReadonlyMat3, ReadonlyMat4, ReadonlyVec4, ReadonlyVec3 } from 'gl-matrix';
+import { ILogHandler } from './ILogHandler';
 
 export interface ILog {
 

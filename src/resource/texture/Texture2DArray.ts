@@ -1,12 +1,12 @@
-import { ITexture2DArray } from "./ITexture2DArray";
-import { GlTexture2DArray } from "../../webgl/texture/GlTexture2DArray";
-import { AbstractTexture } from "./AbstractTexture";
-import { Texture2DArrayConfig } from "./config/Texture2DArrayConfig";
-import { GlSampler } from "../../webgl/GlSampler";
-import { HdrImageResult } from "parse-hdr";
-import { vec2 } from "gl-matrix";
-import { GlInternalFormat } from "../../webgl/enum/GlInternalFormat";
-import { GlFormat } from "../../webgl/enum/GlFormat";
+import { ITexture2DArray } from './ITexture2DArray';
+import { GlTexture2DArray } from '../../webgl/texture/GlTexture2DArray';
+import { AbstractTexture } from './AbstractTexture';
+import { Texture2DArrayConfig } from './config/Texture2DArrayConfig';
+import { GlSampler } from '../../webgl/GlSampler';
+import { HdrImageResult } from 'parse-hdr';
+import { vec2 } from 'gl-matrix';
+import { GlInternalFormat } from '../../webgl/enum/GlInternalFormat';
+import { GlFormat } from '../../webgl/enum/GlFormat';
 
 export class Texture2DArray extends AbstractTexture<GlTexture2DArray> implements ITexture2DArray {
 

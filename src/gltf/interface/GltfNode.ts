@@ -1,8 +1,8 @@
-import { mat4, quat, vec3 } from "gl-matrix"
-import { GltfElement } from "./GltfElement";
-import { GltfNodeExtensions } from "./GltfExtensions";
+import { mat4, quat, vec3 } from 'gl-matrix'
+import { GltfElement } from './GltfElement';
+import { GltfNodeExtensions } from './GltfExtensions';
 
-export interface GltfNode extends GltfElement{
+export interface GltfNode extends GltfElement {
     camera?: number;
     children?: Array<number>;
     skin?: number;

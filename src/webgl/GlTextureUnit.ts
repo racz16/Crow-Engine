@@ -1,4 +1,4 @@
-import { Gl } from "./Gl";
+import { Gl } from './Gl';
 
 export class GlTextureUnit {
 

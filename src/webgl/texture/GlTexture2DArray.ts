@@ -1,9 +1,9 @@
-import { Gl } from "../Gl";
-import { GlTexture } from "./GlTexture";
-import { ReadonlyVec2 } from "gl-matrix";
-import { GlInternalFormat } from "../enum/GlInternalFormat";
-import { GlTexture2DArrayLayer } from "./GlTexture2DArrayLayer";
-import { ITexture2DArray } from "../../resource/texture/ITexture2DArray";
+import { Gl } from '../Gl';
+import { GlTexture } from './GlTexture';
+import { ReadonlyVec2 } from 'gl-matrix';
+import { GlInternalFormat } from '../enum/GlInternalFormat';
+import { GlTexture2DArrayLayer } from './GlTexture2DArrayLayer';
+import { ITexture2DArray } from '../../resource/texture/ITexture2DArray';
 
 export class GlTexture2DArray extends GlTexture implements ITexture2DArray {
 

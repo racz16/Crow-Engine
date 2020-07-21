@@ -1,5 +1,5 @@
-import { GltfElement } from "./GltfElement";
-import { GltfTargetPath } from "../enum/GltfTargetPath";
+import { GltfElement } from './GltfElement';
+import { GltfTargetPath } from '../enum/GltfTargetPath';
 
 export interface GltfTarget extends GltfElement {
     node?: number;

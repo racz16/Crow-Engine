@@ -1,5 +1,5 @@
-import { GltfElement } from "./GltfElement";
-import { GltfBufferViewTarget } from "../enum/GltfBufferViewTarget";
+import { GltfElement } from './GltfElement';
+import { GltfBufferViewTarget } from '../enum/GltfBufferViewTarget';
 
 export interface GltfBufferView extends GltfElement {
     buffer: number;

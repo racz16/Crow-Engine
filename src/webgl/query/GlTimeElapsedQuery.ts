@@ -1,7 +1,7 @@
 
-import { GlScopedQuery } from "./GlScopedQuery";
-import { GlConstants } from "../GlConstants";
-import { Gl } from "../Gl";
+import { GlScopedQuery } from './GlScopedQuery';
+import { GlConstants } from '../GlConstants';
+import { Gl } from '../Gl';
 
 export class GlTimeElapsedQuery extends GlScopedQuery {
 

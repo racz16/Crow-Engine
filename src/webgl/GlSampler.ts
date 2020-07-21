@@ -1,10 +1,10 @@
-import { GlObject } from "./GlObject";
-import { Gl } from "./Gl";
-import { GlConstants } from "./GlConstants";
-import { GlWrap, GlWrapResolver } from "./enum/GlWrap";
-import { GlMagnificationFilter as GlMagnificationFilter, GlMagnificationFilterResolver } from "./enum/GlMagnificationFIlter";
-import { GlMinificationFilter, GlMinificationFilterResolver } from "./enum/GlMinificationFilter";
-import { GlTextureUnit } from "./GlTextureUnit";
+import { GlObject } from './GlObject';
+import { Gl } from './Gl';
+import { GlConstants } from './GlConstants';
+import { GlWrap, GlWrapResolver } from './enum/GlWrap';
+import { GlMagnificationFilter as GlMagnificationFilter, GlMagnificationFilterResolver } from './enum/GlMagnificationFIlter';
+import { GlMinificationFilter, GlMinificationFilterResolver } from './enum/GlMinificationFilter';
+import { GlTextureUnit } from './GlTextureUnit';
 
 export class GlSampler extends GlObject {
 

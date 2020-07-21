@@ -1,12 +1,12 @@
-import { IMesh } from "./IMesh";
-import { GlVao } from "../../webgl/GlVao";
-import { Utility } from "../../utility/Utility";
-import { Conventions } from "../Conventions";
-import { vec3, ReadonlyVec3 } from "gl-matrix";
-import { Gl } from "../../webgl/Gl";
-import { RenderingMode, RenderingModeResolver } from "../RenderingMode";
-import { IndicesType, IndicesTypeResolver } from "../IndicesType";
-import { Engine } from "../../core/Engine";
+import { IMesh } from './IMesh';
+import { GlVao } from '../../webgl/GlVao';
+import { Utility } from '../../utility/Utility';
+import { Conventions } from '../Conventions';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
+import { Gl } from '../../webgl/Gl';
+import { RenderingMode, RenderingModeResolver } from '../RenderingMode';
+import { IndicesType, IndicesTypeResolver } from '../IndicesType';
+import { Engine } from '../../core/Engine';
 
 export class StaticMesh implements IMesh {
 

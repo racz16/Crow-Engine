@@ -1,4 +1,4 @@
-import { GltfLight } from "./GltfLight";
+import { GltfLight } from './GltfLight';
 
 export interface GltfFileExtensions {
     KHR_lights_punctual?: { lights?: Array<GltfLight> };

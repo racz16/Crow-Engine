@@ -1,5 +1,5 @@
-import { AbstractTextureConfig } from "./AbstractTextureConfig";
-import { Texture2DArrayConfigElement } from "./Texture2DArrayConfigElement";
+import { AbstractTextureConfig } from './AbstractTextureConfig';
+import { Texture2DArrayConfigElement } from './Texture2DArrayConfigElement';
 
 export class Texture2DArrayConfig extends AbstractTextureConfig<Texture2DArrayConfigElement> {
 

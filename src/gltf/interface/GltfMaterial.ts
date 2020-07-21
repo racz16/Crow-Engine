@@ -1,10 +1,10 @@
-import { vec3 } from "gl-matrix";
-import { GltfElement } from "./GltfElement";
-import { GltfPbrMetallicRoughness } from "./GltfPbrMetallicRoughness";
-import { GltfAlphaMode } from "../enum/GltfAlphaMode";
-import { GltfNormalTextureInfo } from "./GltfNormalTextureInfo";
-import { GltfOcclusionTextureInfo } from "./GltfOcclusionTextureInfo";
-import { GltfTextureInfo } from "./GltfTextureInfo";
+import { vec3 } from 'gl-matrix';
+import { GltfElement } from './GltfElement';
+import { GltfPbrMetallicRoughness } from './GltfPbrMetallicRoughness';
+import { GltfAlphaMode } from '../enum/GltfAlphaMode';
+import { GltfNormalTextureInfo } from './GltfNormalTextureInfo';
+import { GltfOcclusionTextureInfo } from './GltfOcclusionTextureInfo';
+import { GltfTextureInfo } from './GltfTextureInfo';
 
 export interface GltfMaterial extends GltfElement {
     name?: string;

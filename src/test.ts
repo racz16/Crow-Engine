@@ -361,7 +361,7 @@ export class TestSceneBuilder {
     }
 
     public async loadGltfSampleModel(name: string, type: 'glTF' | 'glTF-Embedded' | 'glTF-Binary', scaleFactor: number, setMainCamera: boolean): Promise<void> {
-        const extension = type === "glTF-Binary" ? 'glb' : 'gltf';
+        const extension = type === 'glTF-Binary' ? 'glb' : 'gltf';
         const loader = await GltfLoader.createLoader(`res/meshes/gltf-samples/${name}/${type}/${name}.${extension}`);
         const result = loader.loadDefaultScene();
         if (setMainCamera) {

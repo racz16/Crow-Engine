@@ -1,5 +1,5 @@
-import { IRenderableComponent } from "../component/renderable/IRenderableComponent";
-import { IRenderable } from "../resource/IRenderable";
+import { IRenderableComponent } from '../component/renderable/IRenderableComponent';
+import { IRenderable } from '../resource/IRenderable';
 
 export interface IRenderableContainer {
 

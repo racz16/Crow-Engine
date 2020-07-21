@@ -1,6 +1,6 @@
-import { vec3 } from "gl-matrix"
-import { GltfLightType } from "../enum/GltfLightType";
-import { GltfSpotLightParameters } from "./GltfSpotLightParameters";
+import { vec3 } from 'gl-matrix'
+import { GltfLightType } from '../enum/GltfLightType';
+import { GltfSpotLightParameters } from './GltfSpotLightParameters';
 
 export interface GltfLight {
     name?: string;

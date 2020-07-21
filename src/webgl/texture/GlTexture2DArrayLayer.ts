@@ -1,11 +1,11 @@
-import { IGlFboAttachment } from "../fbo/IGlFboAttachment";
-import { vec2, ReadonlyVec2 } from "gl-matrix";
-import { GlInternalFormat } from "../enum/GlInternalFormat";
-import { GlTexture2DArray } from "./GlTexture2DArray";
-import { GlWrap } from "../enum/GlWrap";
-import { GlFormat, GlFormatResolver } from "../enum/GlFormat";
-import { Gl } from "../Gl";
-import { Utility } from "../../utility/Utility";
+import { IGlFboAttachment } from '../fbo/IGlFboAttachment';
+import { vec2, ReadonlyVec2 } from 'gl-matrix';
+import { GlInternalFormat } from '../enum/GlInternalFormat';
+import { GlTexture2DArray } from './GlTexture2DArray';
+import { GlWrap } from '../enum/GlWrap';
+import { GlFormat, GlFormatResolver } from '../enum/GlFormat';
+import { Gl } from '../Gl';
+import { Utility } from '../../utility/Utility';
 
 export class GlTexture2DArrayLayer implements IGlFboAttachment {
 

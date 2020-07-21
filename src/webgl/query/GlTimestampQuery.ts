@@ -1,6 +1,6 @@
-import { GlQuery } from "./GlQuery";
-import { GlConstants } from "../GlConstants";
-import { Gl } from "../Gl";
+import { GlQuery } from './GlQuery';
+import { GlConstants } from '../GlConstants';
+import { Gl } from '../Gl';
 
 export class GlTimestampQuery extends GlQuery {
 

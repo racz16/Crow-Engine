@@ -1,5 +1,5 @@
-import { TextureConfigElement } from "./TextureConfigElement";
-import { CubeMapTextureSide } from "../enum/CubeMapTextureSide";
+import { TextureConfigElement } from './TextureConfigElement';
+import { CubeMapTextureSide } from '../enum/CubeMapTextureSide';
 
 export class CubeMapTextureConfigElement extends TextureConfigElement {
 

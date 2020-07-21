@@ -1,5 +1,5 @@
-import { GlQuery } from "./GlQuery";
-import { Gl } from "../Gl";
+import { GlQuery } from './GlQuery';
+import { Gl } from '../Gl';
 
 export abstract class GlScopedQuery extends GlQuery {
 

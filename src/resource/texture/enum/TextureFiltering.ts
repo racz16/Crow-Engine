@@ -1,5 +1,5 @@
-import { GlMagnificationFilter } from "../../../webgl/enum/GlMagnificationFIlter";
-import { GlMinificationFilter } from "../../../webgl/enum/GlMinificationFilter";
+import { GlMagnificationFilter } from '../../../webgl/enum/GlMagnificationFIlter';
+import { GlMinificationFilter } from '../../../webgl/enum/GlMinificationFilter';
 
 export enum TextureFiltering {
     None,

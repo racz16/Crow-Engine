@@ -1,18 +1,18 @@
-import { GltfAccessorType } from "./enum/GltfAccessorType";
-import { GltfAccessorComponentType } from "./enum/GltfAccessorComponentType";
-import { GlVertexAttribPointerType } from "../webgl/enum/GlVertexAttribPointerType";
-import { GltfPrimitiveMode } from "./enum/GltfPrimitiveMode";
-import { RenderingMode } from "../resource/RenderingMode";
-import { IndicesType } from "../resource/IndicesType";
-import { vec3, ReadonlyVec3 } from "gl-matrix";
-import { GltfMinificationFilter } from "./enum/GltfMinificationFIlter";
-import { GlMinificationFilter } from "../webgl/enum/GlMinificationFilter";
-import { GltfMagnificationFilter } from "./enum/GltfMagnificationFilter";
-import { GlMagnificationFilter } from "../webgl/enum/GlMagnificationFIlter";
-import { GltfWrap } from "./enum/GltfWrap";
-import { GlWrap } from "../webgl/enum/GlWrap";
-import { GltfAlphaMode } from "./enum/GltfAlphaMode";
-import { AlphaMode } from "../material/AlphaMode";
+import { GltfAccessorType } from './enum/GltfAccessorType';
+import { GltfAccessorComponentType } from './enum/GltfAccessorComponentType';
+import { GlVertexAttribPointerType } from '../webgl/enum/GlVertexAttribPointerType';
+import { GltfPrimitiveMode } from './enum/GltfPrimitiveMode';
+import { RenderingMode } from '../resource/RenderingMode';
+import { IndicesType } from '../resource/IndicesType';
+import { vec3, ReadonlyVec3 } from 'gl-matrix';
+import { GltfMinificationFilter } from './enum/GltfMinificationFIlter';
+import { GlMinificationFilter } from '../webgl/enum/GlMinificationFilter';
+import { GltfMagnificationFilter } from './enum/GltfMagnificationFilter';
+import { GlMagnificationFilter } from '../webgl/enum/GlMagnificationFIlter';
+import { GltfWrap } from './enum/GltfWrap';
+import { GlWrap } from '../webgl/enum/GlWrap';
+import { GltfAlphaMode } from './enum/GltfAlphaMode';
+import { AlphaMode } from '../material/AlphaMode';
 
 export class GltfResolver {
 

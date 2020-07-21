@@ -1,5 +1,5 @@
-import { GltfTextureInfo } from "./GltfTextureInfo";
+import { GltfTextureInfo } from './GltfTextureInfo';
 
 export interface GltfOcclusionTextureInfo extends GltfTextureInfo {
-    strength?: number;	
+    strength?: number;
 }

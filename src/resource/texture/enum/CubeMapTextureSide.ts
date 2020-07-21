@@ -1,4 +1,4 @@
-import { GlCubeMapSide } from "../../../webgl/enum/GlCubeMapSide";
+import { GlCubeMapSide } from '../../../webgl/enum/GlCubeMapSide';
 
 export enum CubeMapTextureSide {
     RIGHT,

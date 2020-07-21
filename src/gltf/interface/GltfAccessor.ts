@@ -1,7 +1,7 @@
-import { GltfElement } from "./GltfElement";
-import { GltfAccessorComponentType } from "../enum/GltfAccessorComponentType";
-import { GltfAccessorType } from "../enum/GltfAccessorType";
-import { GltfSparse } from "./GltfSparse";
+import { GltfElement } from './GltfElement';
+import { GltfAccessorComponentType } from '../enum/GltfAccessorComponentType';
+import { GltfAccessorType } from '../enum/GltfAccessorType';
+import { GltfSparse } from './GltfSparse';
 
 export interface GltfAccessor extends GltfElement {
     bufferView?: number;

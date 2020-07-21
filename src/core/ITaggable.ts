@@ -1,4 +1,4 @@
-import { TagContainer } from "./TagContainer";
+import { TagContainer } from './TagContainer';
 
 export interface ITaggable {
 

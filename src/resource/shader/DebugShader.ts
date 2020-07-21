@@ -16,8 +16,8 @@ export class DebugShader extends Shader {
     }
 
     public setUniforms(data: { transformation: ReadonlyMat4, layer: number }): void {
-        this.getShaderProgram().loadMatrix4("transformation", data.transformation);
-        this.getShaderProgram().loadInt("layer", data.layer);
+        this.getShaderProgram().loadMatrix4('transformation', data.transformation);
+        this.getShaderProgram().loadInt('layer', data.layer);
     }
 
 }

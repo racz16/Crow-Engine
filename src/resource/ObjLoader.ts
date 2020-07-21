@@ -1,14 +1,14 @@
-import { Mesh } from "../../node_modules/webgl-obj-loader/src/index";
-import { vec3 } from "gl-matrix";
-import { GlVao } from "../webgl/GlVao";
-import { Conventions } from "./Conventions";
-import { GlEbo } from "../webgl/buffer/GlEbo";
-import { GlBufferObjectUsage } from "../webgl/enum/GlBufferObjectUsage";
-import { GlVbo } from "../webgl/buffer/GlVbo";
-import { GlVertexAttribPointer } from "../webgl/GlVertexAttribPointer";
-import { StaticMesh } from "./mesh/StaticMesh";
-import { RenderingMode } from "./RenderingMode";
-import { IndicesType } from "./IndicesType";
+import { Mesh } from '../../node_modules/webgl-obj-loader/src/index';
+import { vec3 } from 'gl-matrix';
+import { GlVao } from '../webgl/GlVao';
+import { Conventions } from './Conventions';
+import { GlEbo } from '../webgl/buffer/GlEbo';
+import { GlBufferObjectUsage } from '../webgl/enum/GlBufferObjectUsage';
+import { GlVbo } from '../webgl/buffer/GlVbo';
+import { GlVertexAttribPointer } from '../webgl/GlVertexAttribPointer';
+import { StaticMesh } from './mesh/StaticMesh';
+import { RenderingMode } from './RenderingMode';
+import { IndicesType } from './IndicesType';
 
 export class ObjLoader {
 

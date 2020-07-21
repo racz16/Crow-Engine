@@ -1,11 +1,11 @@
-import { GlTexture } from "../../webgl/texture/GlTexture";
-import { GlSampler } from "../../webgl/GlSampler";
-import { TextureFiltering, TextureFilteringResolver } from "./enum/TextureFiltering";
-import { TextureWrap, TextureWrapResolver } from "./enum/TextureWrap";
-import { ReadonlyVec2 } from "gl-matrix";
-import { Utility } from "../../utility/Utility";
-import { TextureConfigElement } from "./config/TextureConfigElement";
-import { HdrImageResult } from "parse-hdr";
+import { GlTexture } from '../../webgl/texture/GlTexture';
+import { GlSampler } from '../../webgl/GlSampler';
+import { TextureFiltering, TextureFilteringResolver } from './enum/TextureFiltering';
+import { TextureWrap, TextureWrapResolver } from './enum/TextureWrap';
+import { ReadonlyVec2 } from 'gl-matrix';
+import { Utility } from '../../utility/Utility';
+import { TextureConfigElement } from './config/TextureConfigElement';
+import { HdrImageResult } from 'parse-hdr';
 
 export abstract class AbstractTexture<T extends GlTexture> {
 

@@ -1,4 +1,4 @@
-import { Gl } from "../webgl/Gl";
+import { Gl } from '../webgl/Gl';
 
 export enum RenderingMode {
     POINTS,

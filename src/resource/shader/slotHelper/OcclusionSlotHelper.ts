@@ -1,8 +1,8 @@
-import { ShaderSlotHelper } from "./ShaderSlotHelper";
-import { ParameterKey } from "../../../utility/parameter/ParameterKey";
-import { MaterialSlot } from "../../../material/MaterialSlot";
-import { Material } from "../../../material/Material";
-import { Conventions } from "../../Conventions";
+import { ShaderSlotHelper } from './ShaderSlotHelper';
+import { ParameterKey } from '../../../utility/parameter/ParameterKey';
+import { MaterialSlot } from '../../../material/MaterialSlot';
+import { Material } from '../../../material/Material';
+import { Conventions } from '../../Conventions';
 
 export class OcclusionSlotHelper extends ShaderSlotHelper {
 

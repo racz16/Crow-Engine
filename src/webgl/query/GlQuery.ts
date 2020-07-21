@@ -1,5 +1,5 @@
-import { GlObject } from "../GlObject";
-import { Gl } from "../Gl";
+import { GlObject } from '../GlObject';
+import { Gl } from '../Gl';
 
 export abstract class GlQuery extends GlObject {
 

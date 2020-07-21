@@ -16,7 +16,7 @@ export class TexturedQuadShader extends Shader {
     }
 
     public setUniforms(data: ReadonlyMat4): void {
-        this.getShaderProgram().loadMatrix4("transformation", data);
+        this.getShaderProgram().loadMatrix4('transformation', data);
     }
 
 }

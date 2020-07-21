@@ -1,4 +1,4 @@
-import { ITimeManager } from "./ITimeManager";
+import { ITimeManager } from './ITimeManager';
 
 export class TimeManager implements ITimeManager {
 

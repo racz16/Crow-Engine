@@ -1,5 +1,5 @@
-import { GlScopedQuery } from "./GlScopedQuery";
-import { Gl } from "../Gl";
+import { GlScopedQuery } from './GlScopedQuery';
+import { Gl } from '../Gl';
 
 export class GlAnySamplesPassedConservativeQuery extends GlScopedQuery {
 

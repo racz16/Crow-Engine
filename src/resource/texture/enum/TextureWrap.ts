@@ -1,4 +1,4 @@
-import { GlWrap } from "../../../webgl/enum/GlWrap";
+import { GlWrap } from '../../../webgl/enum/GlWrap';
 
 export enum TextureWrap {
     REPEAT,

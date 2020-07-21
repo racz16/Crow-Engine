@@ -1,4 +1,4 @@
-import { GltfElement } from "./GltfElement";
+import { GltfElement } from './GltfElement';
 
 export interface GltfPerspectiveCamera extends GltfElement {
     aspectRatio?: number;
