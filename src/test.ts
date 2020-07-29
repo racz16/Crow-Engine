@@ -131,7 +131,7 @@ export class TestSceneBuilder {
         PbrLightsStruct.getInstance().setShadowLightSource(pbrdlc);
 
         const rotation = RotationBuilder
-            .createRotation(Axis.X, -30)
+            .createRotation(Axis.X, -20)
             .thenRotate(Axis.Y, 45)
             //.thenRotate(Axis.Z, -45)
             .getQuaternion();

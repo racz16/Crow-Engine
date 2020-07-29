@@ -23,6 +23,7 @@ export class Conventions {
 
     //texture units
     public static readonly TU_ZERO = new GlTextureUnit(0);
+    public static readonly TU_ONE = new GlTextureUnit(1);
 
     public static readonly TU_BASE_COLOR = new GlTextureUnit(1);
     public static readonly TU_NORMAL_POM = new GlTextureUnit(2);

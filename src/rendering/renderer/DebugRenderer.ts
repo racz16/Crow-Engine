@@ -42,7 +42,17 @@ export class DebugRenderer extends Renderer {
 
     protected beforeDraw(): void {
         const image = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DEBUG);
-        this.getShader().loadTexture2DArray(image, Conventions.TU_ZERO);
+        if (image) {
+            this.getShader().loadTexture2DArray(image, Conventions.TU_ZERO);
+        } else {
+            this.getShader().loadTexture2DArray(Engine.getParameters().get(Engine.BLACK_TEXTURE_2D_ARRAY), Conventions.TU_ZERO);
+        }
+        const image2 = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DEBUG_2);
+        if (image2) {
+            this.getShader().loadTexture2D(image2, Conventions.TU_ONE);
+        } else {
+            this.getShader().loadTexture2D(Engine.getParameters().get(Engine.BLACK_TEXTURE_2D), Conventions.TU_ONE);
+        }
     }
 
     protected draw(): void {

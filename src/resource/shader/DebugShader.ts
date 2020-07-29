@@ -13,6 +13,7 @@ export class DebugShader extends Shader {
 
     public connectTextureUnits(): void {
         this.getShaderProgram().connectTextureUnit('image', Conventions.TU_ZERO);
+        this.getShaderProgram().connectTextureUnit('image2', Conventions.TU_ONE);
     }
 
     public setUniforms(data: { transformation: ReadonlyMat4, layer: number }): void {

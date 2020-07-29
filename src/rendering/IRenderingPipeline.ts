@@ -4,6 +4,7 @@ import { PostProcessRenderer } from './PostProcessRenderer';
 import { ParameterContainer } from '../utility/parameter/ParameterContainer';
 import { ReadonlyVec2 } from 'gl-matrix';
 import { IRenderableContainer } from '../core/IRenderableContainer';
+import { GlFbo } from '../webgl/fbo/GlFbo';
 
 export interface IRenderingPipeline {
 
@@ -26,6 +27,8 @@ export interface IRenderingPipeline {
     getRenderedElementCount(): number;
 
     bindFbo(): void;
+
+    getFbo(): GlFbo;
 
     render(): void;
 

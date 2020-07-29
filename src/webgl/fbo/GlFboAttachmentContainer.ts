@@ -77,7 +77,7 @@ export class GlFboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.TEXTURE_2D, texture.getId(), 0);
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode() + this.index, Gl.gl.TEXTURE_2D, texture.getId(), 0);
     }
 
     public attachTexture2DArrayLayer(texture: GlTexture2DArrayLayer): void {
@@ -86,7 +86,7 @@ export class GlFboAttachmentContainer {
         this.textureArrayLayer = texture;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), texture.getTexture2DArray().getId(), 0, texture.getLayer());
+        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode() + this.index, texture.getTexture2DArray().getId(), 0, texture.getLayer());
     }
 
     public attachCubeMapTextureSide(texture: GlCubeMapTextureSide): void {
@@ -95,7 +95,7 @@ export class GlFboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = texture;
         this.fbo.bind();
-        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), texture.getCubeMapTexture().getId(), 0, GlCubeMapSideResolver.enumToGl(texture.getSide()));
+        Gl.gl.framebufferTextureLayer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode() + this.index, texture.getCubeMapTexture().getId(), 0, GlCubeMapSideResolver.enumToGl(texture.getSide()));
     }
 
     public attachRbo(rbo: GlRbo): void {
@@ -104,7 +104,7 @@ export class GlFboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferRenderbuffer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.RENDERBUFFER, rbo.getId())
+        Gl.gl.framebufferRenderbuffer(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode() + this.index, Gl.gl.RENDERBUFFER, rbo.getId())
     }
 
     public detachAttachment(): void {
@@ -113,7 +113,7 @@ export class GlFboAttachmentContainer {
         this.textureArrayLayer = null;
         this.cubeMapSideTexture = null;
         this.fbo.bind();
-        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode(), Gl.gl.TEXTURE_2D, null, 0);
+        Gl.gl.framebufferTexture2D(Gl.gl.FRAMEBUFFER, GlAttachmentSlotResolver.enumToGl(this.slot).getAttachmentPointCode() + this.index, Gl.gl.TEXTURE_2D, null, 0);
     }
 
     //contains

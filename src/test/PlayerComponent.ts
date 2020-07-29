@@ -3,6 +3,7 @@ import { vec3 } from 'gl-matrix';
 import { Engine } from '../core/Engine';
 import { RotationBuilder } from '../utility/RotationBuilder';
 import { Axis } from '../utility/Axis';
+import { PbrLightsStruct } from '../component/light/pbr/PbrLightsStruct';
 
 export class PlayerComponent extends Component {
 
@@ -63,6 +64,17 @@ export class PlayerComponent extends Component {
             const rotation = RotationBuilder.createRotation(Axis.Y_NEGATE, rotateSpeed * deltaTime).getQuaternion();
             this.getGameObject().getTransform().rotate(rotation);
         }
+
+        const lightTransform = PbrLightsStruct.getInstance().getShadowLightSource().getGameObject().getTransform();
+        if (this.includes('ArrowUp')) {
+            const rotation = RotationBuilder.createRotation(Axis.X_NEGATE, rotateSpeed * 0.5 * deltaTime).getQuaternion();
+            lightTransform.rotate(rotation);
+        }
+        if (this.includes('ArrowDown')) {
+            const rotation = RotationBuilder.createRotation(Axis.X, rotateSpeed * 0.5 * deltaTime).getQuaternion();
+            lightTransform.rotate(rotation);
+        }
+
     }
 
 }

@@ -11,6 +11,7 @@ import { IRenderableComponent } from '../../component/renderable/IRenderableComp
 import { IRenderable } from '../../resource/IRenderable';
 import { GlConstants } from '../../webgl/GlConstants';
 import { GlTimeElapsedQuery } from '../../webgl/query/GlTimeElapsedQuery';
+import { GlFboAttachmentSlot } from '../../webgl/enum/GlFboAttachmentSlot';
 
 export class PbrRenderer extends GeometryRenderer {
 
@@ -56,6 +57,15 @@ export class PbrRenderer extends GeometryRenderer {
         for (let i = 0; i < splits.length; i++) {
             this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);
         }
+
+        const fbo = Engine.getRenderingPipeline().getFbo();
+        fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0), fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1));
+    }
+
+    protected afterRendering(): void {
+        super.afterRendering();
+        const fbo = Engine.getRenderingPipeline().getFbo();
+        fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
     }
 
     protected setAlphaMode(renderableComponent: IRenderableComponent<IRenderable>, alphaMode: AlphaMode): void {
