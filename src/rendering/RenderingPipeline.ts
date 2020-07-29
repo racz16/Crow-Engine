@@ -35,6 +35,7 @@ import { GlMagnificationFilter } from '../webgl/enum/GlMagnificationFIlter';
 import { GlConstants } from '../webgl/GlConstants';
 import { AtmosphericScatteringRenderer } from './renderer/AtmosphericScatteringRenderer';
 import { GodrayRenderer } from './renderer/GodrayRenderer';
+import { AcesToneMappingRenderer } from './renderer/AcesToneMappingRenderer';
 
 export class RenderingPipeline implements IRenderingPipeline {
 
@@ -71,6 +72,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.geometryRenderers.addToTheEnd(new PbrRenderer());
         this.postProcessRenderers.addToTheEnd(new GodrayRenderer());
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
+        //this.postProcessRenderers.addToTheEnd(new AcesToneMappingRenderer());
         this.postProcessRenderers.addToTheEnd(new GammaCorrectionRenderer());
         this.screenRenderer = new ScreenRenderer();
         this.refresh();
