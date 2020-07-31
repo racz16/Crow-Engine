@@ -30,5 +30,5 @@ void main() {
         illuminationDecay *= decay;
     }
     vec3 color0 = texture(image, io_textureCoordinates).rgb;
-    o_color = vec4(color0 + color *1.0, 1.0);
+    o_color = vec4(color0 + color, 1.0);
 }

@@ -59,7 +59,11 @@ export class PbrRenderer extends GeometryRenderer {
         }
 
         const fbo = Engine.getRenderingPipeline().getFbo();
-        fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0), fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1));
+        fbo.setDrawBuffers(
+            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
+            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
+            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
+        );
     }
 
     protected afterRendering(): void {

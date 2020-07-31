@@ -114,6 +114,7 @@ layout(std140) uniform Lights {             //binding point: 2
 
 layout(location = 0) out vec4 o_color;
 layout(location = 1) out vec4 o_godray_occlusion;
+layout(location = 2) out vec4 o_emission;
 
 vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow);
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V);
@@ -165,6 +166,7 @@ void main(){
     result += materialInfo.emissiveColor;
     o_color = vec4(result, materialInfo.alpha);
     o_godray_occlusion = vec4(0);
+    o_emission = vec4(materialInfo.emissiveColor, 1.0);
 
     /*shadow cascade debug
     float depth = gl_FragCoord.z / gl_FragCoord.w;

@@ -6,7 +6,7 @@ import { ITexture2D } from '../resource/texture/ITexture2D';
 import { GlTexture2D } from '../webgl/texture/GlTexture2D';
 import { GlFbo } from '../webgl/fbo/GlFbo';
 import { GlFboAttachmentSlot } from '../webgl/enum/GlFboAttachmentSlot';
-import { vec2, mat4, ReadonlyVec2, quat, vec3, } from 'gl-matrix';
+import { vec2, mat4, ReadonlyVec2, quat, vec3, vec4, } from 'gl-matrix';
 import { SkyboxRenderer } from './renderer/SkyboxRenderer';
 import { BlinnPhongRenderer } from './renderer/BlinnPhongRenderer';
 import { ScreenRenderer } from './renderer/ScreenRenderer';
@@ -36,6 +36,8 @@ import { GlConstants } from '../webgl/GlConstants';
 import { AtmosphericScatteringRenderer } from './renderer/AtmosphericScatteringRenderer';
 import { GodrayRenderer } from './renderer/GodrayRenderer';
 import { AcesToneMappingRenderer } from './renderer/AcesToneMappingRenderer';
+import { GlTexture2DArray } from '../webgl/texture/GlTexture2DArray';
+import { BloomRenderer } from './renderer/BloomRenderer';
 
 export class RenderingPipeline implements IRenderingPipeline {
 
@@ -48,6 +50,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     public static readonly DEBUG = new ParameterKey<ITexture2DArray>('DEBUG');
     public static readonly DEBUG_2 = new ParameterKey<ITexture2D>('DEBUG_2');
     public static readonly GODRAY_OCCLUSION = new ParameterKey<ITexture2D>('GODRAY_OCCLUSION');
+    public static readonly EMISSION = new ParameterKey<ITexture2DArray>('EMISSION');
 
     private parameters = new ParameterContainer();
     private fbo: GlFbo;
@@ -70,6 +73,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.geometryRenderers.addToTheEnd(new AtmosphericScatteringRenderer());
         this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
         this.geometryRenderers.addToTheEnd(new PbrRenderer());
+        this.postProcessRenderers.addToTheEnd(new BloomRenderer());
         this.postProcessRenderers.addToTheEnd(new GodrayRenderer());
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
         //this.postProcessRenderers.addToTheEnd(new AcesToneMappingRenderer());
@@ -164,7 +168,8 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.fboTextures[0] = this.createFboTexture();
         this.fboTextures[1] = this.createFboTexture();
         this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
-        this.addGodrayOcclusionTexture();
+        this.createGodrayOcclusionTexture();
+        this.createEmissionTexture();
         this.addDepthAttachmentToTheFbo();
     }
 
@@ -178,7 +183,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         return colorTexture;
     }
 
-    private addGodrayOcclusionTexture(): void {
+    private createGodrayOcclusionTexture(): void {
         const texture = new GlTexture2D();
         texture.allocate(GlInternalFormat.RGB8, this.getRenderingSize(), false);
         texture.setMinificationFilter(GlMinificationFilter.LINEAR);
@@ -186,6 +191,16 @@ export class RenderingPipeline implements IRenderingPipeline {
         texture.setWrapU(GlWrap.CLAMP_TO_EDGE);
         texture.setWrapV(GlWrap.CLAMP_TO_EDGE);
         this.getParameters().set(RenderingPipeline.GODRAY_OCCLUSION, texture);
+    }
+
+    private createEmissionTexture(): void {
+        const texture = new GlTexture2DArray();
+        texture.allocate(GlInternalFormat.RGBA16F, this.getRenderingSize(), 1, false);
+        texture.setMinificationFilter(GlMinificationFilter.LINEAR);
+        texture.setMagnificationFilter(GlMagnificationFilter.LINEAR);
+        texture.setWrapU(GlWrap.REPEAT);
+        texture.setWrapV(GlWrap.REPEAT);
+        this.getParameters().set(RenderingPipeline.EMISSION, texture);
     }
 
     private addDepthAttachmentToTheFbo(): void {
@@ -205,9 +220,19 @@ export class RenderingPipeline implements IRenderingPipeline {
     public render(): void {
         //this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         Engine.getLog().startGroup('rendering');
+
+        const tex = this.getParameters().get(RenderingPipeline.GODRAY_OCCLUSION);
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachTexture2D(tex as GlTexture2D);
+        const tex2 = this.getParameters().get(RenderingPipeline.EMISSION) as GlTexture2DArray;
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).attachTexture2DArrayLayer(tex2.getLayer(0));
+
         this.beforePipeline();
         this.renderIfRendererIsUsableAndActive(this.shadowRenderer);
         this.renderGeometry();
+
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).detachAttachment();
+        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).detachAttachment();
+
         this.renderPostProcess();
         this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
         this.renderToScreen();
@@ -221,17 +246,25 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[0]);
         this.drawIndex = 0;
+
+        this.fbo.setDrawBuffers(
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
+            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
+        );
+
+        Gl.setClearColor(vec4.fromValues(0, 0, 0, 1));
         Gl.clear(true, true, false);
+
+        this.fbo.setDrawBuffers(this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+
         this.useCameraUbo();
     }
 
     protected renderGeometry(): void {
-        const tex = this.getParameters().get(RenderingPipeline.GODRAY_OCCLUSION);
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachTexture2D(tex as GlTexture2D);
         for (const renderer of this.geometryRenderers.getIterator()) {
             this.renderIfRendererIsUsableAndActive(renderer);
         }
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).detachAttachment();
     }
 
     protected renderPostProcess(): void {
@@ -262,10 +295,10 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);*/
 
 
-        /*const ar = 1 / (this.getRenderingSize()[0] / this.getRenderingSize()[1]);
+        /*const ar = 1;// / (this.getRenderingSize()[0] / this.getRenderingSize()[1]);
         const trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(ar * -1 - 0.25 + ar * 0.5, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
         this.debugRenderer.setData(trans, 0);
-        this.getParameters().set(RenderingPipeline.DEBUG_2, this.getParameters().get(RenderingPipeline.GODRAY_OCCLUSION));
+        this.getParameters().set(RenderingPipeline.DEBUG, this.getParameters().get(RenderingPipeline.EMISSION));
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);*/
     }
 

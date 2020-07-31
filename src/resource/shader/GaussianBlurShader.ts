@@ -5,7 +5,7 @@ export class GaussianBlurShader extends Shader {
 
     private horizontal = true;
     private layer = 0;
-    private blurOffset = 0.005;
+    //private blurOffset = 0.005;
 
     public isHorizontal(): boolean {
         return this.horizontal;
@@ -15,9 +15,9 @@ export class GaussianBlurShader extends Shader {
         this.horizontal = horizontal;
     }
 
-    public setBlurOffset(blurOffset: number): void {
+    /*public setBlurOffset(blurOffset: number): void {
         this.blurOffset = blurOffset;
-    }
+    }*/
 
     public setLayer(layer: number): void {
         this.layer = layer;
@@ -26,7 +26,7 @@ export class GaussianBlurShader extends Shader {
     public setUniforms(): void {
         this.getShaderProgram().loadBoolean('horizontal', this.horizontal);
         this.getShaderProgram().loadInt('layer', this.layer);
-        this.getShaderProgram().loadFloat('blurOffset', this.blurOffset);
+        //this.getShaderProgram().loadFloat('blurOffset', this.blurOffset);
     }
 
     protected connectTextureUnits(): void {

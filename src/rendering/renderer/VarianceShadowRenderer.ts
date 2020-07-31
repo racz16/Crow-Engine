@@ -34,7 +34,7 @@ export class VarianceShadowRenderer extends Renderer {
     private fboTextures = new Array<GlTexture2DArray>();
     private readonly resolution = 1024;
     private readonly splitCount = 3;//if you change, also change in the shaders
-    private blur = 1.5;
+    //private blur = 1.5;//TODO
     private readonly wsSplitDistances = new Array<number>();
     private camera: ICameraComponent;
     private initialized = false;
@@ -241,24 +241,24 @@ export class VarianceShadowRenderer extends Renderer {
         Gl.setEnableDepthTest(false);
         for (let i = 0; i < this.splitCount; i++) {
             //const blurOffset = (this.blur * 25) / ((this.wsSplitDistances[i + 1] - this.wsSplitDistances[i]) * this.resolution);
-            const blurOffset = this.blur / this.resolution;
+            //const blurOffset = this.blur / this.resolution;
             this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[1].getLayer(i));
             this.getShader().loadTexture2DArray(this.fboTextures[0], Conventions.TU_ZERO);
-            this.renderGaussianPass(true, i, blurOffset);
+            this.renderGaussianPass(true, i/*, blurOffset*/);
 
             this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2DArrayLayer(this.fboTextures[0].getLayer(i));
             this.getShader().loadTexture2DArray(this.fboTextures[1], Conventions.TU_ZERO);
-            this.renderGaussianPass(false, i, blurOffset);
+            this.renderGaussianPass(false, i, /*blurOffset*/);
         }
 
         Gl.setEnableDepthTest(true);
     }
 
-    private renderGaussianPass(horizontal: boolean, layer: number, blurOffset: number): void {
+    private renderGaussianPass(horizontal: boolean, layer: number/*, blurOffset: number*/): void {
         this.gaussianBlurShader.start();
         this.gaussianBlurShader.setHorizontal(horizontal);
         this.gaussianBlurShader.setLayer(layer);
-        this.gaussianBlurShader.setBlurOffset(blurOffset);
+        //this.gaussianBlurShader.setBlurOffset(blurOffset);
         this.gaussianBlurShader.setUniforms();
         const quad = QuadMesh.getInstance();
         quad.draw();
