@@ -34,7 +34,7 @@ uniform bool isThereTangent;
 uniform mat4[SPLIT_COUNT] shadowProjectionViewMatrices;
 
 void main(){
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(i_position, 1.0f) ;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(i_position, 1.0f);
     io_fragmentPosition = vec3(modelMatrix * vec4(i_position, 1.0f));
     io_normal = normalize(inverseTransposedModelMatrix3x3 * i_normal);
     io_textureCoordinates_0 = i_textureCoordinates_0;

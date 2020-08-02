@@ -15,8 +15,8 @@ export class CameraComponent extends Component implements ICameraComponent {
     private viewMatrix: mat4;
     private projectionMatrix: mat4;
     private frustum: IFrustum;
-    private nearPlaneDistance = 0.01;
-    private farPlaneDistance = 100;
+    private nearPlaneDistance = 1;
+    private farPlaneDistance = 50;
     private fov = 55;
     private horizontalScale = 10;
     private verticalScale = 10;

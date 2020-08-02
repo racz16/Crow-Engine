@@ -52,7 +52,9 @@ export class PbrRenderer extends GeometryRenderer {
         let splits = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_SPLITS);
         if (!splits || !splits.length) {
             splits = new Array<number>();
-            splits.push(1);
+            const camera = Engine.getMainCamera();
+            splits.push(camera.getNearPlaneDistance());
+            splits.push(camera.getFarPlaneDistance());
         }
         for (let i = 0; i < splits.length; i++) {
             this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);

@@ -24,6 +24,7 @@ import { GlMinificationFilter } from '../../webgl/enum/GlMinificationFilter';
 import { GlMagnificationFilter } from '../../webgl/enum/GlMagnificationFIlter';
 import { Conventions } from '../../resource/Conventions';
 import { GlConstants } from '../../webgl/GlConstants';
+import { AlphaMode } from '../../material/AlphaMode';
 
 export class VarianceShadowRenderer extends Renderer {
 
@@ -35,7 +36,8 @@ export class VarianceShadowRenderer extends Renderer {
     private readonly resolution = 1024;
     private readonly splitCount = 3;//if you change, also change in the shaders
     //private blur = 1.5;//TODO
-    private readonly wsSplitDistances = new Array<number>();
+    private lightDistance = 50;
+    private readonly csSplitDistances = new Array<number>();
     private camera: ICameraComponent;
     private initialized = false;
 
@@ -55,14 +57,14 @@ export class VarianceShadowRenderer extends Renderer {
 
     private refreshDistances(): void {
         if (!this.initialized) {
-            const lambda = 0.15;
+            const lambda = 0.5;
             const n = this.camera.getNearPlaneDistance();
             const f = this.camera.getFarPlaneDistance();
 
             for (let i = 0; i < this.splitCount + 1; i++) {
                 const cilog = n * Math.pow(f / n, i / this.splitCount);
                 const ciuni = n + (f - n) * (i / this.splitCount)
-                this.wsSplitDistances[i] = lambda * ciuni + (1 - lambda) * cilog;
+                this.csSplitDistances[i] = lambda * ciuni + (1 - lambda) * cilog;
             }
             this.initialized = true;
         }
@@ -105,26 +107,23 @@ export class VarianceShadowRenderer extends Renderer {
     }
 
     private refreshProjectionViewMatrices(): void {
-        const light = BlinnPhongLightsStruct.getInstance().getShadowLightSource();//TODO
         const IV = this.computeInverseViewMatrix();
-        const inverseRotation = quat.invert(quat.create(), light.getGameObject().getTransform().getAbsoluteRotation());
-        const view = mat4.fromRotationTranslation(mat4.create(), inverseRotation, vec3.create());
         for (let i = 0; i < this.splitCount; i++) {
             let P: mat4;
             if (this.camera.getType() === CameraType.PERSPECTIVE) {
                 P = Utility.computePerspectiveProjectionMatrix(
                     this.camera.getFov(),
                     this.camera.getAspectRatio(),
-                    this.wsSplitDistances[i],
-                    this.wsSplitDistances[i + 1]);
+                    this.csSplitDistances[i],
+                    this.csSplitDistances[i + 1]);
             } else {
                 P = Utility.computeOrthographicProjectionMatrix(
                     -this.camera.getHorizontalScale(),
                     this.camera.getHorizontalScale(),
                     -this.camera.getVerticalalScale(),
                     this.camera.getVerticalalScale(),
-                    this.wsSplitDistances[i],
-                    this.wsSplitDistances[i + 1])
+                    this.csSplitDistances[i],
+                    this.csSplitDistances[i + 1])
             }
             const IP = mat4.invert(mat4.create(), P);
             const cornerPoints = new Array<vec4>();
@@ -134,17 +133,18 @@ export class VarianceShadowRenderer extends Renderer {
                 cornerPoints.push(Utility.computeoWorldSpacePosition(ndcPosition, IP, IV));
             }
 
+            const lightV = this.computeLightViewMatrix();
             const max = vec3.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
             const min = vec3.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
             for (const cp of cornerPoints) {
-                const csp = vec4.transformMat4(vec4.create(), cp, view);
+                const csp = vec4.transformMat4(vec4.create(), cp, lightV);
                 for (let i = 0; i < 3; i++) {
                     min[i] = Math.min(min[i], csp[i]);
                     max[i] = Math.max(max[i], csp[i]);
                 }
             }
-            const projection = mat4.ortho(mat4.create(), min[0], max[0], min[1], max[1], -max[2], -min[2]);
-            mat4.mul(this.projectionViewMatrices[i], projection, view);
+            const projection = mat4.ortho(mat4.create(), min[0], max[0], min[1], max[1], -max[2] - this.lightDistance, -min[2]);
+            mat4.mul(this.projectionViewMatrices[i], projection, lightV);
             let mats = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.SHADOW_PROJECTION_VIEW_MATRICES);
             if (!mats) {
                 mats = new Array<mat4>(this.splitCount);
@@ -158,8 +158,17 @@ export class VarianceShadowRenderer extends Renderer {
                 splits = new Array<number>(this.splitCount + 1);
                 Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.SHADOW_SPLITS, splits);
             }
-            splits[i] = this.wsSplitDistances[i];
+            const P = this.camera.getProjectionMatrix();
+            const res = vec4.fromValues(0, 0, -this.csSplitDistances[i], 1);
+            vec4.transformMat4(res, res, P);
+            splits[i] = res[2] / res[3] * 0.5 + 0.5;
         }
+    }
+
+    private computeLightViewMatrix(): mat4 {
+        const light = BlinnPhongLightsStruct.getInstance().getShadowLightSource();//TODO
+        const inverseRotation = quat.invert(quat.create(), light.getGameObject().getTransform().getAbsoluteRotation());
+        return mat4.fromRotationTranslation(mat4.create(), inverseRotation, vec3.create());
     }
 
     private computeInverseViewMatrix(): mat4 {
@@ -196,6 +205,16 @@ export class VarianceShadowRenderer extends Renderer {
         this.incrementRenderedElementCountBy(1);
         this.incrementRenderedFaceCountBy(renderableComponent.getFaceCount());
         this.getShader().setShadowUniforms(renderableComponent, this.projectionViewMatrices[this.index]);
+        const alphaMode = renderableComponent.getMaterial().getParameters().get(Conventions.MP_ALPHA_MODE);
+        this.setAlphaMode(renderableComponent, alphaMode);
+    }
+
+    protected setAlphaMode(renderableComponent: IRenderableComponent<IRenderable>, alphaMode: AlphaMode): void {
+        this.getShader().getNativeShaderProgram().loadInt('alphaMode', alphaMode);
+        if (alphaMode === AlphaMode.MASK) {
+            const alphaCutoff = renderableComponent.getMaterial().getParameters().get(Conventions.MP_ALPHA_CUTOFF) ?? 0.5;
+            this.getShader().getNativeShaderProgram().loadFloat('alphaCutoff', alphaCutoff);
+        }
     }
 
     protected draw(renderableComponent: IRenderableComponent<IRenderable>): void {
@@ -226,8 +245,8 @@ export class VarianceShadowRenderer extends Renderer {
         this.camera = Engine.getMainCamera();
         this.refreshDistances();
         this.refreshProjectionViewMatrices();
-        //Gl.setCullFace(CullFace.FRONT);
-        //Gl.setCullFace(CullFace.BACK);
+        //Gl.setCullFace(GlCullFace.FRONT);
+        //Gl.setCullFace(GlCullFace.BACK);
         this.fbo.bind();
     }
 

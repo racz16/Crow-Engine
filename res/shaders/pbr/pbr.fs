@@ -169,7 +169,7 @@ void main(){
     o_emission = vec4(materialInfo.emissiveColor, 1.0);
 
     /*shadow cascade debug
-    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    float depth = gl_FragCoord.z;
     o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(1, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1);
     o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 1, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1);
     o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 0.2, 1), vec3(depth <= splits[1] && depth >= splits[0])), 1);
@@ -304,11 +304,11 @@ float calculateShadowOld(vec3 N, vec3 L) {
 }
 
 float calculateShadow(vec3 N, vec3 L) {
-    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    float depth = gl_FragCoord.z;
     float shadow;
-    shadow = mix(shadow, calculateShadowInCascade(N, L, 2), depth <= splits[3] && depth >= splits[2]);
-    shadow = mix(shadow, calculateShadowInCascade(N, L, 1), depth <= splits[2] && depth >= splits[1]);
-    shadow = mix(shadow, calculateShadowInCascade(N, L, 0), depth <= splits[1] && depth >= splits[0]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 2), depth <= splits[3]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 1), depth <= splits[2]);
+    shadow = mix(shadow, calculateShadowInCascade(N, L, 0), depth <= splits[1]);
     return shadow;
 }
 
