@@ -123,7 +123,7 @@ export class VarianceShadowRenderer extends Renderer {
                     -this.camera.getVerticalalScale(),
                     this.camera.getVerticalalScale(),
                     this.csSplitDistances[i],
-                    this.csSplitDistances[i + 1])
+                    this.csSplitDistances[i + 1]);
             }
             const IP = mat4.invert(mat4.create(), P);
             const cornerPoints = new Array<vec4>();
