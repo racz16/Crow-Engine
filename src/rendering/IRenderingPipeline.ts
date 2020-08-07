@@ -26,9 +26,13 @@ export interface IRenderingPipeline {
 
     getRenderedElementCount(): number;
 
-    bindFbo(): void;
+    bindGeometryFbo(): void;
 
-    getFbo(): GlFbo;
+    getGeometryFbo(): GlFbo;
+
+    bindPostProcessFbo(): void;
+
+    getPostProcessFbo(): GlFbo;
 
     render(): void;
 

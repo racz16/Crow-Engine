@@ -51,7 +51,7 @@ export class BloomRenderer extends PostProcessRenderer {
         const emissionTexture = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.EMISSION) as GlTexture2DArray;
         this.getShader().loadTexture2DArray(emissionTexture, Conventions.TU_ONE);
         this.getShader().getNativeShaderProgram().connectTextureUnit('emission', Conventions.TU_ONE);
-        Engine.getRenderingPipeline().bindFbo();
+        Engine.getRenderingPipeline().bindPostProcessFbo();
 
         super.renderUnsafe();
     }

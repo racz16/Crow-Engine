@@ -60,7 +60,8 @@ window.onload = async () => {
 
     //await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1, true);
     await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1, true);
-    //await tsb.loadGltfSampleModel('BoomBox', 'glTF-Binary', 100, true);
+    //await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01, true);
+    //await tsb.loadGltfSampleModel('BoomBox', 'glTF', 100, true);
     //await tsb.loadSketchfabModel('toyota_land_cruiser', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.01, 0));
     //await tsb.loadSketchfabModel('akm_47', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 2, 0));
     //await tsb.loadSketchfabModel('gold_pharaoh', 1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.1, 0));

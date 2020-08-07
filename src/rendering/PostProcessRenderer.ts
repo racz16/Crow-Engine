@@ -4,6 +4,7 @@ import { QuadMesh } from '../resource/mesh/QuadMesh';
 import { Engine } from '../core/Engine';
 import { RenderingPipeline } from './RenderingPipeline';
 import { Conventions } from '../resource/Conventions';
+import { vec2 } from 'gl-matrix';
 
 export abstract class PostProcessRenderer extends Renderer {
 
@@ -23,6 +24,11 @@ export abstract class PostProcessRenderer extends Renderer {
         this.quad.draw();
         this.incrementRenderedElementCountBy(1);
         this.incrementRenderedFaceCountBy(this.quad.getFaceCount());
+    }
+
+    protected beforeRendering(): void {
+        super.beforeRendering();
+        Engine.getRenderingPipeline().bindPostProcessFbo();
     }
 
 }

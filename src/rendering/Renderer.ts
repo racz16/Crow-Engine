@@ -34,7 +34,7 @@ export abstract class Renderer {
         this.getShader().start();
         this.resetRenderedElementCount();
         this.resetRenderedFaceCount();
-        Engine.getRenderingPipeline().bindFbo();
+        Engine.getRenderingPipeline().bindGeometryFbo();
         Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
     }
 

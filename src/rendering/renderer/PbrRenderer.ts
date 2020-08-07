@@ -60,7 +60,7 @@ export class PbrRenderer extends GeometryRenderer {
             this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);
         }
 
-        const fbo = Engine.getRenderingPipeline().getFbo();
+        const fbo = Engine.getRenderingPipeline().getGeometryFbo();
         fbo.setDrawBuffers(
             fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
             fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
@@ -70,7 +70,7 @@ export class PbrRenderer extends GeometryRenderer {
 
     protected afterRendering(): void {
         super.afterRendering();
-        const fbo = Engine.getRenderingPipeline().getFbo();
+        const fbo = Engine.getRenderingPipeline().getGeometryFbo();
         fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
     }
 

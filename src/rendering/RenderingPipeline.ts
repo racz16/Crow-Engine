@@ -53,8 +53,10 @@ export class RenderingPipeline implements IRenderingPipeline {
     public static readonly EMISSION = new ParameterKey<ITexture2DArray>('EMISSION');
 
     private parameters = new ParameterContainer();
-    private fbo: GlFbo;
+    private geometryFbo: GlFbo;
+    private postProcessFbo: GlFbo;
     private fboTextures = new Array<GlTexture2D>(2);
+    private sampleCount = 2;
     private drawIndex = 0;
     private renderingScale = 1;
     private renderables = new RenderableContainer();
@@ -70,9 +72,9 @@ export class RenderingPipeline implements IRenderingPipeline {
         }
         this.shadowRenderer = new VarianceShadowRenderer();
         //this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
-        this.geometryRenderers.addToTheEnd(new AtmosphericScatteringRenderer());
-        this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
+        //this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
         this.geometryRenderers.addToTheEnd(new PbrRenderer());
+        this.geometryRenderers.addToTheEnd(new AtmosphericScatteringRenderer());
         this.postProcessRenderers.addToTheEnd(new BloomRenderer());
         this.postProcessRenderers.addToTheEnd(new GodrayRenderer());
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
@@ -99,8 +101,12 @@ export class RenderingPipeline implements IRenderingPipeline {
         return this.parameters;
     }
 
-    public getFbo(): GlFbo {
-        return this.fbo;
+    public getGeometryFbo(): GlFbo {
+        return this.geometryFbo;
+    }
+
+    public getPostProcessFbo(): GlFbo {
+        return this.postProcessFbo;
     }
 
     public getRenderingScale(): number {
@@ -140,37 +146,72 @@ export class RenderingPipeline implements IRenderingPipeline {
     }
 
     //fbo
-
-    public bindFbo(): void {
-        this.fbo.bind();
+    public bindGeometryFbo(): void {
+        this.geometryFbo.bind();
     }
 
-    private getFboSize(): ReadonlyVec2 {
+    public bindPostProcessFbo(): void {
+        this.postProcessFbo.bind();
+    }
+
+    private getGeometryFboSize(): ReadonlyVec2 {
+        return this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).getAttachment().getSize();
+    }
+
+    private getPostProcessFboSize(): ReadonlyVec2 {
         return this.fboTextures[0].getSize();
     }
 
-    private isFboValid(): boolean {
-        return Utility.isUsable(this.fbo) &&
-            this.getRenderingSize()[0] === this.getFboSize()[0] &&
-            this.getRenderingSize()[1] === this.getFboSize()[1]
+    private areFbosValid(): boolean {
+        return Utility.isUsable(this.geometryFbo) &&
+            this.getRenderingSize()[0] === this.getGeometryFboSize()[0] &&
+            this.getRenderingSize()[1] === this.getGeometryFboSize()[1] &&
+            Utility.isUsable(this.postProcessFbo) &&
+            this.getRenderingSize()[0] === this.getPostProcessFboSize()[0] &&
+            this.getRenderingSize()[1] === this.getPostProcessFboSize()[1];
+
     }
 
-    private createFbo(): void {
-        if (Utility.isUsable(this.fbo)) {
-            this.fbo.releaseAll();
+    private createGeomteryFbo(): void {
+        if (Utility.isUsable(this.geometryFbo)) {
+            this.geometryFbo.releaseAll();
+        }
+        this.geometryFbo = new GlFbo();
+    }
+
+    private createPostProcessFbo(): void {
+        if (Utility.isUsable(this.postProcessFbo)) {
+            this.postProcessFbo.releaseAll();
             Utility.releaseIfUsable(this.fboTextures[0]);
             Utility.releaseIfUsable(this.fboTextures[1]);
         }
-        this.fbo = new GlFbo();
+        this.postProcessFbo = new GlFbo();
     }
 
-    private addAttachmentsToTheFbo(): void {
+    private addAttachmentsToTheGeometryFbo(): void {
+        const colorRbo = new GlRbo();
+        colorRbo.allocate(this.getRenderingSize(), GlInternalFormat.RGBA16F, this.sampleCount);
+        this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachRbo(colorRbo);
+
+        const depthRbo = new GlRbo();
+        depthRbo.allocate(this.getRenderingSize(), GlInternalFormat.DEPTH32F, this.sampleCount);
+        this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).attachRbo(depthRbo);
+
+        const godrayOcclusionRbo = new GlRbo();
+        godrayOcclusionRbo.allocate(this.getRenderingSize(), GlInternalFormat.RGB8, this.sampleCount);
+        this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachRbo(godrayOcclusionRbo);
+
+        const emissionRbo = new GlRbo();
+        emissionRbo.allocate(this.getRenderingSize(), GlInternalFormat.RGBA16F, this.sampleCount);
+        this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).attachRbo(emissionRbo);
+    }
+
+    private addAttachmentsToThePostProcessFbo(): void {
         this.fboTextures[0] = this.createFboTexture();
         this.fboTextures[1] = this.createFboTexture();
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         this.createGodrayOcclusionTexture();
         this.createEmissionTexture();
-        this.addDepthAttachmentToTheFbo();
     }
 
     private createFboTexture(): GlTexture2D {
@@ -198,19 +239,14 @@ export class RenderingPipeline implements IRenderingPipeline {
         texture.allocate(GlInternalFormat.RGBA16F, this.getRenderingSize(), 1, false);
         texture.setMinificationFilter(GlMinificationFilter.LINEAR);
         texture.setMagnificationFilter(GlMagnificationFilter.LINEAR);
-        texture.setWrapU(GlWrap.REPEAT);
-        texture.setWrapV(GlWrap.REPEAT);
+        texture.setWrapU(GlWrap.CLAMP_TO_EDGE);
+        texture.setWrapV(GlWrap.CLAMP_TO_EDGE);
         this.getParameters().set(RenderingPipeline.EMISSION, texture);
     }
 
-    private addDepthAttachmentToTheFbo(): void {
-        const depthRbo = new GlRbo();
-        depthRbo.allocate(this.getRenderingSize(), GlInternalFormat.DEPTH32F, 1);
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).attachRbo(depthRbo);
-    }
-
     protected throwErrorIfFboIsNotComplete(): void {
-        if (!this.fbo.isDrawComplete() || !this.fbo.isReadComplete()) {
+        if (!this.postProcessFbo.isDrawComplete() || !this.postProcessFbo.isReadComplete() ||
+            !this.geometryFbo.isDrawComplete() || !this.geometryFbo.isReadComplete()) {
             throw new Error();
         }
     }
@@ -221,20 +257,44 @@ export class RenderingPipeline implements IRenderingPipeline {
         //this.fbo.getAttachmentContainer(FboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
         Engine.getLog().startGroup('rendering');
 
-        const tex = this.getParameters().get(RenderingPipeline.GODRAY_OCCLUSION);
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachTexture2D(tex as GlTexture2D);
-        const tex2 = this.getParameters().get(RenderingPipeline.EMISSION) as GlTexture2DArray;
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).attachTexture2DArrayLayer(tex2.getLayer(0));
+
 
         this.beforePipeline();
         this.renderIfRendererIsUsableAndActive(this.shadowRenderer);
         this.renderGeometry();
 
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).detachAttachment();
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).detachAttachment();
+        const tex = this.getParameters().get(RenderingPipeline.GODRAY_OCCLUSION);
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachTexture2D(tex as GlTexture2D);
+        const tex2 = this.getParameters().get(RenderingPipeline.EMISSION) as GlTexture2DArray;
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).attachTexture2DArrayLayer(tex2.getLayer(0));
+
+        this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        this.postProcessFbo.setDrawBuffers(this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        this.geometryFbo.blitTo(this.postProcessFbo, vec2.create(), this.getRenderingSize(), vec2.create(), this.getRenderingSize(), GlFboAttachmentSlot.COLOR);
+
+        this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1));
+        this.postProcessFbo.setDrawBuffers(
+            null,
+            this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1)
+        );
+        this.geometryFbo.blitTo(this.postProcessFbo, vec2.create(), this.getRenderingSize(), vec2.create(), this.getRenderingSize(), GlFboAttachmentSlot.COLOR);
+
+        this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2));
+        this.postProcessFbo.setDrawBuffers(
+            null, null,
+            this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
+        );
+        this.geometryFbo.blitTo(this.postProcessFbo, vec2.create(), this.getRenderingSize(), vec2.create(), this.getRenderingSize(), GlFboAttachmentSlot.COLOR);
+
+        this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        this.postProcessFbo.setDrawBuffers(this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+
+
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).detachAttachment();
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).detachAttachment();
 
         this.renderPostProcess();
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
         this.renderToScreen();
         this.afterPipeline();
         Engine.getLog().endGroup();
@@ -242,21 +302,22 @@ export class RenderingPipeline implements IRenderingPipeline {
 
     protected beforePipeline(): void {
         this.refresh();
-        this.bindFbo();
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
+        this.bindPostProcessFbo();
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[0]);
+        this.bindGeometryFbo();
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[0]);
         this.drawIndex = 0;
 
-        this.fbo.setDrawBuffers(
-            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
-            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
-            this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
+        this.geometryFbo.setDrawBuffers(
+            this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
+            this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
+            this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
         );
 
         Gl.setClearColor(vec4.fromValues(0, 0, 0, 1));
         Gl.clear(true, true, false);
 
-        this.fbo.setDrawBuffers(this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        this.geometryFbo.setDrawBuffers(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
 
         this.useCameraUbo();
     }
@@ -320,7 +381,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     protected pingPong(): void {
         this.getParameters().set(RenderingPipeline.WORK, this.fboTextures[this.drawIndex]);
         this.drawIndex = 1 - this.drawIndex;
-        this.fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[this.drawIndex]);
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).attachTexture2D(this.fboTextures[this.drawIndex]);
     }
 
     protected logWarningIfRendererIsNotUsable(renderer: Renderer): void {
@@ -345,9 +406,11 @@ export class RenderingPipeline implements IRenderingPipeline {
 
     private refresh(): void {
         this.refreshCameraAndCanvasIfResized();
-        if (!this.isFboValid()) {
-            this.createFbo();
-            this.addAttachmentsToTheFbo();
+        if (!this.areFbosValid()) {
+            this.createGeomteryFbo();
+            this.addAttachmentsToTheGeometryFbo();
+            this.createPostProcessFbo();
+            this.addAttachmentsToThePostProcessFbo();
             this.throwErrorIfFboIsNotComplete();
         }
     }

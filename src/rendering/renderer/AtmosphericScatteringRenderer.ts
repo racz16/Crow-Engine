@@ -32,14 +32,14 @@ export class AtmosphericScatteringRenderer extends GeometryRenderer {
         Gl.setEnableDepthTest(true);
         Gl.gl.depthFunc(Gl.gl.LEQUAL);
 
-        const fbo = Engine.getRenderingPipeline().getFbo();
+        const fbo = Engine.getRenderingPipeline().getGeometryFbo();
         fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0), fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1));
     }
 
     protected afterRendering(): void {
         super.afterRendering();
         Gl.gl.depthFunc(Gl.gl.LESS);
-        const fbo = Engine.getRenderingPipeline().getFbo();
+        const fbo = Engine.getRenderingPipeline().getGeometryFbo();
         fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
     }
 
