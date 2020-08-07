@@ -2,7 +2,7 @@ import { GlQuery } from './GlQuery';
 import { GlConstants } from '../GlConstants';
 import { Gl } from '../Gl';
 
-export class GlTimestampQuery extends GlQuery {
+export class GlTimestampQuery extends GlQuery<number> {
 
     public getTarget(): number {
         return GlConstants.DISJOINT_TIMER_QUERY_EXTENSION.TIMESTAMP_EXT;

@@ -16,6 +16,7 @@ import { GlFboAttachmentSlot } from '../../webgl/enum/GlFboAttachmentSlot';
 export class PbrRenderer extends GeometryRenderer {
 
     private shader: PbrShader;
+    private query: GlTimeElapsedQuery;
 
     public constructor() {
         super('PBR Renderer');
@@ -23,11 +24,8 @@ export class PbrRenderer extends GeometryRenderer {
             throw new Error();
         }
         this.shader = new PbrShader();
-
         this.query = new GlTimeElapsedQuery();
     }
-
-    query: GlTimeElapsedQuery;
 
     /*protected renderUnsafe(): void {
         if (this.query.isResultAvailable()) {

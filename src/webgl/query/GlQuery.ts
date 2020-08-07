@@ -1,7 +1,7 @@
 import { GlObject } from '../GlObject';
 import { Gl } from '../Gl';
 
-export abstract class GlQuery extends GlObject {
+export abstract class GlQuery<T> extends GlObject {
 
     private alreadyUsed = false;
 
@@ -28,7 +28,7 @@ export abstract class GlQuery extends GlObject {
         return this.isAlreadyUsed() && Gl.gl.getQueryParameter(this.getId(), Gl.gl.QUERY_RESULT_AVAILABLE);
     }
 
-    public getResult(): number {
+    public getResult(): T {
         return Gl.gl.getQueryParameter(this.getId(), Gl.gl.QUERY_RESULT);
     }
 
