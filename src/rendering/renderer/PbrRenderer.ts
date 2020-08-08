@@ -72,6 +72,11 @@ export class PbrRenderer extends GeometryRenderer {
         fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
     }
 
+    protected drawPredicate(renderableComponent: IRenderableComponent<IRenderable>): boolean {
+        const blending = renderableComponent.getMaterial().getParameters().get(Conventions.MP_ALPHA_MODE) === AlphaMode.BLEND;
+        return super.drawPredicate(renderableComponent) && ((this.opaque && !blending) || (!this.opaque && blending));
+    }
+
     protected setAlphaMode(renderableComponent: IRenderableComponent<IRenderable>, alphaMode: AlphaMode): void {
         this.getShader().getNativeShaderProgram().loadInt('alphaMode', alphaMode);
         Gl.setEnableBlend(alphaMode === AlphaMode.BLEND);

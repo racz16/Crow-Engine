@@ -18,6 +18,9 @@ export class AtmosphericScatteringRenderer extends GeometryRenderer {
     }
 
     protected renderUnsafe(): void {
+        if (!this.opaque) {
+            return;
+        }
         const viewport = Gl.getViewportSize();
         this.getShader().getNativeShaderProgram().loadVector2('u_viewport', viewport);
 

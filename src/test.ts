@@ -43,7 +43,7 @@ window.onload = async () => {
     await tsb.loadResources();
     tsb.setUpScene();
     tsb.createUi();
-    //tsb.createGround();
+    tsb.createGround();
     //await tsb.createDamagedHelmet();
     //tsb.createGoldSphere();
 
@@ -55,7 +55,7 @@ window.onload = async () => {
     //tsb.createBezierSpline();
 
     //await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1, true);
-    //await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1, true);
+    await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1, true);
     //await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01, true);
     //await tsb.loadGltfSampleModel('BoomBox', 'glTF', 100, true);
     //await tsb.loadSketchfabModel('toyota_land_cruiser', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.01, 0));
@@ -64,7 +64,7 @@ window.onload = async () => {
     //await tsb.loadSketchfabModel('soviet_t-34_tank', 0.02, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -2.55, 0));
     //await tsb.loadSketchfabModel('crash_of_a_b-17', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 5, 0));
 
-    await tsb.loadSketchfabModel('aegis_idris_frigate_-_new', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion());
+    //await tsb.loadSketchfabModel('aegis_idris_frigate_-_new', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion());
     /*const loader = await GltfLoader.createLoader('res/meshes/metro.glb');
     const result = loader.loadDefaultScene();
     for (const [camera, _] of result.getCameraComponents()) {

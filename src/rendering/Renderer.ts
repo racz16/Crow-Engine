@@ -8,6 +8,7 @@ export abstract class Renderer {
 
     private name: string;
     private active = true;
+    protected opaque: boolean;
     private renderedElementCount = 0;
     private renderedFaceCount = 0;
 
@@ -18,8 +19,9 @@ export abstract class Renderer {
         this.name = name;
     }
 
-    public render(): void {
-        Engine.getLog().startGroup(this.name)
+    public render(opaque = true): void {
+        Engine.getLog().startGroup(this.name);
+        this.opaque = opaque;
         this.beforeRendering();
         this.renderUnsafe();
         this.afterRendering();
