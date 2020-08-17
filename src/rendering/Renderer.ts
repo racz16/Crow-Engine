@@ -3,6 +3,7 @@ import { Utility } from '../utility/Utility';
 import { Engine } from '../core/Engine';
 import { Gl } from '../webgl/Gl';
 import { vec2 } from 'gl-matrix';
+import { RenderingPipeline } from './RenderingPipeline';
 
 export abstract class Renderer {
 
@@ -33,10 +34,14 @@ export abstract class Renderer {
     }
 
     protected beforeRendering(): void {
-        this.getShader().start();
+        this.getShader().start(this.opaque);
         this.resetRenderedElementCount();
         this.resetRenderedFaceCount();
-        Engine.getRenderingPipeline().bindGeometryFbo();
+        if (this.opaque) {
+            Engine.getRenderingPipeline().bindGeometryFbo();
+        } else {
+            Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DUAL_DEPTH_FBO).bind();
+        }
         Gl.setViewport(Engine.getRenderingPipeline().getRenderingSize(), vec2.create());
     }
 

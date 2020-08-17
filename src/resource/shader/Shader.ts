@@ -13,6 +13,7 @@ export abstract class Shader implements IResource {
 
     private shaderProgram: GlShaderProgram;
     private loaded = false;
+    protected opaque: boolean;
 
     public constructor() {
         this.shaderProgram = new GlShaderProgram();
@@ -91,7 +92,8 @@ export abstract class Shader implements IResource {
         this.shaderProgram.loadTexture(textureUnit, texture.getNativeTexture(), texture.getNativeSampler());
     }
 
-    public start(): void {
+    public start(opaque = true): void {
+        this.opaque = opaque;
         this.shaderProgram.start();
         this.connectTextureUnits();
     }

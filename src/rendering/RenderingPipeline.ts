@@ -38,6 +38,7 @@ import { GodrayRenderer } from './renderer/GodrayRenderer';
 import { AcesToneMappingRenderer } from './renderer/AcesToneMappingRenderer';
 import { GlTexture2DArray } from '../webgl/texture/GlTexture2DArray';
 import { BloomRenderer } from './renderer/BloomRenderer';
+import { DualDepthPeeling } from './DualDepthPeeling';
 
 export class RenderingPipeline implements IRenderingPipeline {
 
@@ -49,8 +50,13 @@ export class RenderingPipeline implements IRenderingPipeline {
     public static readonly WORK = new ParameterKey<ITexture2D>('WORK');
     public static readonly DEBUG = new ParameterKey<ITexture2DArray>('DEBUG');
     public static readonly DEBUG_2 = new ParameterKey<ITexture2D>('DEBUG_2');
+    public static readonly DEPTH = new ParameterKey<ITexture2D>('DEPTH');
+    public static readonly DUAL_DEPTH = new ParameterKey<ITexture2D>('DUAL_DEPTH');
+    public static readonly FRONT = new ParameterKey<ITexture2D>('FRONT');
     public static readonly GODRAY_OCCLUSION = new ParameterKey<ITexture2D>('GODRAY_OCCLUSION');
     public static readonly EMISSION = new ParameterKey<ITexture2DArray>('EMISSION');
+    public static readonly DUAL_DEPTH_FBO = new ParameterKey<GlFbo>('DUAL_DEPTH_FBO');
+    public static readonly DUAL_DEPTH_PEEL_PASS_COUNT = new ParameterKey<number>('DUAL_DEPTH_PEEL_PASS_COUNT');
 
     private parameters = new ParameterContainer();
     private geometryFbo: GlFbo;
@@ -64,6 +70,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     private geometryRenderers = new RendererContainer<GeometryRenderer>();
     private postProcessRenderers = new RendererContainer<PostProcessRenderer>();
     private debugRenderer = new DebugRenderer();
+    private dualDepthPeeling: DualDepthPeeling;
     private screenRenderer: ScreenRenderer;
 
     public initialize(): void {
@@ -80,6 +87,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.postProcessRenderers.addToTheEnd(new ReinhardToneMappingRenderer());
         //this.postProcessRenderers.addToTheEnd(new AcesToneMappingRenderer());
         this.postProcessRenderers.addToTheEnd(new GammaCorrectionRenderer());
+        this.dualDepthPeeling = new DualDepthPeeling();
         this.screenRenderer = new ScreenRenderer();
         this.refresh();
         Engine.getLog().logString(LogLevel.INFO_1, 'Rendering Pipeline initialized');
@@ -244,6 +252,16 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.getParameters().set(RenderingPipeline.EMISSION, texture);
     }
 
+    private creatDepthexture(): void {
+        const texture = new GlTexture2D();
+        texture.allocate(GlInternalFormat.DEPTH32F, this.getRenderingSize(), false);
+        texture.setMinificationFilter(GlMinificationFilter.NEAREST);
+        texture.setMagnificationFilter(GlMagnificationFilter.NEAREST);
+        texture.setWrapU(GlWrap.CLAMP_TO_EDGE);
+        texture.setWrapV(GlWrap.CLAMP_TO_EDGE);
+        this.getParameters().set(RenderingPipeline.DEPTH, texture);
+    }
+
     protected throwErrorIfFboIsNotComplete(): void {
         if (!this.postProcessFbo.isDrawComplete() || !this.postProcessFbo.isReadComplete() ||
             !this.geometryFbo.isDrawComplete() || !this.geometryFbo.isReadComplete()) {
@@ -267,6 +285,10 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).attachTexture2D(tex as GlTexture2D);
         const tex2 = this.getParameters().get(RenderingPipeline.EMISSION) as GlTexture2DArray;
         this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).attachTexture2DArrayLayer(tex2.getLayer(0));
+        const depth = this.getParameters().get(RenderingPipeline.DEPTH);
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).attachTexture2D(depth as GlTexture2D);
+
+        this.geometryFbo.blitTo(this.postProcessFbo, vec2.create(), this.getRenderingSize(), vec2.create(), this.getRenderingSize(), GlFboAttachmentSlot.DEPTH);
 
         this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
         this.postProcessFbo.setDrawBuffers(this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
@@ -289,9 +311,11 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.geometryFbo.setReadBuffer(this.geometryFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
         this.postProcessFbo.setDrawBuffers(this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
 
-
         this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1).detachAttachment();
         this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2).detachAttachment();
+        this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.DEPTH).detachAttachment();
+
+        this.dualDepthPeeling.render(this.geometryRenderers);
 
         this.renderPostProcess();
         this.postProcessFbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0).detachAttachment();
@@ -361,6 +385,18 @@ export class RenderingPipeline implements IRenderingPipeline {
         this.debugRenderer.setData(trans, 0);
         this.getParameters().set(RenderingPipeline.DEBUG, this.getParameters().get(RenderingPipeline.EMISSION));
         this.renderIfRendererIsUsableAndActive(this.debugRenderer);*/
+
+        // const ar = 1 //(this.getRenderingSize()[0] / this.getRenderingSize()[1]);
+        // const trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(0, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
+        // this.debugRenderer.setData(trans, 0);
+        // this.getParameters().set(RenderingPipeline.DEBUG_2, this.getParameters().get(RenderingPipeline.DEPTH));
+        // this.renderIfRendererIsUsableAndActive(this.debugRenderer);
+
+        // const ar = 1 //(this.getRenderingSize()[0] / this.getRenderingSize()[1]);
+        // const trans = mat4.fromRotationTranslationScale(mat4.create(), quat.create(), vec3.fromValues(0, 0.5, 0), vec3.fromValues(0.25 * ar, 0.25, 1))
+        // this.debugRenderer.setData(trans, 0);
+        // this.getParameters().set(RenderingPipeline.DEBUG_2, this.getParameters().get(RenderingPipeline.FRONT));
+        // this.renderIfRendererIsUsableAndActive(this.debugRenderer);
     }
 
     protected renderIfRendererIsUsableAndActive(renderer: Renderer): void {
@@ -412,6 +448,8 @@ export class RenderingPipeline implements IRenderingPipeline {
             this.createPostProcessFbo();
             this.addAttachmentsToThePostProcessFbo();
             this.throwErrorIfFboIsNotComplete();
+            Utility.releaseIfUsable(this.parameters.get(RenderingPipeline.DEPTH));
+            this.creatDepthexture();
         }
     }
 

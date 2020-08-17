@@ -107,14 +107,24 @@ uniform sampler2D brdfLutMap;
 uniform bool isThereVertexColor;
 uniform int alphaMode;
 uniform float alphaCutoff;
+uniform bool opaque;
+uniform sampler2D dualDepth;
+uniform sampler2D front;
 
 layout(std140) uniform Lights {             //binding point: 2
     Light[LIGHT_COUNT] lights;              //1024
 };
 
 layout(location = 0) out vec4 o_color;
-layout(location = 1) out vec4 o_godray_occlusion;
+layout(location = 1) out vec4 o_godrayOcclusion;
 layout(location = 2) out vec4 o_emission;
+
+layout(location = 3) out vec4 o_dualDepth;
+layout(location = 4) out vec4 o_front;
+layout(location = 5) out vec4 o_back;
+
+void dualDepthPeel();
+void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission);
 
 vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow);
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V);
@@ -143,6 +153,55 @@ DotInfo createDotInfo(vec3 L, vec3 N, vec3 V);
 MaterialInfo createMaterialInfo(vec2 textureCoordinates_0, vec2 textureCoordinates_1);
 
 void main(){
+    if(opaque) {
+        vec4 color;
+        vec3 godrayOcclusion, emission;
+        calculateColor(color, godrayOcclusion, emission);
+        o_color = color;
+        o_godrayOcclusion = vec4(godrayOcclusion, 0);
+        o_emission = vec4(emission, 1);
+    } else {
+        dualDepthPeel();
+    }
+}
+
+void dualDepthPeel() {
+    float fragDepth = gl_FragCoord.z;
+
+    ivec2 fragCoord = ivec2(gl_FragCoord.xy);
+    vec2 lastDepth = texelFetch(dualDepth, fragCoord, 0).rg;
+    vec4 lastFrontColor = texelFetch(front, fragCoord, 0);
+
+    o_dualDepth.rg = vec2(-9999.0);
+    o_front = lastFrontColor;
+    o_back = vec4(0.0);
+
+    float nearestDepth = - lastDepth.x;
+    float furthestDepth = lastDepth.y;
+    float alphaMultiplier = 1.0 - lastFrontColor.a;
+
+    if (fragDepth < nearestDepth || fragDepth > furthestDepth) {
+        return;
+    }
+
+    if (fragDepth > nearestDepth && fragDepth < furthestDepth) {
+        o_dualDepth.rg = vec2(-fragDepth, fragDepth);
+        return;
+    }
+
+    vec4 color;
+    vec3 godrayOcclusion, emission;
+    calculateColor(color, godrayOcclusion, emission);
+
+    if (fragDepth == nearestDepth) {
+        o_front.rgb += color.rgb * color.a * alphaMultiplier;
+        o_front.a = 1.0 - alphaMultiplier * (1.0 - color.a);
+    } else {
+        o_back += color;
+    }
+}
+
+void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission) {
     vec2 textureCoordinates_0, textureCoordinates_1;
     getTextureCoordinates(textureCoordinates_0, textureCoordinates_1);
     vec3 fragmentPosition = io_fragmentPosition;
@@ -164,9 +223,9 @@ void main(){
     
     result = mix(result, result * vec3(materialInfo.occlusion), material.occlusionStrength);
     result += materialInfo.emissiveColor;
-    o_color = vec4(result, materialInfo.alpha);
-    o_godray_occlusion = vec4(0);
-    o_emission = vec4(materialInfo.emissiveColor, 1.0);
+    color = vec4(result, materialInfo.alpha);
+    godrayOcclusion = vec3(0);
+    emission = materialInfo.emissiveColor;
 
     /*shadow cascade debug
     float depth = gl_FragCoord.z;

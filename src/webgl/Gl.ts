@@ -13,6 +13,7 @@ import { GlMinificationFilter } from './enum/GlMinificationFilter';
 import { GlMagnificationFilter } from './enum/GlMagnificationFIlter';
 import { GlFormat } from './enum/GlFormat';
 import { GlTextureDataType } from './enum/GlTextureDataType';
+import { GlBlendEquation, GlBlendEquationResolver } from './enum/GlBlendEquation';
 
 export class Gl {
 
@@ -94,62 +95,105 @@ export class Gl {
     }
 
     public static isFaceCulling(): boolean {
-        return Gl.context.isEnabled(Gl.context.CULL_FACE);
+        return Gl.gl.isEnabled(Gl.gl.CULL_FACE);
     }
 
     public static setEnableCullFace(enable: boolean): void {
         if (enable) {
-            Gl.context.enable(Gl.context.CULL_FACE);
+            Gl.gl.enable(Gl.gl.CULL_FACE);
         } else {
-            Gl.context.disable(Gl.context.CULL_FACE);
+            Gl.gl.disable(Gl.gl.CULL_FACE);
         }
     }
 
     public static getCullFace(): GlCullFace {
-        return GlCullFaceResolver.glToEnum(Gl.context.getParameter(Gl.context.CULL_FACE_MODE));
+        return GlCullFaceResolver.glToEnum(Gl.gl.getParameter(Gl.gl.CULL_FACE_MODE));
     }
 
     public static setCullFace(cullFace: GlCullFace): void {
         const glCullFace = GlCullFaceResolver.enumToGl(cullFace);
-        Gl.context.cullFace(glCullFace);
+        Gl.gl.cullFace(glCullFace);
     }
 
     public static isAlphaBlend(): boolean {
-        return Gl.context.isEnabled(Gl.context.BLEND);
+        return Gl.gl.isEnabled(Gl.gl.BLEND);
     }
 
     public static setEnableBlend(enable: boolean): void {
         if (enable) {
-            Gl.context.enable(Gl.context.BLEND);
+            Gl.gl.enable(Gl.gl.BLEND);
         } else {
-            Gl.context.disable(Gl.context.BLEND);
+            Gl.gl.disable(Gl.gl.BLEND);
         }
     }
 
-    public static getBlendSourceFactor(): GlBlendFunc {
-        return GlBlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_SRC_ALPHA));
+    public static getBlendRgbSource(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_SRC_RGB));
     }
 
-    public static getBlendDestinationFactor(): GlBlendFunc {
-        return GlBlendFuncResolver.glToEnum(Gl.context.getParameter(Gl.context.BLEND_DST_ALPHA));
+    public static getBlendRgbDestination(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_DST_RGB));
     }
 
-    public static setBlendFunc(sFactor: GlBlendFunc, dFactor: GlBlendFunc): void {
-        const glSFactor = GlBlendFuncResolver.enumToGl(sFactor);
-        const glDFactor = GlBlendFuncResolver.enumToGl(dFactor);
-        Gl.context.blendFunc(glSFactor, glDFactor);
+    public static getBlendAlphaSource(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_SRC_ALPHA));
+    }
+
+    public static getBlendAlphaDestination(): GlBlendFunc {
+        return GlBlendFuncResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_DST_ALPHA));
+    }
+
+    public static setBlendFunc(source: GlBlendFunc, destination: GlBlendFunc): void {
+        const glSFactor = GlBlendFuncResolver.enumToGl(source);
+        const glDFactor = GlBlendFuncResolver.enumToGl(destination);
+        Gl.gl.blendFunc(glSFactor, glDFactor);
+    }
+
+    public static setBlendFuncSeparate(rgbSource: GlBlendFunc, rgbDestination: GlBlendFunc, alphaSource: GlBlendFunc, alphaDestination: GlBlendFunc): void {
+        const glRgbSource = GlBlendFuncResolver.enumToGl(rgbSource);
+        const glRgbDestination = GlBlendFuncResolver.enumToGl(rgbDestination);
+        const glAlphaSource = GlBlendFuncResolver.enumToGl(alphaSource);
+        const glAlphaDestination = GlBlendFuncResolver.enumToGl(alphaDestination);
+        Gl.gl.blendFuncSeparate(glRgbSource, glRgbDestination, glAlphaSource, glAlphaDestination);
+    }
+
+    public static getRgbBlendEquation(): GlBlendEquation {
+        return GlBlendEquationResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_EQUATION_RGB));
+    }
+
+    public static getAlphaBlendEquation(): GlBlendEquation {
+        return GlBlendEquationResolver.glToEnum(Gl.gl.getParameter(Gl.gl.BLEND_EQUATION_ALPHA));
+    }
+
+    public static setBlendEquation(blendEquation: GlBlendEquation): void {
+        const glBlendEquation = GlBlendEquationResolver.enumToGl(blendEquation);
+        Gl.gl.blendEquation(glBlendEquation);
+    }
+
+    public static setBlendEquationSeparate(rgbBlendEquation: GlBlendEquation, alphaBlendEquation: GlBlendEquation): void {
+        const glRgbBlendEquation = GlBlendEquationResolver.enumToGl(rgbBlendEquation);
+        const glAlphaBlendEquation = GlBlendEquationResolver.enumToGl(alphaBlendEquation);
+        Gl.gl.blendEquationSeparate(glRgbBlendEquation, glAlphaBlendEquation);
     }
 
     public static isDepthTest(): boolean {
-        return Gl.context.isEnabled(Gl.context.DEPTH_TEST);
+        return Gl.gl.isEnabled(Gl.gl.DEPTH_TEST);
     }
 
     public static setEnableDepthTest(enable: boolean): void {
         if (enable) {
-            Gl.context.enable(Gl.context.DEPTH_TEST);
+            Gl.gl.enable(Gl.gl.DEPTH_TEST);
         } else {
-            Gl.context.disable(Gl.context.DEPTH_TEST);
+            Gl.gl.disable(Gl.gl.DEPTH_TEST);
         }
+    }
+
+    public static isDepthWrite(): boolean {
+        return Gl.gl.getParameter(Gl.gl.DEPTH_WRITEMASK);
+    }
+
+    public static setDepthWrite(enable: boolean): void {
+        Gl.gl.depthMask(enable);
     }
 
     public static getViewportSize(): ReadonlyVec2 {

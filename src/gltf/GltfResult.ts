@@ -73,7 +73,7 @@ export class GltfResult {
         return this.lightComponents.values();
     }
 
-    public getMesheComponents(): IterableIterator<[RenderableComponent<IMesh>, GltfMesh, GltfPrimitive]> {
+    public getMeshComponents(): IterableIterator<[RenderableComponent<IMesh>, GltfMesh, GltfPrimitive]> {
         return this.meshComponents.values();
     }
 

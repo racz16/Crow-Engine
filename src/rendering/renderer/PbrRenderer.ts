@@ -57,19 +57,33 @@ export class PbrRenderer extends GeometryRenderer {
         for (let i = 0; i < splits.length; i++) {
             this.shader.getNativeShaderProgram().loadFloat(`splits[${i}]`, splits[i]);
         }
-
-        const fbo = Engine.getRenderingPipeline().getGeometryFbo();
-        fbo.setDrawBuffers(
-            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
-            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
-            fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
-        );
+        this.shader.getNativeShaderProgram().loadBoolean('opaque', this.opaque);
+        if (this.opaque) {
+            const fbo = Engine.getRenderingPipeline().getGeometryFbo();
+            fbo.setDrawBuffers(
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0),
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 1),
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 2)
+            );
+        } else {
+            const fbo = Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DUAL_DEPTH_FBO);
+            fbo.setDrawBuffers(
+                null,
+                null,
+                null,
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 3),
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 4),
+                fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 5)
+            );
+        }
     }
 
     protected afterRendering(): void {
         super.afterRendering();
         const fbo = Engine.getRenderingPipeline().getGeometryFbo();
-        fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        if (this.opaque) {
+            fbo.setDrawBuffers(fbo.getAttachmentContainer(GlFboAttachmentSlot.COLOR, 0));
+        }
     }
 
     protected drawPredicate(renderableComponent: IRenderableComponent<IRenderable>): boolean {

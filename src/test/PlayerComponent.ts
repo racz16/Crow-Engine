@@ -4,6 +4,7 @@ import { Engine } from '../core/Engine';
 import { RotationBuilder } from '../utility/RotationBuilder';
 import { Axis } from '../utility/Axis';
 import { PbrLightsStruct } from '../component/light/pbr/PbrLightsStruct';
+import { RenderingPipeline } from '../rendering/RenderingPipeline';
 
 export class PlayerComponent extends Component {
 
@@ -74,7 +75,11 @@ export class PlayerComponent extends Component {
             const rotation = RotationBuilder.createRotation(Axis.X, rotateSpeed * 0.5 * deltaTime).getQuaternion();
             lightTransform.rotate(rotation);
         }
-
+        for (let i = 1; i < 10; i++) {
+            if (this.includes(`Digit${i}`)) {
+                Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.DUAL_DEPTH_PEEL_PASS_COUNT, i);
+            }
+        }
     }
 
 }

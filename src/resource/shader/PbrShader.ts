@@ -20,6 +20,7 @@ import { GlMinificationFilter } from '../../webgl/enum/GlMinificationFilter';
 import { GlMagnificationFilter } from '../../webgl/enum/GlMagnificationFIlter';
 import { OcclusionSlotHelper } from './slotHelper/OcclusionSlotHelper';
 import { Conventions } from '../Conventions';
+import { GlTextureUnit } from '../../webgl/GlTextureUnit';
 
 export class PbrShader extends Shader {
 
@@ -57,6 +58,10 @@ export class PbrShader extends Shader {
         for (const helper of this.slotHelpers) {
             helper.loadSlot(material);
         }
+        if (!this.opaque) {
+            this.getShaderProgram().loadTexture(new GlTextureUnit(10), Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DUAL_DEPTH) as GlTexture2D);
+            this.getShaderProgram().loadTexture(new GlTextureUnit(11), Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.FRONT) as GlTexture2D);
+        }
         this.pbrIblHelper.loadIblMaps();
         this.getShaderProgram().loadInt('shadowLightIndex', PbrLightsStruct.getInstance().getShadowLightIndex());
         this.getShaderProgram().loadBoolean('receiveShadow', renderableComponent.isReceiveShadows());
@@ -80,6 +85,10 @@ export class PbrShader extends Shader {
         }
         this.loadTexture2DArray(shadowMap, Conventions.TU_SHADOW);
         this.getShaderProgram().connectTextureUnit('shadowMap', Conventions.TU_SHADOW);
+        if (!this.opaque) {
+            this.getShaderProgram().connectTextureUnit('dualDepth', new GlTextureUnit(10));
+            this.getShaderProgram().connectTextureUnit('front', new GlTextureUnit(11));
+        }
     }
 
     protected getVertexShaderPath(): string {

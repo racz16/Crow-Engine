@@ -55,6 +55,7 @@ vec3 calculateAtmosphericScattering(vec3 rayDirection, vec3 rayStartPosition, ve
                                     float planetRadius, float atmosphereRadius, vec3 rayleighProfile, float mieProfile, 
                                     float rayleighScaleHeight, float mieScaleHeight, float g) {
 
+    float maxFloat = intBitsToFloat(2139095039);
     float cameraAtmosphereDistance = calculateraySphereIntersectionDistance(rayStartPosition, rayDirection, atmosphereRadius);  //distance between the camera and the end of the atmosphere
     float primaryStepDistance = cameraAtmosphereDistance / float(primaryStepCount);
     float primaryDistanceSum = 0.0;
@@ -65,8 +66,8 @@ vec3 calculateAtmosphericScattering(vec3 rayDirection, vec3 rayStartPosition, ve
     for (int i = 0; i < primaryStepCount; i++) {
         vec3 primarySamplePosition = rayStartPosition + rayDirection * (primaryDistanceSum + primaryStepDistance * 0.5);
         float primaryHeight = length(primarySamplePosition) - planetRadius;
-        float primaryRayleighOpticalDepth = exp(-primaryHeight / rayleighScaleHeight) * primaryStepDistance;
-        float primaryMieOpticalDepth = exp(-primaryHeight / mieScaleHeight) * primaryStepDistance;
+        float primaryRayleighOpticalDepth = min(maxFloat, exp(-primaryHeight / rayleighScaleHeight) * primaryStepDistance);
+        float primaryMieOpticalDepth = min(maxFloat, exp(-primaryHeight / mieScaleHeight) * primaryStepDistance);
         primaryRayleighOpticalDepthSum += primaryRayleighOpticalDepth;
         primaryMieOpticalDepthSum += primaryMieOpticalDepth;
 

@@ -67,7 +67,7 @@ export class GlFbo extends GlObject {
             Gl.gl.readBuffer(Gl.gl.NONE);
         } else {
             this.readBuffer = fac;
-            Gl.gl.readBuffer(Gl.gl.COLOR_ATTACHMENT0 + fac.getIndex());
+            Gl.gl.readBuffer(GlAttachmentSlotResolver.enumToGl(fac.getSlot()).getAttachmentPointCode() + fac.getIndex());
         }
     }
 
