@@ -13,6 +13,6 @@ void main(){
     if(isThereCubeMap){
         o_color = texture(cubeMap, io_textureCoordinates);
     }else{
-        o_color = vec4(pow(vec3(0.5f), vec3(2.2f)), 1.0f);
+        o_color = vec4(pow(vec3(0.5), vec3(2.2)), 1.0);
     }
 }

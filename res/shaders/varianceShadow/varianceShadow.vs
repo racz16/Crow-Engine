@@ -10,7 +10,7 @@ out vec2 io_textureCoordinates_1;
 uniform mat4 projectionViewModelMatrix;
 
 void main(){
-    gl_Position = projectionViewModelMatrix * vec4(i_positiom, 1.0f);
+    gl_Position = projectionViewModelMatrix * vec4(i_positiom, 1.0);
     io_textureCoordinates_0 = i_textureCoordinates_0;
     io_textureCoordinates_1 = i_textureCoordinates_1;
 }

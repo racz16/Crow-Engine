@@ -10,6 +10,6 @@ out vec4 o_color;
 
 void main(){
     vec3 color = texture(image, io_textureCoordinates).rgb;
-    color = pow(color, vec3(1.0f / 2.2f));
-    o_color = vec4(color, 1.0f);
+    color = pow(color, vec3(1.0 / 2.2));
+    o_color = vec4(color, 1.0);
 }

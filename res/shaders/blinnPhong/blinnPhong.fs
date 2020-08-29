@@ -136,20 +136,20 @@ vec3 calculateLight(vec3 materialDiffuseColor, vec4 materialSpecularColor, vec3 
     vec3 diffuse = calculateDiffuseColor(materialDiffuseColor, light.diffuse, normalVector, lightDirection);
     vec3 specular = calculateSpecularColor(materialSpecularColor, light.specular, normalVector, lightToFragmentDirection, viewDirection);
     vec3 ambient = calculateAmbientColor(materialDiffuseColor, light.ambient);
-    float attenuation = light.type == DIRECTIONAL_LIGHT ? 1.0f : calculateAttenuation(fragmentPosition, light.position, light.attenuation);
-    float cutOff = light.type == SPOT_LIGHT ? calculateCutOff(lightToFragmentDirection, lightDirection, light.cutOff) : 1.0f;
+    float attenuation = light.type == DIRECTIONAL_LIGHT ? 1.0 : calculateAttenuation(fragmentPosition, light.position, light.attenuation);
+    float cutOff = light.type == SPOT_LIGHT ? calculateCutOff(lightToFragmentDirection, lightDirection, light.cutOff) : 1.0;
     return (ambient + diffuse * shadow + specular * shadow) * attenuation * cutOff;
 }
 
 vec3 calculateDiffuseColor(vec3 materialDiffuseColor, vec3 lightDiffuseColor, vec3 normalVector, vec3 lightDirection){
-    float diffuseStrength = max(dot(normalVector, -lightDirection), 0.0f);
+    float diffuseStrength = max(dot(normalVector, -lightDirection), 0.0);
     vec3 diffuse = lightDiffuseColor * diffuseStrength * materialDiffuseColor;
     return diffuse;
 }
 
 vec3 calculateSpecularColor(vec4 materialSpecularColor, vec3 lightSpecularColor, vec3 normalVector, vec3 lightToFragmentDirection, vec3 viewDirection){
     vec3 halfwayDirection = normalize(-lightToFragmentDirection + viewDirection);  
-    float specularStrength = pow(max(dot(normalVector, halfwayDirection), 0.0f), materialSpecularColor.a);
+    float specularStrength = pow(max(dot(normalVector, halfwayDirection), 0.0), materialSpecularColor.a);
     return lightSpecularColor * specularStrength * materialSpecularColor.rgb;
 }
 
@@ -159,38 +159,38 @@ vec3 calculateAmbientColor(vec3 materialDiffuseColor, vec3 lightAmbientColor){
 
 float calculateAttenuation(vec3 fragmentPosition, vec3 lightPosition, vec3 lightAttenuation){
     float lightFragmentDistance = length(lightPosition - fragmentPosition);
-    return 1.0f / (lightAttenuation.x + lightAttenuation.y * lightFragmentDistance + lightAttenuation.z * (lightFragmentDistance * lightFragmentDistance));    
+    return 1.0 / (lightAttenuation.x + lightAttenuation.y * lightFragmentDistance + lightAttenuation.z * (lightFragmentDistance * lightFragmentDistance));    
 }
 
 float calculateCutOff(vec3 lightToFragmentDirection, vec3 lightDirection, vec2 lightCutOff){
     float theta = dot(-lightToFragmentDirection, -lightDirection); 
     float epsilon = lightCutOff.x - lightCutOff.y;
-    return clamp((theta - lightCutOff.y) / epsilon, 0.0f, 1.0f);
+    return clamp((theta - lightCutOff.y) / epsilon, 0.0, 1.0);
 }
 
 float calculateShadowOld(vec3 N, vec3 L) {
     if(!receiveShadow){
-        return 1.0f;
+        return 1.0;
     }
-    vec2 texelSize = vec2(1.0f / vec2(textureSize(shadowMap, 0)));
+    vec2 texelSize = vec2(1.0 / vec2(textureSize(shadowMap, 0)));
     vec3 projectionCoordinates = io_fragmentPositionLightSpace[0].xyz / io_fragmentPositionLightSpace[0].w;
-    projectionCoordinates = projectionCoordinates * 0.5f + 0.5f;
+    projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
     float currentDepth = projectionCoordinates.z;
 
-    float maxOffset = 0.0002f;
+    float maxOffset = 0.0002;
     float minOffset = 0.000001;
-    float offsetMod = 1.0f - clamp(dot(N, L), 0.0f, 1.0f);
+    float offsetMod = 1.0 - clamp(dot(N, L), 0.0, 1.0);
     float bias = minOffset + maxOffset * offsetMod;
 
-    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0f : 1.0f;
-    float shadow = 0.0f;
+    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0 : 1.0;
+    float shadow = 0.0;
     for(int x = -1; x <= 1; ++x){
         for(int y = -1; y <= 1; ++y){
-            float pcfDepth = texture(shadowMap, vec3(projectionCoordinates.xy + vec2(x, y) * texelSize, 0)).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 0.3f : 1.0f;        
+            float pcfDepth = texture(shadowMap, vec3(projectionCoordinates.xy + vec2(x, y) * texelSize, 0.0)).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 0.3 : 1.0;        
         }    
     }
-    shadow /= 9.0f;
+    shadow /= 9.0;
     return shadow;
 }
 
@@ -205,7 +205,7 @@ float calculateShadow(vec3 N, vec3 L) {
 
 float calculateShadowInCascade(vec3 N, vec3 L, int cascade){
     if(!receiveShadow){
-        return 1.0f;
+        return 1.0;
     }
     vec3 projectionCoordinates = io_fragmentPositionLightSpace[cascade].xyz / io_fragmentPositionLightSpace[cascade].w;
     projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -218,13 +218,13 @@ float calculateShadowInCascade(vec3 N, vec3 L, int cascade){
 	variance = max(variance, 0.00002);
 	float d = currentDepth - moments.x;
 	float pMax = variance / (variance + d * d);
-    return smoothstep(0.1f, 1.0f, pMax);
+    return smoothstep(0.1, 1.0, pMax);
 }
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
-    float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
-    float layerHeight = 1.0f / numLayers;
-    float curLayerHeight = 0.0f;
+    float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), tangentViewDirection)));
+    float layerHeight = 1.0 / numLayers;
+    float curLayerHeight = 0.0;
     vec2 dtex = material.POMScale * tangentViewDirection.xy / numLayers;
     vec2 currentTextureCoords = textureCoordinates;
     float heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
@@ -237,9 +237,9 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float nextH	= heightFromTexture - curLayerHeight;
     float prevH	= texture(material.normalMap, prevTCoords).a - curLayerHeight + layerHeight;
     float weight = nextH / (nextH - prevH);
-    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0f - weight);
+    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0 - weight);
     
-    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0f || finalTexCoords.x < 0.0f || finalTexCoords.y < 0.0f){
+    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0 || finalTexCoords.x < 0.0 || finalTexCoords.y < 0.0){
         discard;
     }
     return finalTexCoords;
@@ -250,7 +250,7 @@ vec4 getDiffuse(vec2 textureCoordinates, vec3 viewDirection, vec3 normalVector){
     if(material.isThereDiffuseMap){
         diffuse = texture(material.diffuseMap, textureCoordinates * material.diffuseMapTile + material.diffuseMapOffset);
     }else{
-        diffuse = vec4(pow(material.diffuseColor, vec3(2.2f)), 1.0f);
+        diffuse = vec4(pow(material.diffuseColor, vec3(2.2)), 1.0);
     }
     vec3 reflectionColor;
     if(material.isThereReflectionMap){
@@ -282,14 +282,14 @@ vec3 getIntensity(vec2 textureCoordinates){
         intensity = material.environmentIntensityColor;
     }
     if(!material.isThereReflectionMap){
-        intensity.g = 0.0f;
+        intensity.g = 0.0;
     }
     if(!material.isThereRefractionMap){
-        intensity.b = 0.0f;
+        intensity.b = 0.0;
     }
     sum = intensity.r + intensity.g + intensity.b;
-    if(sum == 0.0f){
-        return vec3(1.0f, 0.0f, 0.0f);
+    if(sum == 0.0){
+        return vec3(1.0, 0.0, 0.0);
     }else{
         intensity /= sum;
         return intensity;
@@ -306,14 +306,14 @@ vec4 getSpecularColor(vec2 textureCoordinates){
     }else{
         ret = material.specularColor;
     }
-    ret.a *= 255.0f;
+    ret.a *= 255.0;
     return ret;
 }
 
 vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
         vec3 normal = texture(material.normalMap, textureCoordinates * material.normalMapTile + material.normalMapOffset).rgb;
-        normal = normalize(normal * 2.0f - 1.0f);
+        normal = normalize(normal * 2.0 - 1.0);
         normal = normalize(io_TBN * normal);
         return normal;
     }else{
@@ -325,7 +325,7 @@ vec3 getEmissiveColor(vec2 textureCoordinates){
     if(material.isThereEmissiveMap){
         return texture(material.emissiveMap, textureCoordinates * material.emissiveMapOffset + material.emissiveMapOffset).rgb;
     }else{
-        return pow(material.emissiveColor, vec3(2.2f));
+        return pow(material.emissiveColor, vec3(2.2));
     }
 }
 

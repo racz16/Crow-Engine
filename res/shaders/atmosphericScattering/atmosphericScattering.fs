@@ -59,11 +59,11 @@ vec3 calculateAtmosphericScattering(vec3 rayDirection, vec3 rayStartPosition, ve
     float cameraAtmosphereDistance = calculateraySphereIntersectionDistance(rayStartPosition, rayDirection, atmosphereRadius);  //distance between the camera and the end of the atmosphere
     float primaryStepDistance = cameraAtmosphereDistance / float(primaryStepCount);
     float primaryDistanceSum = 0.0;
-    vec3 rayleighScattering = vec3(0,0,0);
-    vec3 mieScattering = vec3(0,0,0);
+    vec3 rayleighScattering = vec3(0.0);
+    vec3 mieScattering = vec3(0.0);
     float primaryRayleighOpticalDepthSum = 0.0;
     float primaryMieOpticalDepthSum = 0.0;
-    for (int i = 0; i < primaryStepCount; i++) {
+    for (int i=0; i < primaryStepCount; i++) {
         vec3 primarySamplePosition = rayStartPosition + rayDirection * (primaryDistanceSum + primaryStepDistance * 0.5);
         float primaryHeight = length(primarySamplePosition) - planetRadius;
         float primaryRayleighOpticalDepth = min(maxFloat, exp(-primaryHeight / rayleighScaleHeight) * primaryStepDistance);
@@ -75,7 +75,7 @@ vec3 calculateAtmosphericScattering(vec3 rayDirection, vec3 rayStartPosition, ve
         float secondaryDistanceSum = 0.0;
         float secondaryRayleighOpticalDepthSum = 0.0;
         float secondaryMieOpticalDepthSum = 0.0;
-        for (int j = 0; j < secondaryStepCount; j++) {
+        for (int j=0; j < secondaryStepCount; j++) {
             vec3 secondarySamplePosition = primarySamplePosition + inverseLightDirection * (secondaryDistanceSum + secondaryStepDistance * 0.5);
             float secondaryHeight = length(secondarySamplePosition) - planetRadius;
             secondaryRayleighOpticalDepthSum += exp(-secondaryHeight / rayleighScaleHeight) * secondaryStepDistance;
@@ -97,12 +97,12 @@ vec3 calculateAtmosphericScattering(vec3 rayDirection, vec3 rayStartPosition, ve
 
 void main(){
     vec3 viewDirection = calculateDirection();
-    vec3 cameraPosition = vec3(0, 1 ,0);
+    vec3 cameraPosition = vec3(0.0, 1.0 ,0.0);
     float planetRadius = 6372e3;
 
     vec3 color = calculateAtmosphericScattering(
         viewDirection,                                  // normalized ray direction
-        vec3(0, planetRadius, 0) + cameraPosition,      // ray origin
+        vec3(0.0, planetRadius, 0.0) + cameraPosition,      // ray origin
         -u_lightDirection,                              // position of the sun
         22.0,                                           // intensity of the sun
         planetRadius,                                   // radius of the planet in meters
@@ -115,7 +115,7 @@ void main(){
     );
 
     if(dot(-u_lightDirection, viewDirection) >= 0.9999) {
-        o_godray_occlusion = vec4(color, 1);
+        o_godray_occlusion = vec4(color, 1.0);
         color *= 2.0;
     }
     o_color = vec4(color, 1.0);

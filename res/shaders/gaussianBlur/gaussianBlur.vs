@@ -7,5 +7,5 @@ out vec2 io_textureCoordinates;
 
 void main(){
     io_textureCoordinates = i_textureCoordinates;
-    gl_Position = vec4(i_position, 1.0f);
+    gl_Position = vec4(i_position, 1.0);
 }

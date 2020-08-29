@@ -129,7 +129,7 @@ void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission
 vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow);
 vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V);
 float calculateDistributionGGX(DotInfo dotInfo, float roughness);
-float calculateGeometrySchlickGGX(DotInfo dotInfo, float roughness);
+float calculateGeometrySchlickGGX(float dot, float roughness);
 float calculateGeometrySmith(DotInfo dotInfo, float roughness);
 vec3 calculateFresnelSchlick(DotInfo dotInfo, vec3 F0);
 float calculatePointAttenuation(float range, float distance);
@@ -158,8 +158,8 @@ void main(){
         vec3 godrayOcclusion, emission;
         calculateColor(color, godrayOcclusion, emission);
         o_color = color;
-        o_godrayOcclusion = vec4(godrayOcclusion, 0);
-        o_emission = vec4(emission, 1);
+        o_godrayOcclusion = vec4(godrayOcclusion, 0.0);
+        o_emission = vec4(emission, 1.0);
     } else {
         dualDepthPeel();
     }
@@ -210,7 +210,7 @@ void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission
     MaterialInfo materialInfo = createMaterialInfo(textureCoordinates_0, textureCoordinates_1);
     float shadow = calculateShadow();
 
-    vec3 result = vec3(0.0f);
+    vec3 result = vec3(0.0);
     for(int i=0; i<LIGHT_COUNT; i++){
         if(lights[i].lightActive){
             result += calculateLight(i, materialInfo, fragmentPosition, V, N, shadow);
@@ -224,18 +224,18 @@ void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission
     result = mix(result, result * vec3(materialInfo.occlusion), material.occlusionStrength);
     result += materialInfo.emissiveColor;
     color = vec4(result, materialInfo.alpha);
-    godrayOcclusion = vec3(0);
+    godrayOcclusion = vec3(0.0);
     emission = materialInfo.emissiveColor;
 
     /*shadow cascade debug
     float depth = gl_FragCoord.z;
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(1, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1);
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 1, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1);
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 0.2, 1), vec3(depth <= splits[1] && depth >= splits[0])), 1);
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(1.0, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1.0);
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 1.0, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1.0);
+    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 0.2, 1.0), vec3(depth <= splits[1] && depth >= splits[0])), 1.0);
     */
     
-    //o_color = vec4(vec3(materialInfo.alpha).rgb, 1);
-    //o_color = vec4(result.xyz * vec3(0) + vec3(1) * vec3(shadow), 1);
+    //o_color = vec4(vec3(materialInfo.alpha).rgb, 1.0);
+    //o_color = vec4(result.xyz * vec3(0.0) + vec3(1.0) * vec3(shadow), 1.0);
 }
 
 vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosition, vec3 V, vec3 N, float shadow){
@@ -244,8 +244,8 @@ vec3 calculateLight(int lightIndex, MaterialInfo materialInfo, vec3 fragmentPosi
     vec3 fragmentToLightVector = light.type == DIRECTIONAL_LIGHT ? -light.direction : light.position - fragmentPosition;
     vec3 L = normalize(fragmentToLightVector);
     float lightDistance = length(fragmentToLightVector);
-    float pointAttenuation = light.type == DIRECTIONAL_LIGHT ? 1.0f : calculatePointAttenuation(light.range, lightDistance);
-    float spotAttenuation = light.type != SPOT_LIGHT ? 1.0f : calculateSpotAttenuation(light.direction, L, light.cutOff.x, light.cutOff.y);
+    float pointAttenuation = light.type == DIRECTIONAL_LIGHT ? 1.0 : calculatePointAttenuation(light.range, lightDistance);
+    float spotAttenuation = light.type != SPOT_LIGHT ? 1.0 : calculateSpotAttenuation(light.direction, L, light.cutOff.x, light.cutOff.y);
     vec3 shade = calculateShading(materialInfo, L, N, V);
     return pointAttenuation * spotAttenuation * light.intensity * light.color * shade * shadow;
 }
@@ -257,11 +257,9 @@ vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V){
     float D = calculateDistributionGGX(dotInfo, materialInfo.roughness);
     float G = calculateGeometrySmith(dotInfo, materialInfo.roughness);
 
-    vec3 nominator = D * G * F;
-    float denominator = 4.0f * dotInfo.NdotV * dotInfo.NdotL;
-    vec3 specular = nominator / max(denominator, 0.001f);
+    vec3 specular = D * G * F / 4.0;
 
-    vec3 diffuseFactor = (vec3(1.0f) - F) * (1.0f - materialInfo.metalness);
+    vec3 diffuseFactor = (vec3(1.0) - F) * (1.0 - materialInfo.metalness);
     vec3 diffuse = diffuseFactor * materialInfo.baseColor / PI;
 
     return (diffuse + specular) * dotInfo.NdotL;
@@ -273,34 +271,32 @@ float calculateDistributionGGX(DotInfo dotInfo, float roughness){
     float NdotH_2 = dotInfo.NdotH * dotInfo.NdotH;
 
     float nominator = roughnessAlpha_2;
-    float denominator = (NdotH_2 * (roughnessAlpha_2 - 1.0f) + 1.0f);
+    float denominator = (NdotH_2 * (roughnessAlpha_2 - 1.0) + 1.0);
     denominator = PI * denominator * denominator;
 
-    return nominator / max(denominator, 0.001f);
+    return nominator / max(denominator, 0.001);
 }
 
-float calculateGeometrySchlickGGX(DotInfo dotInfo, float roughness){
-    float r = (roughness + 1.0f);
-    float k = (r * r) / 8.0f;
+float calculateGeometrySchlickGGX(float dot, float roughness){
+    float r = (roughness + 1.0);
+    float k = (r * r) / 8.0;
 
-    float nominator   = dotInfo.NdotV;
-    float denominator = dotInfo.NdotV * (1.0f - k) + k;
-
-    return nominator / denominator;
+    float denominator = dot * (1.0 - k) + k;
+    return 1.0 / denominator;
 }
 
 float calculateGeometrySmith(DotInfo dotInfo, float roughness){
-    float ggx2 = calculateGeometrySchlickGGX(dotInfo, roughness);
-    float ggx1 = calculateGeometrySchlickGGX(dotInfo, roughness);
+    float ggx2 = calculateGeometrySchlickGGX(dotInfo.NdotV, roughness);
+    float ggx1 = calculateGeometrySchlickGGX(dotInfo.NdotL, roughness);
     return ggx1 * ggx2;
 }
 
 vec3 calculateFresnelSchlick(DotInfo dotInfo, vec3 F0){
-    return F0 + (1.0f - F0) * pow(1.0f - dotInfo.VdotH, 5.0f);
+    return F0 + (1.0 - F0) * pow(1.0 - dotInfo.VdotH, 5.0);
 }
 
 float calculatePointAttenuation(float range, float distance){
-    return max(min(1.0 - pow(distance / range, 4.0f), 1.0f), 0.0f) / pow(distance, 2.0f);
+    return max(min(1.0 - pow(distance / range, 4.0), 1.0), 0.0) / pow(distance, 2.0);
 }
 
 float calculateSpotAttenuation(vec3 lightDirection, vec3 L, float cutoffAngleCos, float outerCutOffAngleCos){
@@ -311,17 +307,17 @@ float calculateSpotAttenuation(vec3 lightDirection, vec3 L, float cutoffAngleCos
         {
             return smoothstep(outerCutOffAngleCos, cutoffAngleCos, realAngleCos);
         }
-        return 1.0f;
+        return 1.0;
     }
-    return 0.0f;
+    return 0.0;
 }
 
 vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
-    float NdotV = max(dot(N, V), 0.0f);
+    float NdotV = max(dot(N, V), 0.0);
     vec3 R = reflect(-V, N);
 
     vec3 F = calculateFresnelSchlickRoughness(materialInfo, NdotV);
-    vec3 diffuseFactor = (1.0f - F) * (1.0f - materialInfo.metalness); 
+    vec3 diffuseFactor = (1.0 - F) * (1.0 - materialInfo.metalness); 
     vec3 irradiance = texture(diffuseIblMap, N).rgb;
     vec3 diffuse = diffuseFactor * irradiance * materialInfo.baseColor;
 
@@ -333,32 +329,32 @@ vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
 }
 
 vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV){
-    return materialInfo.F0 + (max(vec3(1.0f - materialInfo.roughness), materialInfo.F0) - materialInfo.F0) * pow(1.0f - NdotV, 5.0f);
+    return materialInfo.F0 + (max(vec3(1.0 - materialInfo.roughness), materialInfo.F0) - materialInfo.F0) * pow(1.0 - NdotV, 5.0);
 }
 
 float calculateShadowOld(vec3 N, vec3 L) {
     if(!receiveShadow){
-        return 1.0f;
+        return 1.0;
     }
-    vec2 texelSize = vec2(1.0f / vec2(textureSize(shadowMap, 0)));
+    vec2 texelSize = vec2(1.0 / vec2(textureSize(shadowMap, 0)));
     vec3 projectionCoordinates = io_fragmentPositionLightSpace[0].xyz / io_fragmentPositionLightSpace[0].w;
-    projectionCoordinates = projectionCoordinates * 0.5f + 0.5f;
+    projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
     float currentDepth = projectionCoordinates.z;
 
-    float maxOffset = 0.0002f;
+    float maxOffset = 0.0002;
     float minOffset = 0.000001;
-    float offsetMod = 1.0f - clamp(dot(N, L), 0.0f, 1.0f);
+    float offsetMod = 1.0 - clamp(dot(N, L), 0.0, 1.0);
     float bias = minOffset + maxOffset * offsetMod;
 
-    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0f : 1.0f;
-    float shadow = 0.0f;
+    return currentDepth - bias > texture(shadowMap, vec3(projectionCoordinates.xy, 0)).r ? 0.0 : 1.0;
+    float shadow = 0.0;
     for(int x = -1; x <= 1; ++x){
         for(int y = -1; y <= 1; ++y){
             float pcfDepth = texture(shadowMap, vec3(projectionCoordinates.xy + vec2(x, y) * texelSize, 0)).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 0.3f : 1.0f;        
+            shadow += currentDepth - bias > pcfDepth  ? 0.3 : 1.0;        
         }    
     }
-    shadow /= 9.0f;
+    shadow /= 9.0;
     return shadow;
 }
 
@@ -375,7 +371,7 @@ float calculateShadow() {
 
 float calculateShadowInCascade(int cascade){
     if(!receiveShadow){
-        return 1.0f;
+        return 1.0;
     }
     vec3 projectionCoordinates = io_fragmentPositionLightSpace[cascade].xyz / io_fragmentPositionLightSpace[cascade].w;
     projectionCoordinates = projectionCoordinates * 0.5 + 0.5;
@@ -388,13 +384,13 @@ float calculateShadowInCascade(int cascade){
 	variance = max(variance, 0.00002);
 	float d = currentDepth - moments.x;
 	float pMax = variance / (variance + d * d);
-    return smoothstep(0.5f/*TODO magic number -> uniform*/, 1.0f, pMax);
+    return smoothstep(0.5/*TODO magic number -> uniform*/, 1.0, pMax);
 }
 
 vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
-    float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0, 0, 1), tangentViewDirection)));
-    float layerHeight = 1.0f / numLayers;
-    float curLayerHeight = 0.0f;//mix(0.0f, 1000.0f, material.isTherePOM);//TODO
+    float numLayers = mix(material.POMMaxLayers, material.POMMinLayers, abs(dot(vec3(0.0, 0.0, 1.0), tangentViewDirection)));
+    float layerHeight = 1.0 / numLayers;
+    float curLayerHeight = 0.0;//mix(0.0, 1000.0, material.isTherePOM);//TODO
     vec2 dtex = material.POMScale * tangentViewDirection.xy / numLayers;
     vec2 currentTextureCoords = textureCoordinates;
     float heightFromTexture = texture(material.normalMap, currentTextureCoords).a;
@@ -408,8 +404,8 @@ vec2 parallaxMapping(vec3 tangentViewDirection, vec2 textureCoordinates){
     float nextH	= heightFromTexture - curLayerHeight;
     float prevH	= texture(material.normalMap, prevTCoords).a - curLayerHeight + layerHeight;
     float weight = nextH / (nextH - prevH);
-    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0f - weight);
-    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0f || finalTexCoords.x < 0.0f || finalTexCoords.y < 0.0f){
+    vec2 finalTexCoords = prevTCoords * weight + currentTextureCoords * (1.0 - weight);
+    if(finalTexCoords.x > 1.0 || finalTexCoords.y > 1.0 || finalTexCoords.x < 0.0 || finalTexCoords.y < 0.0){
         discard;
     }
     return finalTexCoords;
@@ -424,8 +420,8 @@ mat3 computeTbn(vec2 textureCoordinates) {
     if(!bool(io_isThereTangent)) {
         vec3 pos_dx = dFdx(io_fragmentPosition);
         vec3 pos_dy = dFdy(io_fragmentPosition);
-        vec3 tex_dx = dFdx(vec3(textureCoordinates, 0.0f));
-        vec3 tex_dy = dFdy(vec3(textureCoordinates, 0.0f));
+        vec3 tex_dx = dFdx(vec3(textureCoordinates, 0.0));
+        vec3 tex_dy = dFdy(vec3(textureCoordinates, 0.0));
         vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
         vec3 ng;
         if(bool(io_isThereNormal)) {
@@ -447,8 +443,8 @@ vec3 getNormalVector(vec2 textureCoordinates){
     if(material.isThereNormalMap){
         mat3 tbn = computeTbn(textureCoordinates);//TODO
         vec3 normal = texture(material.normalMap, textureCoordinates * material.normalMapTile + material.normalMapOffset).rgb;
-        normal = normal * 2.0f - 1.0f;
-        normal *= vec3(material.normalScale, material.normalScale, 1.0f);
+        normal = normal * 2.0 - 1.0;
+        normal *= vec3(material.normalScale, material.normalScale, 1.0);
         normal = normalize(tbn * normal);
         return normal;
     }else{
@@ -457,14 +453,14 @@ vec3 getNormalVector(vec2 textureCoordinates){
 }
 
 void getBaseColorAndAlpha(vec2 textureCoordinates, out vec3 baseColor, out float alpha){
-    vec4 result = vec4(material.baseColor, 1.0f);
+    vec4 result = vec4(material.baseColor, 1.0);
     if(material.isThereBaseColorMap){
         result *= texture(material.baseColorMap, textureCoordinates * material.baseColorMapTile + material.baseColorMapOffset);
     }
     if(isThereVertexColor) {
         result *= vec4(io_vertex_color, 1.0);
     }
-    baseColor = pow(result.rgb, vec3(2.2f));
+    baseColor = pow(result.rgb, vec3(2.2));
     if(alphaMode == ALPHA_MODE_OPAQUE) {
         alpha = 1.0;
     }else if(alphaMode == ALPHA_MODE_MASK) {
@@ -489,7 +485,7 @@ float getOcclusion(vec2 textureCoordinates){
     if(material.isThereOcclusionMap){
         return texture(material.occlusionMap, textureCoordinates * material.occlusionMapTile + material.occlusionMapOffset).r;
     }else{
-        return 1.0f;
+        return 1.0;
     }
 }
 
@@ -498,13 +494,13 @@ vec3 getEmissiveColor(vec2 textureCoordinates){
     if(material.isThereEmissiveMap){
         color *= texture(material.emissiveMap, textureCoordinates * material.emissiveMapTile + material.emissiveMapOffset).rgb;
     }
-    return pow(color, vec3(2.2f));
+    return pow(color, vec3(2.2));
 }
 
 void getTextureCoordinates(out vec2 textureCoordinates_0, out vec2 textureCoordinates_1) {
     textureCoordinates_0 = transformTextureCoordinates(io_textureCoordinates_0);
     if(material.baseColorTextureCoordinate + material.roughnessMetalnessTextureCoordinate + material.occlusionTextureCoordinate + 
-        material.emissiveTextureCoordinate  + material.normalMapTextureCoordinate> 0) {
+        material.emissiveTextureCoordinate  + material.normalMapTextureCoordinate > 0) {
         textureCoordinates_1 = transformTextureCoordinates(io_textureCoordinates_1);
     }
 }

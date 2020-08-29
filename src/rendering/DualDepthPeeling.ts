@@ -70,6 +70,9 @@ export class DualDepthPeeling {
     }
 
     public render(geometryRenderers: RendererContainer<GeometryRenderer>): void {
+        if (!Utility.isUsable(this.blendShader)) {
+            return;
+        }
         this.updateFboAndAttachments();
         this.beforeRender();
 
@@ -120,7 +123,9 @@ export class DualDepthPeeling {
         Gl.clear(true, false, false);
 
         for (const renderer of geometryRenderers.getIterator()) {
-            renderer.render(false);
+            if (Utility.isUsable(renderer) && renderer.isActive()) {
+                renderer.render(false);
+            }
         }
     }
 

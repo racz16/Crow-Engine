@@ -26,13 +26,13 @@ uniform bool useNormalMap;
 uniform mat4[SPLIT_COUNT] shadowProjectionViewMatrices;
 
 void main(){
-    gl_Position = projectionMatrix *  viewMatrix * modelMatrix * vec4(i_position, 1.0f);
-    io_fragmentPosition = vec3(modelMatrix * vec4(i_position, 1.0f));
+    gl_Position = projectionMatrix *  viewMatrix * modelMatrix * vec4(i_position, 1.0);
+    io_fragmentPosition = vec3(modelMatrix * vec4(i_position, 1.0));
     io_normal = normalize(inverseTransposedModelMatrix3x3 * i_normal);
     io_textureCoordinates = i_textureCoordinates;
     io_viewPosition = viewPosition;
     for(int i=0; i<SPLIT_COUNT; i++){
-        io_fragmentPositionLightSpace[i] = shadowProjectionViewMatrices[i] * vec4(io_fragmentPosition, 1.0f);
+        io_fragmentPositionLightSpace[i] = shadowProjectionViewMatrices[i] * vec4(io_fragmentPosition, 1.0);
     }
     if(useNormalMap){
         vec3 tangentColumn = normalize(mat3(modelMatrix) * i_tangent);

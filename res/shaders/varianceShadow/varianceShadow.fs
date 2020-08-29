@@ -42,6 +42,6 @@ void main(){
     float depthSquared = depth * depth;
     float dx = dFdx(depth);
     float dy = dFdy(depth);
-    depthSquared += 0.25f * (dx * dx + dy * dy);
+    depthSquared += 0.25 * (dx * dx + dy * dy);
     o_color = vec4(depth, depthSquared, 0.0, 1.0);
 }
