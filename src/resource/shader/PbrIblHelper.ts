@@ -12,7 +12,7 @@ export class PbrIblHelper {
     private readonly DIFFUSE_IBL_MAP_NAME = 'diffuseIblMap';
     private readonly SPECULAR_IBL_MAP_NAME = 'specularIblMap';
     private readonly BRDF_LUT_MAP_NAME = 'brdfLutMap';
-    private readonly ARE_THERE_IBL_MAPS = 'areThereIblMaps';
+    private readonly USE_IBL = 'useIbl';
     private readonly SPECULAR_IBL_LOD_COUNT = 10;
 
     private shaderProgram: GlShaderProgram;
@@ -25,9 +25,10 @@ export class PbrIblHelper {
 
     public loadIblMaps(): void {
         const renderingPipeline = Engine.getRenderingPipeline();
+        const useIbl = renderingPipeline.getParameters().get(RenderingPipeline.PBR_USE_IBL);
         const diffuseIblMap = renderingPipeline.getParameters().get(RenderingPipeline.PBR_DIFFUSE_IBL_MAP);
         const specularIblMap = renderingPipeline.getParameters().get(RenderingPipeline.PBR_SPECULAR_IBL_MAP);
-        if (this.areIblMapsUsable(diffuseIblMap, specularIblMap)) {
+        if (useIbl && this.areIblMapsUsable(diffuseIblMap, specularIblMap)) {
             this.loadTextures(diffuseIblMap, specularIblMap);
         } else {
             this.loadDefaultTextures();
@@ -45,7 +46,7 @@ export class PbrIblHelper {
         this.shaderProgram.loadTexture(Conventions.TU_SPECULAR_IBL, specularIblMap.getNativeTexture(), specularIblMap.getNativeSampler());
         this.shaderProgram.connectTextureUnit(this.BRDF_LUT_MAP_NAME, Conventions.TU_BRDF_LUT);
         this.shaderProgram.loadTexture(Conventions.TU_BRDF_LUT, this.brdfLut.getNativeTexture(), this.brdfLut.getNativeSampler());
-        this.shaderProgram.loadBoolean(this.ARE_THERE_IBL_MAPS, true);
+        this.shaderProgram.loadBoolean(this.USE_IBL, true);
         this.shaderProgram.loadFloat('specularIblLodCount', this.SPECULAR_IBL_LOD_COUNT);
     }
 
@@ -53,7 +54,7 @@ export class PbrIblHelper {
         this.loadDefaultCubeMapTexture(this.DIFFUSE_IBL_MAP_NAME, Conventions.TU_DIFFUSE_IBL);
         this.loadDefaultCubeMapTexture(this.SPECULAR_IBL_MAP_NAME, Conventions.TU_SPECULAR_IBL);
         this.loadDefaultTexture2D(this.BRDF_LUT_MAP_NAME, Conventions.TU_BRDF_LUT);
-        this.shaderProgram.loadBoolean(this.ARE_THERE_IBL_MAPS, false);
+        this.shaderProgram.loadBoolean(this.USE_IBL, false);
     }
 
     private loadDefaultTexture2D(mapName: string, textureUnit: GlTextureUnit): void {

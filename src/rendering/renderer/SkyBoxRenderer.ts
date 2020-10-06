@@ -1,4 +1,4 @@
-import { SkyBoxShader as SkyboxShader } from '../../resource/shader/SkyboxShader';
+import { SkyBoxShader } from '../../resource/shader/SkyboxShader';
 import { Gl } from '../../webgl/Gl';
 import { GeometryRenderer } from '../GeometryRenderer';
 import { IRenderableComponent } from '../../component/renderable/IRenderableComponent';
@@ -7,11 +7,11 @@ import { Utility } from '../../utility/Utility';
 
 export class SkyboxRenderer extends GeometryRenderer {
 
-    private shader: SkyboxShader;
+    private shader: SkyBoxShader;
 
     public constructor() {
-        super('Skybox Renderer');
-        this.shader = new SkyboxShader();
+        super('SkyBox Renderer');
+        this.shader = new SkyBoxShader();
     }
 
     protected drawPredicate(renderableComponent: IRenderableComponent<IRenderable>): boolean {
@@ -28,7 +28,7 @@ export class SkyboxRenderer extends GeometryRenderer {
         Gl.gl.depthFunc(Gl.gl.LESS);
     }
 
-    public getShader(): SkyboxShader {
+    public getShader(): SkyBoxShader {
         return this.shader;
     }
 

@@ -57,6 +57,7 @@ export class RenderingPipeline implements IRenderingPipeline {
     public static readonly EMISSION = new ParameterKey<ITexture2DArray>('EMISSION');
     public static readonly DUAL_DEPTH_FBO = new ParameterKey<GlFbo>('DUAL_DEPTH_FBO');
     public static readonly DUAL_DEPTH_PEEL_PASS_COUNT = new ParameterKey<number>('DUAL_DEPTH_PEEL_PASS_COUNT');
+    public static readonly PBR_USE_IBL = new ParameterKey<boolean>('PBR_USE_IBL');
 
     private parameters = new ParameterContainer();
     private geometryFbo: GlFbo;
@@ -81,6 +82,7 @@ export class RenderingPipeline implements IRenderingPipeline {
         //this.geometryRenderers.addToTheEnd(new SkyboxRenderer());
         //this.geometryRenderers.addToTheEnd(new BlinnPhongRenderer());
         this.geometryRenderers.addToTheEnd(new PbrRenderer());
+        this.getParameters().set(RenderingPipeline.PBR_USE_IBL, true);
         this.geometryRenderers.addToTheEnd(new AtmosphericScatteringRenderer());
         this.postProcessRenderers.addToTheEnd(new BloomRenderer());
         this.postProcessRenderers.addToTheEnd(new GodrayRenderer());

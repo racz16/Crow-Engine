@@ -35,10 +35,10 @@ export abstract class Renderer {
 
     protected beforeRendering(): void {
         this.getShader().start(this.opaque);
-        this.resetRenderedElementCount();
-        this.resetRenderedFaceCount();
         if (this.opaque) {
             Engine.getRenderingPipeline().bindGeometryFbo();
+            this.resetRenderedElementCount();
+            this.resetRenderedFaceCount();
         } else {
             Engine.getRenderingPipeline().getParameters().get(RenderingPipeline.DUAL_DEPTH_FBO).bind();
         }

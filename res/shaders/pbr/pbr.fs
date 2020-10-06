@@ -53,7 +53,7 @@ struct DotInfo{
 };
 
 struct MaterialInfo{
-    vec3 baseColor;
+    vec3 albedo;
     vec3 emissiveColor;
     vec3 F0;
     float alpha;
@@ -99,7 +99,7 @@ uniform sampler2DArray shadowMap;
 uniform int shadowLightIndex;
 uniform bool receiveShadow;
 uniform float[SPLIT_COUNT + 1] splits;
-uniform bool areThereIblMaps;
+uniform bool useIbl;
 uniform samplerCube diffuseIblMap;
 uniform samplerCube specularIblMap;
 uniform float specularIblLodCount;
@@ -217,7 +217,7 @@ void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission
         }
     }
 
-    if(areThereIblMaps){
+    if(useIbl){
         result += calculateIbl(materialInfo, V, N);
     }
     
@@ -260,7 +260,7 @@ vec3 calculateShading(MaterialInfo materialInfo, vec3 L, vec3 N, vec3 V){
     vec3 specular = D * G * F / 4.0;
 
     vec3 diffuseFactor = (vec3(1.0) - F) * (1.0 - materialInfo.metalness);
-    vec3 diffuse = diffuseFactor * materialInfo.baseColor / PI;
+    vec3 diffuse = diffuseFactor * materialInfo.albedo / PI;
 
     return (diffuse + specular) * dotInfo.NdotL;
 }
@@ -319,13 +319,15 @@ vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
     vec3 F = calculateFresnelSchlickRoughness(materialInfo, NdotV);
     vec3 diffuseFactor = (1.0 - F) * (1.0 - materialInfo.metalness); 
     vec3 irradiance = texture(diffuseIblMap, N).rgb;
-    vec3 diffuse = diffuseFactor * irradiance * materialInfo.baseColor;
+    irradiance = pow(irradiance, vec3(2.2));
+    vec3 diffuse = diffuseFactor * irradiance * materialInfo.albedo;
 
-    vec3 prefilteredColor = textureLod(specularIblMap, R,  materialInfo.roughness * specularIblLodCount).rgb;   
-    vec2 envBRDF = texture(brdfLutMap, vec2(NdotV), materialInfo.roughness).rg;
+    vec3 prefilteredColor = textureLod(specularIblMap, R,  materialInfo.roughness * specularIblLodCount).rgb;
+    prefilteredColor = pow(prefilteredColor, vec3(2.2));
+    vec2 envBRDF = texture(brdfLutMap, vec2(NdotV, materialInfo.roughness)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
-    return diffuse + specular; 
+    return diffuse + specular;
 }
 
 vec3 calculateFresnelSchlickRoughness(MaterialInfo materialInfo, float NdotV){

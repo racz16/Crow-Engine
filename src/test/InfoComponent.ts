@@ -2,6 +2,7 @@ import { Component } from '../component/Component';
 import { Audio } from '../resource/Audio';
 import { Engine } from '../core/Engine';
 import { GlConstants } from '../webgl/GlConstants';
+import { RenderingPipeline } from '../rendering/RenderingPipeline';
 
 export class InfoComponent extends Component {
 
@@ -18,6 +19,8 @@ export class InfoComponent extends Component {
         document.getElementById('compress').onclick = this.toggleFullscreen;
         document.getElementById('vendor').textContent = GlConstants.UNMASKED_VENDOR;
         document.getElementById('renderer').textContent = GlConstants.UNMASKED_RENDERER;
+        (document.getElementById('ibl') as HTMLInputElement).checked = true;
+        document.getElementById('ibl').onclick = this.toggleIbl;
     }
 
     private mute(): void {
@@ -37,6 +40,11 @@ export class InfoComponent extends Component {
         } else {
             document.documentElement.requestFullscreen();
         }
+    }
+
+    private toggleIbl(): void {
+        const useIbl = (document.getElementById('ibl') as HTMLInputElement).checked;
+        Engine.getRenderingPipeline().getParameters().set(RenderingPipeline.PBR_USE_IBL, useIbl);
     }
 
     private unmute(): void {

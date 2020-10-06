@@ -44,7 +44,7 @@ window.onload = async () => {
     await tsb.loadResources();
     tsb.setUpScene();
     tsb.createUi();
-    tsb.createGround();
+
     //await tsb.createDamagedHelmet();
     //tsb.createGoldSphere();
 
@@ -55,11 +55,17 @@ window.onload = async () => {
     //tsb.createDragon();
     //tsb.createBezierSpline();
 
-    //await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1, true);
-    //await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1, true);
-    await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01, true);
-    //await tsb.loadGltfSampleModel('BoomBox', 'glTF', 100, true);
+    tsb.createGround();
+    //await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01);
+    //await tsb.loadGltfSampleModel('DamagedHelmet', 'glTF', 1, 0.9);
+    await tsb.loadGltfSampleModel('FlightHelmet', 'glTF', 10);
+
+
+    //await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1);
+    //await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1);
+    //await tsb.loadGltfSampleModel('BoomBox', 'glTF', 100);
     //await tsb.loadSketchfabModel('toyota_land_cruiser', 0.01, RotationBuilder.createRotation(Axis.X_NEGATE, 90).thenRotate(Axis.Y, 45).getQuaternion(), vec3.fromValues(0, -0.01, 0));
+    //await tsb.loadSketchfabModel('ferrari_enzo', 1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).thenRotate(Axis.Y, 45).getQuaternion(), vec3.fromValues(0, -0.01, 0));
     //await tsb.loadSketchfabModel('akm_47', 0.1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, 2, 0));
     //await tsb.loadSketchfabModel('gold_pharaoh', 1, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -0.1, 0));
     //await tsb.loadSketchfabModel('soviet_t-34_tank', 0.02, RotationBuilder.createRotation(Axis.X_NEGATE, 90).getQuaternion(), vec3.fromValues(0, -2.55, 0));
@@ -140,10 +146,11 @@ export class TestSceneBuilder {
 
     private async createSkybox(): Promise<void> {
         const renderingPipeline = Engine.getRenderingPipeline();
-        const diffuseIblMap = await this.createIblMap('res/textures/pisa/diffuse', 'diffuse', 1);
+        const ibleName = 'doge2';
+        const diffuseIblMap = await this.createIblMap(`res/textures/${ibleName}/diffuse`, 'diffuse', 1);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_DIFFUSE_IBL_MAP, diffuseIblMap);
 
-        const specularIblMap = await this.createIblMap('res/textures/pisa/specular', 'specular', 11);
+        const specularIblMap = await this.createIblMap(`res/textures/${ibleName}/specular`, 'specular', 11);
         renderingPipeline.getParameters().set(RenderingPipeline.PBR_SPECULAR_IBL_MAP, specularIblMap);
         specularIblMap.getNativeTexture().setWrapU(GlWrap.CLAMP_TO_EDGE);
         specularIblMap.getNativeTexture().setWrapV(GlWrap.CLAMP_TO_EDGE);
@@ -198,7 +205,7 @@ export class TestSceneBuilder {
         const meshComponent = new MeshComponent(objLoader.loadMesh(), material);
         go.getComponents().add(meshComponent);
         go.getTransform().setRelativeScale(vec3.fromValues(200, 1, 100));
-        go.getTransform().setRelativePosition(vec3.fromValues(0, .02, 0));
+        //go.getTransform().setRelativePosition(vec3.fromValues(0, .02, 0));
     }
 
     public async createDamagedHelmet(): Promise<void> {
@@ -360,7 +367,7 @@ export class TestSceneBuilder {
         as.start();
     }
 
-    public async loadGltfSampleModel(name: string, type: 'glTF' | 'glTF-Embedded' | 'glTF-Binary', scaleFactor: number, setMainCamera: boolean): Promise<void> {
+    public async loadGltfSampleModel(name: string, type: 'glTF' | 'glTF-Embedded' | 'glTF-Binary', scaleFactor: number, verticalTranslation = 0, setMainCamera = false): Promise<void> {
         const extension = type === 'glTF-Binary' ? 'glb' : 'gltf';
         const loader = await GltfLoader.createLoader(`res/meshes/gltf-samples/${name}/${type}/${name}.${extension}`);
         const result = loader.loadDefaultScene();
@@ -371,8 +378,10 @@ export class TestSceneBuilder {
             }
         }
         for (const [go, _] of result.getGameObjects()) {
-            if (!go.getParent())
+            if (!go.getParent()) {
                 go.getTransform().setRelativeScale(vec3.fromValues(scaleFactor, scaleFactor, scaleFactor));
+                go.getTransform().setRelativePosition(vec3.fromValues(0, verticalTranslation, 0));
+            }
         }
     }
 
