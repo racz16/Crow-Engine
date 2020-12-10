@@ -229,10 +229,10 @@ void calculateColor(out vec4 color, out vec3 godrayOcclusion,  out vec3 emission
 
     /*shadow cascade debug
     float depth = gl_FragCoord.z;
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(1.0, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1.0);
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 1.0, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1.0);
-    o_color = vec4(mix(o_color.rgb, o_color.rgb * vec3(0.2, 0.2, 1.0), vec3(depth <= splits[1] && depth >= splits[0])), 1.0);
-    */
+    color = vec4(mix(color.rgb, color.rgb * vec3(1.0, 0.2, 0.2), vec3(depth <= splits[3] && depth >= splits[2])), 1.0);
+    color = vec4(mix(color.rgb, color.rgb * vec3(0.2, 1.0, 0.2), vec3(depth <= splits[2] && depth >= splits[1])), 1.0);
+    color = vec4(mix(color.rgb, color.rgb * vec3(0.2, 0.2, 1.0), vec3(depth <= splits[1] && depth >= splits[0])), 1.0);*/
+    
     
     //o_color = vec4(vec3(materialInfo.alpha).rgb, 1.0);
     //o_color = vec4(result.xyz * vec3(0.0) + vec3(1.0) * vec3(shadow), 1.0);
@@ -319,11 +319,9 @@ vec3 calculateIbl(MaterialInfo materialInfo, vec3 V, vec3 N){
     vec3 F = calculateFresnelSchlickRoughness(materialInfo, NdotV);
     vec3 diffuseFactor = (1.0 - F) * (1.0 - materialInfo.metalness); 
     vec3 irradiance = texture(diffuseIblMap, N).rgb;
-    irradiance = pow(irradiance, vec3(2.2));
     vec3 diffuse = diffuseFactor * irradiance * materialInfo.albedo;
 
     vec3 prefilteredColor = textureLod(specularIblMap, R,  materialInfo.roughness * specularIblLodCount).rgb;
-    prefilteredColor = pow(prefilteredColor, vec3(2.2));
     vec2 envBRDF = texture(brdfLutMap, vec2(NdotV, materialInfo.roughness)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 

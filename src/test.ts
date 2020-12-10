@@ -55,11 +55,18 @@ window.onload = async () => {
     //tsb.createDragon();
     //tsb.createBezierSpline();
 
-    tsb.createGround();
-    //await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01);
+    //tsb.createGround();
+    await tsb.loadGltfSampleModel('Sponza', 'glTF', 0.01);
     //await tsb.loadGltfSampleModel('DamagedHelmet', 'glTF', 1, 0.9);
-    await tsb.loadGltfSampleModel('FlightHelmet', 'glTF', 10);
+    //await tsb.loadGltfSampleModel('FlightHelmet', 'glTF', 10);
 
+
+    /*const loader = await GltfLoader.createLoader(`res/meshes/test/rhino.glb`);
+    const result = loader.loadDefaultScene();
+    for (const [camera, _] of result.getCameraComponents()) {
+        if (camera.getType() === CameraType.PERSPECTIVE)
+            Engine.setMainCamera(camera);
+    }*/
 
     //await tsb.loadGltfSampleModel('MetalRoughSpheres', 'glTF-Binary', 1);
     //await tsb.loadGltfSampleModel('AlphaBlendModeTest', 'glTF', 1);
@@ -138,7 +145,7 @@ export class TestSceneBuilder {
 
         const rotation = RotationBuilder
             .createRotation(Axis.X, -20)
-            //.thenRotate(Axis.Y, 45)
+            .thenRotate(Axis.Y, 45)
             //.thenRotate(Axis.Z, -45)
             .getQuaternion();
         dlgo.getTransform().setRelativeRotation(rotation);
@@ -380,7 +387,7 @@ export class TestSceneBuilder {
         for (const [go, _] of result.getGameObjects()) {
             if (!go.getParent()) {
                 go.getTransform().setRelativeScale(vec3.fromValues(scaleFactor, scaleFactor, scaleFactor));
-                go.getTransform().setRelativePosition(vec3.fromValues(0, verticalTranslation, 0));
+                //go.getTransform().setRelativePosition(vec3.fromValues(0, verticalTranslation, 0));
             }
         }
     }

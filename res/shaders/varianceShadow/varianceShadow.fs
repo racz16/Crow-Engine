@@ -21,7 +21,7 @@ const int ALPHA_MODE_BLEND = 2;
 
 void discardIfTransparent(){
     if(!isThereTextureMap) {
-        discard;
+        return;
     }
     vec2 textureCoordinates = mix(io_textureCoordinates_0, io_textureCoordinates_1, bvec2(textureCoordinate != 0));
     float alpha = texture(textureMap, textureCoordinates * tile + offset).a;
